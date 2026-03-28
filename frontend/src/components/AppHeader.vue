@@ -44,7 +44,7 @@
             </div>
             <div class="logo-text">
               <h1>{{ lawFirmName }}</h1>
-              <p>客户服务系统</p>
+              <p>Client Service Portal</p>
             </div>
           </div>
 
@@ -131,27 +131,53 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 
 <style scoped>
 .app-header {
-  background: linear-gradient(135deg, #0f2438 0%, #1a3a5c 50%, #2c5282 100%) !important;
+  background:
+    linear-gradient(135deg, rgba(12, 27, 43, 0.98) 0%, rgba(18, 44, 68, 0.96) 44%, rgba(34, 74, 110, 0.94) 100%) !important;
   padding: 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), 0 0 40px rgba(212, 175, 55, 0.05);
+  box-shadow: 0 18px 48px rgba(10, 20, 30, 0.16);
   position: relative;
   z-index: 100;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-  min-height: 90px;
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(196, 160, 92, 0.18);
+  min-height: 94px;
   height: auto;
-  line-height: normal !important; /* 覆盖 Ant Design a-layout-header 的 line-height: 64px */
+  line-height: normal !important;
+  overflow: hidden;
+}
+
+.app-header::before,
+.app-header::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.app-header::before {
+  inset: 0;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(196, 160, 92, 0.12), transparent 24%),
+    radial-gradient(circle at 86% 0%, rgba(98, 137, 173, 0.16), transparent 26%);
+}
+
+.app-header::after {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(196, 160, 92, 0) 0%, rgba(196, 160, 92, 0.5) 50%, rgba(196, 160, 92, 0) 100%);
 }
 
 .header-content {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 32px;
-  min-height: 90px;
+  min-height: 94px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
+  position: relative;
+  z-index: 1;
 }
 
 /* 左侧区域 */
@@ -182,7 +208,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
 }
 
 .logo-icon-wrapper {
@@ -195,21 +221,21 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: transparent;
-  border-radius: 12px;
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border-radius: 16px;
   transition: all 0.3s ease;
-  padding: 4px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
+  padding: 8px;
+  border: 1px solid rgba(196, 160, 92, 0.24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .logo-icon:hover {
-  transform: scale(1.05);
+  transform: translateY(-1px);
   border-color: var(--accent-color);
-  box-shadow: 0 0 12px rgba(212, 175, 55, 0.3);
-  background: rgba(212, 175, 55, 0.05);
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.18);
+  background: linear-gradient(180deg, rgba(196, 160, 92, 0.1), rgba(255, 255, 255, 0.03));
 }
 
 .logo-image {
@@ -223,11 +249,11 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
-  gap: 2px !important;
+  gap: 4px !important;
 }
 
 .logo-text h1 {
-  font-size: 18px !important;
+  font-size: 19px !important;
   font-weight: 600 !important;
   color: #fff !important;
   margin: 0 !important;
@@ -239,10 +265,12 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 
 .logo-text p {
   font-size: 12px !important;
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: rgba(255, 255, 255, 0.72) !important;
   margin: 0 !important;
-  font-weight: 400 !important;
+  font-weight: 500 !important;
   line-height: 1.4 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -257,13 +285,14 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 }
 
 .welcome-text {
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 13px;
   font-weight: 400;
   line-height: 1.5;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  letter-spacing: 0.04em;
 }
 
 /* Detail variant 时的header高度优化 */
@@ -273,7 +302,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 
 .page-title {
   color: #fff;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 600;
   margin: 0;
   line-height: 1.2;
@@ -281,18 +310,23 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 
 /* Header 按钮通用样式 */
 .header-btn {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  padding: 8px;
+  border-radius: 12px;
+  padding: 9px;
+  min-width: 42px;
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .header-btn:hover {
   color: #fff !important;
   background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(196, 160, 92, 0.24);
 }
 
 .back-btn {
@@ -318,7 +352,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 /* 响应式 - 移动端 */
 @media (max-width: 768px) {
   .app-header {
-    min-height: 64px;
+    min-height: 70px;
   }
 
   .app-header.has-welcome {
@@ -327,7 +361,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 
   .header-content {
     padding: 0 16px;
-    min-height: 64px;
+    min-height: 70px;
   }
 
   .logo-section {
@@ -335,16 +369,17 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
   }
 
   .logo-icon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
   }
 
   .logo-text h1 {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .logo-text p {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .title-section {
@@ -378,7 +413,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
 @media (max-width: 480px) {
   .header-content {
     padding: 0 12px;
-    min-height: 64px;
+    min-height: 70px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
@@ -390,6 +425,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName)
   .logo-icon {
     width: 36px;
     height: 36px;
+    padding: 6px;
   }
 
   .logo-text h1 {

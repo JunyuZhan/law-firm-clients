@@ -25,7 +25,7 @@ describe('date utilities', () => {
     it('returns dash for empty date', () => {
       expect(formatDate()).toBe('-')
       expect(formatDate('')).toBe('-')
-      expect(formatDate(null as any)).toBe('-')
+      expect(formatDate(null as unknown as string)).toBe('-')
     })
   })
 

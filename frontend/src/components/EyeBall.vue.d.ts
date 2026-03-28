@@ -1,6 +1,6 @@
 import { DefineComponent } from 'vue'
 
-const EyeBall: DefineComponent<{
+interface EyeBallProps {
   size?: number
   pupilSize?: number
   maxDistance?: number
@@ -9,6 +9,8 @@ const EyeBall: DefineComponent<{
   isBlinking?: boolean
   forceLookX?: number
   forceLookY?: number
-}, any, any, any, any, any>
+}
+
+const EyeBall: DefineComponent<EyeBallProps>
 
 export default EyeBall

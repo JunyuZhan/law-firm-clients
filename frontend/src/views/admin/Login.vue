@@ -1,23 +1,12 @@
 <template>
   <div class="login-page">
-    <!-- 左侧装饰区域 -->
-    <div class="login-left">
-      <div class="left-content">
-        <!-- 装饰几何图形 -->
-        <div class="decorations">
-          <div class="circle circle-1" />
-          <div class="circle circle-2" />
-          <div class="circle circle-3" />
-          <div class="line line-1" />
-          <div class="line line-2" />
-          <div class="dot dot-1" />
-          <div class="dot dot-2" />
-          <div class="dot dot-3" />
-        </div>
-        
-        <!-- Logo 和标题 -->
-        <div class="brand">
-          <div class="logo-wrapper">
+    <div class="login-shell">
+      <section class="login-showcase glass-panel">
+        <div class="showcase-top">
+          <div class="eyebrow">
+            Admin Authentication
+          </div>
+          <div class="brand-lockup">
             <div class="logo">
               <img
                 v-if="appConfigStore.logoUrl"
@@ -37,114 +26,77 @@
                 <path d="M12 12L4 7.5" />
               </svg>
             </div>
+            <div>
+              <h1 class="editorial-title brand-title">
+                {{ appConfigStore.lawFirmName }}
+              </h1>
+              <p class="brand-subtitle">
+                {{ appConfigStore.appSlogan || '客户服务管理系统' }}
+              </p>
+            </div>
           </div>
-          <h1 class="brand-title">
-            {{ appConfigStore.lawFirmName }}
-          </h1>
-          <p class="brand-subtitle">
-            {{ appConfigStore.appSlogan || '客户服务管理系统' }}
+        </div>
+
+        <div class="showcase-copy">
+          <h2 class="editorial-title showcase-title">
+            统一的客户门户，需要同样克制而可靠的后台入口
+          </h2>
+          <p class="showcase-text">
+            管理端负责项目、通知、文件与配置协同，因此登录页不再独立成另一种审美，而是回到同一套产品语言里。
           </p>
         </div>
-        
-        <!-- 特性说明 -->
-        <div class="features">
+
+        <div class="showcase-metrics">
+          <div class="metric-chip">
+            <span>Session</span>
+            <strong>Protected</strong>
+          </div>
+          <div class="metric-chip">
+            <span>Captcha</span>
+            <strong>Enabled</strong>
+          </div>
+          <div class="metric-chip">
+            <span>Workspace</span>
+            <strong>Unified</strong>
+          </div>
+        </div>
+
+        <div class="feature-list">
           <div class="feature-item">
-            <div class="feature-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M9 12l2 2 4-4" />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                />
-              </svg>
-            </div>
-            <div class="feature-text">
-              <h3>安全可靠</h3>
-              <p>企业级数据加密保护</p>
+            <span class="feature-index">01</span>
+            <div>
+              <h3>安全认证</h3>
+              <p>用户名密码、验证码与会话控制共同收敛到统一登录流程。</p>
             </div>
           </div>
           <div class="feature-item">
-            <div class="feature-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle
-                  cx="9"
-                  cy="7"
-                  r="4"
-                />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <div class="feature-text">
-              <h3>高效协作</h3>
-              <p>团队案件协同管理</p>
+            <span class="feature-index">02</span>
+            <div>
+              <h3>运营效率</h3>
+              <p>进入后台后可直接处理项目、通知与系统配置，不必跨系统切换。</p>
             </div>
           </div>
           <div class="feature-item">
-            <div class="feature-icon">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <rect
-                  x="3"
-                  y="4"
-                  width="18"
-                  height="18"
-                  rx="2"
-                  ry="2"
-                />
-                <line
-                  x1="16"
-                  y1="2"
-                  x2="16"
-                  y2="6"
-                />
-                <line
-                  x1="8"
-                  y1="2"
-                  x2="8"
-                  y2="6"
-                />
-                <line
-                  x1="3"
-                  y1="10"
-                  x2="21"
-                  y2="10"
-                />
-              </svg>
-            </div>
-            <div class="feature-text">
-              <h3>智能日程</h3>
-              <p>案件进度实时追踪</p>
+            <span class="feature-index">03</span>
+            <div>
+              <h3>品牌一致</h3>
+              <p>视觉规则与门户、后台 shell 对齐，减少“像三个产品”的割裂感。</p>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- 右侧登录表单 -->
-    <div class="login-right">
-      <div class="login-form-wrapper">
+      </section>
+
+      <section class="login-panel glass-panel">
         <div class="form-header">
-          <h2>欢迎回来</h2>
-          <p>请登录您的账户以继续</p>
+          <div class="eyebrow">
+            Sign In
+          </div>
+          <h2 class="editorial-title">
+            欢迎回来
+          </h2>
+          <p>请使用您的管理员账户继续操作。</p>
         </div>
-        
+
         <a-form
           :model="form"
           :rules="rules"
@@ -163,7 +115,7 @@
               </template>
             </a-input>
           </a-form-item>
-          
+
           <a-form-item name="password">
             <a-input-password
               v-model:value="form.password"
@@ -177,7 +129,7 @@
               </template>
             </a-input-password>
           </a-form-item>
-          
+
           <a-form-item name="captchaText">
             <div class="captcha-row">
               <a-input
@@ -200,7 +152,7 @@
               </div>
             </div>
           </a-form-item>
-          
+
           <a-form-item>
             <a-button
               type="primary"
@@ -210,11 +162,11 @@
               block
               class="login-button"
             >
-              登录
+              登录后台
             </a-button>
           </a-form-item>
         </a-form>
-        
+
         <a-alert
           v-if="errorMessage"
           :message="errorMessage"
@@ -222,7 +174,7 @@
           show-icon
           class="error-alert"
         />
-        
+
         <div class="form-footer">
           <p v-if="appConfigStore.copyright">
             {{ appConfigStore.copyright }}
@@ -243,7 +195,7 @@
             </a>
           </p>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -323,22 +275,22 @@ function refreshCaptcha() {
 
 async function handleLogin() {
   if (loading.value) return
-  
+
   errorMessage.value = ''
-  
+
   if (!form.value.captchaText || !form.value.captchaText.trim()) {
     errorMessage.value = '请输入验证码'
     return
   }
-  
+
   loading.value = true
-  
+
   try {
     await authStore.login(
       form.value.username,
       form.value.password,
       captchaId.value,
-      form.value.captchaText
+      form.value.captchaText,
     )
     message.success('登录成功')
     router.push('/admin/matters')
@@ -359,144 +311,56 @@ onMounted(() => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  display: flex;
+  padding: 24px;
+  background: linear-gradient(180deg, #f6f8fb 0%, #eef2f6 100%);
 }
 
-/* 左侧装饰区域 */
-.login-left {
-  flex: 1;
-  background: linear-gradient(135deg, #0f2438 0%, #1a3a5c 50%, #2c5282 100%);
+.login-shell {
+  min-height: calc(100vh - 48px);
+  width: min(1360px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+  gap: 24px;
+}
+
+.login-showcase,
+.login-panel {
+  border-radius: 18px;
+  padding: 32px;
+}
+
+.login-showcase {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #10273d;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.showcase-top {
+  display: grid;
+  gap: 26px;
+}
+
+.brand-lockup {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.left-content {
-  position: relative;
-  z-index: 2;
-  padding: 40px;
-}
-
-/* 装饰元素 */
-.decorations {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.circle {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(212, 175, 55, 0.2);
-}
-
-.circle-1 {
-  width: 300px;
-  height: 300px;
-  top: -50px;
-  right: -100px;
-  animation: float 8s ease-in-out infinite;
-}
-
-.circle-2 {
-  width: 200px;
-  height: 200px;
-  bottom: 10%;
-  left: -50px;
-  animation: float 6s ease-in-out infinite reverse;
-}
-
-.circle-3 {
-  width: 150px;
-  height: 150px;
-  top: 40%;
-  right: 20%;
-  border-color: rgba(255, 255, 255, 0.1);
-  animation: float 10s ease-in-out infinite;
-}
-
-.line {
-  position: absolute;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
-}
-
-.line-1 {
-  width: 200px;
-  top: 30%;
-  left: 10%;
-  transform: rotate(-15deg);
-}
-
-.line-2 {
-  width: 150px;
-  bottom: 25%;
-  right: 15%;
-  transform: rotate(20deg);
-}
-
-.dot {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(212, 175, 55, 0.5);
-}
-
-.dot-1 {
-  top: 20%;
-  left: 30%;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.dot-2 {
-  top: 60%;
-  right: 25%;
-  animation: pulse 2s ease-in-out infinite 0.5s;
-}
-
-.dot-3 {
-  bottom: 30%;
-  left: 20%;
-  animation: pulse 2s ease-in-out infinite 1s;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.5); }
-}
-
-/* 品牌区域 */
-.brand {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.logo-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 24px;
+  gap: 18px;
 }
 
 .logo {
   width: 72px;
   height: 72px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  border-radius: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .logo img {
@@ -506,145 +370,152 @@ onMounted(() => {
 }
 
 .logo svg {
-  width: 40px;
-  height: 40px;
-  color: #d4af37;
+  width: 38px;
+  height: 38px;
+  color: var(--accent-color);
 }
 
 .brand-title {
-  font-family: var(--font-heading);
-  font-size: 32px;
-  font-weight: 600;
+  margin: 0 0 6px;
+  font-size: clamp(30px, 4vw, 52px);
   color: #fff;
-  margin: 0 0 8px 0;
-  letter-spacing: 2px;
 }
 
 .brand-subtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
   margin: 0;
-  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.68);
+  line-height: 1.7;
 }
 
-/* 特性列表 */
-.features {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.showcase-copy {
+  max-width: 640px;
+}
+
+.showcase-title {
+  margin: 0 0 18px;
+  font-size: clamp(34px, 5vw, 60px);
+  color: #fff;
+  line-height: 0.98;
+}
+
+.showcase-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.85;
+  font-size: 16px;
+}
+
+.showcase-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.metric-chip {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.metric-chip span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.46);
+}
+
+.metric-chip strong {
+  display: block;
+  font-size: 20px;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.feature-list {
+  display: grid;
+  gap: 14px;
 }
 
 .feature-item {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
   gap: 16px;
-  padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  align-items: start;
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
 }
 
-.feature-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(212, 175, 55, 0.2);
-  transform: translateX(8px);
+.feature-index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.46);
 }
 
-.feature-icon {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.feature-icon svg {
-  width: 22px;
-  height: 22px;
-  color: #d4af37;
-}
-
-.feature-text h3 {
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 600;
+.feature-item h3 {
+  margin: 0 0 6px;
   color: #fff;
-  margin: 0 0 4px 0;
+  font-size: 18px;
 }
 
-.feature-text p {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+.feature-item p {
   margin: 0;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.7;
 }
 
-/* 右侧登录表单 */
-.login-right {
-  width: 480px;
-  background: #fff;
+.login-panel {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 40px;
-}
-
-.login-form-wrapper {
-  width: 100%;
-  max-width: 360px;
+  background: #fff;
+  border: 1px solid rgba(21, 33, 46, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .form-header {
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .form-header h2 {
-  font-family: var(--font-heading);
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 8px 0;
+  margin: 18px 0 10px;
+  font-size: clamp(30px, 4vw, 44px);
+  color: var(--primary-color-dark);
+  line-height: 1.02;
 }
 
 .form-header p {
-  font-size: 15px;
-  color: var(--text-secondary);
   margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
-/* 表单样式 */
 .login-form :deep(.ant-form-item) {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-.login-input :deep(.ant-input) {
-  background: var(--bg-secondary);
-  border-color: var(--border-color);
-  transition: all 0.3s ease;
-}
-
-.login-input :deep(.ant-input:hover) {
-  border-color: var(--primary-color-lighter);
-}
-
-.login-input :deep(.ant-input:focus),
-.login-input :deep(.ant-input-affix-wrapper-focused) {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.1);
+.login-input :deep(.ant-input),
+.login-input :deep(.ant-input-affix-wrapper) {
+  min-height: 54px;
 }
 
 .input-icon {
   color: var(--text-tertiary);
 }
 
-/* 验证码行 */
 .captcha-row {
   display: flex;
   gap: 12px;
+}
+
+.login-form :deep(.ant-btn-primary) {
+  min-height: 52px;
 }
 
 .captcha-input {
@@ -652,21 +523,22 @@ onMounted(() => {
 }
 
 .captcha-image {
-  width: 120px;
-  height: 40px;
+  width: 132px;
+  height: 54px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-secondary);
-  transition: all 0.3s ease;
+  background: #fff;
+  transition: border-color 0.2s ease, transform 0.2s ease;
   overflow: hidden;
 }
 
 .captcha-image:hover {
-  border-color: var(--primary-color-lighter);
+  border-color: rgba(37, 77, 119, 0.35);
+  transform: translateY(-1px);
 }
 
 .captcha-image img {
@@ -680,31 +552,19 @@ onMounted(() => {
   color: var(--text-tertiary);
 }
 
-/* 登录按钮 */
 .login-button {
-  height: 44px;
+  height: 54px;
   font-size: 15px;
-  font-weight: 500;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
-  border: none;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
+  font-weight: 600;
+  border-radius: 10px !important;
 }
 
-.login-button:hover {
-  background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color-lighter) 100%);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-/* 错误提示 */
 .error-alert {
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
-/* 底部 */
 .form-footer {
-  margin-top: 40px;
+  margin-top: 28px;
   text-align: center;
   font-size: 13px;
   color: var(--text-tertiary);
@@ -715,33 +575,53 @@ onMounted(() => {
 }
 
 .icp-link a {
-  color: var(--text-tertiary);
+  color: inherit;
   text-decoration: none;
-  transition: color 0.2s ease;
 }
 
 .icp-link a:hover {
   color: var(--primary-color);
 }
 
-/* 响应式 */
-@media (max-width: 900px) {
-  .login-left {
-    display: none;
+@media (max-width: 1024px) {
+  .login-shell {
+    grid-template-columns: 1fr;
   }
-  
-  .login-right {
-    width: 100%;
+
+  .login-showcase {
+    min-height: auto;
   }
 }
 
-@media (max-width: 480px) {
-  .login-right {
-    padding: 24px;
+@media (max-width: 640px) {
+  .login-page {
+    padding: 12px;
   }
-  
-  .form-header h2 {
-    font-size: 24px;
+
+  .login-shell {
+    min-height: calc(100vh - 24px);
+  }
+
+  .login-showcase,
+  .login-panel {
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  .brand-lockup {
+    align-items: flex-start;
+  }
+
+  .captcha-row {
+    flex-direction: column;
+  }
+
+  .showcase-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .captcha-image {
+    width: 100%;
   }
 }
 </style>

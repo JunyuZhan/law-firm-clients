@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const props = defineProps({
   size: { type: Number, default: 12 },
@@ -64,19 +64,6 @@ const calculatePupilPosition = () => {
 }
 
 const pupilPosition = ref({ x: 0, y: 0 })
-
-// Update pupilPosition on mouse move
-const updatePupilPosition = () => {
-  pupilPosition.value = calculatePupilPosition()
-}
-
-// We'll update on every mouse move, but we can also use a watcher
-// However, we are updating in the handleMouseMove, so we can call calculatePupilPosition there
-// But to keep the reactive update, we can use a watcher on mouseX and mouseY
-// Alternatively, we can compute it in the template, but that would be inefficient.
-// Let's use a watcher for mouseX and mouseY to update pupilPosition.
-
-import { watch } from 'vue'
 
 watch([mouseX, mouseY], () => {
   pupilPosition.value = calculatePupilPosition()

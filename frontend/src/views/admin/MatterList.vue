@@ -1,23 +1,68 @@
 <template>
   <div class="matter-list-container">
-    <a-card>
-      <template #title>
-        <span>项目列表</span>
-      </template>
-      <template #extra>
-        <a-button @click="loadData">
-          <template #icon>
-            <ReloadOutlined />
-          </template>
-          刷新
-        </a-button>
-      </template>
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">
+          Matter Operations
+        </div>
+        <h2 class="editorial-title intro-title">
+          项目列表
+        </h2>
+        <p class="intro-text">
+          查看客户项目状态、访问有效期与访问链接，作为后台运营的核心工作台。
+        </p>
+      </div>
+      <a-button @click="loadData">
+        <template #icon>
+          <ReloadOutlined />
+        </template>
+        刷新
+      </a-button>
+    </section>
 
-      <!-- 搜索表单 -->
+    <section class="filter-panel">
+      <div class="panel-head">
+        <div>
+          <span class="panel-kicker">Overview</span>
+          <h3>项目态势</h3>
+        </div>
+        <p>先看活跃度和风险，再进入筛选与操作。</p>
+      </div>
+
+      <div class="stats-grid matter-stats-grid">
+        <div class="stats-card">
+          <span class="stats-label">总项目数</span>
+          <strong>{{ summaryStats.total }}</strong>
+          <p>当前返回结果中的全部项目。</p>
+        </div>
+        <div class="stats-card active">
+          <span class="stats-label">有效访问</span>
+          <strong>{{ summaryStats.active }}</strong>
+          <p>客户仍可通过访问链接直接进入。</p>
+        </div>
+        <div class="stats-card expired-card">
+          <span class="stats-label">已过期</span>
+          <strong>{{ summaryStats.expired }}</strong>
+          <p>建议优先检查是否需要重新生成访问。</p>
+        </div>
+        <div class="stats-card revoked-card">
+          <span class="stats-label">已撤销</span>
+          <strong>{{ summaryStats.revoked }}</strong>
+          <p>访问已被主动停用。</p>
+        </div>
+      </div>
+
+      <div class="panel-head panel-head--compact">
+        <div>
+          <span class="panel-kicker">Filters</span>
+          <h3>精确筛选</h3>
+        </div>
+      </div>
+
       <a-form
         :model="searchForm"
         layout="inline"
-        style="margin-bottom: 16px"
+        class="matter-filter-form"
         @finish="handleSearch"
       >
         <a-form-item label="客户ID">
@@ -25,7 +70,7 @@
             v-model:value="searchForm.clientId"
             placeholder="请输入客户ID"
             allow-clear
-            style="width: 150px"
+            style="width: 160px"
           />
         </a-form-item>
         <a-form-item label="状态">
@@ -33,7 +78,7 @@
             v-model:value="searchForm.status"
             placeholder="请选择状态"
             allow-clear
-            style="width: 120px"
+            style="width: 140px"
           >
             <a-select-option value="ACTIVE">
               有效
@@ -54,7 +99,7 @@
             @change="handleDateRangeChange"
           />
         </a-form-item>
-        <a-form-item>
+        <a-form-item class="filter-actions">
           <a-space>
             <a-button
               type="primary"
@@ -68,8 +113,9 @@
           </a-space>
         </a-form-item>
       </a-form>
+    </section>
 
-      <!-- 数据表格 -->
+    <section class="table-panel">
       <a-table
         :columns="columns"
         :data-source="dataSource"
@@ -89,13 +135,13 @@
             <a
               :href="record.accessUrl"
               target="_blank"
-              style="word-break: break-all"
+              class="matter-link"
             >
               {{ record.accessUrl }}
             </a>
           </template>
           <template v-else-if="column.key === 'expiresAt'">
-            <span :style="{ color: isExpired(record.expiresAt) ? '#cf1322' : '' }">
+            <span :class="{ expired: isExpired(record.expiresAt) }">
               {{ formatDate(record.expiresAt) }}
             </span>
           </template>
@@ -125,12 +171,12 @@
           </template>
         </template>
       </a-table>
-    </a-card>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import { ReloadOutlined } from '@ant-design/icons-vue'
@@ -161,7 +207,6 @@ const pagination = ref({
   showTotal: (total: number) => `共 ${total} 条`,
 })
 
-// 表格列定义
 const columns = [
   { title: '项目ID', key: 'id', dataIndex: 'id', ellipsis: true, width: 180, align: 'center' },
   { title: '律所项目ID', key: 'lawFirmMatterId', dataIndex: 'lawFirmMatterId', width: 130, align: 'center' },
@@ -175,7 +220,16 @@ const columns = [
   { title: '操作', key: 'action', width: 120, fixed: 'right', align: 'center' },
 ]
 
-// 加载数据
+const summaryStats = computed(() => {
+  const items = dataSource.value
+  return {
+    total: items.length,
+    active: items.filter(item => item.status === 'ACTIVE').length,
+    expired: items.filter(item => item.status === 'EXPIRED').length,
+    revoked: items.filter(item => item.status === 'REVOKED').length,
+  }
+})
+
 async function loadData() {
   loading.value = true
   try {
@@ -197,13 +251,11 @@ async function loadData() {
   }
 }
 
-// 搜索
 function handleSearch() {
   pagination.value.current = 1
   loadData()
 }
 
-// 重置
 function handleReset() {
   searchForm.value = {
     clientId: undefined,
@@ -216,7 +268,6 @@ function handleReset() {
   handleSearch()
 }
 
-// 日期范围变化
 function handleDateRangeChange(dates: [Dayjs, Dayjs] | null) {
   if (dates) {
     searchForm.value.startTime = dates[0].toISOString()
@@ -227,18 +278,15 @@ function handleDateRangeChange(dates: [Dayjs, Dayjs] | null) {
   }
 }
 
-// 表格变化
 function handleTableChange(pag: TablePaginationConfig) {
   if (pag.current) pagination.value.current = pag.current
   if (pag.pageSize) pagination.value.pageSize = pag.pageSize
 }
 
-// 查看项目详情
 function handleView(record: MatterListItem) {
   router.push(`/admin/matters/${record.id}`)
 }
 
-// 撤销项目
 async function handleRevoke(record: MatterListItem) {
   try {
     await revokeMatter(record.id)
@@ -250,12 +298,8 @@ async function handleRevoke(record: MatterListItem) {
   }
 }
 
-// 获取状态名称
-// 使用统一的状态工具函数
 const getStatusName = getMatterStatusText
 const getStatusColor = getMatterStatusColor
-
-// isExpired 和 formatDate 已从 @/utils/date 导入
 
 onMounted(() => {
   loadData()
@@ -264,172 +308,102 @@ onMounted(() => {
 
 <style scoped>
 .matter-list-container {
-  padding: 0;
+  display: grid;
+  gap: 18px;
 }
 
-.matter-list-container :deep(.ant-card) {
-  border-radius: 12px;
-  box-shadow: var(--shadow-sm);
+.filter-panel {
+  display: grid;
+  gap: 18px;
 }
 
-.matter-list-container :deep(.ant-card-head) {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
 }
 
-.matter-list-container :deep(.ant-card-body) {
-  padding: 20px;
+.panel-head h3 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: var(--primary-color-dark);
 }
 
-.matter-list-container :deep(.ant-form) {
-  margin-bottom: 16px;
+.panel-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
-.matter-list-container :deep(.ant-form-item) {
-  margin-bottom: 12px;
+.panel-head--compact h3 {
+  font-size: 18px;
 }
 
-.matter-list-container :deep(.ant-table) {
-  font-size: 14px;
+.panel-kicker {
+  display: inline-block;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-/* 固定列背景色 */
-/* 表体固定列 */
-.matter-list-container :deep(.ant-table-cell-fix-right),
-.matter-list-container :deep(.ant-table-cell-fix-left),
-.matter-list-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-right),
-.matter-list-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-left),
-.matter-list-container :deep([class*="ant-table-cell-fix-right"]),
-.matter-list-container :deep([class*="ant-table-cell-fix-left"]) {
-  background: #fff !important;
-  background-color: #fff !important;
-  background-image: none !important;
+.matter-stats-grid .stats-card.active strong {
+  color: var(--success-color);
 }
 
-/* 表头固定列 */
-.matter-list-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-right),
-.matter-list-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-left) {
-  background: #fafafa !important;
-  background-color: #fafafa !important;
-  background-image: none !important;
+.matter-stats-grid .expired-card strong {
+  color: var(--warning-color);
 }
 
-/* 表体固定列 hover */
-.matter-list-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-right),
-.matter-list-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-left),
-.matter-list-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td[class*="ant-table-cell-fix-right"]),
-.matter-list-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td[class*="ant-table-cell-fix-left"]),
-.matter-list-container :deep(.ant-table-tbody > tr:hover > td.ant-table-cell-fix-right),
-.matter-list-container :deep(.ant-table-tbody > tr:hover > td.ant-table-cell-fix-left),
-.matter-list-container :deep(tr.ant-table-row:hover td.ant-table-cell-fix-right),
-.matter-list-container :deep(tr.ant-table-row:hover td.ant-table-cell-fix-left),
-.matter-list-container :deep(tr:hover td.ant-table-cell-fix-right),
-.matter-list-container :deep(tr:hover td.ant-table-cell-fix-left),
-.matter-list-container :deep(tr.ant-table-row:hover [class*="ant-table-cell-fix-right"]),
-.matter-list-container :deep(tr.ant-table-row:hover [class*="ant-table-cell-fix-left"]),
-.matter-list-container :deep(tr:hover [class*="ant-table-cell-fix-right"]),
-.matter-list-container :deep(tr:hover [class*="ant-table-cell-fix-left"]) {
-  background: var(--accent-color-lighter, #fffbf0) !important;
-  background-color: var(--accent-color-lighter, #fffbf0) !important;
-  background-image: none !important;
+.matter-stats-grid .revoked-card strong {
+  color: var(--error-color);
 }
 
-.matter-list-container :deep(.ant-table-thead > tr > th) {
-  background: var(--bg-tertiary);
-  font-weight: 600;
-  padding: 12px 8px;
+.matter-filter-form {
+  display: flex;
+  gap: 12px 8px;
 }
 
-.matter-list-container :deep(.ant-table-tbody > tr > td) {
-  padding: 12px 8px;
+.matter-filter-form :deep(.ant-form-item) {
+  margin-bottom: 0;
 }
 
-.matter-list-container :deep(.ant-btn) {
-  height: 32px;
-  padding: 0 12px;
+.filter-actions {
+  margin-left: auto;
 }
 
-/* 移动端优化 */
+.matter-link {
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-all;
+}
+
+.expired {
+  color: #cf1322;
+}
+
 @media (max-width: 768px) {
-  .matter-list-container {
-    padding: 0;
+  .panel-head {
+    display: grid;
   }
-  
-  .matter-list-container :deep(.ant-card-head) {
-    padding: 12px 16px;
+
+  .matter-filter-form {
+    display: grid;
   }
-  
-  .matter-list-container :deep(.ant-card-body) {
-    padding: 16px 12px;
-  }
-  
-  .matter-list-container :deep(.ant-form) {
-    flex-direction: column;
-  }
-  
-  .matter-list-container :deep(.ant-form-item) {
-    margin-bottom: 12px;
+
+  .matter-filter-form :deep(.ant-form-item) {
     width: 100%;
   }
-  
-  .matter-list-container :deep(.ant-form-item-label) {
-    padding-bottom: 4px;
-  }
-  
-  .matter-list-container :deep(.ant-input-number),
-  .matter-list-container :deep(.ant-select),
-  .matter-list-container :deep(.ant-picker) {
+
+  .matter-filter-form :deep(.ant-input-number),
+  .matter-filter-form :deep(.ant-select),
+  .matter-filter-form :deep(.ant-picker) {
     width: 100% !important;
   }
-  
-  .matter-list-container :deep(.ant-table) {
-    font-size: 12px;
-  }
-  
-  .matter-list-container :deep(.ant-table-thead > tr > th) {
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  .matter-list-container :deep(.ant-table-tbody > tr > td) {
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  .matter-list-container :deep(.ant-table-scroll) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .matter-list-container :deep(.ant-btn) {
-    height: 28px;
-    padding: 0 8px;
-    font-size: 12px;
-  }
-  
-  .matter-list-container :deep(.ant-tag) {
-    font-size: 11px;
-    padding: 2px 6px;
-  }
-  
-  .matter-list-container :deep(.ant-space) {
-    flex-wrap: wrap;
-  }
-}
 
-@media (max-width: 480px) {
-  .matter-list-container :deep(.ant-card-head) {
-    padding: 10px 12px;
-  }
-  
-  .matter-list-container :deep(.ant-card-body) {
-    padding: 12px 8px;
-  }
-  
-  .matter-list-container :deep(.ant-table-thead > tr > th),
-  .matter-list-container :deep(.ant-table-tbody > tr > td) {
-    padding: 6px 2px;
-    font-size: 10px;
+  .filter-actions {
+    margin-left: 0;
   }
 }
 </style>

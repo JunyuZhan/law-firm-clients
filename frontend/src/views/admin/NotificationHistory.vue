@@ -1,25 +1,38 @@
 <template>
   <div class="notification-history-container">
-    <a-card>
-      <template #title>
-        <span>通知记录列表</span>
-      </template>
-      <template #extra>
-        <a-space>
-          <a-button @click="loadData">
-            <template #icon>
-              <ReloadOutlined />
-            </template>
-            刷新
-          </a-button>
-        </a-space>
-      </template>
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">
+          Notification Operations
+        </div>
+        <h2 class="editorial-title intro-title">
+          通知记录
+        </h2>
+        <p class="intro-text">
+          查看短信、微信与邮件发送状态，定位失败原因，并按项目维度触发重试。
+        </p>
+      </div>
+      <a-button @click="loadData">
+        <template #icon>
+          <ReloadOutlined />
+        </template>
+        刷新
+      </a-button>
+    </section>
 
-      <!-- 搜索表单 -->
+    <section class="filter-panel">
+      <div class="panel-head">
+        <div>
+          <span class="panel-kicker">Filter + Summary</span>
+          <h3>发送态势</h3>
+        </div>
+        <p>按项目、渠道和状态定位异常，再决定是否触发重试。</p>
+      </div>
+
       <a-form
         :model="searchForm"
         layout="inline"
-        style="margin-bottom: 16px"
+        class="notification-filter-form"
         @finish="handleSearch"
       >
         <a-form-item label="项目ID">
@@ -82,7 +95,7 @@
             @change="handleDateRangeChange"
           />
         </a-form-item>
-        <a-form-item>
+        <a-form-item class="filter-actions">
           <a-space>
             <a-button
               type="primary"
@@ -96,113 +109,66 @@
           </a-space>
         </a-form-item>
       </a-form>
+    </section>
 
-      <!-- 统计信息 -->
-      <a-spin :spinning="statisticsLoading">
-        <a-row
-          :gutter="16"
-          style="margin-bottom: 16px"
-        >
-          <a-col
-            :xs="12"
-            :sm="6"
-          >
-            <a-statistic
-              title="总数"
-              :value="statistics.total"
-            />
-          </a-col>
-          <a-col
-            :xs="12"
-            :sm="6"
-          >
-            <a-statistic
-              title="成功"
-              :value="statistics.success"
-              :value-style="{ color: '#3f8600' }"
-            />
-          </a-col>
-          <a-col
-            :xs="12"
-            :sm="6"
-          >
-            <a-statistic
-              title="失败"
-              :value="statistics.failed"
-              :value-style="{ color: '#cf1322' }"
-            />
-          </a-col>
-          <a-col
-            :xs="12"
-            :sm="6"
-          >
-            <a-statistic
-              title="待发送"
-              :value="statistics.pending"
-              :value-style="{ color: '#1890ff' }"
-            />
-          </a-col>
-        </a-row>
-        
-        <!-- 按类型统计 -->
-        <a-row
-          v-if="statisticsData && (statisticsData.byType || statisticsData.sms)"
-          :gutter="16"
-          style="margin-bottom: 16px"
-        >
-          <a-col
-            :xs="24"
-            :sm="8"
-          >
-            <a-card size="small">
-              <a-statistic
-                title="短信"
-                :value="(statisticsData.byType?.SMS?.total || statisticsData.sms?.total || 0)"
-              />
-              <div style="margin-top: 8px">
-                <span style="color: #3f8600">成功: {{ statisticsData.byType?.SMS?.success || statisticsData.sms?.success || 0 }}</span>
-                <span style="margin-left: 16px; color: #cf1322">失败: {{ statisticsData.byType?.SMS?.failed || statisticsData.sms?.failed || 0 }}</span>
-              </div>
-            </a-card>
-          </a-col>
-          <a-col
-            :xs="24"
-            :sm="8"
-          >
-            <a-card size="small">
-              <a-statistic
-                title="微信"
-                :value="(statisticsData.byType?.WECHAT?.total || statisticsData.wechat?.total || 0)"
-              />
-              <div style="margin-top: 8px">
-                <span style="color: #3f8600">成功: {{ statisticsData.byType?.WECHAT?.success || statisticsData.wechat?.success || 0 }}</span>
-                <span style="margin-left: 16px; color: #cf1322">失败: {{ statisticsData.byType?.WECHAT?.failed || statisticsData.wechat?.failed || 0 }}</span>
-              </div>
-            </a-card>
-          </a-col>
-          <a-col
-            :xs="24"
-            :sm="8"
-          >
-            <a-card size="small">
-              <a-statistic
-                title="邮件"
-                :value="(statisticsData.byType?.EMAIL?.total || statisticsData.email?.total || 0)"
-              />
-              <div style="margin-top: 8px">
-                <span style="color: #3f8600">成功: {{ statisticsData.byType?.EMAIL?.success || statisticsData.email?.success || 0 }}</span>
-                <span style="margin-left: 16px; color: #cf1322">失败: {{ statisticsData.byType?.EMAIL?.failed || statisticsData.email?.failed || 0 }}</span>
-              </div>
-            </a-card>
-          </a-col>
-        </a-row>
-      </a-spin>
+    <section class="stats-grid">
+      <div class="stats-card">
+        <span class="stats-label">总数</span>
+        <strong>{{ statistics.total }}</strong>
+        <p>当前筛选范围内的全部通知记录。</p>
+      </div>
+      <div class="stats-card success">
+        <span class="stats-label">成功</span>
+        <strong>{{ statistics.success }}</strong>
+        <p>已完成发送并返回成功结果。</p>
+      </div>
+      <div class="stats-card danger">
+        <span class="stats-label">失败</span>
+        <strong>{{ statistics.failed }}</strong>
+        <p>优先关注失败原因与重试队列。</p>
+      </div>
+      <div class="stats-card info">
+        <span class="stats-label">待发送</span>
+        <strong>{{ statistics.pending }}</strong>
+        <p>仍在等待异步发送或回执确认。</p>
+      </div>
+    </section>
 
-      <!-- 数据表格 -->
+    <section class="channel-grid">
+      <article class="channel-card">
+        <div class="channel-title">
+          短信
+        </div>
+        <div class="channel-total">
+          {{ statisticsData?.byType?.SMS?.total || statisticsData?.sms?.total || 0 }}
+        </div>
+        <p>成功 {{ statisticsData?.byType?.SMS?.success || statisticsData?.sms?.success || 0 }} / 失败 {{ statisticsData?.byType?.SMS?.failed || statisticsData?.sms?.failed || 0 }}</p>
+      </article>
+      <article class="channel-card">
+        <div class="channel-title">
+          微信
+        </div>
+        <div class="channel-total">
+          {{ statisticsData?.byType?.WECHAT?.total || statisticsData?.wechat?.total || 0 }}
+        </div>
+        <p>成功 {{ statisticsData?.byType?.WECHAT?.success || statisticsData?.wechat?.success || 0 }} / 失败 {{ statisticsData?.byType?.WECHAT?.failed || statisticsData?.wechat?.failed || 0 }}</p>
+      </article>
+      <article class="channel-card">
+        <div class="channel-title">
+          邮件
+        </div>
+        <div class="channel-total">
+          {{ statisticsData?.byType?.EMAIL?.total || statisticsData?.email?.total || 0 }}
+        </div>
+        <p>成功 {{ statisticsData?.byType?.EMAIL?.success || statisticsData?.email?.success || 0 }} / 失败 {{ statisticsData?.byType?.EMAIL?.failed || statisticsData?.email?.failed || 0 }}</p>
+      </article>
+    </section>
+
+    <section class="table-panel">
       <a-table
         :columns="columns"
         :data-source="dataSource"
-        :loading="loading"
+        :loading="loading || statisticsLoading"
         :pagination="pagination"
         :scroll="{ x: 'max-content' }"
         row-key="id"
@@ -228,7 +194,7 @@
               <a-tag
                 v-if="record.nextRetryAt"
                 color="orange"
-                style="margin-left: 8px"
+                class="retry-tag"
               >
                 下次重试: {{ formatDate(record.nextRetryAt) }}
               </a-tag>
@@ -237,7 +203,7 @@
           </template>
           <template v-else-if="column.key === 'action'">
             <a-button
-              v-if="record.status === 'FAILED' && record.retryCount < (record.maxRetries || 3)"
+              v-if="record.status === 'FAILED' && (record.retryCount || 0) < (record.maxRetries || 3)"
               type="link"
               size="small"
               @click="handleRetry(record)"
@@ -247,7 +213,7 @@
           </template>
         </template>
       </a-table>
-    </a-card>
+    </section>
   </div>
 </template>
 
@@ -286,7 +252,6 @@ const pagination = ref({
   showTotal: (total: number) => `共 ${total} 条`,
 })
 
-// 统计信息（优先使用后端统计，否则使用前端计算）
 const statistics = computed(() => {
   if (statisticsData.value) {
     return {
@@ -296,25 +261,23 @@ const statistics = computed(() => {
       pending: statisticsData.value.pending || 0,
     }
   }
-  
-  // 前端计算（作为后备）
+
   const stats = {
     total: dataSource.value.length,
     success: 0,
     failed: 0,
     pending: 0,
   }
-  
+
   dataSource.value.forEach(item => {
     if (item.status === 'SUCCESS') stats.success++
     else if (item.status === 'FAILED') stats.failed++
     else if (item.status === 'PENDING') stats.pending++
   })
-  
+
   return stats
 })
 
-// 表格列定义
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id', width: 80, align: 'center' },
   { title: '项目ID', key: 'matterId', dataIndex: 'matterId', ellipsis: true, width: 180, align: 'center' },
@@ -323,12 +286,11 @@ const columns = [
   { title: '状态', key: 'status', width: 100, align: 'center' },
   { title: '发送时间', key: 'sentAt', dataIndex: 'sentAt', width: 180, align: 'center' },
   { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 180, align: 'center' },
-  { title: '重试信息', key: 'retryInfo', width: 200, align: 'center' },
+  { title: '重试信息', key: 'retryInfo', width: 220, align: 'center' },
   { title: '错误信息', key: 'errorMessage', dataIndex: 'errorMessage', ellipsis: true, width: 200, align: 'center' },
   { title: '操作', key: 'action', width: 100, align: 'center', fixed: 'right' },
 ]
 
-// 加载数据
 async function loadData() {
   loading.value = true
   try {
@@ -344,8 +306,6 @@ async function loadData() {
     const res = await getNotificationHistory(params)
     dataSource.value = res.data || []
     pagination.value.total = dataSource.value.length
-    
-    // 加载统计信息
     await loadStatistics()
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : '加载通知记录失败'
@@ -355,7 +315,6 @@ async function loadData() {
   }
 }
 
-// 加载统计信息
 async function loadStatistics() {
   statisticsLoading.value = true
   try {
@@ -374,13 +333,11 @@ async function loadStatistics() {
   }
 }
 
-// 搜索
 function handleSearch() {
   pagination.value.current = 1
   loadData()
 }
 
-// 重置
 function handleReset() {
   searchForm.value = {
     matterId: '',
@@ -395,7 +352,6 @@ function handleReset() {
   handleSearch()
 }
 
-// 日期范围变化
 function handleDateRangeChange(dates: [Dayjs, Dayjs] | null) {
   if (dates) {
     searchForm.value.startTime = dates[0].toISOString()
@@ -406,13 +362,11 @@ function handleDateRangeChange(dates: [Dayjs, Dayjs] | null) {
   }
 }
 
-// 表格变化
 function handleTableChange(pag: TablePaginationConfig) {
   if (pag.current) pagination.value.current = pag.current
   if (pag.pageSize) pagination.value.pageSize = pag.pageSize
 }
 
-// 重试发送
 async function handleRetry(record: NotificationHistory) {
   if (!record?.matterId) {
     message.error('无法获取项目ID')
@@ -428,7 +382,6 @@ async function handleRetry(record: NotificationHistory) {
   }
 }
 
-// 获取类型名称
 function getTypeName(type: string): string {
   const map: Record<string, string> = {
     SMS: '短信',
@@ -438,7 +391,6 @@ function getTypeName(type: string): string {
   return map[type] || type
 }
 
-// 获取类型颜色
 function getTypeColor(type: string): string {
   const map: Record<string, string> = {
     SMS: 'blue',
@@ -448,32 +400,25 @@ function getTypeColor(type: string): string {
   return map[type] || 'default'
 }
 
-// 使用统一的状态工具函数
 const getStatusName = getNotificationStatusText
 const getStatusColor = getNotificationStatusColor
 
-// 脱敏显示接收人
 function maskRecipient(recipient: string, type: string): string {
   if (!recipient) return '-'
-  
-  if (type === 'SMS') {
-    // 手机号：138****5678
-    if (recipient.length === 11) {
-      return recipient.substring(0, 3) + '****' + recipient.substring(7)
-    }
-  } else if (type === 'EMAIL') {
-    // 邮箱：wa***@example.com
+
+  if (type === 'SMS' && recipient.length === 11) {
+    return recipient.substring(0, 3) + '****' + recipient.substring(7)
+  }
+
+  if (type === 'EMAIL') {
     const [local, domain] = recipient.split('@')
     if (local && domain) {
-      const masked = local.substring(0, 2) + '***'
-      return masked + '@' + domain
+      return local.substring(0, 2) + '***@' + domain
     }
   }
-  
+
   return recipient
 }
-
-// formatDate 已从 @/utils/date 导入
 
 onMounted(() => {
   loadData()
@@ -482,148 +427,135 @@ onMounted(() => {
 
 <style scoped>
 .notification-history-container {
-  padding: 0;
+  display: grid;
+  gap: 18px;
 }
 
-.notification-history-container :deep(.ant-card) {
-  border-radius: 12px;
+.channel-card {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
-.notification-history-container :deep(.ant-card-head) {
-  padding: 16px 20px;
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.notification-history-container :deep(.ant-card-body) {
-  padding: 20px;
+.panel-head h3 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: var(--primary-color-dark);
 }
 
-.notification-history-container :deep(.ant-form) {
-  margin-bottom: 16px;
+.panel-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
-.notification-history-container :deep(.ant-table) {
-  font-size: 14px;
+.panel-kicker {
+  display: inline-block;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-/* 固定列背景色 - 最强覆盖 */
-.notification-history-container :deep(.ant-table-cell-fix-right),
-.notification-history-container :deep(.ant-table-cell-fix-left),
-.notification-history-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-right),
-.notification-history-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-left),
-.notification-history-container :deep(td.ant-table-cell-fix-right),
-.notification-history-container :deep(td.ant-table-cell-fix-left),
-.notification-history-container :deep([class*="ant-table-cell-fix-right"]),
-.notification-history-container :deep([class*="ant-table-cell-fix-left"]) {
-  background: #fff !important;
-  background-color: #fff !important;
-  background-image: none !important;
+.notification-filter-form {
+  display: flex;
+  gap: 12px 8px;
 }
 
-.notification-history-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-right),
-.notification-history-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-left),
-.notification-history-container :deep(th.ant-table-cell-fix-right),
-.notification-history-container :deep(th.ant-table-cell-fix-left) {
-  background: #fafafa !important;
-  background-color: #fafafa !important;
-  background-image: none !important;
+.notification-filter-form :deep(.ant-form-item) {
+  margin-bottom: 0;
 }
 
-.notification-history-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-right),
-.notification-history-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-left),
-.notification-history-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td[class*="ant-table-cell-fix-right"]),
-.notification-history-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td[class*="ant-table-cell-fix-left"]),
-.notification-history-container :deep(.ant-table-tbody > tr:hover > td.ant-table-cell-fix-right),
-.notification-history-container :deep(.ant-table-tbody > tr:hover > td.ant-table-cell-fix-left),
-.notification-history-container :deep(tr.ant-table-row:hover td.ant-table-cell-fix-right),
-.notification-history-container :deep(tr.ant-table-row:hover td.ant-table-cell-fix-left),
-.notification-history-container :deep(tr:hover td.ant-table-cell-fix-right),
-.notification-history-container :deep(tr:hover td.ant-table-cell-fix-left),
-.notification-history-container :deep(tr.ant-table-row:hover [class*="ant-table-cell-fix-right"]),
-.notification-history-container :deep(tr.ant-table-row:hover [class*="ant-table-cell-fix-left"]),
-.notification-history-container :deep(tr:hover [class*="ant-table-cell-fix-right"]),
-.notification-history-container :deep(tr:hover [class*="ant-table-cell-fix-left"]) {
-  background: var(--accent-color-lighter, #fffbf0) !important;
-  background-color: var(--accent-color-lighter, #fffbf0) !important;
-  background-image: none !important;
+.filter-actions {
+  margin-left: auto;
 }
 
-/* 移动端优化 */
+.channel-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.channel-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.channel-card {
+  padding: 18px;
+}
+
+.channel-title {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.channel-total {
+  display: block;
+  color: var(--primary-color-dark);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.channel-card p {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.retry-tag {
+  margin-left: 8px;
+}
+
+@media (max-width: 992px) {
+  .channel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
-  .notification-history-container {
-    padding: 0;
+  .channel-card {
+    padding: 16px;
+    border-radius: 20px;
   }
-  
-  .notification-history-container :deep(.ant-card-head) {
-    padding: 12px 16px;
+
+  .panel-head {
+    display: grid;
   }
-  
-  .notification-history-container :deep(.ant-card-body) {
-    padding: 16px 12px;
+
+  .notification-filter-form {
+    display: grid;
   }
-  
-  .notification-history-container :deep(.ant-form) {
-    flex-direction: column;
-  }
-  
-  .notification-history-container :deep(.ant-form-item) {
+
+  .notification-filter-form :deep(.ant-form-item) {
     width: 100%;
-    margin-bottom: 12px;
   }
-  
-  .notification-history-container :deep(.ant-input),
-  .notification-history-container :deep(.ant-select),
-  .notification-history-container :deep(.ant-picker) {
+
+  .notification-filter-form :deep(.ant-input),
+  .notification-filter-form :deep(.ant-input-number),
+  .notification-filter-form :deep(.ant-select),
+  .notification-filter-form :deep(.ant-picker) {
     width: 100% !important;
   }
-  
-  .notification-history-container :deep(.ant-table) {
-    font-size: 12px;
-  }
-  
-  .notification-history-container :deep(.ant-table-thead > tr > th) {
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  .notification-history-container :deep(.ant-table-tbody > tr > td) {
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  .notification-history-container :deep(.ant-table-scroll) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .notification-history-container :deep(.ant-btn) {
-    height: 32px;
-    padding: 0 12px;
-    font-size: 12px;
-  }
-  
-  .notification-history-container :deep(.ant-statistic-title) {
-    font-size: 12px;
-  }
-  
-  .notification-history-container :deep(.ant-statistic-content) {
-    font-size: 20px;
-  }
-}
 
-@media (max-width: 480px) {
-  .notification-history-container :deep(.ant-card-head) {
-    padding: 10px 12px;
+  .filter-actions {
+    margin-left: 0;
   }
-  
-  .notification-history-container :deep(.ant-card-body) {
-    padding: 12px 8px;
-  }
-  
-  .notification-history-container :deep(.ant-table-thead > tr > th),
-  .notification-history-container :deep(.ant-table-tbody > tr > td) {
-    padding: 6px 2px;
-    font-size: 10px;
+
+  .channel-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

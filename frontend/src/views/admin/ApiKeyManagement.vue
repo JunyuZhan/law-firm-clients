@@ -1,132 +1,143 @@
 <template>
   <div class="api-key-management-container">
-    <a-row
-      :gutter="16"
-      class="equal-height-row"
-    >
-      <!-- 左侧：API 对接信息 -->
-      <a-col
-        :xs="24"
-        :lg="12"
-        class="equal-height-col"
-      >
-        <a-card
-          size="small"
-          class="equal-height-card"
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">
+          Integration Access
+        </div>
+        <h2 class="editorial-title intro-title">
+          API 密钥管理
+        </h2>
+        <p class="intro-text">
+          管理律所系统与客户服务系统之间的接口密钥，同时确认回调配置路径和对接说明。
+        </p>
+      </div>
+      <a-space>
+        <a-button
+          type="primary"
+          @click="showCreateModal = true"
         >
-          <template #title>
-            <span>API 对接信息（律所系统 → 客服系统）</span>
+          <template #icon>
+            <PlusOutlined />
           </template>
-          <a-descriptions
-            :column="1"
-            size="small"
-            bordered
-          >
-            <a-descriptions-item label="API 地址">
-              <a-typography-text
-                v-if="apiBaseUrl"
-                copyable
-                :content="apiBaseUrl"
-              >
-                <code>{{ apiBaseUrl }}</code>
-              </a-typography-text>
-              <span
-                v-else
-                style="color: #999"
-              >
-                未配置（请在「系统配置」中设置 system.base-url）
-              </span>
-              <div style="color: #999; font-size: 12px; margin-top: 4px">
-                注：管理系统配置时直接使用此地址，无需添加 /api
-              </div>
-            </a-descriptions-item>
-            <a-descriptions-item label="认证方式">
-              <div><code>X-API-Key: {API密钥}</code></div>
-              <div><code>X-API-Secret: {API密钥Secret}</code></div>
-            </a-descriptions-item>
-            <a-descriptions-item label="使用说明">
-              <ol style="margin: 0; padding-left: 20px">
-                <li>在下方创建 API 密钥</li>
-                <li>将 <b>API 地址</b> 和 <b>API 密钥</b> 提供给律所系统管理员</li>
-                <li>律所系统在「外部系统集成 → 客户服务系统」中配置</li>
-              </ol>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-card>
-      </a-col>
+          新增密钥
+        </a-button>
+        <a-button @click="loadData">
+          <template #icon>
+            <ReloadOutlined />
+          </template>
+          刷新
+        </a-button>
+      </a-space>
+    </section>
 
-      <!-- 右侧：回调配置指引 -->
-      <a-col
-        :xs="24"
-        :lg="12"
-        class="equal-height-col"
-      >
-        <a-card
+    <section class="guide-grid">
+      <article class="guide-card">
+        <h3>API 对接信息</h3>
+        <a-descriptions
+          :column="1"
           size="small"
-          class="equal-height-card"
+          bordered
         >
-          <template #title>
-            <span>回调配置（客服系统 → 律所系统）</span>
-          </template>
-          <a-descriptions
-            :column="1"
-            size="small"
-            bordered
-          >
-            <a-descriptions-item label="功能说明">
-              客户访问项目或下载文件时，自动通知律所系统记录日志
-            </a-descriptions-item>
-            <a-descriptions-item label="配置项">
-              <ul style="margin: 0; padding-left: 20px; line-height: 1.8">
-                <li><b>启用回调</b>：开启/关闭回调功能</li>
-                <li><b>律所系统地址</b>：律所系统提供的回调接收地址</li>
-                <li><b>回调密钥</b>：需与律所系统配置一致</li>
-              </ul>
-            </a-descriptions-item>
-          </a-descriptions>
-          <div style="margin-top: 12px">
-            <router-link to="/admin/config">
-              <a-button type="default">
-                <template #icon>
-                  <SettingOutlined />
-                </template>
-                前往「系统配置」页面配置
-              </a-button>
-            </router-link>
-          </div>
-        </a-card>
-      </a-col>
-    </a-row>
+          <a-descriptions-item label="API 地址">
+            <a-typography-text
+              v-if="apiBaseUrl"
+              copyable
+              :content="apiBaseUrl"
+            >
+              <code>{{ apiBaseUrl }}</code>
+            </a-typography-text>
+            <span
+              v-else
+              class="muted-text"
+            >
+              未配置（请在「系统配置」中设置 system.base-url）
+            </span>
+            <div class="helper-text">
+              注：管理系统配置时直接使用此地址，无需添加 /api
+            </div>
+          </a-descriptions-item>
+          <a-descriptions-item label="认证方式">
+            <div><code>X-API-Key: {API密钥}</code></div>
+            <div><code>X-API-Secret: {API密钥Secret}</code></div>
+          </a-descriptions-item>
+          <a-descriptions-item label="使用说明">
+            <ol class="guide-list">
+              <li>在下方创建 API 密钥</li>
+              <li>将 API 地址和 API 密钥提供给律所系统管理员</li>
+              <li>在律所系统的外部系统集成中完成配置</li>
+            </ol>
+          </a-descriptions-item>
+        </a-descriptions>
+      </article>
 
-    <a-card>
-      <template #title>
-        <span>API密钥管理</span>
-      </template>
-      <template #extra>
-        <a-space>
-          <a-button
-            type="primary"
-            @click="showCreateModal = true"
-          >
-            <template #icon>
-              <PlusOutlined />
-            </template>
-            新增密钥
-          </a-button>
-          <a-button @click="loadData">
-            <template #icon>
-              <ReloadOutlined />
-            </template>
-            刷新
-          </a-button>
-        </a-space>
-      </template>
+      <article class="guide-card">
+        <h3>回调配置</h3>
+        <a-descriptions
+          :column="1"
+          size="small"
+          bordered
+        >
+          <a-descriptions-item label="功能说明">
+            客户访问项目或下载文件时，系统会自动通知律所系统记录日志。
+          </a-descriptions-item>
+          <a-descriptions-item label="配置项">
+            <ul class="guide-list">
+              <li><b>启用回调</b>：开启或关闭回调功能</li>
+              <li><b>律所系统地址</b>：律所系统提供的回调接收地址</li>
+              <li><b>回调密钥</b>：需与律所系统配置一致</li>
+            </ul>
+          </a-descriptions-item>
+        </a-descriptions>
+        <div class="guide-footer">
+          <router-link to="/admin/config">
+            <a-button type="default">
+              <template #icon>
+                <SettingOutlined />
+              </template>
+              前往系统配置
+            </a-button>
+          </router-link>
+        </div>
+      </article>
+    </section>
 
-      <!-- 搜索表单 -->
+    <section class="stats-grid">
+      <div class="stats-card">
+        <span class="stats-label">密钥总数</span>
+        <strong>{{ keyStats.total }}</strong>
+        <p>当前所有对接密钥的总量。</p>
+      </div>
+      <div class="stats-card success">
+        <span class="stats-label">启用中</span>
+        <strong>{{ keyStats.enabled }}</strong>
+        <p>处于可用状态，可直接用于系统集成。</p>
+      </div>
+      <div class="stats-card danger">
+        <span class="stats-label">已禁用</span>
+        <strong>{{ keyStats.disabled }}</strong>
+        <p>已停用，不再允许对外调用。</p>
+      </div>
+      <div class="stats-card info">
+        <span class="stats-label">已过期</span>
+        <strong>{{ keyStats.expired }}</strong>
+        <p>已达到过期时间，建议及时轮换。</p>
+      </div>
+    </section>
+
+    <section class="filter-panel">
+      <div class="panel-head">
+        <div>
+          <span class="panel-kicker">Access Control</span>
+          <h3>筛选与治理</h3>
+        </div>
+        <p>根据启用状态快速筛出需要轮换、停用或检查的密钥。</p>
+      </div>
+
       <a-form
         :model="searchForm"
         layout="inline"
-        style="margin-bottom: 16px"
+        class="key-filter-form"
         @finish="handleSearch"
       >
         <a-form-item label="状态">
@@ -134,7 +145,7 @@
             v-model:value="searchForm.enabled"
             placeholder="请选择状态"
             allow-clear
-            style="width: 120px"
+            style="width: 140px"
           >
             <a-select-option :value="true">
               启用
@@ -144,7 +155,7 @@
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item>
+        <a-form-item class="filter-actions">
           <a-space>
             <a-button
               type="primary"
@@ -158,8 +169,9 @@
           </a-space>
         </a-form-item>
       </a-form>
+    </section>
 
-      <!-- 数据表格 -->
+    <section class="table-panel">
       <a-table
         :columns="columns"
         :data-source="dataSource"
@@ -182,10 +194,7 @@
             >
               {{ maskSecret(record.apiSecret) }}
             </a-typography-text>
-            <span
-              v-else
-              style="color: #999"
-            >-</span>
+            <span class="muted-text">-</span>
           </template>
           <template v-else-if="column.key === 'enabled'">
             <a-switch
@@ -194,7 +203,7 @@
             />
           </template>
           <template v-else-if="column.key === 'expiresAt'">
-            <span :style="{ color: isExpired(record.expiresAt) ? '#cf1322' : '' }">
+            <span :class="{ expired: isExpired(record.expiresAt) }">
               {{ formatApiKeyDate(record.expiresAt) }}
             </span>
           </template>
@@ -223,9 +232,8 @@
           </template>
         </template>
       </a-table>
-    </a-card>
+    </section>
 
-    <!-- 创建/编辑对话框 -->
     <a-modal
       v-model:open="showCreateModal"
       :title="editingRecord ? '编辑API密钥' : '新增API密钥'"
@@ -269,20 +277,15 @@
           >
             <template #message>
               <div>
-                <div style="margin-bottom: 8px">
+                <div class="modal-title-note">
                   <strong>Secret 仅在创建时显示一次完整值</strong>
                 </div>
-                <div style="font-size: 12px; color: #666; margin-bottom: 8px">
+                <div class="modal-text-note">
                   出于安全考虑，编辑时无法查看完整 Secret。
                 </div>
-                <div style="font-size: 12px; color: #666">
-                  <strong>管理系统对接说明：</strong>
+                <div class="modal-text-note">
+                  创建密钥后请立即复制保存；如忘记 Secret，需要删除并重新创建。
                 </div>
-                <ol style="margin: 8px 0 0 20px; font-size: 12px; color: #666">
-                  <li>创建密钥时，在成功弹窗中会显示完整的 Key 和 Secret</li>
-                  <li>请立即复制保存，关闭弹窗后将无法再次查看</li>
-                  <li>如果忘记 Secret，需要删除当前密钥并重新创建</li>
-                </ol>
               </div>
             </template>
           </a-alert>
@@ -305,7 +308,6 @@
       </a-form>
     </a-modal>
 
-    <!-- 创建成功弹窗 -->
     <a-modal
       v-model:open="showSuccessModal"
       title="API 密钥创建成功"
@@ -318,10 +320,10 @@
       <a-alert
         type="warning"
         show-icon
-        style="margin-bottom: 16px"
+        class="success-alert"
       >
         <template #message>
-          请立即复制保存以下密钥信息，关闭后将无法再次查看 Secret！
+          请立即复制保存以下密钥信息，关闭后将无法再次查看 Secret。
         </template>
       </a-alert>
       <a-descriptions
@@ -345,7 +347,7 @@
           </a-typography-text>
         </a-descriptions-item>
       </a-descriptions>
-      <div style="margin-top: 16px; text-align: center">
+      <div class="success-footer">
         <a-button
           type="primary"
           @click="showSuccessModal = false"
@@ -384,18 +386,15 @@ const showCreateModal = ref(false)
 const showSuccessModal = ref(false)
 const editingRecord = ref<ApiKeyInfo | null>(null)
 
-// 响应式宽度
 const windowWidth = ref(window.innerWidth)
 const modalWidth = computed(() => {
   return windowWidth.value < 768 ? '95%' : '600px'
 })
 
-// 监听窗口大小变化
 function handleResize() {
   windowWidth.value = window.innerWidth
 }
 
-// API Secret 脱敏显示（仅展示前4位和后4位）
 function maskSecret(secret: string): string {
   if (!secret || secret.length <= 8) return '••••••••'
   return secret.substring(0, 4) + '••••••' + secret.substring(secret.length - 4)
@@ -430,7 +429,13 @@ const pagination = ref({
   showTotal: (total: number) => `共 ${total} 条`,
 })
 
-// 表格列定义
+const keyStats = computed(() => ({
+  total: dataSource.value.length,
+  enabled: dataSource.value.filter(item => item.enabled).length,
+  disabled: dataSource.value.filter(item => !item.enabled).length,
+  expired: dataSource.value.filter(item => isExpired(item.expiresAt)).length,
+}))
+
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id', width: 80, align: 'center' },
   { title: '密钥名称', key: 'keyName', dataIndex: 'keyName', ellipsis: true, width: 150, align: 'center' },
@@ -441,10 +446,6 @@ const columns = [
   { title: '操作', key: 'action', width: 150, align: 'center', fixed: 'right' },
 ]
 
-/**
- * 统一的配置加载错误处理
- * 配置加载失败不阻塞页面，使用默认值并记录警告
- */
 function handleConfigLoadError(configName: string, error: unknown): void {
   const errorMessage = error instanceof Error ? error.message : String(error)
   logger.warn(`加载${configName}失败: ${errorMessage}`)
@@ -454,13 +455,11 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback
 }
 
-// 加载 API 基础地址
 async function loadApiBaseUrl() {
   try {
     const res = await getConfigList({ configKey: 'system.base-url', limit: 1 })
     const config = res.data?.find(c => c.configKey === 'system.base-url')
     if (config?.configValue) {
-      // 移除末尾的斜杠
       apiBaseUrl.value = config.configValue.replace(/\/+$/, '')
     }
   } catch (error) {
@@ -468,7 +467,6 @@ async function loadApiBaseUrl() {
   }
 }
 
-// 加载数据
 async function loadData() {
   loading.value = true
   try {
@@ -486,13 +484,11 @@ async function loadData() {
   }
 }
 
-// 搜索
 function handleSearch() {
   pagination.value.current = 1
   loadData()
 }
 
-// 重置
 function handleReset() {
   searchForm.value = {
     enabled: undefined,
@@ -501,13 +497,11 @@ function handleReset() {
   handleSearch()
 }
 
-// 表格变化
 function handleTableChange(pag: TablePaginationConfig) {
   if (pag.current) pagination.value.current = pag.current
   if (pag.pageSize) pagination.value.pageSize = pag.pageSize
 }
 
-// 编辑
 function handleEdit(record: ApiKeyInfo) {
   editingRecord.value = record
   formData.value = {
@@ -518,7 +512,6 @@ function handleEdit(record: ApiKeyInfo) {
   showCreateModal.value = true
 }
 
-// 切换启用状态
 async function handleToggleEnabled(record: ApiKeyInfo, enabled: boolean) {
   try {
     await updateApiKey(record.id, { enabled })
@@ -526,11 +519,10 @@ async function handleToggleEnabled(record: ApiKeyInfo, enabled: boolean) {
     await loadData()
   } catch (error: unknown) {
     message.error(getErrorMessage(error, '更新失败'))
-    await loadData() // 刷新以恢复原状态
+    await loadData()
   }
 }
 
-// 删除
 async function handleDelete(record: ApiKeyInfo) {
   try {
     await deleteApiKey(record.id)
@@ -541,7 +533,6 @@ async function handleDelete(record: ApiKeyInfo) {
   }
 }
 
-// 提交表单
 async function handleSubmit() {
   if (!formData.value.keyName) {
     message.warning('请填写密钥名称')
@@ -559,7 +550,6 @@ async function handleSubmit() {
   submitLoading.value = true
   try {
     if (editingRecord.value) {
-      // 更新
       const updateData: UpdateApiKeyRequest = {}
       if (formData.value.keyName) updateData.keyName = formData.value.keyName
       if (formData.value.enabled !== undefined) updateData.enabled = formData.value.enabled
@@ -576,9 +566,8 @@ async function handleSubmit() {
       await updateApiKey(editingRecord.value.id, updateData)
       message.success('API密钥已更新')
     } else {
-      // 创建（不传备注信息，后端不存储）
       const createData: CreateApiKeyRequest = {
-        keyName: formData.value.keyName!,
+        keyName: formData.value.keyName,
       }
       if (formData.value.expiresAt) {
         createData.expiresAt = dayjs.isDayjs(formData.value.expiresAt)
@@ -587,7 +576,6 @@ async function handleSubmit() {
       }
 
       const res = await createApiKey(createData)
-      // 显示完整密钥弹窗（仅创建时）
       if (res.data) {
         createdApiKey.value = {
           apiKey: res.data.apiKey || '',
@@ -605,7 +593,6 @@ async function handleSubmit() {
   }
 }
 
-// 取消
 function handleCancel() {
   showCreateModal.value = false
   editingRecord.value = null
@@ -616,13 +603,11 @@ function handleCancel() {
   }
 }
 
-// 判断是否过期
 function isExpired(expiresAt?: string): boolean {
   if (!expiresAt) return false
   return dayjs(expiresAt).isBefore(dayjs())
 }
 
-// 格式化日期（API密钥专用，空值显示"永不过期"）
 function formatApiKeyDate(date?: string): string {
   if (!date) return '永不过期'
   return formatDate(date)
@@ -641,254 +626,153 @@ onUnmounted(() => {
 
 <style scoped>
 .api-key-management-container {
-  padding: 0;
+  display: grid;
+  gap: 18px;
 }
 
-/* 等高卡片布局 */
-.equal-height-row {
+.panel-head {
   display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.equal-height-col {
-  display: flex;
-  margin-bottom: 16px;
-}
-
-.equal-height-card {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.equal-height-card :deep(.ant-card-body) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.equal-height-card :deep(.ant-form) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.api-key-management-container :deep(.ant-card) {
-  border-radius: 12px;
+.panel-head h3 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: var(--primary-color-dark);
+}
+
+.panel-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.panel-kicker {
+  display: inline-block;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.guide-card {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
-.api-key-management-container :deep(.ant-card-head) {
-  padding: 16px 20px;
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.api-key-management-container :deep(.ant-card-body) {
+.guide-card {
   padding: 20px;
 }
 
-.api-key-management-container :deep(.ant-form) {
+.guide-card h3 {
+  margin: 0 0 16px;
+  color: var(--primary-color-dark);
+  font-size: 20px;
+}
+
+.guide-card :deep(.ant-descriptions-bordered .ant-descriptions-item-label) {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.guide-list {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.8;
+}
+
+.guide-footer {
+  margin-top: 14px;
+}
+
+.helper-text,
+.muted-text {
+  color: var(--text-tertiary);
+}
+
+.helper-text {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.key-filter-form {
+  display: flex;
+  gap: 12px 8px;
+}
+
+.key-filter-form :deep(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.filter-actions {
+  margin-left: auto;
+}
+
+.expired {
+  color: #cf1322;
+}
+
+.modal-title-note {
+  margin-bottom: 8px;
+}
+
+.modal-text-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.success-alert {
   margin-bottom: 16px;
 }
 
-.api-key-management-container :deep(.ant-table) {
-  font-size: 14px;
+.success-footer {
+  margin-top: 16px;
+  text-align: center;
 }
 
-/* 确保操作列按钮可见 - 操作列是固定列 */
-.api-key-management-container :deep(.ant-table-cell-fix-right) {
-  min-width: 150px !important;
+@media (max-width: 992px) {
+  .guide-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.api-key-management-container :deep(.ant-table-cell-fix-right .ant-space) {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex-wrap: nowrap !important;
-  gap: 8px !important;
-}
-
-.api-key-management-container :deep(.ant-table-cell-fix-right .ant-btn) {
-  display: inline-block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  flex-shrink: 0 !important;
-  white-space: nowrap !important;
-}
-
-/* 固定列背景色 - 最强覆盖（包括内联样式） */
-/* 表体固定列 */
-.api-key-management-container :deep(.ant-table-cell-fix-right),
-.api-key-management-container :deep(.ant-table-cell-fix-left),
-.api-key-management-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-right),
-.api-key-management-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-left),
-.api-key-management-container :deep(td.ant-table-cell-fix-right),
-.api-key-management-container :deep(td.ant-table-cell-fix-left),
-.api-key-management-container :deep([class*="ant-table-cell-fix-right"]),
-.api-key-management-container :deep([class*="ant-table-cell-fix-left"]) {
-  background: #fff !important;
-  background-color: #fff !important;
-  background-image: none !important;
-}
-
-/* 表头固定列 */
-.api-key-management-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-right),
-.api-key-management-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-left),
-.api-key-management-container :deep(th.ant-table-cell-fix-right),
-.api-key-management-container :deep(th.ant-table-cell-fix-left) {
-  background: #fafafa !important;
-  background-color: #fafafa !important;
-  background-image: none !important;
-}
-
-/* 表体固定列 hover - 最高优先级 */
-.api-key-management-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-right),
-.api-key-management-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-left),
-.api-key-management-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td[class*="ant-table-cell-fix-right"]),
-.api-key-management-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td[class*="ant-table-cell-fix-left"]),
-.api-key-management-container :deep(.ant-table-tbody > tr:hover > td.ant-table-cell-fix-right),
-.api-key-management-container :deep(.ant-table-tbody > tr:hover > td.ant-table-cell-fix-left),
-.api-key-management-container :deep(tr.ant-table-row:hover td.ant-table-cell-fix-right),
-.api-key-management-container :deep(tr.ant-table-row:hover td.ant-table-cell-fix-left),
-.api-key-management-container :deep(tr:hover td.ant-table-cell-fix-right),
-.api-key-management-container :deep(tr:hover td.ant-table-cell-fix-left),
-.api-key-management-container :deep(tr.ant-table-row:hover [class*="ant-table-cell-fix-right"]),
-.api-key-management-container :deep(tr.ant-table-row:hover [class*="ant-table-cell-fix-left"]),
-.api-key-management-container :deep(tr:hover [class*="ant-table-cell-fix-right"]),
-.api-key-management-container :deep(tr:hover [class*="ant-table-cell-fix-left"]) {
-  background: var(--accent-color-lighter, #fffbf0) !important;
-  background-color: var(--accent-color-lighter, #fffbf0) !important;
-  background-image: none !important;
-}
-
-/* 移动端优化 */
 @media (max-width: 768px) {
-  .api-key-management-container {
-    padding: 0;
+  .panel-head {
+    display: grid;
   }
-  
-  .api-key-management-container :deep(.ant-card-head) {
-    padding: 12px 16px;
+
+  .guide-card {
+    padding: 16px;
+    border-radius: 20px;
   }
-  
-  .api-key-management-container :deep(.ant-card-body) {
-    padding: 16px 12px;
+
+  .key-filter-form {
+    display: grid;
   }
-  
-  .api-key-management-container :deep(.ant-form) {
-    flex-direction: column;
-  }
-  
-  .api-key-management-container :deep(.ant-form-item) {
+
+  .key-filter-form :deep(.ant-form-item) {
     width: 100%;
-    margin-bottom: 12px;
   }
-  
-  .api-key-management-container :deep(.ant-input),
-  .api-key-management-container :deep(.ant-select) {
+
+  .key-filter-form :deep(.ant-input),
+  .key-filter-form :deep(.ant-select) {
     width: 100% !important;
   }
-  
-  .api-key-management-container :deep(.ant-table) {
-    font-size: 12px;
-  }
-  
-  .api-key-management-container :deep(.ant-table-thead > tr > th) {
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  .api-key-management-container :deep(.ant-table-tbody > tr > td) {
-    padding: 8px 4px;
-    font-size: 11px;
-  }
-  
-  .api-key-management-container :deep(.ant-table-scroll) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .api-key-management-container :deep(.ant-btn) {
-    height: 32px;
-    padding: 0 12px;
-    font-size: 12px;
-  }
-  
-  .api-key-management-container :deep(.ant-modal) {
-    max-width: 90%;
-    margin: 20px auto;
-  }
-  
-  .api-key-management-container :deep(.ant-modal-content) {
-    padding: 16px;
-  }
-}
 
-/* API密钥弹窗移动端优化 */
-:deep(.apikey-modal .ant-modal),
-:deep(.apikey-success-modal .ant-modal) {
-  margin: 0;
-  max-width: 100vw;
-  top: 0;
-  padding-bottom: 0;
-}
-
-:deep(.apikey-modal .ant-modal-content),
-:deep(.apikey-success-modal .ant-modal-content) {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-:deep(.apikey-modal .ant-modal-body),
-:deep(.apikey-success-modal .ant-modal-body) {
-  flex: 1;
-  overflow: auto;
-  padding: 16px;
-}
-
-:deep(.apikey-modal .ant-modal-footer) {
-  padding: 12px 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-@media (min-width: 769px) {
-  :deep(.apikey-modal .ant-modal),
-  :deep(.apikey-success-modal .ant-modal) {
-    margin: 0 auto;
-    top: 50px;
-    padding-bottom: 24px;
-  }
-  
-  :deep(.apikey-modal .ant-modal-content),
-  :deep(.apikey-success-modal .ant-modal-content) {
-    height: auto;
-  }
-  
-  :deep(.apikey-modal .ant-modal-body),
-  :deep(.apikey-success-modal .ant-modal-body) {
-    padding: 24px;
-  }
-  
-  :deep(.apikey-modal .ant-modal-footer) {
-    padding: 10px 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .api-key-management-container :deep(.ant-card-head) {
-    padding: 10px 12px;
-  }
-  
-  .api-key-management-container :deep(.ant-card-body) {
-    padding: 12px 8px;
-  }
-  
-  .api-key-management-container :deep(.ant-table-thead > tr > th),
-  .api-key-management-container :deep(.ant-table-tbody > tr > td) {
-    padding: 6px 2px;
-    font-size: 10px;
+  .filter-actions {
+    margin-left: 0;
   }
 }
 </style>

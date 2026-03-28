@@ -1,6 +1,5 @@
 <template>
   <a-layout class="admin-layout">
-    <!-- 移动端遮罩层 -->
     <div
       v-if="isMobile && !collapsed"
       class="mobile-overlay"
@@ -13,7 +12,7 @@
       class="sider"
       :class="{ 'mobile-sidebar': isMobile }"
     >
-      <div class="logo gradient-bg-primary">
+      <div class="logo">
         <div
           v-if="!collapsed"
           class="logo-content"
@@ -26,15 +25,11 @@
             >
           </div>
           <div class="logo-text">
-            <a-typography-title
-              :level="4"
-              style="color: white; margin: 0"
-            >
+            <span class="logo-kicker">Operations</span>
+            <a-typography-title :level="4">
               {{ appShortName }}
             </a-typography-title>
-            <a-typography-text style="color: rgba(255, 255, 255, 0.65); font-size: 12px">
-              {{ appShortNameEn }}
-            </a-typography-text>
+            <a-typography-text>{{ appShortNameEn }}</a-typography-text>
           </div>
         </div>
         <div
@@ -56,9 +51,16 @@
         class="admin-menu"
         @click="handleMenuClick"
       />
+      <div
+        v-if="!collapsed"
+        class="sider-footer"
+      >
+        <span class="sider-footer-label">Secure Workspace</span>
+        <strong>{{ appShortNameEn || 'Law Firm Clients' }}</strong>
+        <p>项目、文件、通知与系统配置在同一控制台内完成。</p>
+      </div>
     </a-layout-sider>
     <a-layout class="main-layout">
-      <!-- 版本更新提示横幅 -->
       <div
         v-if="updateInfo.hasUpdate && !updateInfo.dismissed"
         class="update-banner"
@@ -105,8 +107,8 @@
 
       <a-layout-header class="header">
         <div class="header-content">
-          <a-button 
-            type="text" 
+          <a-button
+            type="text"
             class="collapse-btn"
             @click="collapsed = !collapsed"
           >
@@ -115,9 +117,16 @@
               <MenuFoldOutlined v-else />
             </template>
           </a-button>
-          <div class="header-title">
-            <span class="page-title">{{ currentPageTitle }}</span>
+
+          <div class="header-title-block">
+            <span class="header-eyebrow">Admin Console</span>
+            <div class="header-title-row">
+              <span class="page-title">{{ currentPageTitle }}</span>
+              <span class="header-caption">统一查看项目、通知、文件与系统配置</span>
+              <span class="header-status-pill">{{ headerStatusLabel }}</span>
+            </div>
           </div>
+
           <a-space
             class="header-actions"
             size="middle"
@@ -204,16 +213,14 @@ const route = useRoute()
 const authStore = useAuthStore()
 const appConfigStore = useAppConfigStore()
 
-// 从全局配置 store 获取配置
 const appShortName = computed(() => appConfigStore.appShortName)
 const appShortNameEn = computed(() => appConfigStore.appShortNameEn)
 const logoUrl = computed(() => appConfigStore.logoUrl)
-const logoCollapsedUrl = ref(LOGO_COLLAPSED_URL)  // 折叠Logo暂用默认值
+const logoCollapsedUrl = ref(LOGO_COLLAPSED_URL)
 
 const collapsed = ref(false)
 const selectedKeys = ref<string[]>([])
 
-// 版本更新信息
 const updateInfo = ref({
   hasUpdate: false,
   currentVersion: '',
@@ -223,43 +230,44 @@ const updateInfo = ref({
   dismissed: false,
 })
 
-// 当前页面标题
 const currentPageTitle = computed(() => {
   const matched = route.matched.find(r => r.meta?.title)
   return matched?.meta?.title as string || '管理后台'
 })
 
-// 窗口宽度（响应式）
-const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+const headerStatusLabel = computed(() => {
+  if (route.path.includes('/maintenance')) {
+    return 'System Control'
+  }
+  if (route.path.includes('/config') || route.path.includes('/api-keys')) {
+    return 'Protected Settings'
+  }
+  return 'Secure Session'
+})
 
-// 检测是否为移动端
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 const isMobile = computed(() => windowWidth.value <= 768)
 
-// 监听窗口大小变化
 let resizeHandler: (() => void) | null = null
 
-// 无活动自动登出相关
-const IDLE_TIMEOUT = 30 * 60 * 1000 // 30分钟无活动自动登出
-const WARNING_TIME = 5 * 60 * 1000 // 提前5分钟警告
-const RESET_INTERVAL = 5000 // 5秒内不重复重置计时器（避免频繁重置）
+const IDLE_TIMEOUT = 30 * 60 * 1000
+const WARNING_TIME = 5 * 60 * 1000
+const RESET_INTERVAL = 5000
 let idleTimer: ReturnType<typeof setTimeout> | null = null
 let warningTimer: ReturnType<typeof setTimeout> | null = null
-let lastResetTime = 0 // 上次重置计时器的时间
+let lastResetTime = 0
 let warningModal: ReturnType<typeof Modal.warning> | null = null
 let isPageVisible = true
 
-// 重置无活动计时器
 function resetIdleTimer() {
   const now = Date.now()
-  
-  // 如果距离上次重置时间太短，跳过（避免频繁重置）
+
   if (now - lastResetTime < RESET_INTERVAL) {
     return
   }
-  
+
   lastResetTime = now
-  
-  // 清除现有计时器
+
   if (idleTimer) {
     clearTimeout(idleTimer)
     idleTimer = null
@@ -268,35 +276,30 @@ function resetIdleTimer() {
     clearTimeout(warningTimer)
     warningTimer = null
   }
-  
-  // 关闭警告弹窗
+
   if (warningModal) {
     warningModal.destroy()
     warningModal = null
   }
-  
-  // 如果页面不可见，不启动计时器
+
   if (!isPageVisible) {
     return
   }
-  
-  // 设置警告计时器（提前5分钟警告）
+
   warningTimer = setTimeout(() => {
     showIdleWarning()
   }, IDLE_TIMEOUT - WARNING_TIME)
-  
-  // 设置自动登出计时器
+
   idleTimer = setTimeout(() => {
     handleAutoLogout()
   }, IDLE_TIMEOUT)
 }
 
-// 显示无活动警告
 function showIdleWarning() {
   if (warningModal) {
-    return // 已经显示警告
+    return
   }
-  
+
   const remainingMinutes = Math.ceil(WARNING_TIME / 60000)
   const idleMinutes = Math.floor((IDLE_TIMEOUT - WARNING_TIME) / 60000)
   warningModal = Modal.warning({
@@ -305,25 +308,20 @@ function showIdleWarning() {
     okText: '继续使用',
     cancelText: '立即登出',
     onOk: () => {
-      // resetIdleTimer 内部会关闭弹窗并重置 warningModal
       resetIdleTimer()
     },
     onCancel: () => {
-      // handleAutoLogout 内部会关闭弹窗并重置 warningModal
       handleAutoLogout()
     },
   })
 }
 
-// 自动登出
 function handleAutoLogout() {
-  // 关闭警告弹窗
   if (warningModal) {
     warningModal.destroy()
     warningModal = null
   }
-  
-  // 清除计时器
+
   if (idleTimer) {
     clearTimeout(idleTimer)
     idleTimer = null
@@ -332,25 +330,19 @@ function handleAutoLogout() {
     clearTimeout(warningTimer)
     warningTimer = null
   }
-  
-  // 登出
+
   message.warning('由于长时间无操作，系统已自动登出')
   authStore.logout()
   router.push('/admin/login')
 }
 
-// 处理用户活动
 function handleUserActivity() {
-  // 重置计时器（函数内部会检查是否频繁重置）
   resetIdleTimer()
 }
 
-// 页面可见性变化处理
 function handleVisibilityChange() {
   isPageVisible = !document.hidden
   if (isPageVisible) {
-    // 页面变为可见，强制重置计时器（忽略 RESET_INTERVAL 限制）
-    // 清除现有计时器
     if (idleTimer) {
       clearTimeout(idleTimer)
       idleTimer = null
@@ -363,11 +355,9 @@ function handleVisibilityChange() {
       warningModal.destroy()
       warningModal = null
     }
-    // 强制重置（跳过 RESET_INTERVAL 检查）
     lastResetTime = 0
     resetIdleTimer()
   } else {
-    // 页面变为隐藏，清除计时器（但不重置最后活动时间）
     if (idleTimer) {
       clearTimeout(idleTimer)
       idleTimer = null
@@ -385,60 +375,46 @@ function handleVisibilityChange() {
 
 onMounted(() => {
   resizeHandler = () => {
-    // 更新窗口宽度（触发 isMobile 重新计算）
     windowWidth.value = window.innerWidth
-    
-    // 窗口大小变化时，如果从移动端切换到桌面端，自动展开侧边栏
+
     if (window.innerWidth > 768) {
       collapsed.value = false
     } else {
-      // 切换到移动端时，默认收起
       collapsed.value = true
     }
   }
   window.addEventListener('resize', resizeHandler)
-  // 移动端默认收起侧边栏
   if (isMobile.value) {
     collapsed.value = true
   }
-  
-  // 如果store中没有用户信息，尝试从API获取
+
   if (authStore.isAuthenticated && !authStore.getCurrentUserInfo()) {
     authStore.fetchCurrentUser().catch(() => {
-      // 如果获取失败，可能是Token已过期，清除认证信息
       authStore.clearAuth()
       router.push('/admin/login')
     })
   }
-  
-  // 检查版本更新
+
   checkForUpdates()
-  
-  // 初始化无活动自动登出（仅在已登录时）
+
   if (authStore.isAuthenticated) {
-    // 监听用户活动事件
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
     events.forEach(event => {
       document.addEventListener(event, handleUserActivity, { passive: true })
     })
-    
-    // 监听页面可见性变化
+
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    
-    // 启动无活动计时器
     resetIdleTimer()
   }
 })
 
-// 检查版本更新
 async function checkForUpdates() {
-  // 检查是否已经在本次会话中关闭了提示
   const dismissed = sessionStorage.getItem('update_dismissed')
   if (dismissed) {
     updateInfo.value.dismissed = true
     return
   }
-  
+
   try {
     const res = await request.get('/api/admin/system/version/check')
     if (res.success && res.data) {
@@ -460,7 +436,6 @@ async function checkForUpdates() {
   }
 }
 
-// 查看更新内容
 function viewReleaseNotes() {
   if (updateInfo.value.releaseUrl) {
     window.open(updateInfo.value.releaseUrl, '_blank')
@@ -475,18 +450,15 @@ function viewReleaseNotes() {
   }
 }
 
-// 前往系统维护页面
 function goToMaintenance() {
   router.push('/admin/maintenance')
 }
 
-// 稍后提醒（本次会话不再显示）
 function dismissUpdate() {
   updateInfo.value.dismissed = true
   sessionStorage.setItem('update_dismissed', 'true')
 }
 
-// 忽略此版本
 async function ignoreVersion() {
   if (!updateInfo.value.latestVersion) {
     message.warning('无法获取版本号')
@@ -496,22 +468,19 @@ async function ignoreVersion() {
     await request.post(`/api/admin/system/version/ignore?version=${updateInfo.value.latestVersion}`)
     updateInfo.value.hasUpdate = false
     message.success('已忽略此版本，下次有新版本时会再次提醒')
-  } catch (e) {
+  } catch {
     message.error('操作失败')
   }
 }
 
 onUnmounted(() => {
-  // 清理事件监听器
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler)
   }
-  // 停止 watch
   if (stopWatch) {
     stopWatch()
   }
-  
-  // 清除无活动计时器
+
   if (idleTimer) {
     clearTimeout(idleTimer)
     idleTimer = null
@@ -520,26 +489,21 @@ onUnmounted(() => {
     clearTimeout(warningTimer)
     warningTimer = null
   }
-  
-  // 关闭警告弹窗
+
   if (warningModal) {
     warningModal.destroy()
     warningModal = null
   }
-  
-  // 移除用户活动监听器
+
   const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
   events.forEach(event => {
     document.removeEventListener(event, handleUserActivity)
   })
-  
-  // 移除页面可见性监听器
+
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
-// 菜单项（按功能分组排序）
 const menuItems: MenuProps['items'] = [
-  // === 业务功能 ===
   {
     key: '/admin/matters',
     icon: () => h(AppstoreOutlined),
@@ -564,7 +528,6 @@ const menuItems: MenuProps['items'] = [
     label: '通知记录',
     title: '通知记录',
   },
-  // === 通知配置 ===
   {
     key: '/admin/notification-templates',
     icon: () => h(FileSyncOutlined),
@@ -577,7 +540,6 @@ const menuItems: MenuProps['items'] = [
     label: '通知配置',
     title: '通知配置',
   },
-  // === 系统配置 ===
   {
     key: '/admin/api-keys',
     icon: () => h(ApiOutlined),
@@ -598,21 +560,18 @@ const menuItems: MenuProps['items'] = [
   },
 ]
 
-// 监听路由变化，更新选中菜单
 const stopWatch = watch(
   () => route.path,
   (path) => {
     selectedKeys.value = [path]
   },
-  { immediate: true }
+  { immediate: true },
 )
 
-// 菜单点击处理
 function handleMenuClick({ key }: { key: string }) {
   router.push(key as string)
 }
 
-// 登出
 async function handleLogout() {
   try {
     await authStore.logout()
@@ -626,23 +585,45 @@ async function handleLogout() {
 </script>
 
 <style>
-/* 全局样式 - 确保 CSS 变量和工具类可用 */
 .admin-layout {
   min-height: 100vh;
   background: var(--bg-secondary);
 }
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>
 
 <style scoped>
+.admin-layout {
+  position: relative;
+  background:
+    radial-gradient(circle at top right, rgba(63, 109, 153, 0.14), transparent 26%),
+    radial-gradient(circle at bottom left, rgba(201, 164, 76, 0.12), transparent 18%),
+    var(--bg-secondary);
+}
 
-/* 版本更新横幅 */
 .update-banner {
-  background: linear-gradient(90deg, #1890ff 0%, #52c41a 100%);
+  background: linear-gradient(90deg, rgba(24, 58, 90, 0.96) 0%, rgba(49, 92, 130, 0.94) 100%);
   color: #fff;
-  padding: 10px 24px;
+  padding: 12px 28px;
   position: sticky;
   top: 0;
   z-index: 1000;
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(196, 160, 92, 0.16);
 }
 
 .update-content {
@@ -694,9 +675,9 @@ async function handleLogout() {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* 侧边栏样式 */
 .sider {
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(180deg, rgba(10, 24, 37, 0.98) 0%, rgba(16, 39, 61, 0.98) 100%) !important;
+  box-shadow: none;
   position: fixed;
   left: 0;
   top: 0;
@@ -707,9 +688,9 @@ async function handleLogout() {
   overflow-x: hidden;
   z-index: 100;
   transition: width 0.2s;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* 侧边栏收起时的宽度 */
 .sider.ant-layout-sider-collapsed {
   width: 80px;
 }
@@ -720,7 +701,6 @@ async function handleLogout() {
   height: 100%;
 }
 
-/* 侧边栏滚动条样式优化 */
 .sider::-webkit-scrollbar {
   width: 6px;
 }
@@ -739,39 +719,38 @@ async function handleLogout() {
 }
 
 .logo {
-  height: 72px;
+  min-height: 108px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(180deg, rgba(15, 35, 53, 0.92) 0%, rgba(17, 41, 63, 0.72) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
-/* Logo hover效果 - 轻微高亮 */
-.logo:hover {
-  opacity: 0.95;
+.logo::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(196, 160, 92, 0), rgba(196, 160, 92, 0.44), rgba(196, 160, 92, 0));
 }
 
 .logo-content {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: 24px 18px;
   width: 100%;
 }
 
-.logo-icon {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .logo-image {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   object-fit: contain;
   display: block;
 }
@@ -789,67 +768,121 @@ async function handleLogout() {
   overflow: hidden;
 }
 
-.logo-text h2 {
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0;
-  line-height: 1.3;
+.logo-kicker {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.logo-text :deep(h4) {
+  color: #fff !important;
+  margin: 0 !important;
+  line-height: 1.25 !important;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.logo-text p {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 10px;
-  margin: 2px 0 0 0;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.logo-text :deep(.ant-typography) {
+  color: rgba(255, 255, 255, 0.62) !important;
+  font-size: 12px;
 }
 
 .logo-collapsed {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 24px 16px;
 }
 
 .admin-menu {
   flex: 1;
   border-right: none;
-  padding: 8px 0;
+  padding: 18px 10px 20px;
+  background: transparent !important;
 }
 
 .admin-menu :deep(.ant-menu-item) {
-  margin: 4px 8px;
-  border-radius: var(--radius-sm);
-  height: 44px;
-  line-height: 44px;
+  margin: 4px 6px;
+  border-radius: 16px;
+  height: 50px;
+  line-height: 50px;
   transition: all 0.2s ease;
   cursor: pointer;
+  color: rgba(255, 255, 255, 0.78) !important;
+  font-weight: 500;
 }
 
 .admin-menu :deep(.ant-menu-item:hover) {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08) !important;
+  transform: translateX(2px);
 }
 
 .admin-menu :deep(.ant-menu-item-selected) {
-  background: rgba(255, 255, 255, 0.15);
-  border-left: 3px solid var(--primary-color-light);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff !important;
 }
 
 .admin-menu :deep(.ant-menu-item-selected::after) {
   display: none;
 }
 
-/* 头部样式 */
+.admin-menu :deep(.ant-menu-item-selected .anticon) {
+  color: var(--accent-color) !important;
+}
+
+.sider-footer {
+  margin: 10px 18px 20px;
+  padding: 18px 16px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sider-footer-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sider-footer strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sider-footer p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.main-layout {
+  margin-left: 240px;
+  transition: margin-left 0.2s;
+  min-height: 100vh;
+  background: transparent !important;
+}
+
+.admin-layout .sider.ant-layout-sider-collapsed ~ .main-layout {
+  margin-left: 80px;
+}
+
 .header {
-  background: #fff;
+  background: transparent !important;
   padding: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: sticky;
   top: 0;
   z-index: 99;
@@ -858,47 +891,76 @@ async function handleLogout() {
 .header-content {
   display: flex;
   align-items: center;
-  height: 72px;
-  padding: 0 24px;
-  max-width: 100%;
+  gap: 16px;
+  min-height: 92px;
+  width: min(var(--shell-max-width), calc(100vw - 240px - 2 * var(--shell-gutter)));
+  margin: 0 auto;
+  padding: 18px 0 10px;
 }
 
 .collapse-btn {
   color: var(--text-primary);
   font-size: 18px;
-  margin-right: 16px;
   transition: all 0.2s ease;
   cursor: pointer;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
 }
 
 .collapse-btn:hover {
   color: var(--primary-color);
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.92) !important;
 }
 
-.header-title {
+.header-title-block {
   flex: 1;
-  margin-left: 8px;
+}
+
+.header-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.header-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 600;
-  color: var(--text-primary);
-  position: relative;
-  padding-left: 16px;
+  color: var(--primary-color-dark);
+  line-height: 1.1;
 }
 
-.page-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 20px;
-  background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
-  border-radius: 2px;
+.header-caption {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.header-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(196, 160, 92, 0.12);
+  border: 1px solid rgba(196, 160, 92, 0.18);
+  color: var(--accent-color-deep);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .header-actions {
@@ -911,16 +973,19 @@ async function handleLogout() {
   align-items: center;
   gap: 6px;
   transition: all 0.2s ease;
-  background: transparent !important;
+  background: rgba(255, 255, 255, 0.76) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   cursor: pointer;
+  min-height: 46px;
+  backdrop-filter: blur(14px);
 }
 
 .header-btn:hover {
   color: var(--primary-color);
-  background: var(--bg-tertiary) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
 }
 
-/* 铃铛徽章样式 */
 .header-actions :deep(.ant-badge) {
   display: flex;
   align-items: center;
@@ -934,218 +999,103 @@ async function handleLogout() {
   font-size: 14px;
 }
 
-/* 主布局区域（右侧内容区） */
-.main-layout {
-  margin-left: 240px;
-  transition: margin-left 0.2s;
-  min-height: 100vh;
-}
-
-/* 当侧边栏收起时，调整主布局的左边距 */
-.admin-layout .sider.ant-layout-sider-collapsed ~ .main-layout {
-  margin-left: 80px;
-}
-
-/* 内容区域 */
 .content {
-  margin: 24px;
+  padding: 0 0 24px;
   min-height: calc(100vh - 120px);
 }
 
 .content-wrapper {
-  background: transparent;
+  width: min(var(--shell-max-width), calc(100vw - 240px - 2 * var(--shell-gutter)));
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-color);
+  border-radius: 26px;
+  padding: 24px;
+  min-height: calc(100vh - 160px);
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(22px);
 }
 
-/* 响应式设计 - 平板 */
+.mobile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;
+}
+
+.mobile-sidebar {
+  z-index: 1000;
+}
+
 @media (max-width: 1024px) {
   .sider {
     width: 200px !important;
   }
-  
+
   .main-layout {
     margin-left: 200px;
   }
-  
+
   .admin-layout :deep(.ant-layout-sider-collapsed) ~ .main-layout {
     margin-left: 80px;
   }
-  
-  .content {
-    margin: 20px;
+
+  .header-content,
+  .content-wrapper {
+    width: min(var(--shell-max-width), calc(100vw - 200px - 2 * 20px));
   }
 }
 
-/* 响应式设计 - 移动端 */
 @media (max-width: 768px) {
-  .admin-layout {
-    position: relative;
-  }
-  
   .main-layout {
     margin-left: 0 !important;
   }
-  
+
   .sider {
     position: fixed !important;
     left: 0;
     top: 0;
     bottom: 0;
-    z-index: 1000;
-    height: 100vh;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
   }
-  
+
   .sider.mobile-sidebar:not(.ant-layout-sider-collapsed) {
     transform: translateX(0) !important;
   }
-  
+
   .sider.mobile-sidebar.ant-layout-sider-collapsed {
     transform: translateX(-100%) !important;
   }
-  
-  .mobile-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: 999;
-    transition: opacity 0.3s ease;
-  }
-  
-  .logo {
-    height: 64px;
-  }
-  
-  .logo-content {
-    padding: 0 12px;
-  }
-  
-  .logo-icon {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .logo-image {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .logo-text h2 {
-    font-size: 14px;
-  }
-  
-  .logo-text p {
-    font-size: 9px;
-  }
-  
-  .admin-menu :deep(.ant-menu-item) {
-    height: 40px;
-    line-height: 40px;
-    margin: 2px 4px;
-    font-size: 14px;
-  }
-  
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 999;
-  }
-  
+
   .header-content {
-    padding: 0 12px;
-    height: 64px;
+    width: min(var(--shell-max-width), calc(100vw - 2 * 16px));
+    padding: 14px 0 8px;
+    min-height: 76px;
   }
-  
-  .collapse-btn {
-    font-size: 20px;
-    margin-right: 12px;
-    padding: 8px;
-  }
-  
-  .page-title {
-    font-size: 16px;
-    padding-left: 12px;
-  }
-  
-  .page-title::before {
-    width: 3px;
-    height: 16px;
-  }
-  
-  .header-actions {
-    gap: 4px;
-  }
-  
-  .header-btn {
-    padding: 8px;
-  }
-  
+
+  .header-caption,
   .header-btn-text {
     display: none;
   }
-  
-  .content {
-    margin: 12px;
-    padding: 16px;
-    min-height: calc(100vh - 88px);
-  }
-}
 
-/* 小屏手机优化 */
-@media (max-width: 480px) {
-  .header-content {
-    padding: 0 8px;
-    height: 56px;
-  }
-  
   .page-title {
-    font-size: 14px;
-    padding-left: 8px;
+    font-size: 20px;
   }
-  
+
   .content {
-    margin: 8px;
-    padding: 12px;
+    padding-bottom: 20px;
   }
-  
-  .logo-text h2 {
-    font-size: 13px;
-  }
-  
-  .logo-text p {
-    font-size: 9px;
-  }
-  
-  .admin-menu :deep(.ant-menu-item) {
-    height: 36px;
-    line-height: 36px;
-    font-size: 13px;
-  }
-}
-</style>
 
-<style>
-/* 全局样式 - Logo 渐变背景 */
-.logo.gradient-bg-primary {
-  background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 50%, var(--primary-color-light) 100%) !important;
-}
-
-/* 全局样式 - 平滑过渡 */
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+  .content-wrapper {
+    width: min(var(--shell-max-width), calc(100vw - 2 * 16px));
+    border-radius: 20px;
+    padding: 16px;
+    min-height: calc(100vh - 128px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .update-banner {
+    padding: 10px 16px;
   }
 }
 </style>

@@ -1,52 +1,85 @@
 <template>
   <div class="notification-settings-container">
-    <a-card>
-      <template #title>
-        <span>通知配置</span>
-      </template>
-      <template #extra>
-        <a-button @click="loadData">
-          <template #icon>
-            <ReloadOutlined />
-          </template>
-          刷新
-        </a-button>
-      </template>
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">
+          Channel Configuration
+        </div>
+        <h2 class="editorial-title intro-title">
+          通知配置
+        </h2>
+        <p class="intro-text">
+          在同一页面管理邮件、短信、微信三个渠道的启用状态与发送参数，保存后立即生效。
+        </p>
+      </div>
+      <a-button @click="loadData">
+        <template #icon>
+          <ReloadOutlined />
+        </template>
+        刷新
+      </a-button>
+    </section>
 
+    <section class="info-panel">
       <a-alert
         message="配置说明"
-        description="在此页面配置邮件、短信、微信通知的相关参数。配置保存后，系统会优先使用数据库中的配置，如果数据库中没有配置，则使用 application.yml 中的默认配置。"
+        description="系统优先使用数据库中的通知配置；当数据库中不存在对应键时，才会回退到 application.yml 中的默认值。"
         type="info"
         show-icon
-        style="margin-bottom: 24px"
       />
+    </section>
 
-      <a-spin :spinning="loading">
-        <!-- 邮件通知配置 -->
-        <a-card
-          title="邮件通知"
-          style="margin-bottom: 24px"
-        >
-          <a-form
-            :model="emailForm"
-            layout="vertical"
-          >
-            <a-form-item label="启用邮件通知">
+    <section class="stats-grid">
+      <div class="stats-card">
+        <span class="stats-label">启用渠道</span>
+        <strong>{{ enabledChannelCount }}/3</strong>
+        <p>当前已启用的通知渠道数量。</p>
+      </div>
+      <div class="stats-card success">
+        <span class="stats-label">邮件</span>
+        <strong>{{ emailForm.enabled ? 'ON' : 'OFF' }}</strong>
+        <p>{{ emailForm.smtpHost ? 'SMTP 已配置' : 'SMTP 待配置' }}</p>
+      </div>
+      <div class="stats-card info">
+        <span class="stats-label">短信</span>
+        <strong>{{ smsForm.enabled ? 'ON' : 'OFF' }}</strong>
+        <p>{{ smsForm.provider === 'tencent' ? '腾讯云通道' : '阿里云通道' }}</p>
+      </div>
+      <div class="stats-card danger">
+        <span class="stats-label">微信</span>
+        <strong>{{ wechatForm.enabled ? 'ON' : 'OFF' }}</strong>
+        <p>{{ wechatForm.templateId ? '模板已配置' : '模板待配置' }}</p>
+      </div>
+    </section>
+
+    <a-spin :spinning="loading">
+      <section class="channel-grid">
+        <article class="channel-card">
+          <div class="channel-header">
+            <div>
+              <div class="channel-kicker">
+                Email
+              </div>
+              <h3>邮件通知</h3>
+            </div>
+            <div class="channel-switch">
               <a-switch
                 v-model:checked="emailForm.enabled"
                 @change="handleEmailEnabledChange"
               />
-              <span style="margin-left: 8px; color: #999">
-                {{ emailForm.enabled ? '已启用' : '已禁用' }}
-              </span>
-            </a-form-item>
+              <span>{{ emailForm.enabled ? '已启用' : '已禁用' }}</span>
+            </div>
+          </div>
+
+          <a-form
+            :model="emailForm"
+            layout="vertical"
+            class="channel-form"
+          >
             <template v-if="emailForm.enabled">
-              <a-divider
-                orientation="left"
-                style="margin: 16px 0"
-              >
+              <div class="subsection-title">
                 SMTP 服务器配置
-              </a-divider>
+              </div>
               <a-form-item label="SMTP 服务器地址">
                 <a-input
                   v-model:value="emailForm.smtpHost"
@@ -75,18 +108,15 @@
                 />
               </a-form-item>
               <a-alert
-                message="配置说明"
-                description="SMTP 配置保存后立即生效，无需重启服务。如果使用环境变量 SPRING_MAIL_* 配置，则环境变量优先级更高。"
+                message="SMTP 配置保存后立即生效，无需重启服务。若通过环境变量 SPRING_MAIL_* 覆盖，则环境变量优先。"
                 type="info"
                 show-icon
-                style="margin-bottom: 16px"
+                class="inline-alert"
               />
-              <a-divider
-                orientation="left"
-                style="margin: 16px 0"
-              >
+
+              <div class="subsection-title">
                 发件人信息
-              </a-divider>
+              </div>
               <a-form-item label="发件人邮箱">
                 <a-input
                   v-model:value="emailForm.from"
@@ -110,26 +140,30 @@
               </a-button>
             </a-form-item>
           </a-form>
-        </a-card>
+        </article>
 
-        <!-- 短信通知配置 -->
-        <a-card
-          title="短信通知"
-          style="margin-bottom: 24px"
-        >
-          <a-form
-            :model="smsForm"
-            layout="vertical"
-          >
-            <a-form-item label="启用短信通知">
+        <article class="channel-card">
+          <div class="channel-header">
+            <div>
+              <div class="channel-kicker">
+                SMS
+              </div>
+              <h3>短信通知</h3>
+            </div>
+            <div class="channel-switch">
               <a-switch
                 v-model:checked="smsForm.enabled"
                 @change="handleSmsEnabledChange"
               />
-              <span style="margin-left: 8px; color: #999">
-                {{ smsForm.enabled ? '已启用' : '已禁用' }}
-              </span>
-            </a-form-item>
+              <span>{{ smsForm.enabled ? '已启用' : '已禁用' }}</span>
+            </div>
+          </div>
+
+          <a-form
+            :model="smsForm"
+            layout="vertical"
+            class="channel-form"
+          >
             <template v-if="smsForm.enabled">
               <a-form-item label="服务商">
                 <a-select
@@ -144,6 +178,7 @@
                   </a-select-option>
                 </a-select>
               </a-form-item>
+
               <template v-if="smsForm.provider === 'aliyun'">
                 <a-form-item label="Access Key ID">
                   <a-input
@@ -174,11 +209,12 @@
                     v-model:value="smsForm.aliyun.endpoint"
                     placeholder="请输入 API 端点（默认：dysmsapi.aliyuncs.com）"
                   />
-                  <div style="margin-top: 4px; font-size: 12px; color: #999">
+                  <div class="field-note">
                     可选，留空使用默认值
                   </div>
                 </a-form-item>
               </template>
+
               <template v-if="smsForm.provider === 'tencent'">
                 <a-form-item label="Secret ID">
                   <a-input
@@ -215,8 +251,8 @@
                     v-model:value="smsForm.tencent.region"
                     placeholder="请输入区域（默认：ap-beijing）"
                   />
-                  <div style="margin-top: 4px; font-size: 12px; color: #999">
-                    可选，留空使用默认值（如：ap-beijing, ap-shanghai）
+                  <div class="field-note">
+                    可选，留空使用默认值
                   </div>
                 </a-form-item>
               </template>
@@ -231,23 +267,30 @@
               </a-button>
             </a-form-item>
           </a-form>
-        </a-card>
+        </article>
 
-        <!-- 微信通知配置 -->
-        <a-card title="微信通知">
-          <a-form
-            :model="wechatForm"
-            layout="vertical"
-          >
-            <a-form-item label="启用微信通知">
+        <article class="channel-card">
+          <div class="channel-header">
+            <div>
+              <div class="channel-kicker">
+                WeChat
+              </div>
+              <h3>微信通知</h3>
+            </div>
+            <div class="channel-switch">
               <a-switch
                 v-model:checked="wechatForm.enabled"
                 @change="handleWechatEnabledChange"
               />
-              <span style="margin-left: 8px; color: #999">
-                {{ wechatForm.enabled ? '已启用' : '已禁用' }}
-              </span>
-            </a-form-item>
+              <span>{{ wechatForm.enabled ? '已启用' : '已禁用' }}</span>
+            </div>
+          </div>
+
+          <a-form
+            :model="wechatForm"
+            layout="vertical"
+            class="channel-form"
+          >
             <template v-if="wechatForm.enabled">
               <a-form-item label="AppID">
                 <a-input
@@ -266,8 +309,8 @@
                   v-model:value="wechatForm.templateId"
                   placeholder="请输入微信模板消息ID（可选，也可在通知模板管理中配置）"
                 />
-                <div style="margin-top: 4px; font-size: 12px; color: #999">
-                  提示：可以在「通知模板管理」页面配置更详细的模板内容
+                <div class="field-note">
+                  可以在通知模板管理页面配置更细的模板内容。
                 </div>
               </a-form-item>
             </template>
@@ -281,14 +324,14 @@
               </a-button>
             </a-form-item>
           </a-form>
-        </a-card>
-      </a-spin>
-    </a-card>
+        </article>
+      </section>
+    </a-spin>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { ReloadOutlined } from '@ant-design/icons-vue'
 import { getConfigList, saveConfig, type SysConfigInfo } from '@/api/config'
@@ -300,7 +343,6 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback
 }
 
-// 邮件配置表单
 const emailForm = ref({
   enabled: false,
   smtpHost: '',
@@ -311,7 +353,6 @@ const emailForm = ref({
   fromName: '',
 })
 
-// 短信配置表单
 const smsForm = ref({
   enabled: false,
   provider: 'aliyun',
@@ -332,7 +373,6 @@ const smsForm = ref({
   },
 })
 
-// 微信配置表单
 const wechatForm = ref({
   enabled: false,
   appId: '',
@@ -340,20 +380,21 @@ const wechatForm = ref({
   templateId: '',
 })
 
-// 从配置列表中查找配置值
+const enabledChannelCount = computed(() =>
+  [emailForm.value.enabled, smsForm.value.enabled, wechatForm.value.enabled].filter(Boolean).length,
+)
+
 function findConfigValue(configs: SysConfigInfo[], key: string): string | null {
   const config = configs.find(c => c.configKey === key)
   return config ? config.configValue : null
 }
 
-// 加载配置数据
 async function loadData() {
   loading.value = true
   try {
     const res = await getConfigList({ limit: 200 })
     const configs = res.data || []
 
-    // 加载邮件配置（兼容两种键名格式：带前缀和不带前缀）
     emailForm.value.enabled = findConfigValue(configs, 'client-service.notification.email.enabled') === 'true' || findConfigValue(configs, 'notification.email.enabled') === 'true'
     emailForm.value.smtpHost = findConfigValue(configs, 'spring.mail.host') || ''
     emailForm.value.smtpPort = parseInt(findConfigValue(configs, 'spring.mail.port') || '587', 10)
@@ -362,7 +403,6 @@ async function loadData() {
     emailForm.value.from = findConfigValue(configs, 'client-service.notification.email.from') || findConfigValue(configs, 'notification.email.from') || ''
     emailForm.value.fromName = findConfigValue(configs, 'client-service.notification.email.from-name') || findConfigValue(configs, 'notification.email.from-name') || ''
 
-    // 加载短信配置（兼容两种键名格式：带前缀和不带前缀）
     smsForm.value.enabled = findConfigValue(configs, 'client-service.notification.sms.enabled') === 'true' || findConfigValue(configs, 'notification.sms.enabled') === 'true'
     smsForm.value.provider = findConfigValue(configs, 'client-service.notification.sms.provider') || findConfigValue(configs, 'notification.sms.provider') || 'aliyun'
     smsForm.value.aliyun.accessKeyId = findConfigValue(configs, 'client-service.notification.sms.aliyun.access-key-id') || ''
@@ -377,7 +417,6 @@ async function loadData() {
     smsForm.value.tencent.templateId = findConfigValue(configs, 'client-service.notification.sms.tencent.template-id') || ''
     smsForm.value.tencent.region = findConfigValue(configs, 'client-service.notification.sms.tencent.region') || ''
 
-    // 加载微信配置（兼容两种键名格式：带前缀和不带前缀）
     wechatForm.value.enabled = findConfigValue(configs, 'client-service.notification.wechat.enabled') === 'true' || findConfigValue(configs, 'notification.wechat.enabled') === 'true'
     wechatForm.value.appId = findConfigValue(configs, 'client-service.notification.wechat.app-id') || ''
     wechatForm.value.appSecret = findConfigValue(configs, 'client-service.notification.wechat.app-secret') || ''
@@ -389,13 +428,7 @@ async function loadData() {
   }
 }
 
-// 保存配置的通用方法
-async function saveConfigValue(
-  configKey: string,
-  configValue: string,
-  configType: string = 'STRING',
-  description?: string
-) {
+async function saveConfigValue(configKey: string, configValue: string, configType: string = 'STRING', description?: string) {
   await saveConfig({
     configKey,
     configValue,
@@ -404,67 +437,17 @@ async function saveConfigValue(
   })
 }
 
-// 保存邮件配置
 async function handleSaveEmailConfig() {
   saving.value = true
   try {
-    await saveConfigValue(
-      'client-service.notification.email.enabled',
-      String(emailForm.value.enabled),
-      'BOOLEAN',
-      '是否启用邮件通知'
-    )
+    await saveConfigValue('client-service.notification.email.enabled', String(emailForm.value.enabled), 'BOOLEAN', '是否启用邮件通知')
     if (emailForm.value.enabled) {
-      // 保存 SMTP 服务器配置
-      if (emailForm.value.smtpHost) {
-        await saveConfigValue(
-          'spring.mail.host',
-          emailForm.value.smtpHost,
-          'STRING',
-          'SMTP 服务器地址'
-        )
-      }
-      if (emailForm.value.smtpPort) {
-        await saveConfigValue(
-          'spring.mail.port',
-          String(emailForm.value.smtpPort),
-          'NUMBER',
-          'SMTP 服务器端口'
-        )
-      }
-      if (emailForm.value.smtpUsername) {
-        await saveConfigValue(
-          'spring.mail.username',
-          emailForm.value.smtpUsername,
-          'STRING',
-          'SMTP 用户名'
-        )
-      }
-      if (emailForm.value.smtpPassword) {
-        await saveConfigValue(
-          'spring.mail.password',
-          emailForm.value.smtpPassword,
-          'STRING',
-          'SMTP 密码'
-        )
-      }
-      // 保存发件人信息
-      if (emailForm.value.from) {
-        await saveConfigValue(
-          'client-service.notification.email.from',
-          emailForm.value.from,
-          'STRING',
-          '邮件发件人邮箱'
-        )
-      }
-      if (emailForm.value.fromName) {
-        await saveConfigValue(
-          'client-service.notification.email.from-name',
-          emailForm.value.fromName,
-          'STRING',
-          '邮件发件人名称'
-        )
-      }
+      if (emailForm.value.smtpHost) await saveConfigValue('spring.mail.host', emailForm.value.smtpHost, 'STRING', 'SMTP 服务器地址')
+      if (emailForm.value.smtpPort) await saveConfigValue('spring.mail.port', String(emailForm.value.smtpPort), 'NUMBER', 'SMTP 服务器端口')
+      if (emailForm.value.smtpUsername) await saveConfigValue('spring.mail.username', emailForm.value.smtpUsername, 'STRING', 'SMTP 用户名')
+      if (emailForm.value.smtpPassword) await saveConfigValue('spring.mail.password', emailForm.value.smtpPassword, 'STRING', 'SMTP 密码')
+      if (emailForm.value.from) await saveConfigValue('client-service.notification.email.from', emailForm.value.from, 'STRING', '邮件发件人邮箱')
+      if (emailForm.value.fromName) await saveConfigValue('client-service.notification.email.from-name', emailForm.value.fromName, 'STRING', '邮件发件人名称')
     }
     message.success('邮件配置已保存，SMTP 配置已立即生效')
   } catch (error: unknown) {
@@ -474,113 +457,25 @@ async function handleSaveEmailConfig() {
   }
 }
 
-// 保存短信配置
 async function handleSaveSmsConfig() {
   saving.value = true
   try {
-    await saveConfigValue(
-      'client-service.notification.sms.enabled',
-      String(smsForm.value.enabled),
-      'BOOLEAN',
-      '是否启用短信通知'
-    )
+    await saveConfigValue('client-service.notification.sms.enabled', String(smsForm.value.enabled), 'BOOLEAN', '是否启用短信通知')
     if (smsForm.value.enabled) {
-      await saveConfigValue(
-        'client-service.notification.sms.provider',
-        smsForm.value.provider,
-        'STRING',
-        '短信服务商（aliyun/tencent）'
-      )
+      await saveConfigValue('client-service.notification.sms.provider', smsForm.value.provider, 'STRING', '短信服务商（aliyun/tencent）')
       if (smsForm.value.provider === 'aliyun') {
-        if (smsForm.value.aliyun.accessKeyId) {
-          await saveConfigValue(
-            'client-service.notification.sms.aliyun.access-key-id',
-            smsForm.value.aliyun.accessKeyId,
-            'STRING',
-            '阿里云 Access Key ID'
-          )
-        }
-        if (smsForm.value.aliyun.accessKeySecret) {
-          await saveConfigValue(
-            'client-service.notification.sms.aliyun.access-key-secret',
-            smsForm.value.aliyun.accessKeySecret,
-            'STRING',
-            '阿里云 Access Key Secret'
-          )
-        }
-        if (smsForm.value.aliyun.signName) {
-          await saveConfigValue(
-            'client-service.notification.sms.aliyun.sign-name',
-            smsForm.value.aliyun.signName,
-            'STRING',
-            '阿里云短信签名名称'
-          )
-        }
-        if (smsForm.value.aliyun.templateCode) {
-          await saveConfigValue(
-            'client-service.notification.sms.aliyun.template-code',
-            smsForm.value.aliyun.templateCode,
-            'STRING',
-            '阿里云短信模板代码'
-          )
-        }
-        if (smsForm.value.aliyun.endpoint) {
-          await saveConfigValue(
-            'client-service.notification.sms.aliyun.endpoint',
-            smsForm.value.aliyun.endpoint,
-            'STRING',
-            '阿里云短信 API 端点'
-          )
-        }
+        if (smsForm.value.aliyun.accessKeyId) await saveConfigValue('client-service.notification.sms.aliyun.access-key-id', smsForm.value.aliyun.accessKeyId, 'STRING', '阿里云 Access Key ID')
+        if (smsForm.value.aliyun.accessKeySecret) await saveConfigValue('client-service.notification.sms.aliyun.access-key-secret', smsForm.value.aliyun.accessKeySecret, 'STRING', '阿里云 Access Key Secret')
+        if (smsForm.value.aliyun.signName) await saveConfigValue('client-service.notification.sms.aliyun.sign-name', smsForm.value.aliyun.signName, 'STRING', '阿里云短信签名名称')
+        if (smsForm.value.aliyun.templateCode) await saveConfigValue('client-service.notification.sms.aliyun.template-code', smsForm.value.aliyun.templateCode, 'STRING', '阿里云短信模板代码')
+        if (smsForm.value.aliyun.endpoint) await saveConfigValue('client-service.notification.sms.aliyun.endpoint', smsForm.value.aliyun.endpoint, 'STRING', '阿里云短信 API 端点')
       } else if (smsForm.value.provider === 'tencent') {
-        if (smsForm.value.tencent.secretId) {
-          await saveConfigValue(
-            'client-service.notification.sms.tencent.secret-id',
-            smsForm.value.tencent.secretId,
-            'STRING',
-            '腾讯云 Secret ID'
-          )
-        }
-        if (smsForm.value.tencent.secretKey) {
-          await saveConfigValue(
-            'client-service.notification.sms.tencent.secret-key',
-            smsForm.value.tencent.secretKey,
-            'STRING',
-            '腾讯云 Secret Key'
-          )
-        }
-        if (smsForm.value.tencent.appId) {
-          await saveConfigValue(
-            'client-service.notification.sms.tencent.app-id',
-            smsForm.value.tencent.appId,
-            'STRING',
-            '腾讯云短信应用ID'
-          )
-        }
-        if (smsForm.value.tencent.signName) {
-          await saveConfigValue(
-            'client-service.notification.sms.tencent.sign-name',
-            smsForm.value.tencent.signName,
-            'STRING',
-            '腾讯云短信签名名称'
-          )
-        }
-        if (smsForm.value.tencent.templateId) {
-          await saveConfigValue(
-            'client-service.notification.sms.tencent.template-id',
-            smsForm.value.tencent.templateId,
-            'STRING',
-            '腾讯云短信模板ID'
-          )
-        }
-        if (smsForm.value.tencent.region) {
-          await saveConfigValue(
-            'client-service.notification.sms.tencent.region',
-            smsForm.value.tencent.region,
-            'STRING',
-            '腾讯云短信区域'
-          )
-        }
+        if (smsForm.value.tencent.secretId) await saveConfigValue('client-service.notification.sms.tencent.secret-id', smsForm.value.tencent.secretId, 'STRING', '腾讯云 Secret ID')
+        if (smsForm.value.tencent.secretKey) await saveConfigValue('client-service.notification.sms.tencent.secret-key', smsForm.value.tencent.secretKey, 'STRING', '腾讯云 Secret Key')
+        if (smsForm.value.tencent.appId) await saveConfigValue('client-service.notification.sms.tencent.app-id', smsForm.value.tencent.appId, 'STRING', '腾讯云短信应用ID')
+        if (smsForm.value.tencent.signName) await saveConfigValue('client-service.notification.sms.tencent.sign-name', smsForm.value.tencent.signName, 'STRING', '腾讯云短信签名名称')
+        if (smsForm.value.tencent.templateId) await saveConfigValue('client-service.notification.sms.tencent.template-id', smsForm.value.tencent.templateId, 'STRING', '腾讯云短信模板ID')
+        if (smsForm.value.tencent.region) await saveConfigValue('client-service.notification.sms.tencent.region', smsForm.value.tencent.region, 'STRING', '腾讯云短信区域')
       }
     }
     message.success('短信配置已保存，配置更新后立即生效')
@@ -591,41 +486,14 @@ async function handleSaveSmsConfig() {
   }
 }
 
-// 保存微信配置
 async function handleSaveWechatConfig() {
   saving.value = true
   try {
-    await saveConfigValue(
-      'client-service.notification.wechat.enabled',
-      String(wechatForm.value.enabled),
-      'BOOLEAN',
-      '是否启用微信通知'
-    )
+    await saveConfigValue('client-service.notification.wechat.enabled', String(wechatForm.value.enabled), 'BOOLEAN', '是否启用微信通知')
     if (wechatForm.value.enabled) {
-      if (wechatForm.value.appId) {
-        await saveConfigValue(
-          'client-service.notification.wechat.app-id',
-          wechatForm.value.appId,
-          'STRING',
-          '微信公众号 AppID'
-        )
-      }
-      if (wechatForm.value.appSecret) {
-        await saveConfigValue(
-          'client-service.notification.wechat.app-secret',
-          wechatForm.value.appSecret,
-          'STRING',
-          '微信公众号 AppSecret'
-        )
-      }
-      if (wechatForm.value.templateId) {
-        await saveConfigValue(
-          'client-service.notification.wechat.template-id',
-          wechatForm.value.templateId,
-          'STRING',
-          '微信模板消息ID'
-        )
-      }
+      if (wechatForm.value.appId) await saveConfigValue('client-service.notification.wechat.app-id', wechatForm.value.appId, 'STRING', '微信公众号 AppID')
+      if (wechatForm.value.appSecret) await saveConfigValue('client-service.notification.wechat.app-secret', wechatForm.value.appSecret, 'STRING', '微信公众号 AppSecret')
+      if (wechatForm.value.templateId) await saveConfigValue('client-service.notification.wechat.template-id', wechatForm.value.templateId, 'STRING', '微信模板消息ID')
     }
     message.success('微信配置已保存')
   } catch (error: unknown) {
@@ -635,23 +503,15 @@ async function handleSaveWechatConfig() {
   }
 }
 
-// 启用状态变化处理（自动保存）
 async function handleEmailEnabledChange() {
   try {
-    await saveConfigValue(
-      'client-service.notification.email.enabled',
-      String(emailForm.value.enabled),
-      'BOOLEAN',
-      '是否启用邮件通知'
-    )
+    await saveConfigValue('client-service.notification.email.enabled', String(emailForm.value.enabled), 'BOOLEAN', '是否启用邮件通知')
     message.success(emailForm.value.enabled ? '邮件通知已启用' : '邮件通知已禁用')
     if (!emailForm.value.enabled) {
-      // 禁用时清空本地配置
       emailForm.value.from = ''
       emailForm.value.fromName = ''
     }
   } catch (error: unknown) {
-    // 恢复开关状态
     emailForm.value.enabled = !emailForm.value.enabled
     message.error(getErrorMessage(error, '保存失败'))
   }
@@ -659,33 +519,13 @@ async function handleEmailEnabledChange() {
 
 async function handleSmsEnabledChange() {
   try {
-    await saveConfigValue(
-      'client-service.notification.sms.enabled',
-      String(smsForm.value.enabled),
-      'BOOLEAN',
-      '是否启用短信通知'
-    )
+    await saveConfigValue('client-service.notification.sms.enabled', String(smsForm.value.enabled), 'BOOLEAN', '是否启用短信通知')
     message.success(smsForm.value.enabled ? '短信通知已启用' : '短信通知已禁用')
     if (!smsForm.value.enabled) {
-      // 禁用时清空本地配置
-      smsForm.value.aliyun = {
-        accessKeyId: '',
-        accessKeySecret: '',
-        signName: '',
-        templateCode: '',
-        endpoint: '',
-      }
-      smsForm.value.tencent = {
-        secretId: '',
-        secretKey: '',
-        appId: '',
-        signName: '',
-        templateId: '',
-        region: '',
-      }
+      smsForm.value.aliyun = { accessKeyId: '', accessKeySecret: '', signName: '', templateCode: '', endpoint: '' }
+      smsForm.value.tencent = { secretId: '', secretKey: '', appId: '', signName: '', templateId: '', region: '' }
     }
   } catch (error: unknown) {
-    // 恢复开关状态
     smsForm.value.enabled = !smsForm.value.enabled
     message.error(getErrorMessage(error, '保存失败'))
   }
@@ -693,21 +533,14 @@ async function handleSmsEnabledChange() {
 
 async function handleWechatEnabledChange() {
   try {
-    await saveConfigValue(
-      'client-service.notification.wechat.enabled',
-      String(wechatForm.value.enabled),
-      'BOOLEAN',
-      '是否启用微信通知'
-    )
+    await saveConfigValue('client-service.notification.wechat.enabled', String(wechatForm.value.enabled), 'BOOLEAN', '是否启用微信通知')
     message.success(wechatForm.value.enabled ? '微信通知已启用' : '微信通知已禁用')
     if (!wechatForm.value.enabled) {
-      // 禁用时清空本地配置
       wechatForm.value.appId = ''
       wechatForm.value.appSecret = ''
       wechatForm.value.templateId = ''
     }
   } catch (error: unknown) {
-    // 恢复开关状态
     wechatForm.value.enabled = !wechatForm.value.enabled
     message.error(getErrorMessage(error, '保存失败'))
   }
@@ -720,189 +553,93 @@ onMounted(() => {
 
 <style scoped>
 .notification-settings-container {
-  padding: 0;
+  display: grid;
+  gap: 18px;
 }
 
-.notification-settings-container :deep(.ant-card) {
-  border-radius: 12px;
+.info-panel,
+.channel-card {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
-.notification-settings-container :deep(.ant-card-head) {
-  padding: 16px 20px;
+.info-panel {
+  padding: 18px;
 }
 
-.notification-settings-container :deep(.ant-card-body) {
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.channel-card {
   padding: 20px;
 }
 
-/* 移动端优化 */
-@media (max-width: 768px) {
-  .notification-settings-container {
-    padding: 0;
-  }
-  
-  .notification-settings-container :deep(.ant-card) {
-    margin-bottom: 16px;
-    border-radius: 8px;
-  }
-  
-  .notification-settings-container :deep(.ant-card-head) {
-    padding: 12px 16px;
-    min-height: auto;
-    flex-wrap: wrap;
-  }
-  
-  .notification-settings-container :deep(.ant-card-head-wrapper) {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .notification-settings-container :deep(.ant-card-head-title) {
-    font-size: 14px;
-    flex: 1 1 auto;
-  }
-  
-  .notification-settings-container :deep(.ant-card-extra) {
-    margin-left: 0 !important;
-  }
-  
-  .notification-settings-container :deep(.ant-card-extra .ant-btn) {
-    height: 32px;
-    padding: 0 12px;
-    font-size: 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-card-body) {
-    padding: 16px 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-alert) {
-    margin-bottom: 16px;
-    font-size: 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-alert-message) {
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-  
-  .notification-settings-container :deep(.ant-alert-description) {
-    font-size: 12px;
-    line-height: 1.5;
-  }
-  
-  .notification-settings-container :deep(.ant-divider) {
-    margin: 12px 0;
-  }
-  
-  .notification-settings-container :deep(.ant-divider-horizontal.ant-divider-with-text-left) {
-    font-size: 13px;
-  }
-  
-  .notification-settings-container :deep(.ant-form-item) {
-    margin-bottom: 16px;
-  }
-  
-  .notification-settings-container :deep(.ant-form-item-label) {
-    padding-bottom: 4px;
-  }
-  
-  .notification-settings-container :deep(.ant-form-item-label > label) {
-    font-size: 13px;
-    height: auto;
-  }
-  
-  .notification-settings-container :deep(.ant-input),
-  .notification-settings-container :deep(.ant-input-number),
-  .notification-settings-container :deep(.ant-input-password),
-  .notification-settings-container :deep(.ant-select) {
-    font-size: 14px;
-    height: 36px;
-  }
-  
-  .notification-settings-container :deep(.ant-input-number) {
-    width: 100% !important;
-  }
-  
-  .notification-settings-container :deep(.ant-btn) {
-    height: 36px;
-    padding: 0 16px;
-    font-size: 13px;
-    width: 100%;
-  }
-  
-  .notification-settings-container :deep(.ant-switch) {
-    min-width: 44px;
-    height: 22px;
-  }
-  
-  .notification-settings-container :deep(.ant-switch + span) {
-    font-size: 12px;
-    margin-left: 8px;
-  }
-  
-  .notification-settings-container :deep(div[style*="margin-top: 4px"]) {
-    font-size: 11px !important;
-    margin-top: 4px !important;
-    line-height: 1.4;
+.channel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.channel-kicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.channel-header h3 {
+  margin: 0;
+  color: var(--primary-color-dark);
+  font-size: 22px;
+}
+
+.channel-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.channel-form :deep(.ant-form-item:last-child) {
+  margin-bottom: 0;
+}
+
+.subsection-title {
+  margin: 4px 0 16px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.inline-alert {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1100px) {
+  .channel-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 480px) {
-  .notification-settings-container :deep(.ant-card-head) {
-    padding: 10px 12px;
+@media (max-width: 768px) {
+  .info-panel,
+  .channel-card {
+    padding: 16px;
+    border-radius: 20px;
   }
-  
-  .notification-settings-container :deep(.ant-card-head-title) {
-    font-size: 13px;
-  }
-  
-  .notification-settings-container :deep(.ant-card-body) {
-    padding: 12px 8px;
-  }
-  
-  .notification-settings-container :deep(.ant-alert) {
-    margin-bottom: 12px;
-    padding: 8px 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-alert-message) {
-    font-size: 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-alert-description) {
-    font-size: 11px;
-  }
-  
-  .notification-settings-container :deep(.ant-form-item) {
-    margin-bottom: 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-form-item-label > label) {
-    font-size: 12px;
-  }
-  
-  .notification-settings-container :deep(.ant-input),
-  .notification-settings-container :deep(.ant-input-number),
-  .notification-settings-container :deep(.ant-input-password),
-  .notification-settings-container :deep(.ant-select) {
-    font-size: 14px;
-    height: 36px;
-  }
-  
-  .notification-settings-container :deep(.ant-btn) {
-    height: 36px;
-    font-size: 13px;
-  }
-  
-  .notification-settings-container :deep(.ant-switch + span) {
-    font-size: 11px;
-    margin-left: 6px;
-  }
-  
-  .notification-settings-container :deep(div[style*="margin-top: 4px"]) {
-    font-size: 10px !important;
+
+  .channel-header {
+    flex-direction: column;
   }
 }
 </style>

@@ -1,78 +1,72 @@
 <template>
   <div class="letter-verification-container">
-    <a-card>
-      <template #title>
-        <span>函件验证记录</span>
-      </template>
-      <template #extra>
-        <a-space>
-          <a-button @click="loadStatistics">
-            <template #icon>
-              <BarChartOutlined />
-            </template>
-            统计
-          </a-button>
-          <a-button @click="loadData">
-            <template #icon>
-              <ReloadOutlined />
-            </template>
-            刷新
-          </a-button>
-        </a-space>
-      </template>
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">
+          Verification Ledger
+        </div>
+        <h2 class="editorial-title intro-title">
+          函件验证记录
+        </h2>
+        <p class="intro-text">
+          统一查看律师函验证状态、访问次数与过期情况，便于后台快速判断函件是否仍可被第三方核验。
+        </p>
+      </div>
+      <a-space>
+        <a-button @click="loadStatistics">
+          <template #icon>
+            <BarChartOutlined />
+          </template>
+          {{ showStatistics ? '收起统计' : '查看统计' }}
+        </a-button>
+        <a-button @click="loadData">
+          <template #icon>
+            <ReloadOutlined />
+          </template>
+          刷新
+        </a-button>
+      </a-space>
+    </section>
 
-      <!-- 统计卡片 -->
-      <a-row
-        v-if="showStatistics"
-        :gutter="16"
-        style="margin-bottom: 16px"
-      >
-        <a-col
-          :xs="12"
-          :sm="6"
-        >
-          <a-statistic
-            title="总记录数"
-            :value="statistics.total"
-          />
-        </a-col>
-        <a-col
-          :xs="12"
-          :sm="6"
-        >
-          <a-statistic
-            title="有效"
-            :value="statistics.active"
-            value-style="color: #52c41a"
-          />
-        </a-col>
-        <a-col
-          :xs="12"
-          :sm="6"
-        >
-          <a-statistic
-            title="已过期"
-            :value="statistics.expired"
-            value-style="color: #faad14"
-          />
-        </a-col>
-        <a-col
-          :xs="12"
-          :sm="6"
-        >
-          <a-statistic
-            title="已撤销"
-            :value="statistics.revoked"
-            value-style="color: #ff4d4f"
-          />
-        </a-col>
-      </a-row>
+    <section
+      v-if="showStatistics"
+      class="stats-grid"
+    >
+      <article class="stat-card">
+        <span>总记录数</span>
+        <strong>{{ statistics.total }}</strong>
+        <p>当前全部可检索的函件验证记录。</p>
+      </article>
+      <article class="stat-card success">
+        <span>有效</span>
+        <strong>{{ statistics.active }}</strong>
+        <p>仍可被第三方继续核验。</p>
+      </article>
+      <article class="stat-card warning">
+        <span>已过期</span>
+        <strong>{{ statistics.expired }}</strong>
+        <p>超过有效期，建议重新核查状态。</p>
+      </article>
+      <article class="stat-card danger">
+        <span>已撤销</span>
+        <strong>{{ statistics.revoked }}</strong>
+        <p>已被主动撤销，不应继续使用。</p>
+      </article>
+    </section>
 
-      <!-- 搜索表单 -->
+    <section class="filter-panel">
+      <div class="panel-head">
+        <div>
+          <span class="panel-kicker">Search Ledger</span>
+          <h3>验证检索</h3>
+        </div>
+        <p>按状态与关键词快速定位异常函件，再进入详情与撤销操作。</p>
+      </div>
+
       <a-form
         :model="searchForm"
         layout="inline"
-        style="margin-bottom: 16px"
+        class="verification-filter-form"
         @finish="handleSearch"
       >
         <a-form-item label="状态">
@@ -80,7 +74,7 @@
             v-model:value="searchForm.status"
             placeholder="请选择状态"
             allow-clear
-            style="width: 120px"
+            style="width: 140px"
           >
             <a-select-option value="ACTIVE">
               有效
@@ -95,10 +89,10 @@
             v-model:value="searchForm.keyword"
             placeholder="编号/律所/律师/接收单位"
             allow-clear
-            style="width: 200px"
+            style="width: 240px"
           />
         </a-form-item>
-        <a-form-item>
+        <a-form-item class="filter-actions">
           <a-space>
             <a-button
               type="primary"
@@ -112,8 +106,9 @@
           </a-space>
         </a-form-item>
       </a-form>
+    </section>
 
-      <!-- 数据表格 -->
+    <section class="table-panel">
       <a-table
         :columns="columns"
         :data-source="dataSource"
@@ -130,30 +125,29 @@
             </a-tag>
           </template>
           <template v-else-if="column.key === 'validUntil'">
-            <span :style="{ color: isExpired(record.validUntil) ? '#cf1322' : '' }">
+            <span :class="{ expired: isExpired(record.validUntil) }">
               {{ formatDateTime(record.validUntil) }}
             </span>
           </template>
           <template v-else-if="column.key === 'verifyCount'">
-            <a-badge
-              :count="record.verifyCount"
-              :number-style="{ backgroundColor: '#52c41a' }"
-              show-zero
-            />
+            <span class="count-pill">{{ record.verifyCount }}</span>
           </template>
           <template v-else-if="column.key === 'lastVerifyAt'">
-            <span v-if="record.lastVerifyAt">
+            <span
+              v-if="record.lastVerifyAt"
+              class="verify-time"
+            >
               {{ formatDateTime(record.lastVerifyAt) }}
               <a-tooltip
                 v-if="record.lastVerifyIp"
                 :title="'IP: ' + record.lastVerifyIp"
               >
-                <InfoCircleOutlined style="margin-left: 4px; color: #999" />
+                <InfoCircleOutlined class="verify-tip" />
               </a-tooltip>
             </span>
             <span
               v-else
-              style="color: #999"
+              class="muted-text"
             >-</span>
           </template>
           <template v-else-if="column.key === 'action'">
@@ -182,78 +176,101 @@
           </template>
         </template>
       </a-table>
-    </a-card>
+    </section>
 
-    <!-- 详情抽屉 -->
     <a-drawer
       v-model:open="detailVisible"
-      title="函件验证详情"
-      :width="500"
+      :width="520"
       placement="right"
+      class="verification-drawer"
     >
-      <a-descriptions
+      <template #title>
+        <div class="drawer-title-block">
+          <div class="drawer-kicker">
+            Verification Detail
+          </div>
+          <div class="drawer-title">
+            函件验证详情
+          </div>
+        </div>
+      </template>
+
+      <div
         v-if="currentRecord"
-        :column="1"
-        bordered
-        size="small"
+        class="detail-stack"
       >
-        <a-descriptions-item label="函件编号">
-          <a-typography-text copyable>
-            {{ currentRecord.applicationNo }}
-          </a-typography-text>
-        </a-descriptions-item>
-        <a-descriptions-item label="状态">
+        <section class="detail-hero">
+          <div>
+            <div class="detail-label">
+              函件编号
+            </div>
+            <h3>{{ currentRecord.applicationNo }}</h3>
+          </div>
           <a-tag :color="getStatusColor(currentRecord)">
             {{ getStatusName(currentRecord) }}
           </a-tag>
-        </a-descriptions-item>
-        <a-descriptions-item label="函件类型">
-          {{ currentRecord.letterTypeName || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="律师事务所">
-          {{ currentRecord.firmName || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="出函律师">
-          {{ currentRecord.lawyerNames || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="接收单位">
-          {{ currentRecord.targetUnit || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="关联项目">
-          {{ currentRecord.matterName || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="审批时间">
-          {{ formatDateTime(currentRecord.approvedAt) }}
-        </a-descriptions-item>
-        <a-descriptions-item label="盖章时间">
-          {{ formatDateTime(currentRecord.printedAt) }}
-        </a-descriptions-item>
-        <a-descriptions-item label="有效期至">
-          <span :style="{ color: isExpired(currentRecord.validUntil) ? '#cf1322' : '' }">
-            {{ formatDateTime(currentRecord.validUntil) }}
-            {{ isExpired(currentRecord.validUntil) ? '（已过期）' : '' }}
-          </span>
-        </a-descriptions-item>
-        <a-descriptions-item label="验证次数">
-          <a-badge
-            :count="currentRecord.verifyCount"
-            :number-style="{ backgroundColor: '#52c41a' }"
-            show-zero
-          />
-        </a-descriptions-item>
-        <a-descriptions-item label="最后验证时间">
-          {{ formatDateTime(currentRecord.lastVerifyAt) || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="最后验证IP">
-          {{ currentRecord.lastVerifyIp || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="备注">
-          {{ currentRecord.remark || '-' }}
-        </a-descriptions-item>
-        <a-descriptions-item label="创建时间">
-          {{ formatDateTime(currentRecord.createdAt) }}
-        </a-descriptions-item>
-      </a-descriptions>
+        </section>
+
+        <section class="detail-panel">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span>函件类型</span>
+              <strong>{{ currentRecord.letterTypeName || '-' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>律师事务所</span>
+              <strong>{{ currentRecord.firmName || '-' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>出函律师</span>
+              <strong>{{ currentRecord.lawyerNames || '-' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>接收单位</span>
+              <strong>{{ currentRecord.targetUnit || '-' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>关联项目</span>
+              <strong>{{ currentRecord.matterName || '-' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>验证次数</span>
+              <strong>{{ currentRecord.verifyCount }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>审批时间</span>
+              <strong>{{ formatDateTime(currentRecord.approvedAt) }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>盖章时间</span>
+              <strong>{{ formatDateTime(currentRecord.printedAt) }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>有效期至</span>
+              <strong :class="{ expired: isExpired(currentRecord.validUntil) }">
+                {{ formatDateTime(currentRecord.validUntil) }}
+                {{ isExpired(currentRecord.validUntil) ? '（已过期）' : '' }}
+              </strong>
+            </div>
+            <div class="detail-item">
+              <span>最后验证时间</span>
+              <strong>{{ formatDateTime(currentRecord.lastVerifyAt) || '-' }}</strong>
+            </div>
+            <div class="detail-item">
+              <span>最后验证IP</span>
+              <strong>{{ currentRecord.lastVerifyIp || '-' }}</strong>
+            </div>
+            <div class="detail-item full">
+              <span>备注</span>
+              <strong>{{ currentRecord.remark || '-' }}</strong>
+            </div>
+            <div class="detail-item full">
+              <span>创建时间</span>
+              <strong>{{ formatDateTime(currentRecord.createdAt) }}</strong>
+            </div>
+          </div>
+        </section>
+      </div>
     </a-drawer>
   </div>
 </template>
@@ -300,7 +317,7 @@ const columns = [
   { title: '接收单位', key: 'targetUnit', dataIndex: 'targetUnit', width: 150, align: 'center', ellipsis: true },
   { title: '状态', key: 'status', width: 80, align: 'center' },
   { title: '有效期至', key: 'validUntil', width: 160, align: 'center' },
-  { title: '验证次数', key: 'verifyCount', width: 90, align: 'center' },
+  { title: '验证次数', key: 'verifyCount', width: 100, align: 'center' },
   { title: '最后验证', key: 'lastVerifyAt', width: 180, align: 'center' },
   { title: '操作', key: 'action', width: 120, fixed: 'right', align: 'center' },
 ]
@@ -411,82 +428,228 @@ onMounted(() => {
 
 <style scoped>
 .letter-verification-container {
-  padding: 0;
+  display: grid;
+  gap: 18px;
 }
 
-.letter-verification-container :deep(.ant-card) {
-  border-radius: 12px;
+.stat-card,
+.detail-hero,
+.detail-panel {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
-.letter-verification-container :deep(.ant-card-head) {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.letter-verification-container :deep(.ant-card-body) {
+.panel-head h3 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: var(--primary-color-dark);
+}
+
+.panel-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.panel-kicker {
+  display: inline-block;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  padding: 20px 22px;
+}
+
+.stat-card span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 12px;
+  font-size: 32px;
+  font-family: var(--font-heading);
+}
+
+.stat-card p {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.stat-card.success {
+  background: linear-gradient(180deg, rgba(82, 196, 26, 0.12), rgba(255, 255, 255, 0.72));
+}
+
+.stat-card.warning {
+  background: linear-gradient(180deg, rgba(250, 173, 20, 0.12), rgba(255, 255, 255, 0.72));
+}
+
+.stat-card.danger {
+  background: linear-gradient(180deg, rgba(255, 77, 79, 0.1), rgba(255, 255, 255, 0.72));
+}
+
+.verification-filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 0;
+}
+
+.filter-actions {
+  margin-inline-start: auto;
+}
+
+.expired {
+  color: #b42318;
+  font-weight: 600;
+}
+
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(82, 196, 26, 0.14);
+  color: #226d17;
+  font-weight: 700;
+}
+
+.verify-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.verify-tip,
+.muted-text {
+  color: var(--text-tertiary);
+}
+
+.detail-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.detail-hero,
+.detail-panel {
   padding: 20px;
 }
 
-.letter-verification-container :deep(.ant-statistic-title) {
-  font-size: 13px;
+.detail-label,
+.drawer-kicker {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.drawer-title {
+  margin-top: 6px;
+  font-size: 22px;
+  font-family: var(--font-heading);
+}
+
+.detail-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.detail-hero h3 {
+  margin: 10px 0 0;
+  font-size: 28px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.detail-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(21, 33, 46, 0.06);
+}
+
+.detail-item span {
   color: var(--text-secondary);
+  font-size: 12px;
 }
 
-.letter-verification-container :deep(.ant-statistic-content-value) {
-  font-size: 24px;
-}
-
-.letter-verification-container :deep(.ant-table-thead > tr > th) {
-  background: var(--bg-tertiary);
+.detail-item strong {
+  color: var(--text-primary);
   font-weight: 600;
-  padding: 12px 8px;
+  line-height: 1.6;
 }
 
-.letter-verification-container :deep(.ant-table-tbody > tr > td) {
-  padding: 12px 8px;
+.detail-item.full {
+  grid-column: 1 / -1;
 }
 
-/* 固定列背景色 */
-.letter-verification-container :deep(.ant-table-cell-fix-right),
-.letter-verification-container :deep(.ant-table-tbody > tr > td.ant-table-cell-fix-right) {
-  background: #fff !important;
+@media (max-width: 1100px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.letter-verification-container :deep(.ant-table-thead > tr > th.ant-table-cell-fix-right) {
-  background: #fafafa !important;
-}
-
-.letter-verification-container :deep(.ant-table-tbody > tr.ant-table-row:hover > td.ant-table-cell-fix-right) {
-  background: var(--accent-color-lighter, #fffbf0) !important;
-}
-
-/* 移动端优化 */
 @media (max-width: 768px) {
-  .letter-verification-container :deep(.ant-card-head) {
-    padding: 12px 16px;
+  .panel-head {
+    display: grid;
   }
 
-  .letter-verification-container :deep(.ant-card-body) {
-    padding: 16px 12px;
+  .verification-filter-form {
+    display: block;
   }
 
-  .letter-verification-container :deep(.ant-form) {
-    flex-direction: column;
-  }
-
-  .letter-verification-container :deep(.ant-form-item) {
-    margin-bottom: 12px;
+  .verification-filter-form :deep(.ant-form-item) {
     width: 100%;
+    margin-right: 0;
+    margin-bottom: 12px;
   }
 
-  .letter-verification-container :deep(.ant-select),
-  .letter-verification-container :deep(.ant-input) {
+  .verification-filter-form :deep(.ant-select),
+  .verification-filter-form :deep(.ant-input) {
     width: 100% !important;
   }
 
-  .letter-verification-container :deep(.ant-statistic-content-value) {
-    font-size: 20px;
+  .stats-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-hero {
+    flex-direction: column;
   }
 }
 </style>

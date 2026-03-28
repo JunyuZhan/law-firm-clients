@@ -1,24 +1,54 @@
 <template>
   <div class="system-maintenance">
-    <a-page-header
-      title="系统维护"
-      sub-title="备份、状态监控"
-    >
-      <template #extra>
-        <a-button
-          type="primary"
-          :loading="loading"
-          @click="refreshStatus"
-        >
-          <ReloadOutlined /> 刷新状态
-        </a-button>
-      </template>
-    </a-page-header>
+    <section class="page-intro">
+      <div>
+        <div class="eyebrow">
+          Operations & Maintenance
+        </div>
+        <h2 class="editorial-title intro-title">
+          系统维护
+        </h2>
+        <p class="intro-text">
+          把系统状态、版本升级、数据备份与审计日志集中到一个运维工作台，减少切页和重复判断。
+        </p>
+      </div>
+      <a-button
+        type="primary"
+        :loading="loading"
+        @click="refreshStatus"
+      >
+        <template #icon>
+          <ReloadOutlined />
+        </template>
+        刷新状态
+      </a-button>
+    </section>
 
-    <!-- 系统状态卡片 -->
+    <section class="ops-overview">
+      <article class="ops-metric">
+        <span>数据库连接</span>
+        <strong>{{ status.database?.connected ? '正常' : '待检查' }}</strong>
+        <p>数据库连通性和基础数据面状态。</p>
+      </article>
+      <article class="ops-metric">
+        <span>文件存储</span>
+        <strong>{{ status.storage?.available ? '可用' : '待检查' }}</strong>
+        <p>对象存储或本地存储路径的可用性。</p>
+      </article>
+      <article class="ops-metric">
+        <span>备份文件</span>
+        <strong>{{ backups.length }}</strong>
+        <p>当前可下载或恢复的备份数量。</p>
+      </article>
+      <article class="ops-metric">
+        <span>版本状态</span>
+        <strong>{{ gitInfo.hasUpdate ? '可升级' : gitInfo.currentVersion ? '最新' : '未检查' }}</strong>
+        <p>仓库版本检查结果与升级建议。</p>
+      </article>
+    </section>
+
     <a-row
       :gutter="[16, 16]"
-      style="margin-bottom: 24px"
       class="status-row"
     >
       <a-col
@@ -29,6 +59,7 @@
         <a-card
           title="数据库状态"
           :loading="loading"
+          class="maintenance-card"
         >
           <template #extra>
             <a-tag :color="status.database?.connected ? 'green' : 'red'">
@@ -65,6 +96,7 @@
         <a-card
           title="文件存储"
           :loading="loading"
+          class="maintenance-card"
         >
           <template #extra>
             <a-tag :color="status.storage?.available ? 'green' : 'red'">
@@ -101,6 +133,7 @@
         <a-card
           title="服务器信息"
           :loading="loading"
+          class="maintenance-card"
         >
           <a-descriptions
             :column="1"
@@ -129,7 +162,7 @@
     <!-- 系统升级 -->
     <a-card
       title="系统升级"
-      style="margin-bottom: 24px"
+      class="maintenance-card section-card"
     >
       <template #extra>
         <a-button
@@ -319,7 +352,7 @@
     <!-- 数据备份 -->
     <a-card
       title="数据备份"
-      style="margin-bottom: 24px"
+      class="maintenance-card section-card"
     >
       <template #extra>
         <a-button
@@ -377,7 +410,7 @@
     <!-- 日志管理 -->
     <a-card
       title="日志管理"
-      style="margin-bottom: 24px"
+      class="maintenance-card section-card"
     >
       <a-tabs v-model:active-key="logActiveTab">
         <!-- 登录日志 -->
@@ -533,7 +566,10 @@
     </a-card>
 
     <!-- 快捷操作指南 -->
-    <a-card title="命令行操作（高级）">
+    <a-card
+      title="命令行操作（高级）"
+      class="maintenance-card section-card"
+    >
       <a-collapse>
         <a-collapse-panel
           key="1"
@@ -1196,7 +1232,60 @@ onMounted(() => {
 
 <style scoped>
 .system-maintenance {
-  padding: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.ops-metric {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
+}
+
+.ops-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.ops-metric {
+  padding: 20px 22px;
+}
+
+.ops-metric span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.ops-metric strong {
+  display: block;
+  margin-top: 12px;
+  font-size: 30px;
+  font-family: var(--font-heading);
+}
+
+.ops-metric p {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.maintenance-card :deep(.ant-card-head) {
+  min-height: 64px;
+  border-bottom: 1px solid rgba(21, 33, 46, 0.08);
+}
+
+.maintenance-card :deep(.ant-card-head-title) {
+  font-size: 20px;
+  font-family: var(--font-heading);
+}
+
+.section-card {
+  margin-top: 2px;
 }
 
 /* 横向排列的卡片高度一致 */
@@ -1243,9 +1332,10 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   width: calc(50% - 4px);
-  padding: 4px 8px;
-  background: #f5f5f5;
-  border-radius: 4px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(21, 33, 46, 0.08);
   font-size: 12px;
 }
 
@@ -1268,9 +1358,11 @@ onMounted(() => {
 }
 
 .upgrade-command {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.74);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(21, 33, 46, 0.08);
+  box-shadow: var(--shadow-xs);
 }
 
 .version-card {
@@ -1307,10 +1399,11 @@ onMounted(() => {
 }
 
 .upgrade-options {
-  background: #fafafa;
+  background: rgba(255, 255, 255, 0.7);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 16px;
   margin-bottom: 16px;
+  border: 1px solid rgba(21, 33, 46, 0.08);
 }
 
 .option-item {
@@ -1319,6 +1412,31 @@ onMounted(() => {
 
 .option-item:last-child {
   margin-bottom: 0;
+}
+
+.system-maintenance :deep(.ant-table-thead > tr > th) {
+  background: rgba(235, 229, 220, 0.55);
+  font-weight: 700;
+}
+
+.system-maintenance :deep(.ant-tabs-nav::before) {
+  border-bottom-color: rgba(21, 33, 46, 0.08);
+}
+
+.system-maintenance :deep(.ant-form-inline) {
+  row-gap: 8px;
+}
+
+@media (max-width: 1100px) {
+  .ops-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .ops-overview {
+    grid-template-columns: 1fr;
+  }
 }
 
 .option-desc {
@@ -1348,36 +1466,6 @@ onMounted(() => {
 
 /* 移动端适配 */
 @media (max-width: 768px) {
-  .system-maintenance {
-    padding: 12px;
-  }
-
-  .system-maintenance :deep(.ant-page-header) {
-    padding: 12px 0;
-  }
-
-  .system-maintenance :deep(.ant-page-header-heading) {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .system-maintenance :deep(.ant-page-header-heading-left) {
-    flex: 1 1 100%;
-  }
-
-  .system-maintenance :deep(.ant-page-header-heading-extra) {
-    flex: 1 1 100%;
-    margin-left: 0 !important;
-  }
-
-  .system-maintenance :deep(.ant-page-header-heading-title) {
-    font-size: 18px;
-  }
-
-  .system-maintenance :deep(.ant-page-header-heading-sub-title) {
-    display: none;
-  }
-
   .system-maintenance :deep(.ant-card) {
     border-radius: 8px;
   }
@@ -1515,54 +1603,7 @@ onMounted(() => {
 }
 
 /* 升级指南弹窗移动端优化 */
-:deep(.upgrade-modal .ant-modal) {
-  margin: 0;
-  max-width: 100vw;
-  top: 0;
-  padding-bottom: 0;
-}
-
-:deep(.upgrade-modal .ant-modal-content) {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-:deep(.upgrade-modal .ant-modal-body) {
-  flex: 1;
-  overflow: auto;
-  padding: 16px;
-}
-
-@media (min-width: 769px) {
-  :deep(.upgrade-modal .ant-modal) {
-    margin: 0 auto;
-    top: 50px;
-    padding-bottom: 24px;
-  }
-  
-  :deep(.upgrade-modal .ant-modal-content) {
-    height: auto;
-  }
-  
-  :deep(.upgrade-modal .ant-modal-body) {
-    padding: 24px;
-  }
-}
-
 @media (max-width: 480px) {
-  .system-maintenance {
-    padding: 8px;
-  }
-
-  .system-maintenance :deep(.ant-page-header) {
-    padding: 8px 0;
-  }
-
-  .system-maintenance :deep(.ant-page-header-heading-title) {
-    font-size: 16px;
-  }
-
   .system-maintenance :deep(.ant-card-head) {
     padding: 10px 12px;
   }

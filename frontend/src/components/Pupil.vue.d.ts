@@ -1,11 +1,13 @@
 import { DefineComponent } from 'vue'
 
-const Pupil: DefineComponent<{
+interface PupilProps {
   size?: number
   maxDistance?: number
   pupilColor?: string
   forceLookX?: number
   forceLookY?: number
-}, any, any, any, any, any>
+}
+
+const Pupil: DefineComponent<PupilProps>
 
 export default Pupil
