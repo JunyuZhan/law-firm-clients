@@ -61,7 +61,7 @@
 - **修复提交**：`0d5a668 fix: 修复客户服务推送相关问题`
 - **修复内容**：`PortalMatterDTO` 所有 `LocalDateTime` 字段添加 Jackson 注解
 
-### 2.5. ~~项目详情页Header显示问题~~ ✅ 已修复（feature/client-service-system 分支）
+### 2.5. ~~项目详情页Header显示问题~~ ✅ 已修复（law-firm-clients 仓库）
 - **问题**：Header背景是白色，文字颜色也是白色，高度不够
 - **原因**：`style.css` 中的 `.ant-layout` 使用 `!important` 覆盖了 AppHeader 的渐变背景
 - **修复提交**：`a09ee66d fix: 修复项目详情页Header显示问题`

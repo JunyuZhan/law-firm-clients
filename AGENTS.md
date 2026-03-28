@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus MCP
 
-This project is indexed by GitNexus as **law-firm-client-service** (1923 symbols, 4980 relationships, 146 execution flows).
+This repository is maintained as **law-firm-clients**. If GitNexus still shows **law-firm-client-service**, re-run indexing before relying on the repository name metadata.
 
 GitNexus provides a knowledge graph over this codebase — call chains, blast radius, execution flows, and semantic search.
 
