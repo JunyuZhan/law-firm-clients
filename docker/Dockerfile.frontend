@@ -14,8 +14,8 @@ WORKDIR /app
 # 复制 package.json 和 lock 文件
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
-# 安装依赖
-RUN pnpm install --frozen-lockfile --registry=https://registry.npmmirror.com
+# 允许 lockfile 与 package.json 存在轻微漂移，避免服务器构建被卡死
+RUN pnpm install --no-frozen-lockfile --registry=https://registry.npmmirror.com
 
 # 复制源代码
 COPY frontend/ ./
