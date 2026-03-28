@@ -1,0 +1,82 @@
+spring:
+  application:
+    name: client-service-test
+  
+  # 禁用Redis自动配置（测试环境使用本地缓存）
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+  
+  # 数据源配置（使用内存数据库H2进行测试）
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;INIT=CREATE SCHEMA IF NOT EXISTS PUBLIC\;RUNSCRIPT FROM 'classpath:schema-test.sql';DB_CLOSE_DELAY=-1
+    username: sa
+    password: 
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+
+  # Redis配置（测试环境禁用Redis，使用本地缓存）
+  # 注意：测试环境使用TestCacheConfig中的本地缓存，不连接Redis
+  # data:
+  #   redis:
+  #     host: localhost
+  #     port: 6379
+  #     database: 15
+
+  # MyBatis-Plus配置
+  mybatis-plus:
+    mapper-locations: classpath*:/mapper/**/*.xml
+    type-aliases-package: com.clientservice.domain.entity
+    configuration:
+      map-underscore-to-camel-case: true
+    global-config:
+      db-config:
+        id-type: auto
+        logic-delete-field: deleted
+        logic-delete-value: 1
+        logic-not-delete-value: 0
+
+  # 邮件配置（测试环境使用Mock，不实际发送）
+  mail:
+    host: smtp.test.com
+    port: 587
+    username: test@test.com
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+# 应用配置
+client-service:
+  system:
+    name: 客户服务系统测试
+    base-url: http://localhost:8081
+  jwt:
+    secret: test-jwt-secret-key-for-testing-purposes-only-2026-abcdefghijklmnopqrstuvwxyz1234567890  # 测试环境JWT密钥（至少32字符）
+  notification:
+    email:
+      enabled: false  # 测试环境禁用邮件通知，避免连接失败
+      from: test@test.com
+      from-name: 测试系统
+  file:
+    storage:
+      type: local
+      local:
+        path: ${java.io.tmpdir}/client-service-test/files
+    max-size: 10485760  # 10MB
+    validate-content: false  # 测试环境禁用文件内容验证，避免需要真实的文件内容
+  access-log:
+    retention-days: 90
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.clientservice: DEBUG
+    org.springframework: WARN

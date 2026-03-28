@@ -1,0 +1,72 @@
+# =====================================================
+# 客户服务系统 - 生产环境配置
+# =====================================================
+# 此配置文件用于生产环境，会覆盖 application.yml 中的配置
+# 敏感信息必须通过环境变量配置，不要在此文件中硬编码
+# =====================================================
+
+spring:
+  # 数据源配置（必须通过环境变量配置）
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+
+  # Redis配置（必须通过环境变量配置）
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD:}
+
+  # MyBatis-Plus配置
+  mybatis-plus:
+    configuration:
+      # 生产环境关闭SQL日志
+      log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+# 跨域配置（通过环境变量配置允许的域名，例如：https://example.com）
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+
+# 应用配置
+client-service:
+  # 系统配置
+  system:
+    # 生产环境必须配置正确的外部访问地址
+    base-url: ${BASE_URL}
+
+  # JWT配置（生产环境必须配置强密钥）
+  jwt:
+    secret: ${CLIENT_SERVICE_JWT_SECRET}
+    expiration-hours: ${CLIENT_SERVICE_JWT_EXPIRATION:24}
+
+  # 文件存储配置
+  file:
+    storage:
+      # 生产环境建议使用 minio 或 oss
+      type: ${FILE_STORAGE_TYPE:local}
+      local:
+        path: ${FILE_STORAGE_PATH:/data/client-service/files}
+      minio:
+        endpoint: ${MINIO_ENDPOINT}
+        access-key: ${MINIO_ACCESS_KEY}
+        secret-key: ${MINIO_SECRET_KEY}
+        bucket-name: ${MINIO_BUCKET:client-service}
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.clientservice: INFO
+    # 生产环境关闭 SQL 日志
+    org.mybatis: WARN
+    com.zaxxer.hikari: WARN
+
+# SpringDoc配置（生产环境建议关闭）
+springdoc:
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:false}

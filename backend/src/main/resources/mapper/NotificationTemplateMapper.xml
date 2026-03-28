@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clientservice.infrastructure.persistence.mapper.NotificationTemplateMapper">
+
+    <!-- 根据模板类型和提供商查询启用的模板 -->
+    <select id="selectEnabledByTypeAndProvider" resultType="com.clientservice.domain.entity.NotificationTemplate">
+        SELECT * FROM notification_template
+        WHERE template_type = #{templateType}
+        AND provider = #{provider}
+        AND enabled = true
+        AND deleted = false
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 根据模板代码查询 -->
+    <select id="selectByTemplateCode" resultType="com.clientservice.domain.entity.NotificationTemplate">
+        SELECT * FROM notification_template
+        WHERE template_code = #{templateCode}
+        AND provider = #{provider}
+        AND deleted = false
+        LIMIT 1
+    </select>
+
+</mapper>

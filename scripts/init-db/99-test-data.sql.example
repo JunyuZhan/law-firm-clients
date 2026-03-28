@@ -1,0 +1,78 @@
+-- =====================================================
+-- 测试数据脚本
+-- 用于开发和测试环境
+-- =====================================================
+
+-- =====================================================
+-- 1. API密钥测试数据
+-- =====================================================
+
+-- 插入测试API密钥
+INSERT INTO public.api_key (key_name, api_key, api_secret, law_firm_name, enabled, expires_at)
+VALUES 
+    ('测试律所API密钥', 'test-api-key-12345678901234567890', 'test-api-secret', '测试律师事务所', true, NULL),
+    ('开发环境API密钥', 'dev-api-key-12345678901234567890', 'dev-api-secret', '开发环境律所', true, NULL)
+ON CONFLICT (api_key) DO NOTHING;
+
+-- =====================================================
+-- 2. 系统配置测试数据
+-- =====================================================
+
+-- 插入系统配置
+INSERT INTO public.sys_config (config_key, config_value, config_type, description)
+VALUES 
+    ('system.name', '客户服务系统', 'STRING', '系统名称'),
+    ('system.version', '1.0.0', 'STRING', '系统版本'),
+    ('notification.email.enabled', 'false', 'BOOLEAN', '邮件通知是否启用'),
+    ('notification.sms.enabled', 'false', 'BOOLEAN', '短信通知是否启用'),
+    ('notification.wechat.enabled', 'false', 'BOOLEAN', '微信通知是否启用'),
+    ('notification.wechat.template-id', '', 'STRING', '微信模板ID'),
+    ('file.max-size', '10485760', 'NUMBER', '最大文件大小（字节）'),
+    ('file.storage.type', 'local', 'STRING', '文件存储类型'),
+    ('api.token-expire-days', '30', 'NUMBER', 'Token默认有效期（天）'),
+    ('api.token-length', '32', 'NUMBER', 'Token长度')
+ON CONFLICT (config_key) DO UPDATE 
+SET config_value = EXCLUDED.config_value,
+    updated_at = CURRENT_TIMESTAMP;
+
+-- =====================================================
+-- 3. 测试项目数据（可选）
+-- =====================================================
+
+-- 插入测试项目（如果需要，取消注释）
+-- 注意：实际使用时，项目数据通过API接口推送，这里仅用于测试
+-- INSERT INTO public.client_matter (
+--     id, law_firm_matter_id, client_id, client_name, 
+--     matter_data, scopes, valid_days, expires_at, 
+--     access_token, access_url, status
+-- )
+-- VALUES (
+--     'CS1706860800000123456',
+--     1001,
+--     2001,
+--     '测试客户',
+--     '{"matterId": 1001, "matterName": "测试项目", "matterNo": "M20260202001"}'::jsonb,
+--     'MATTER_INFO,MATTER_PROGRESS',
+--     30,
+--     CURRENT_TIMESTAMP + INTERVAL '30 days',
+--     'test-access-token-12345678901234567890123456789012',
+--     'http://localhost:8081/portal/matter/CS1706860800000123456?token=test-access-token-12345678901234567890123456789012',
+--     'ACTIVE'
+-- )
+-- ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================
+-- 4. 验证数据
+-- =====================================================
+
+-- 验证API密钥
+SELECT 'API密钥数量: ' || COUNT(*) FROM public.api_key WHERE enabled = true;
+
+-- 验证系统配置
+SELECT '系统配置数量: ' || COUNT(*) FROM public.sys_config;
+
+-- 验证测试项目（如果已插入）
+-- SELECT '测试项目数量: ' || COUNT(*) FROM public.client_matter WHERE id = 'CS1706860800000123456';
+
+-- 注意：PostgreSQL不支持COMMENT ON SCRIPT语法，这里仅作为文档说明
+-- 测试数据脚本 - 用于开发和测试环境

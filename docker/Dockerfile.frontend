@@ -1,0 +1,40 @@
+# 客户服务系统前端构建 Dockerfile
+# 多阶段构建：先构建，再复制到 Nginx
+#
+# 注意：律所名称等配置请修改 frontend/.env.production
+
+# ========== 构建阶段 ==========
+FROM node:20-alpine AS builder
+
+# 安装 pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+WORKDIR /app
+
+# 复制 package.json 和 lock 文件
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+
+# 安装依赖
+RUN pnpm install --frozen-lockfile --registry=https://registry.npmmirror.com
+
+# 复制源代码
+COPY frontend/ ./
+
+# 构建生产版本
+RUN pnpm run build
+
+# ========== 生产阶段 ==========
+# 使用 nginx unprivileged 镜像（非 root 运行，安全最佳实践）
+FROM nginxinc/nginx-unprivileged:alpine
+
+# 复制构建产物到 Nginx（使用非 root 用户目录）
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# 复制 Nginx 配置
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+# 暴露端口（unprivileged 镜像默认监听 8080）
+EXPOSE 8080
+
+# 启动 Nginx（默认以 nginx 用户运行）
+CMD ["nginx", "-g", "daemon off;"]

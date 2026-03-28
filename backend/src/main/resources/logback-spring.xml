@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- 定义日志文件路径 -->
+    <property name="LOG_PATH" value="${LOG_PATH:-logs}"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-client-service}"/>
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- JSON格式控制台输出（用于Loki/ELK） -->
+    <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <version/>
+                <logLevel/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <mdc/>
+                <stackTrace/>
+                <pattern>
+                    <pattern>
+                        {
+                            "application": "${spring.application.name:-client-service}",
+                            "environment": "${spring.profiles.active:-default}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出（普通格式） -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- JSON格式文件输出（用于Loki/ELK） -->
+    <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}-json.log</file>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>Asia/Shanghai</timeZone>
+                </timestamp>
+                <version/>
+                <logLevel/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <mdc/>
+                <stackTrace/>
+                <pattern>
+                    <pattern>
+                        {
+                            "application": "${spring.application.name:-client-service}",
+                            "environment": "${spring.profiles.active:-default}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}-json-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- Loki Appender（可选，需要Loki可用） -->
+    <!-- 注意：需要启用loki profile才能使用，例如：spring.profiles.active=prod,loki -->
+    <!-- 注意：loki profile可以单独使用，也可以与其他profile组合使用 -->
+    <springProfile name="loki">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>${LOKI_URL:-http://localhost:3100/loki/api/v1/push}</url>
+            </http>
+            <format>
+                <label>
+                    <pattern>application,environment,level</pattern>
+                </label>
+                <message>
+                    <pattern>l=%level c=%logger{20} t=%thread | %msg %ex</pattern>
+                </message>
+                <labelPattern>
+                    <pattern>application=${spring.application.name:-client-service},environment=${spring.profiles.active:-default},level=%level</pattern>
+                </labelPattern>
+            </format>
+            <batch>
+                <maxBatchSize>100</maxBatchSize>
+                <maxBatchWaitMs>5000</maxBatchWaitMs>
+            </batch>
+        </appender>
+    </springProfile>
+
+    <!-- 日志级别配置 -->
+    
+    <!-- 开发环境使用普通格式 -->
+    <springProfile name="dev">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+        <logger name="com.clientservice" level="DEBUG"/>
+    </springProfile>
+
+    <!-- 测试环境 -->
+    <springProfile name="test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="com.clientservice" level="DEBUG"/>
+    </springProfile>
+
+    <!-- 生产环境 + Loki：使用JSON格式并发送到Loki -->
+    <!-- 注意：需要同时启用prod和loki profile，例如：spring.profiles.active=prod,loki -->
+    <springProfile name="prod &amp; loki">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_JSON"/>
+            <appender-ref ref="FILE_JSON"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+        <logger name="com.clientservice" level="INFO"/>
+    </springProfile>
+
+    <!-- 生产环境（不包含Loki）：仅使用JSON格式 -->
+    <springProfile name="prod &amp; !loki">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE_JSON"/>
+            <appender-ref ref="FILE_JSON"/>
+        </root>
+        <logger name="com.clientservice" level="INFO"/>
+    </springProfile>
+
+    <!-- 默认配置（非dev/test/prod环境） -->
+    <springProfile name="!dev &amp; !test &amp; !prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+        <logger name="com.clientservice" level="DEBUG"/>
+    </springProfile>
+</configuration>

@@ -1,0 +1,35 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'client-service'
+    environment: 'production'
+
+# 告警规则文件
+rule_files:
+  - 'alerts.yml'
+
+scrape_configs:
+  # Prometheus自身监控
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 客户服务系统后端监控
+  - job_name: 'client-service-backend'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['app:8081']  # 对应docker-compose.yml中的服务名
+        labels:
+          application: 'client-service'
+          service: 'backend'
+
+  # PostgreSQL监控（如果配置了postgres_exporter）
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+
+  # Redis监控（如果配置了redis_exporter）
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']

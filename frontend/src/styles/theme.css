@@ -1,0 +1,189 @@
+/* 律师事务所专业配色方案 - 平衡专业与视觉吸引力 */
+/* 字体加载：使用 display=swap 避免 FOIT（字体加载时的不可见文字） */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+  /* 主色调 - 专业深蓝系（保留渐变但更保守） */
+  --primary-color: #1a3a5c;
+  --primary-color-light: #2c5282;
+  --primary-color-lighter: #4a7ba7;
+  --primary-color-dark: #0f2438;
+  
+  /* 淡金黄色 - 用于悬停效果，与蓝色形成统一风格 */
+  --accent-color: #d4af37;
+  --accent-color-light: rgba(212, 175, 55, 0.15);
+  --accent-color-lighter: rgba(212, 175, 55, 0.08);
+  
+  /* CTA按钮色 - 专业蓝色 */
+  --cta-color: #0369A1;
+  --cta-color-hover: #0284C7;
+  
+  /* 背景色 */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #f5f7fa;
+  --bg-tertiary: #fafafa;
+  
+  /* 文本色 */
+  --text-primary: #1a1a1a;
+  --text-secondary: #595959;
+  --text-tertiary: #8c8c8c;
+  
+  /* 边框色 */
+  --border-color: #e8e8e8;
+  --border-color-light: #f0f0f0;
+  
+  /* 状态色 */
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #ff4d4f;
+  --info-color: #1890ff;
+  
+  /* 阴影 - 适当的层次感 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* 字体 - 优化中文回退 */
+  --font-heading: 'EB Garamond', 'Songti SC', 'SimSun', 'STSong', serif;
+  --font-body: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  
+  /* 等宽字体（用于日期、数字等） */
+  --font-mono: 'SF Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+/* 全局样式优化 */
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+/* ========================================
+   统一过渡效果 (150-200ms)
+   ======================================== */
+a,
+button,
+.ant-btn,
+.ant-card,
+.ant-menu-item,
+.ant-table-row,
+.ant-tag,
+.ant-badge,
+[role="button"] {
+  transition: all 0.2s ease;
+}
+
+/* ========================================
+   cursor-pointer 可点击元素
+   ======================================== */
+.ant-card.clickable,
+.ant-table-row.clickable,
+.ant-menu-item,
+.ant-tag[onclick],
+.ant-collapse-header,
+[role="button"],
+[data-clickable="true"] {
+  cursor: pointer;
+}
+
+/* 卡片悬停效果增强 */
+.ant-card.clickable:hover,
+.ant-card.hoverable:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color-lighter);
+}
+
+/* 表格行悬停增强 */
+.ant-table-row.clickable:hover {
+  background-color: var(--accent-color-lighter) !important;
+}
+
+/* Focus 状态可见性 */
+.ant-btn:focus-visible,
+.ant-input:focus-visible,
+.ant-select-focused .ant-select-selector {
+  outline: 2px solid var(--primary-color-light);
+  outline-offset: 2px;
+}
+
+/* 标题使用专业字体 */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 专业卡片样式 */
+.pro-card {
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.pro-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* 专业按钮样式 - 保留渐变但更保守 */
+.pro-button-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.pro-button-primary:hover {
+  background: linear-gradient(135deg, var(--primary-color-light) 0%, var(--primary-color-lighter) 100%);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* 渐变背景 - 专业蓝色渐变 */
+.gradient-bg-primary {
+  background: linear-gradient(135deg, var(--primary-color-dark) 0%, var(--primary-color) 50%, var(--primary-color-light) 100%);
+}
+
+/* 专业分隔线 */
+.pro-divider {
+  border-color: var(--border-color);
+  margin: var(--spacing-lg) 0;
+}
+
+/* 平滑的过渡效果 */
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  :root {
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+  }
+}

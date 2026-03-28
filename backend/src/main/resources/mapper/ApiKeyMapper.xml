@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clientservice.infrastructure.persistence.mapper.ApiKeyMapper">
+
+    <!-- 根据API密钥查询 -->
+    <select id="selectByApiKey" resultType="com.clientservice.domain.entity.ApiKey">
+        SELECT * FROM api_key
+        WHERE api_key = #{apiKey}
+        AND enabled = true
+        AND deleted = false
+        AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
+    </select>
+
+    <!-- 更新最后使用时间 -->
+    <update id="updateLastUsedAt">
+        UPDATE api_key
+        SET last_used_at = CURRENT_TIMESTAMP,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = false
+    </update>
+
+</mapper>

@@ -1,0 +1,133 @@
+package com.clientservice.interfaces.rest;
+
+import com.clientservice.application.dto.ClientFileDTO;
+import com.clientservice.application.service.FileService;
+import com.clientservice.common.result.Result;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 管理员文件管理控制器
+ */
+@Slf4j
+@Tag(name = "管理员文件管理", description = "文件查询、统计和管理")
+@RestController
+@RequestMapping("/api/admin/files")
+@RequiredArgsConstructor
+public class AdminFileController {
+
+    private final FileService fileService;
+
+    /**
+     * 获取文件列表（支持分页和筛选）
+     */
+    @Operation(summary = "获取文件列表", description = "获取所有文件，支持按项目、状态筛选")
+    @GetMapping
+    public Result<Map<String, Object>> getFiles(
+            @Parameter(description = "项目ID") @RequestParam(required = false) String matterId,
+            @Parameter(description = "文件状态") @RequestParam(required = false) String status,
+            @Parameter(description = "文件类别") @RequestParam(required = false) String fileCategory,
+            @Parameter(description = "关键字") @RequestParam(required = false) String keyword,
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int pageSize) {
+        // 分页参数安全校验
+        page = Math.max(1, page);
+        pageSize = Math.max(1, Math.min(100, pageSize));
+        
+        Map<String, Object> result = fileService.getFilesWithPagination(
+            matterId, status, fileCategory, keyword, page, pageSize);
+        return Result.success(result);
+    }
+
+    /**
+     * 获取文件统计信息
+     */
+    @Operation(summary = "获取文件统计", description = "获取文件存储统计信息")
+    @GetMapping("/statistics")
+    public Result<Map<String, Object>> getStatistics() {
+        Map<String, Object> stats = fileService.getFileStatistics();
+        return Result.success(stats);
+    }
+
+    /**
+     * 获取文件详情
+     */
+    @Operation(summary = "获取文件详情")
+    @GetMapping("/{fileId}")
+    public Result<ClientFileDTO> getFile(
+            @Parameter(description = "文件ID", required = true) @PathVariable String fileId) {
+        ClientFileDTO file = fileService.getFileById(fileId);
+        return Result.success(file);
+    }
+
+    /**
+     * 删除文件（管理员）
+     */
+    @Operation(summary = "删除文件", description = "管理员删除文件")
+    @DeleteMapping("/{fileId}")
+    public Result<Void> deleteFile(
+            @Parameter(description = "文件ID", required = true) @PathVariable String fileId) {
+        fileService.deleteFile(fileId);
+        log.info("管理员删除文件: fileId={}", fileId);
+        return Result.success();
+    }
+
+    /**
+     * 批量删除文件
+     */
+    @Operation(summary = "批量删除文件", description = "批量删除多个文件（单次最多100个）")
+    @DeleteMapping("/batch")
+    public Result<Map<String, Object>> batchDeleteFiles(
+            @Parameter(description = "文件ID列表", required = true) @RequestBody List<String> fileIds) {
+        if (fileIds == null || fileIds.isEmpty()) {
+            return Result.badRequest("文件ID列表不能为空");
+        }
+        if (fileIds.size() > 100) {
+            return Result.badRequest("单次批量删除不能超过100个文件");
+        }
+        int successCount = 0;
+        int failCount = 0;
+        
+        for (String fileId : fileIds) {
+            try {
+                fileService.deleteFile(fileId);
+                successCount++;
+            } catch (Exception e) {
+                log.warn("删除文件失败: fileId={}, error={}", fileId, e.getMessage());
+                failCount++;
+            }
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("successCount", successCount);
+        result.put("failCount", failCount);
+        
+        log.info("批量删除文件完成: successCount={}, failCount={}", successCount, failCount);
+        return Result.success(result);
+    }
+
+    /**
+     * 清理过期文件
+     */
+    @Operation(summary = "清理过期文件", description = "清理已删除状态的文件")
+    @PostMapping("/cleanup")
+    public Result<Map<String, Object>> cleanupFiles(
+            @Parameter(description = "清理天数（删除N天前标记为删除的文件）") 
+            @RequestParam(defaultValue = "30") int days) {
+        int cleanedCount = fileService.cleanupDeletedFiles(days);
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("cleanedCount", cleanedCount);
+        
+        log.info("清理过期文件完成: cleanedCount={}, days={}", cleanedCount, days);
+        return Result.success(result);
+    }
+}

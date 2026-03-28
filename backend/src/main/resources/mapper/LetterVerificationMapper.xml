@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clientservice.infrastructure.persistence.mapper.LetterVerificationMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.clientservice.domain.entity.LetterVerification">
+        <id column="id" property="id"/>
+        <result column="letter_id" property="letterId"/>
+        <result column="application_no" property="applicationNo"/>
+        <result column="verification_code" property="verificationCode"/>
+        <result column="letter_type" property="letterType"/>
+        <result column="letter_type_name" property="letterTypeName"/>
+        <result column="target_unit" property="targetUnit"/>
+        <result column="lawyer_names" property="lawyerNames"/>
+        <result column="firm_name" property="firmName"/>
+        <result column="matter_name" property="matterName"/>
+        <result column="approved_at" property="approvedAt"/>
+        <result column="printed_at" property="printedAt"/>
+        <result column="valid_until" property="validUntil"/>
+        <result column="remark" property="remark"/>
+        <result column="verify_count" property="verifyCount"/>
+        <result column="last_verify_at" property="lastVerifyAt"/>
+        <result column="last_verify_ip" property="lastVerifyIp"/>
+        <result column="status" property="status"/>
+        <result column="deleted" property="deleted"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 基础列 -->
+    <sql id="Base_Column_List">
+        id, letter_id, application_no, verification_code, letter_type, letter_type_name,
+        target_unit, lawyer_names, firm_name, matter_name, approved_at, printed_at,
+        valid_until, remark, verify_count, last_verify_at, last_verify_ip, status,
+        deleted, created_at, updated_at
+    </sql>
+
+</mapper>

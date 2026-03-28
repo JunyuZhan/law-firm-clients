@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clientservice.infrastructure.persistence.mapper.AdminUserMapper">
+
+    <!-- 根据用户名查询管理员用户 -->
+    <select id="selectByUsername" resultType="com.clientservice.domain.entity.AdminUser">
+        SELECT * FROM admin_user
+        WHERE username = #{username}
+        AND deleted = false
+    </select>
+
+    <!-- 更新最后登录时间和IP -->
+    <update id="updateLastLoginTime">
+        UPDATE admin_user
+        SET last_login_at = CURRENT_TIMESTAMP,
+            last_login_ip = #{ipAddress},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = false
+    </update>
+
+    <!-- 增加登录失败次数 -->
+    <update id="incrementFailedLoginCount">
+        UPDATE admin_user
+        SET failed_login_count = failed_login_count + 1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = false
+    </update>
+
+    <!-- 重置登录失败次数 -->
+    <update id="resetFailedLoginCount">
+        UPDATE admin_user
+        SET failed_login_count = 0,
+            locked_until = NULL,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = false
+    </update>
+
+    <!-- 锁定账户 -->
+    <update id="lockAccount">
+        UPDATE admin_user
+        SET locked_until = #{lockedUntil},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = false
+    </update>
+
+    <!-- 解锁账户 -->
+    <update id="unlockAccount">
+        UPDATE admin_user
+        SET locked_until = NULL,
+            failed_login_count = 0,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND deleted = false
+    </update>
+
+</mapper>

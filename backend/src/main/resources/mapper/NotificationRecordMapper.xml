@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clientservice.infrastructure.persistence.mapper.NotificationRecordMapper">
+
+    <!-- 根据项目ID查询通知记录（限制返回数量避免大数据量） -->
+    <select id="selectByMatterId" resultType="com.clientservice.domain.entity.NotificationRecord">
+        SELECT * FROM notification_record
+        WHERE matter_id = #{matterId}
+        AND deleted = false
+        ORDER BY created_at DESC
+        LIMIT 500
+    </select>
+
+    <!-- 根据客户ID查询通知记录（限制返回数量避免大数据量） -->
+    <select id="selectByClientId" resultType="com.clientservice.domain.entity.NotificationRecord">
+        SELECT * FROM notification_record
+        WHERE client_id = #{clientId}
+        AND deleted = false
+        ORDER BY created_at DESC
+        LIMIT 500
+    </select>
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.clientservice.infrastructure.persistence.mapper.ClientFileMapper">
+
+    <!-- 根据项目ID查询文件列表 -->
+    <select id="selectByMatterId" resultType="com.clientservice.domain.entity.ClientFile">
+        SELECT * FROM client_file
+        WHERE matter_id = #{matterId}
+        AND deleted = false
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        ORDER BY uploaded_at DESC
+    </select>
+
+    <!-- 根据外部文件ID查询 -->
+    <select id="selectByExternalFileId" resultType="com.clientservice.domain.entity.ClientFile">
+        SELECT * FROM client_file
+        WHERE id = #{externalFileId}
+        AND deleted = false
+    </select>
+
+    <!-- 分页查询文件列表 -->
+    <select id="selectWithPagination" resultType="com.clientservice.domain.entity.ClientFile">
+        SELECT * FROM client_file
+        WHERE deleted = false
+        <if test="matterId != null and matterId != ''">
+            AND matter_id = #{matterId}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="fileCategory != null and fileCategory != ''">
+            AND file_category = #{fileCategory}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (file_name ILIKE CONCAT('%', #{keyword}, '%') 
+                 OR description ILIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        ORDER BY uploaded_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计文件数量 -->
+    <select id="countWithFilter" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM client_file
+        WHERE deleted = false
+        <if test="matterId != null and matterId != ''">
+            AND matter_id = #{matterId}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        <if test="fileCategory != null and fileCategory != ''">
+            AND file_category = #{fileCategory}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (file_name ILIKE CONCAT('%', #{keyword}, '%') 
+                 OR description ILIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+    </select>
+
+    <!-- 统计文件大小总和 -->
+    <select id="sumFileSize" resultType="java.lang.Long">
+        SELECT COALESCE(SUM(file_size), 0) FROM client_file
+        WHERE deleted = false
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <!-- 按类别统计文件数量 -->
+    <select id="countByCategory" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM client_file
+        WHERE deleted = false
+        AND file_category = #{fileCategory}
+    </select>
+
+    <!-- 统计有文件的项目数量 -->
+    <select id="countDistinctMatters" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT matter_id) FROM client_file
+        WHERE deleted = false
+    </select>
+
+    <!-- 查询指定时间之前删除的文件（分批处理，避免内存溢出） -->
+    <select id="selectDeletedBefore" resultType="com.clientservice.domain.entity.ClientFile">
+        SELECT * FROM client_file
+        WHERE status = 'DELETED'
+        AND deleted = false
+        AND uploaded_at &lt; #{before}
+        LIMIT 500
+    </select>
+
+</mapper>
