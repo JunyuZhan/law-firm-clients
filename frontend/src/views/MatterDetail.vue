@@ -614,9 +614,11 @@ import dayjs from 'dayjs'
 import logger from '@/utils/logger'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
+import { usePortalVisitorStore } from '@/stores/portalVisitor'
 
 const route = useRoute()
 const router = useRouter()
+const portalVisitorStore = usePortalVisitorStore()
 
 const loading = ref(false)
 const fileLoading = ref(false)
@@ -778,6 +780,11 @@ async function loadMatterDetail() {
   try {
     const res = await getClientMatterDetail(matterId.value, token.value)
     matterDetail.value = res.data
+    portalVisitorStore.saveProfile({
+      clientId: res.data.clientId ?? null,
+      clientName: res.data.clientName || '',
+      lastMatterId: res.data.id || matterId.value,
+    })
     await loadFileList()
     logger.debug('[MatterDetail] 数据加载成功')
   } catch (error: unknown) {

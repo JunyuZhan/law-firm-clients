@@ -44,7 +44,7 @@
             </div>
             <div class="logo-text">
               <h1>{{ lawFirmName }}</h1>
-              <p>Client Service Portal</p>
+              <p>客户服务系统</p>
             </div>
           </div>
 

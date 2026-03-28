@@ -1,6 +1,6 @@
 # 快速启动指南
 
-> 最后更新：2026-02-02
+> 最后更新：2026-03-29
 
 ## 🚀 快速开始（5分钟）
 
@@ -101,6 +101,10 @@ curl -X POST http://localhost:8081/api/matter/receive \
 ```bash
 curl "http://localhost:8081/portal/api/matter/CS1706860800000123456?token=test-access-token-12345678901234567890123456789012"
 ```
+
+说明：
+- 门户首页地址通常为 `http://localhost/portal`
+- 当前前台页面包含：首页、我的项目、文件中心、消息通知、个人中心、帮助中心
 
 ### 3. 上传文件
 

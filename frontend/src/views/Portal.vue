@@ -3,7 +3,9 @@
     <a-layout class="portal-layout">
       <AppHeader
         variant="portal"
+        :show-mobile-menu="isMobile"
         :show-admin-button="true"
+        @menu-click="openMobileDrawer"
         @admin-click="goToAdmin"
       />
 
@@ -12,7 +14,7 @@
           <div class="hero-grid fade-in">
             <div class="hero-copy glass-panel">
               <div class="eyebrow">
-                Client Access Workspace
+                客户访问工作台
               </div>
               <h1 class="editorial-title hero-title">
                 {{ appSlogan?.replace(/[、,，]/g, ' · ') || '精确、安全、透明的客户门户' }}
@@ -112,7 +114,7 @@
           <div class="feature-head">
             <div>
               <div class="eyebrow">
-                Portal Overview
+                门户概览
               </div>
               <h2 class="editorial-title feature-title">
                 统一的信息层级，而不是分散的功能堆叠
@@ -216,13 +218,18 @@
           </div>
         </div>
       </a-layout-footer>
+      <MobileDrawer
+        v-model:open="mobileDrawerOpen"
+        :user-name="drawerUserName"
+        @menu-click="handleDrawerMenuClick"
+      />
       <MobileBottomNav />
     </a-layout>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   LinkOutlined,
@@ -235,14 +242,19 @@ import {
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import AppHeader from '@/components/AppHeader.vue'
+import MobileDrawer from '@/components/MobileDrawer.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
 import { useAppConfigStore } from '@/stores/appConfig'
+import { usePortalVisitorStore } from '@/stores/portalVisitor'
 import logger from '@/utils/logger'
 
 const router = useRouter()
 const route = useRoute()
+const portalVisitorStore = usePortalVisitorStore()
 const matterUrl = ref('')
 const loading = ref(false)
+const mobileDrawerOpen = ref(false)
+const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 const showPasteButton = ref(false)
 const canPaste = ref(false)
 const pasteButtonText = ref('粘贴')
@@ -252,6 +264,8 @@ const appSlogan = computed(() => appConfigStore.appSlogan)
 const icpLicense = computed(() => appConfigStore.icpLicense)
 const lawFirmName = computed(() => appConfigStore.lawFirmName)
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
+const isMobile = computed(() => windowWidth.value <= 768)
+const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmName.value)
 
 const features = [
   {
@@ -398,7 +412,26 @@ function goToAdmin() {
   })
 }
 
+function openMobileDrawer() {
+  mobileDrawerOpen.value = true
+}
+
+function handleDrawerMenuClick(key: string) {
+  if (key === 'portal') {
+    mobileDrawerOpen.value = false
+  }
+}
+
+function updateWindowWidth() {
+  windowWidth.value = window.innerWidth
+  if (!isMobile.value) {
+    mobileDrawerOpen.value = false
+  }
+}
+
 onMounted(() => {
+  updateWindowWidth()
+  window.addEventListener('resize', updateWindowWidth)
   const urlParam = route.query.url as string
   if (urlParam) {
     const parsed = parseMatterUrl(urlParam)
@@ -410,6 +443,10 @@ onMounted(() => {
       })
     }
   }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth)
 })
 </script>
 

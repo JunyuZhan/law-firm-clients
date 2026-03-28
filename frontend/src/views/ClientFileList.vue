@@ -2,7 +2,7 @@
   <div class="file-list-container">
     <AppHeader
       variant="portal"
-      title="我的文件"
+      title="文件中心"
     />
     <a-layout-content class="content">
       <a-spin :spinning="loading">
@@ -27,7 +27,7 @@
           class="empty-state"
         >
           <FileOutlined class="empty-icon" />
-          <p>请先访问项目</p>
+          <p>请先进入项目</p>
         </div>
         <div
           v-else-if="files.length === 0"

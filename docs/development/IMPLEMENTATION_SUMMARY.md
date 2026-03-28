@@ -1,6 +1,6 @@
 # 客户服务系统实现总结
 
-> 最后更新：2026-02-02
+> 最后更新：2026-03-29
 
 ## 📊 总体进度
 
@@ -26,12 +26,16 @@
 - ✅ 项目撤销功能
 
 ### 3. 客户门户
+- ✅ 门户首页（访问链接输入）
 - ✅ 项目详情页面（`/matter/:id`）
+- ✅ 文件中心、消息通知、个人中心、帮助中心
 - ✅ 文件上传/下载/删除
 - ✅ 文件预览（图片、PDF、文本）
 - ✅ 文件上传进度显示
 - ✅ 律师信息展示
 - ✅ 响应式设计（移动端、平板、PC）
+- ✅ 移动端抽屉菜单与底部导航
+- ✅ 前台访客资料缓存（基于最近一次项目详情访问）
 
 ### 4. 通知服务
 - ✅ 邮件通知（SMTP）
@@ -127,14 +131,24 @@ frontend/
 │   │   ├── apiKey.ts
 │   │   └── config.ts
 │   ├── views/
-│   │   ├── Portal.vue        # 客户门户入口
+│   │   ├── Portal.vue        # 客户门户首页
 │   │   ├── MatterDetail.vue  # 客户门户项目详情
+│   │   ├── ClientFileList.vue
+│   │   ├── ClientNotifications.vue
+│   │   ├── ClientProfile.vue
+│   │   ├── HelpCenter.vue
 │   │   └── admin/            # 管理后台页面
 │   │       ├── MatterList.vue
 │   │       ├── MatterDetail.vue
 │   │       ├── NotificationHistory.vue
 │   │       ├── ApiKeyManagement.vue
 │   │       └── SystemConfig.vue
+│   ├── components/
+│   │   ├── AppHeader.vue
+│   │   ├── MobileDrawer.vue
+│   │   └── MobileBottomNav.vue
+│   ├── stores/
+│   │   └── portalVisitor.ts  # 前台访客资料状态
 │   └── router/
 │       └── index.ts
 ```
@@ -152,6 +166,7 @@ frontend/
 
 ### 客户门户
 - `GET /portal/api/matter/{id}` - 获取项目详情（客户门户）
+- 前端路由：`/portal`、`/matters`、`/files`、`/notifications`、`/profile`、`/help`
 
 ### 文件管理
 - `POST /api/client/files/upload` - 上传文件
@@ -222,7 +237,7 @@ frontend/
 
 客户服务系统的核心功能已全部实现，包括：
 - ✅ 项目数据接收和管理
-- ✅ 客户门户（项目详情、文件管理）
+- ✅ 客户门户（首页、项目详情、文件中心、消息通知、个人中心、帮助中心）
 - ✅ 多渠道通知（邮件、短信、微信）
 - ✅ 通知重试机制
 - ✅ 管理后台（项目、通知、API密钥、系统配置）

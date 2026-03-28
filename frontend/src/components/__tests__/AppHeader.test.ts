@@ -23,7 +23,6 @@ describe('AppHeader', () => {
           'a-layout-header': true,
           'a-button': true,
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -48,7 +47,6 @@ describe('AppHeader', () => {
             template: '<button class="header-btn back-btn"><slot /></button>',
           },
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -72,7 +70,6 @@ describe('AppHeader', () => {
             template: '<button class="header-btn back-btn" @click="$emit(\'click\')"><slot /></button>',
           },
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -99,7 +96,6 @@ describe('AppHeader', () => {
             template: '<button class="header-btn back-btn"><slot /></button>',
           },
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -125,7 +121,6 @@ describe('AppHeader', () => {
             template: '<button class="header-btn back-btn"><slot /></button>',
           },
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -151,7 +146,6 @@ describe('AppHeader', () => {
           },
           'a-button': true,
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -175,7 +169,6 @@ describe('AppHeader', () => {
           },
           'a-button': true,
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -197,7 +190,6 @@ describe('AppHeader', () => {
           },
           'a-button': true,
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -220,7 +212,6 @@ describe('AppHeader', () => {
           },
           'a-button': true,
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })
@@ -243,7 +234,6 @@ describe('AppHeader', () => {
           },
           'a-button': true,
           ArrowLeftOutlined: true,
-          'img': true,
         },
       },
     })

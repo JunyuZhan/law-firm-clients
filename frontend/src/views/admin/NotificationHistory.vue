@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          Notification Operations
+          通知管理
         </div>
         <h2 class="editorial-title intro-title">
           通知记录
@@ -23,7 +23,7 @@
     <section class="filter-panel">
       <div class="panel-head">
         <div>
-          <span class="panel-kicker">Filter + Summary</span>
+          <span class="panel-kicker">筛选与概览</span>
           <h3>发送态势</h3>
         </div>
         <p>按项目、渠道和状态定位异常，再决定是否触发重试。</p>

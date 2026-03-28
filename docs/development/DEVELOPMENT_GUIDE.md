@@ -46,7 +46,7 @@ com.clientservice/
 - **规范**：
   - 使用`@RestController`注解
   - 统一使用`Result<T>`响应格式
-  - 所有管理接口需要API密钥验证
+  - 所有管理接口需要后台登录认证（JWT）
   - 使用Swagger注解完善API文档
 
 #### 2. 应用层（Application）
@@ -211,7 +211,7 @@ onMounted(() => {
 
 6. **Controller层**
    - 创建Controller类
-   - 添加API密钥验证（管理接口）
+   - 添加后台登录认证（管理接口）
    - 添加Swagger注解
 
 7. **前端API客户端**

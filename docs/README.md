@@ -33,7 +33,7 @@ docs/
 
 ### 新手入门
 1. [快速启动指南](guides/QUICKSTART.md) - 5 分钟快速部署
-2. [用户手册](guides/USER_MANUAL.md) - 功能使用说明
+2. [用户手册](guides/USER_MANUAL.md) - 门户首页、项目详情、文件中心、消息通知、个人中心、帮助中心使用说明
 3. [管理员登录指南](guides/ADMIN_LOGIN_GUIDE.md) - 管理后台登录
 
 ### API 开发
@@ -56,3 +56,4 @@ docs/
 ### 开发参考
 1. [开发指南](development/DEVELOPMENT_GUIDE.md) - 本地开发环境搭建
 2. [实现总结](development/IMPLEMENTATION_SUMMARY.md) - 功能实现说明
+3. [前端 README](../frontend/README.md) - 前端路由、状态管理、移动端组件说明

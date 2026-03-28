@@ -40,7 +40,7 @@ const routes: RouteRecordRaw[] = [
     path: '/files',
     name: 'ClientFileList',
     component: () => import('@/views/ClientFileList.vue'),
-    meta: { title: '我的文件' },
+    meta: { title: '文件中心' },
   },
   {
     path: '/notifications',
@@ -53,6 +53,12 @@ const routes: RouteRecordRaw[] = [
     name: 'ClientProfile',
     component: () => import('@/views/ClientProfile.vue'),
     meta: { title: '个人中心' },
+  },
+  {
+    path: '/help',
+    name: 'ClientHelp',
+    component: () => import('@/views/HelpCenter.vue'),
+    meta: { title: '帮助中心' },
   },
   {
     path: '/verify/letter',

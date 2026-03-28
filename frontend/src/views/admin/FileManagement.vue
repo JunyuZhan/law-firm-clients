@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          File Operations
+          文件管理工作台
         </div>
         <h2 class="editorial-title intro-title">
           文件管理

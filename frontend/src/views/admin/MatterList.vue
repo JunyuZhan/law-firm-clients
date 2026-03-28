@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          Matter Operations
+          项目管理
         </div>
         <h2 class="editorial-title intro-title">
           项目列表
@@ -23,7 +23,7 @@
     <section class="filter-panel">
       <div class="panel-head">
         <div>
-          <span class="panel-kicker">Overview</span>
+          <span class="panel-kicker">概览</span>
           <h3>项目态势</h3>
         </div>
         <p>先看活跃度和风险，再进入筛选与操作。</p>

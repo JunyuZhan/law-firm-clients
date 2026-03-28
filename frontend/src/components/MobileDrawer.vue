@@ -15,7 +15,7 @@
           class="drawer-logo"
         >
         <div class="drawer-title">
-          <span class="drawer-app-name">客户服务系统</span>
+          <span class="drawer-app-name">{{ appTitle }}</span>
         </div>
       </div>
     </template>
@@ -69,18 +69,18 @@
 
         <a-menu-divider />
 
-        <a-menu-item key="settings">
+        <a-menu-item key="profile">
           <template #icon>
             <SettingOutlined />
           </template>
-          设置
+          个人中心
         </a-menu-item>
 
-        <a-menu-item key="logout">
+        <a-menu-item key="portal">
           <template #icon>
             <LogoutOutlined />
           </template>
-          退出登录
+          返回门户
         </a-menu-item>
       </a-menu>
 
@@ -90,14 +90,14 @@
             :size="40"
             :src="userAvatar"
           >
-            {{ userName.charAt(0) }}
+            {{ displayUserName.charAt(0) }}
           </a-avatar>
           <div class="user-details">
             <div class="user-name">
-              {{ userName }}
+              {{ displayUserName }}
             </div>
             <div class="user-role">
-              客户端用户
+              {{ userRoleLabel }}
             </div>
           </div>
         </div>
@@ -108,7 +108,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useAppConfigStore } from '@/stores/appConfig'
+import { usePortalVisitorStore } from '@/stores/portalVisitor'
 import {
   HomeOutlined,
   FileTextOutlined,
@@ -128,7 +130,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   open: false,
-  userName: '访客',
+  userName: '',
   userAvatar: '',
   unreadCount: 0,
 })
@@ -139,7 +141,9 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const selectedKeys = ref<string[]>(['home'])
+const route = useRoute()
+const appConfigStore = useAppConfigStore()
+const portalVisitorStore = usePortalVisitorStore()
 const menuTheme = ref<'light' | 'dark'>('dark')
 
 const visible = computed({
@@ -147,22 +151,36 @@ const visible = computed({
   set: (value) => emit('update:open', value),
 })
 
-const logoUrl = computed(() => {
-  return new URL('/logo.svg', import.meta.url).href
+const logoUrl = computed(() => appConfigStore.logoUrl)
+const appTitle = computed(() => appConfigStore.appShortName || appConfigStore.appName || '客户服务系统')
+const displayUserName = computed(() => props.userName || portalVisitorStore.displayName || '访客')
+const userRoleLabel = computed(() => {
+  if (portalVisitorStore.hasProfile) return '客户门户用户'
+  if (props.userName) return '门户导航'
+  return '访客'
+})
+const selectedKeys = computed(() => {
+  const path = route.path
+  if (path === '/' || path === '/portal') return ['home']
+  if (path.startsWith('/matters') || path.startsWith('/matter/')) return ['matter']
+  if (path.startsWith('/files')) return ['file']
+  if (path.startsWith('/notifications')) return ['notification']
+  if (path.startsWith('/help')) return ['help']
+  if (path.startsWith('/profile')) return ['profile']
+  return ['home']
 })
 
 const handleMenuClick = ({ key }: { key: string }) => {
-  selectedKeys.value = [key]
   emit('menu-click', key)
   
   const routes: Record<string, string> = {
-    home: '/',
+    home: '/portal',
     matter: '/matters',
     file: '/files',
     notification: '/notifications',
     help: '/help',
-    settings: '/settings',
-    logout: '/logout',
+    profile: '/profile',
+    portal: '/portal',
   }
   
   if (routes[key]) {

@@ -54,7 +54,7 @@ function handleMenuClick(key: string) {
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|---------|------|
 | open | Boolean | false | 控制抽屉显示/隐藏 |
-| userName | String | '访客' | 用户名称 |
+| userName | String | '' | 用户名称；为空时优先使用 `portalVisitor` 中的最近访客资料 |
 | userAvatar | String | '' | 用户头像 URL |
 | unreadCount | Number | 0 | 未读消息数量 |
 
@@ -179,11 +179,11 @@ import MobileBottomNav from '@/components/MobileBottomNav.vue'
 
 | Key | 标签 | 图标 | 路径 |
 |-----|------|------|------|
-| home | 首页 | HomeOutlined | / |
-| matter | 项目 | FileTextOutlined | /matters |
-| files | 文件 | FolderOutlined | /files |
-| notifications | 消息 | BellOutlined | /notifications |
-| profile | 我的 | UserOutlined | /profile |
+| home | 首页 | HomeOutlined | /portal |
+| matter | 我的项目 | FileTextOutlined | /matters |
+| files | 文件中心 | FolderOutlined | /files |
+| notifications | 消息通知 | BellOutlined | /notifications |
+| profile | 个人中心 | UserOutlined | /profile |
 
 **自定义导航项：**
 
@@ -209,25 +209,19 @@ const navItems = computed<NavItem[]>(() => [
 已将以下组件集成到 `Portal.vue`：
 
 1. **MobileDrawer** - 添加移动端菜单按钮和抽屉
-2. **响应式样式** - 添加了 768px 和 480px 断点的适配
+2. **MobileBottomNav** - 提供固定底部导航
+3. **响应式样式** - 添加了 768px 和 480px 断点的适配
 
 ### Portal.vue 中的关键修改
 
-**1. 添加菜单按钮**
+**1. 通过 AppHeader 暴露菜单按钮**
 
 ```vue
-<div class="header-actions">
-  <a-button
-    type="text"
-    class="header-link mobile-menu-btn"
-    @click="mobileMenuVisible = true"
-  >
-    <template #icon>
-      <MenuOutlined />
-    </template>
-  </a-button>
-  <!-- 其他按钮 -->
-</div>
+<AppHeader
+  variant="portal"
+  :show-mobile-menu="isMobile"
+  @menu-click="openMobileDrawer"
+/>
 ```
 
 **2. 添加 MobileDrawer 组件**
@@ -235,7 +229,7 @@ const navItems = computed<NavItem[]>(() => [
 ```vue
 <MobileDrawer
   v-model:open="mobileMenuVisible"
-  user-name="访客"
+  :user-name="drawerUserName"
   unread-count="0"
   @menu-click="handleMenuClick"
 />

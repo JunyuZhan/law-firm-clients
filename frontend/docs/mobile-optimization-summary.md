@@ -56,14 +56,14 @@
 - 从右侧滑出的抽屉菜单
 - 支持菜单项高亮
 - 支持徽章提示（未读消息）
-- 用户信息展示
+- 用户信息展示（优先读取最近一次客户项目访问同步的访客资料）
 - 优雅的动画效果
 
 **Props**:
 | 属性 | 类型 | 说明 |
 |------|------|------|
 | open | Boolean | 控制显示/隐藏 |
-| userName | String | 用户名称 |
+| userName | String | 用户名称；为空时回退到 `portalVisitor` 状态 |
 | userAvatar | String | 用户头像 URL |
 | unreadCount | Number | 未读消息数量 |
 
@@ -124,11 +124,11 @@
 **导航项**:
 | Key | 标签 | 图标 | 路径 |
 |-----|------|------|------|
-| home | 首页 | HomeOutlined | / |
-| matter | 项目 | FileTextOutlined | /matters |
-| files | 文件 | FolderOutlined | /files |
-| notifications | 消息 | BellOutlined | /notifications |
-| profile | 我的 | UserOutlined | /profile |
+| home | 首页 | HomeOutlined | /portal |
+| matter | 我的项目 | FileTextOutlined | /matters |
+| files | 文件中心 | FolderOutlined | /files |
+| notifications | 消息通知 | BellOutlined | /notifications |
+| profile | 个人中心 | UserOutlined | /profile |
 
 **响应式设计**:
 - 桌面端（≥769px）：隐藏
@@ -254,10 +254,12 @@ img {
 
 ### 5. 页面优化
 
-#### MatterDetail.vue
+#### Portal.vue
 **改造内容**:
-- ✅ 使用 AppHeader 替换原有 header
-- ✅ 添加 MobileDrawer 移动端菜单
+- ✅ 使用 AppHeader 暴露移动端菜单按钮
+- ✅ 接入 MobileDrawer 移动端抽屉菜单
+- ✅ 接入 MobileBottomNav 底部导航
+- ✅ 抽屉菜单和真实路由闭环（首页、我的项目、文件中心、消息通知、个人中心、帮助中心）
 - ✅ 删除重复的 header 样式代码
 - ✅ 统一 header 高度和样式
 

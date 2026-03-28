@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          System Configuration
+          配置中心
         </div>
         <h2 class="editorial-title intro-title">
           系统配置
@@ -65,11 +65,11 @@
               <a-form-item label="系统简称（英文）">
                 <a-input
                   v-model:value="brandConfig.appShortNameEn"
-                  placeholder="如：XX Law Service"
+                  placeholder="如：XX Law Service（可选）"
                   @blur="saveBrandConfig('system.app-short-name-en', brandConfig.appShortNameEn)"
                 />
                 <div class="field-hint">
-                  显示在管理后台侧边栏下方
+                  可选字段；如需双语品牌展示，可显示在管理后台侧边栏下方
                 </div>
               </a-form-item>
             </a-form>

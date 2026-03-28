@@ -1,7 +1,7 @@
 # 系统配置管理指南
 
-> 文档版本：v1.0  
-> 更新日期：2026-02-03
+> 文档版本：v1.1  
+> 更新日期：2026-03-29
 
 ## 📋 概述
 
@@ -46,6 +46,26 @@
   - `https://client-service.example.com`（生产环境）
   - `http://localhost:8081/v1`（如果API网关有版本路径）
 - 用途：生成客户访问链接时使用，如：`{base-url}/portal/matter/{matterId}?token={token}`
+
+### 1.1 品牌与门户展示配置
+
+当前管理后台的“系统配置”页面已拆分出“品牌配置”和“门户配置”两个可视化区域，常用字段如下：
+
+| 配置键 | 用途 |
+|--------|------|
+| `system.app-name` | 浏览器标题、页脚版权等完整系统名称 |
+| `system.app-short-name` | 管理后台侧边栏主标题 |
+| `system.app-short-name-en` | 管理后台侧边栏可选英文副标题 |
+| `system.logo-url` | 门户和后台共用 Logo |
+| `system.law-firm-name` | 门户头部与页脚显示的律所名称 |
+| `system.law-firm-website` | 帮助中心和页脚“官网”跳转链接 |
+| `system.app-slogan` | 门户首页主标语、帮助中心提示语 |
+| `system.icp-license` | 页脚备案号 |
+| `system.copyright` | 页脚版权文案 |
+
+说明：
+- `system.app-short-name-en` 为可选字段，当前界面以中文为主、英文为辅
+- 帮助中心、移动端抽屉和门户首页都会复用上述品牌字段
 
 ### 2. 通知服务配置
 

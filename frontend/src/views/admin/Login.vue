@@ -4,7 +4,7 @@
       <section class="login-showcase glass-panel">
         <div class="showcase-top">
           <div class="eyebrow">
-            Admin Authentication
+            管理端登录
           </div>
           <div class="brand-lockup">
             <div class="logo">
@@ -48,16 +48,16 @@
 
         <div class="showcase-metrics">
           <div class="metric-chip">
-            <span>Session</span>
-            <strong>Protected</strong>
+            <span>会话</span>
+            <strong>已保护</strong>
           </div>
           <div class="metric-chip">
-            <span>Captcha</span>
-            <strong>Enabled</strong>
+            <span>验证码</span>
+            <strong>已启用</strong>
           </div>
           <div class="metric-chip">
-            <span>Workspace</span>
-            <strong>Unified</strong>
+            <span>工作台</span>
+            <strong>已统一</strong>
           </div>
         </div>
 
@@ -89,7 +89,7 @@
       <section class="login-panel glass-panel">
         <div class="form-header">
           <div class="eyebrow">
-            Sign In
+            登录
           </div>
           <h2 class="editorial-title">
             欢迎回来

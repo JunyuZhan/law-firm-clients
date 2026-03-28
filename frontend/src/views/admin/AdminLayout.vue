@@ -25,11 +25,11 @@
             >
           </div>
           <div class="logo-text">
-            <span class="logo-kicker">Operations</span>
+            <span class="logo-kicker">管理工作台</span>
             <a-typography-title :level="4">
               {{ appShortName }}
             </a-typography-title>
-            <a-typography-text>{{ appShortNameEn }}</a-typography-text>
+            <a-typography-text>{{ appShortNameEn || appShortName }}</a-typography-text>
           </div>
         </div>
         <div
@@ -55,8 +55,8 @@
         v-if="!collapsed"
         class="sider-footer"
       >
-        <span class="sider-footer-label">Secure Workspace</span>
-        <strong>{{ appShortNameEn || 'Law Firm Clients' }}</strong>
+        <span class="sider-footer-label">统一管理空间</span>
+        <strong>{{ appShortName || '客户服务系统' }}</strong>
         <p>项目、文件、通知与系统配置在同一控制台内完成。</p>
       </div>
     </a-layout-sider>
@@ -119,7 +119,7 @@
           </a-button>
 
           <div class="header-title-block">
-            <span class="header-eyebrow">Admin Console</span>
+            <span class="header-eyebrow">管理后台</span>
             <div class="header-title-row">
               <span class="page-title">{{ currentPageTitle }}</span>
               <span class="header-caption">统一查看项目、通知、文件与系统配置</span>
@@ -237,12 +237,12 @@ const currentPageTitle = computed(() => {
 
 const headerStatusLabel = computed(() => {
   if (route.path.includes('/maintenance')) {
-    return 'System Control'
+    return '系统维护'
   }
   if (route.path.includes('/config') || route.path.includes('/api-keys')) {
-    return 'Protected Settings'
+    return '受保护配置'
   }
-  return 'Secure Session'
+  return '安全会话'
 })
 
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
