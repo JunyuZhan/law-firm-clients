@@ -224,6 +224,9 @@
                   placeholder="如：http://192.168.1.100/api"
                   @blur="saveSystemConfig('callback.law-firm-url', systemConfig.callbackUrl)"
                 />
+                <div class="field-hint">
+                  新主链路下通常无需手工填写。律所管理系统推送项目时会自动把自己的回调地址绑定到该项目；这里只作为历史项目或特殊覆盖场景兜底。
+                </div>
               </a-form-item>
               <a-form-item
                 v-if="systemConfig.callbackEnabled"
@@ -234,6 +237,9 @@
                   placeholder="与律所系统约定的密钥"
                   @blur="saveSystemConfig('callback.api-key', systemConfig.callbackApiKey)"
                 />
+                <div class="field-hint">
+                  新主链路下通常优先复用当前项目来源 API key 的 Secret；这里只作为旧链路或手工覆盖兜底。
+                </div>
               </a-form-item>
               <a-form-item
                 v-if="systemConfig.callbackEnabled"

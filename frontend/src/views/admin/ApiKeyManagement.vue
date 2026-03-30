@@ -66,6 +66,7 @@
               <li>在下方创建 API 密钥</li>
               <li>将 API 地址和 API 密钥提供给律所系统管理员</li>
               <li>在律所系统的外部系统集成中完成配置</li>
+              <li>建议同时保留 API Secret，供律所系统回调校验自动复用</li>
             </ol>
           </a-descriptions-item>
         </a-descriptions>
@@ -83,9 +84,10 @@
           </a-descriptions-item>
           <a-descriptions-item label="配置项">
             <ul class="guide-list">
+              <li><b>默认主链路</b>：律所系统推送项目时会自动下发回调地址，并按该项目来源 API key 自动回调</li>
               <li><b>启用回调</b>：开启或关闭回调功能</li>
-              <li><b>律所系统地址</b>：律所系统提供的回调接收地址</li>
-              <li><b>回调密钥</b>：需与律所系统配置一致</li>
+              <li><b>律所系统地址</b>：仅历史项目或特殊场景下手工覆盖时使用</li>
+              <li><b>回调密钥</b>：仅旧链路兜底使用；新链路优先复用该 API key 对应的 Secret</li>
             </ul>
           </a-descriptions-item>
         </a-descriptions>
