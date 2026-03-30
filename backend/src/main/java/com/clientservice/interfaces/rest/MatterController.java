@@ -57,7 +57,7 @@ public class MatterController {
                 apiKey.getKeyName(), apiKey.getLawFirmName());
 
         // 2. 接收项目数据（传递请求对象以支持动态获取 baseUrl）
-        MatterReceiveResponse response = matterService.receiveMatterData(request, httpRequest);
+        MatterReceiveResponse response = matterService.receiveMatterData(request, httpRequest, apiKey);
 
         log.info("接收项目数据成功: id={}, clientId={}", response.getId(), request.getClientId());
 

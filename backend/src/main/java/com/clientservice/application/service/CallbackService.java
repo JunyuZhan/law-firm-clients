@@ -1,12 +1,16 @@
 package com.clientservice.application.service;
 
 import com.clientservice.common.util.UrlGenerator;
+import com.clientservice.domain.entity.ApiKey;
 import com.clientservice.domain.entity.AccessLog;
 import com.clientservice.domain.entity.ClientFile;
 import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.domain.entity.DownloadLog;
 import com.clientservice.domain.entity.NotificationRecord;
+import com.clientservice.infrastructure.persistence.mapper.ApiKeyMapper;
 import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,10 +38,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CallbackService {
 
+    private static final String CALLBACK_URL_KEY = "_lawFirmCallbackUrl";
+    private static final String SOURCE_API_KEY_ID_KEY = "_sourceApiKeyId";
+
     private final ClientMatterMapper matterMapper;
+    private final ApiKeyMapper apiKeyMapper;
     private final RestTemplate restTemplate;
     private final SysConfigService sysConfigService;
     private final UrlGenerator urlGenerator;
+    private final ObjectMapper objectMapper;
 
     /** 管理系统回调地址（配置文件中的默认值） */
     @Value("${client-service.callback.law-firm-url:}")
@@ -114,17 +123,16 @@ public class CallbackService {
             return;
         }
 
-        String callbackUrl = getLawFirmCallbackUrl();
-        if (callbackUrl == null || callbackUrl.isEmpty()) {
-            log.debug("未配置回调地址，跳过访问日志回调");
-            return;
-        }
-
         try {
             // 获取项目信息
             ClientMatter matter = matterMapper.selectById(accessLog.getMatterId());
             if (matter == null) {
                 log.warn("项目不存在，跳过访问日志回调: matterId={}", accessLog.getMatterId());
+                return;
+            }
+            String callbackUrl = resolveLawFirmCallbackUrl(matter);
+            if (callbackUrl == null || callbackUrl.isEmpty()) {
+                log.debug("未配置回调地址，跳过访问日志回调");
                 return;
             }
 
@@ -142,7 +150,7 @@ public class CallbackService {
 
             // 发送回调请求
             String fullCallbackUrl = buildLawFirmCallbackUrl(callbackUrl, "/open/client/access-log");
-            sendCallback(fullCallbackUrl, callbackData);
+            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
 
             log.debug("访问日志回调成功: matterId={}, clientId={}", 
                     accessLog.getMatterId(), accessLog.getClientId());
@@ -165,17 +173,16 @@ public class CallbackService {
             return;
         }
 
-        String callbackUrl = getLawFirmCallbackUrl();
-        if (callbackUrl == null || callbackUrl.isEmpty()) {
-            log.debug("未配置回调地址，跳过下载日志回调");
-            return;
-        }
-
         try {
             // 获取项目信息
             ClientMatter matter = matterMapper.selectById(downloadLog.getMatterId());
             if (matter == null) {
                 log.warn("项目不存在，跳过下载日志回调: matterId={}", downloadLog.getMatterId());
+                return;
+            }
+            String callbackUrl = resolveLawFirmCallbackUrl(matter);
+            if (callbackUrl == null || callbackUrl.isEmpty()) {
+                log.debug("未配置回调地址，跳过下载日志回调");
                 return;
             }
 
@@ -195,7 +202,7 @@ public class CallbackService {
 
             // 发送回调请求
             String fullCallbackUrl = buildLawFirmCallbackUrl(callbackUrl, "/open/client/download-log");
-            sendCallback(fullCallbackUrl, callbackData);
+            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
 
             log.debug("下载日志回调成功: matterId={}, fileId={}", 
                     downloadLog.getMatterId(), downloadLog.getFileId());
@@ -221,13 +228,12 @@ public class CallbackService {
             return;
         }
 
-        String callbackUrl = getLawFirmCallbackUrl();
-        if (callbackUrl == null || callbackUrl.isEmpty()) {
-            log.debug("未配置回调地址，跳过文件上传回调");
-            return;
-        }
-
         try {
+            String callbackUrl = resolveLawFirmCallbackUrl(matter);
+            if (callbackUrl == null || callbackUrl.isEmpty()) {
+                log.debug("未配置回调地址，跳过文件上传回调");
+                return;
+            }
             // 生成文件下载URL
             String fileDownloadUrl = urlGenerator.generateFileDownloadUrl(
                     file.getId(), file.getMatterId(), token);
@@ -251,7 +257,7 @@ public class CallbackService {
 
             // 发送回调请求
             String fullCallbackUrl = buildLawFirmCallbackUrl(callbackUrl, "/open/client/files");
-            sendCallback(fullCallbackUrl, callbackData);
+            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
 
             log.debug("文件上传回调成功: fileId={}, matterId={}", 
                     file.getId(), file.getMatterId());
@@ -306,7 +312,8 @@ public class CallbackService {
         }
     }
 
-    private void sendCallback(final String url, final Map<String, Object> data) {
+    private void sendCallback(
+            final String url, final Map<String, Object> data, final String callbackApiKey) {
         // SSRF 防护：验证回调 URL 不指向内网
         validateCallbackUrl(url);
 
@@ -314,7 +321,7 @@ public class CallbackService {
         
         for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
             try {
-                doSendCallback(url, data);
+                doSendCallback(url, data, callbackApiKey);
                 return; // 成功则直接返回
             } catch (Exception e) {
                 lastException = e;
@@ -359,15 +366,15 @@ public class CallbackService {
         return base + LAW_FIRM_API_PREFIX + endpointPath;
     }
 
-    private void doSendCallback(final String url, final Map<String, Object> data) {
+    private void doSendCallback(
+            final String url, final Map<String, Object> data, final String callbackApiKey) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // 添加回调 API Key（如果配置了）
-        String apiKey = getCallbackApiKey();
-        if (apiKey != null && !apiKey.isEmpty()) {
-            headers.set("X-Callback-Key", apiKey);
-            headers.set("Authorization", "Bearer " + apiKey);
+        if (callbackApiKey != null && !callbackApiKey.isEmpty()) {
+            headers.set("X-Callback-Key", callbackApiKey);
+            headers.set("Authorization", "Bearer " + callbackApiKey);
         }
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
@@ -393,7 +400,8 @@ public class CallbackService {
             return;
         }
 
-        String callbackUrl = getLawFirmCallbackUrl();
+        ClientMatter matter = record.getMatterId() != null ? matterMapper.selectById(record.getMatterId()) : null;
+        String callbackUrl = resolveLawFirmCallbackUrl(matter);
         if (callbackUrl == null || callbackUrl.isEmpty()) {
             log.debug("未配置回调地址，跳过通知成功回调");
             return;
@@ -416,7 +424,7 @@ public class CallbackService {
             // 发送回调请求
             String fullCallbackUrl =
                     buildLawFirmCallbackUrl(callbackUrl, "/open/client/notification-success");
-            sendCallback(fullCallbackUrl, callbackData);
+            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
 
             log.info("通知成功回调成功: matterId={}, notificationType={}",
                     record.getMatterId(), record.getNotificationType());
@@ -439,7 +447,8 @@ public class CallbackService {
             return;
         }
 
-        String callbackUrl = getLawFirmCallbackUrl();
+        ClientMatter matter = record.getMatterId() != null ? matterMapper.selectById(record.getMatterId()) : null;
+        String callbackUrl = resolveLawFirmCallbackUrl(matter);
         if (callbackUrl == null || callbackUrl.isEmpty()) {
             log.debug("未配置回调地址，跳过通知失败回调");
             return;
@@ -464,7 +473,7 @@ public class CallbackService {
             // 发送回调请求
             String fullCallbackUrl =
                     buildLawFirmCallbackUrl(callbackUrl, "/open/client/notification-failure");
-            sendCallback(fullCallbackUrl, callbackData);
+            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
 
             log.info("通知失败回调成功: matterId={}, notificationType={}, errorCode={}",
                     record.getMatterId(), record.getNotificationType(), record.getErrorCode());
@@ -472,6 +481,49 @@ public class CallbackService {
         } catch (Exception e) {
             log.error("通知失败回调失败: matterId={}", record.getMatterId(), e);
             // 回调失败不影响主流程，只记录日志
+        }
+    }
+
+    private String resolveLawFirmCallbackUrl(final ClientMatter matter) {
+        Map<String, Object> metadata = parseMatterMetadata(matter);
+        Object callbackUrl = metadata.get(CALLBACK_URL_KEY);
+        if (callbackUrl instanceof String callbackUrlValue && !callbackUrlValue.isBlank()) {
+            return callbackUrlValue.trim();
+        }
+        return getLawFirmCallbackUrl();
+    }
+
+    private String resolveCallbackApiKey(final ClientMatter matter) {
+        Map<String, Object> metadata = parseMatterMetadata(matter);
+        Object apiKeyIdObj = metadata.get(SOURCE_API_KEY_ID_KEY);
+        if (apiKeyIdObj != null) {
+            try {
+                Long apiKeyId = Long.parseLong(String.valueOf(apiKeyIdObj));
+                ApiKey apiKey = apiKeyMapper.selectById(apiKeyId);
+                if (apiKey != null && Boolean.TRUE.equals(apiKey.getEnabled())) {
+                    if (apiKey.getApiSecret() != null && !apiKey.getApiSecret().isBlank()) {
+                        return apiKey.getApiSecret();
+                    }
+                    if (apiKey.getApiKey() != null && !apiKey.getApiKey().isBlank()) {
+                        return apiKey.getApiKey();
+                    }
+                }
+            } catch (NumberFormatException e) {
+                log.warn("项目回调元数据中的 API Key ID 非法: {}", apiKeyIdObj);
+            }
+        }
+        return getCallbackApiKey();
+    }
+
+    private Map<String, Object> parseMatterMetadata(final ClientMatter matter) {
+        if (matter == null || matter.getMatterData() == null || matter.getMatterData().isBlank()) {
+            return java.util.Collections.emptyMap();
+        }
+        try {
+            return objectMapper.readValue(matter.getMatterData(), new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            log.warn("解析项目回调元数据失败: matterId={}", matter.getId(), e);
+            return java.util.Collections.emptyMap();
         }
     }
 }

@@ -8,6 +8,7 @@ import com.clientservice.common.exception.BusinessException;
 import com.clientservice.common.exception.ErrorCode;
 import com.clientservice.common.util.TokenGenerator;
 import com.clientservice.common.util.UrlGenerator;
+import com.clientservice.domain.entity.ApiKey;
 import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -58,6 +59,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 @RequiredArgsConstructor
 public class MatterService {
 
+    private static final String CALLBACK_URL_KEY = "_lawFirmCallbackUrl";
+    private static final String SOURCE_API_KEY_ID_KEY = "_sourceApiKeyId";
+
     private final ClientMatterMapper matterMapper;
     private final ObjectMapper objectMapper;
     private final UrlGenerator urlGenerator;
@@ -80,7 +84,7 @@ public class MatterService {
      */
     @Transactional
     public MatterReceiveResponse receiveMatterData(final MatterReceiveRequest request) {
-        return receiveMatterData(request, null);
+        return receiveMatterData(request, null, null);
     }
 
     /**
@@ -92,6 +96,17 @@ public class MatterService {
      */
     @Transactional
     public MatterReceiveResponse receiveMatterData(final MatterReceiveRequest request, final HttpServletRequest httpRequest) {
+        return receiveMatterData(request, httpRequest, null);
+    }
+
+    /**
+     * 接收项目数据（支持绑定来源 API Key 与回调地址）
+     */
+    @Transactional
+    public MatterReceiveResponse receiveMatterData(
+            final MatterReceiveRequest request,
+            final HttpServletRequest httpRequest,
+            final ApiKey sourceApiKey) {
         try {
             // 1. 提取项目ID
             Long matterId = extractMatterId(request.getMatterData());
@@ -105,7 +120,8 @@ public class MatterService {
                 // 保存旧token（用于清除缓存）
                 String oldToken = existing.getAccessToken();
                 // 更新现有记录（会重新生成token）
-                MatterReceiveResponse response = updateExistingMatter(existing, request, httpRequest);
+                MatterReceiveResponse response =
+                        updateExistingMatter(existing, request, httpRequest, sourceApiKey);
                 // 清除相关缓存（因为token已变化）
                 clearMatterCache(existing.getId(), oldToken);
                 return response;
@@ -113,7 +129,7 @@ public class MatterService {
 
             // 3. 创建新记录（使用 try-catch 处理并发插入导致的唯一约束冲突）
             try {
-                return createNewMatter(matterId, request, httpRequest);
+                return createNewMatter(matterId, request, httpRequest, sourceApiKey);
             } catch (DataIntegrityViolationException e) {
                 log.warn("并发插入检测: lawFirmMatterId={} 已存在，转为更新操作", matterId);
                 // 重新查询并更新
@@ -121,7 +137,8 @@ public class MatterService {
                 if (existing != null) {
                     // 保存旧token（用于清除缓存）
                     String oldToken = existing.getAccessToken();
-                    MatterReceiveResponse response = updateExistingMatter(existing, request, httpRequest);
+                    MatterReceiveResponse response =
+                            updateExistingMatter(existing, request, httpRequest, sourceApiKey);
                     clearMatterCache(existing.getId(), oldToken);
                     return response;
                 } else {
@@ -171,7 +188,10 @@ public class MatterService {
      * @return 响应
      */
     private MatterReceiveResponse createNewMatter(
-            final Long lawFirmMatterId, final MatterReceiveRequest request, final HttpServletRequest httpRequest) {
+            final Long lawFirmMatterId,
+            final MatterReceiveRequest request,
+            final HttpServletRequest httpRequest,
+            final ApiKey sourceApiKey) {
         // 生成ID和令牌
         String id = TokenGenerator.generateId();
         String token = TokenGenerator.generateToken(tokenLength);
@@ -183,7 +203,7 @@ public class MatterService {
         // 序列化项目数据
         String matterDataJson;
         try {
-            matterDataJson = objectMapper.writeValueAsString(request.getMatterData());
+            matterDataJson = objectMapper.writeValueAsString(buildStoredMatterData(request, sourceApiKey));
         } catch (Exception e) {
             log.error("序列化项目数据失败", e);
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "序列化项目数据失败");
@@ -231,7 +251,10 @@ public class MatterService {
      * @return 响应
      */
     private MatterReceiveResponse updateExistingMatter(
-            final ClientMatter existing, final MatterReceiveRequest request, final HttpServletRequest httpRequest) {
+            final ClientMatter existing,
+            final MatterReceiveRequest request,
+            final HttpServletRequest httpRequest,
+            final ApiKey sourceApiKey) {
         // 重新生成令牌和访问链接（传递请求对象以支持动态获取 baseUrl）
         String token = TokenGenerator.generateToken(tokenLength);
         String accessUrl = urlGenerator.generateAccessUrl(existing.getId(), token, httpRequest);
@@ -243,7 +266,7 @@ public class MatterService {
         // 序列化项目数据
         String matterDataJson;
         try {
-            matterDataJson = objectMapper.writeValueAsString(request.getMatterData());
+            matterDataJson = objectMapper.writeValueAsString(buildStoredMatterData(request, sourceApiKey));
         } catch (Exception e) {
             log.error("序列化项目数据失败", e);
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "序列化项目数据失败");
@@ -271,6 +294,21 @@ public class MatterService {
                 .id(existing.getId())
                 .accessUrl(accessUrl)
                 .build();
+    }
+
+    private Map<String, Object> buildStoredMatterData(
+            final MatterReceiveRequest request, final ApiKey sourceApiKey) {
+        Map<String, Object> storedMatterData = new java.util.HashMap<>();
+        if (request.getMatterData() != null) {
+            storedMatterData.putAll(request.getMatterData());
+        }
+        if (request.getCallbackUrl() != null && !request.getCallbackUrl().isBlank()) {
+            storedMatterData.put(CALLBACK_URL_KEY, request.getCallbackUrl().trim());
+        }
+        if (sourceApiKey != null && sourceApiKey.getId() != null) {
+            storedMatterData.put(SOURCE_API_KEY_ID_KEY, sourceApiKey.getId());
+        }
+        return storedMatterData;
     }
 
     /**

@@ -34,4 +34,8 @@ public class MatterReceiveRequest {
     @NotNull(message = "数据范围不能为空")
     @JsonProperty("scopes")
     private List<String> scopes;
+
+    /** 律所管理系统回调基础地址 */
+    @JsonProperty("callbackUrl")
+    private String callbackUrl;
 }
