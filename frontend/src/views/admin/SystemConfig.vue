@@ -29,6 +29,77 @@
       </div>
     </section>
 
+    <section class="config-entry-strip">
+      <article class="entry-card">
+        <div class="entry-head">
+          <div>
+            <span class="panel-kicker">Delivery Flow</span>
+            <h3>先初始化，再补配置，再做验收</h3>
+          </div>
+          <span class="entry-badge">推荐顺序</span>
+        </div>
+        <p>首次交付时建议先通过初始化向导落品牌，再在这里补充系统参数，最后到系统信息与系统维护页面完成巡检和上线前核查。</p>
+        <a-space wrap>
+          <a-button
+            type="primary"
+            @click="goTo('/admin/setup')"
+          >
+            打开首次初始化
+          </a-button>
+          <a-button @click="goTo('/admin/system-info')">
+            查看系统信息
+          </a-button>
+          <a-button @click="goTo('/admin/maintenance')">
+            打开系统维护
+          </a-button>
+        </a-space>
+      </article>
+    </section>
+
+    <section class="completion-strip config-card">
+      <div class="completion-head">
+        <div>
+          <span class="panel-kicker">Completion</span>
+          <h3>先补齐品牌和门户字段，再进入系统级参数</h3>
+        </div>
+      </div>
+      <div class="completion-grid">
+        <div class="completion-item">
+          <span>品牌配置</span>
+          <strong>{{ brandCompletionRate }}</strong>
+          <p>{{ brandCompletion }}/4 项已完成</p>
+        </div>
+        <div class="completion-item">
+          <span>门户配置</span>
+          <strong>{{ portalCompletionRate }}</strong>
+          <p>{{ portalCompletion }}/5 项已完成</p>
+        </div>
+        <div class="completion-item">
+          <span>系统配置项</span>
+          <strong>{{ dataSource.length }}</strong>
+          <p>高级配置列表中的当前条目数</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Config Desk</span>
+        <h3>品牌、门户与系统参数的落地顺序</h3>
+        <p>先确认品牌与门户字段完整度，再核对基础 URL 与回调策略，最后才进入底层高级配置，避免交付时先改细项后返工。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">品牌完成度</span>
+        <strong>{{ brandCompletionRate }}</strong>
+        <p>系统名称、简称和 Logo 是否已具备上线条件。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">门户完成度</span>
+        <strong>{{ portalCompletionRate }}</strong>
+        <p>首页信息与页脚信息当前补全程度。</p>
+      </article>
+    </section>
+
     <a-tabs
       v-model:active-key="activeTab"
       type="card"
@@ -40,7 +111,12 @@
       >
         <div class="config-grid">
           <section class="config-card">
-            <h3>系统名称</h3>
+            <div class="card-heading">
+              <div>
+                <span class="panel-kicker">Brand Naming</span>
+                <h3>系统名称</h3>
+              </div>
+            </div>
             <a-form layout="vertical">
               <a-form-item label="系统全称（浏览器标题）">
                 <a-input
@@ -76,7 +152,12 @@
           </section>
 
           <section class="config-card">
-            <h3>Logo 设置</h3>
+            <div class="card-heading">
+              <div>
+                <span class="panel-kicker">Brand Asset</span>
+                <h3>Logo 设置</h3>
+              </div>
+            </div>
             <a-form layout="vertical">
               <a-form-item label="Logo 图片地址">
                 <a-input
@@ -115,7 +196,12 @@
       >
         <div class="config-grid">
           <section class="config-card">
-            <h3>律所信息</h3>
+            <div class="card-heading">
+              <div>
+                <span class="panel-kicker">Firm Profile</span>
+                <h3>律所信息</h3>
+              </div>
+            </div>
             <a-form layout="vertical">
               <a-form-item label="律所名称">
                 <a-input
@@ -141,7 +227,12 @@
           </section>
 
           <section class="config-card">
-            <h3>页面内容</h3>
+            <div class="card-heading">
+              <div>
+                <span class="panel-kicker">Portal Content</span>
+                <h3>页面内容</h3>
+              </div>
+            </div>
             <a-form layout="vertical">
               <a-form-item label="首页标语">
                 <a-input
@@ -184,7 +275,12 @@
       >
         <div class="config-grid">
           <section class="config-card">
-            <h3>系统地址</h3>
+            <div class="card-heading">
+              <div>
+                <span class="panel-kicker">System Endpoint</span>
+                <h3>系统地址</h3>
+              </div>
+            </div>
             <a-form layout="vertical">
               <a-form-item label="系统基础 URL（必填）">
                 <a-input
@@ -202,7 +298,12 @@
           </section>
 
           <section class="config-card">
-            <h3>回调配置</h3>
+            <div class="card-heading">
+              <div>
+                <span class="panel-kicker">Callback Policy</span>
+                <h3>回调配置</h3>
+              </div>
+            </div>
             <a-form layout="vertical">
               <a-form-item label="启用回调">
                 <a-switch
@@ -501,11 +602,10 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
 import logger from '@/utils/logger'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue'
-
-let saveStatusTimer: number | undefined
 import {
   getConfigList,
   saveConfig,
@@ -518,6 +618,9 @@ import {
   type UpdateConfigRequest,
 } from '@/api/config'
 
+let saveStatusTimer: number | undefined
+const router = useRouter()
+
 const activeTab = ref('brand')
 const loading = ref(false)
 const dataSource = ref<SysConfigInfo[]>([])
@@ -527,6 +630,10 @@ const saveStatus = ref<'saving' | 'saved' | 'error' | ''>('')
 
 const windowWidth = ref(window.innerWidth)
 const modalWidth = computed(() => windowWidth.value < 768 ? '95%' : '600px')
+
+function goTo(path: string) {
+  router.push(path)
+}
 
 function handleResize() {
   windowWidth.value = window.innerWidth
@@ -579,10 +686,12 @@ const pagination = ref({
 const brandCompletion = computed(() =>
   [brandConfig.appName, brandConfig.appShortName, brandConfig.appShortNameEn, brandConfig.logoUrl].filter(Boolean).length,
 )
+const brandCompletionRate = computed(() => `${Math.round((brandCompletion.value / 4) * 100)}%`)
 
 const portalCompletion = computed(() =>
   [portalConfig.lawFirmName, portalConfig.lawFirmWebsite, portalConfig.appSlogan, portalConfig.icpLicense, portalConfig.copyright].filter(Boolean).length,
 )
+const portalCompletionRate = computed(() => `${Math.round((portalCompletion.value / 5) * 100)}%`)
 
 const columns = [
   { title: '配置键', key: 'configKey', dataIndex: 'configKey', ellipsis: true, width: 180 },
@@ -827,11 +936,56 @@ onUnmounted(() => {
   min-width: min(420px, 100%);
 }
 
+.config-entry-strip {
+  display: grid;
+}
+
+.entry-card {
+  padding: 20px 22px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 9, 24, 0.04), rgba(179, 138, 61, 0.12)), rgba(252, 251, 248, 0.82);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+}
+
+.entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.entry-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+  color: var(--lex-primary-soft);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.entry-card h3 {
+  margin: 8px 0 10px;
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+.entry-card p {
+  margin: 0 0 16px;
+  max-width: 760px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
 .mini-stat {
-  padding: 14px 16px;
-  border-radius: 20px;
-  background: rgba(16, 38, 61, 0.04);
-  border: 1px solid rgba(16, 38, 61, 0.08);
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.04);
+  border: 1px solid rgba(0, 9, 24, 0.06);
 }
 
 .mini-stat span {
@@ -844,7 +998,7 @@ onUnmounted(() => {
 
 .mini-stat strong {
   display: block;
-  color: var(--primary-color-dark);
+  color: var(--text-primary);
   font-family: var(--font-heading);
   font-size: 28px;
   line-height: 1;
@@ -852,11 +1006,55 @@ onUnmounted(() => {
 
 .config-card,
 .advanced-panel {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
+  background: rgba(252, 251, 248, 0.82);
+  border: 1px solid rgba(0, 9, 24, 0.05);
+  border-radius: 8px;
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
+}
+
+.completion-strip {
+  display: grid;
+  gap: 14px;
+}
+
+.completion-head h3 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text-primary);
+}
+
+.completion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.completion-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(248, 244, 237, 0.68);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+}
+
+.completion-item span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.completion-item strong {
+  color: var(--text-primary);
+  font-family: var(--font-heading);
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.completion-item p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 .config-tabs :deep(.ant-tabs-nav) {
@@ -864,7 +1062,12 @@ onUnmounted(() => {
 }
 
 .config-tabs :deep(.ant-tabs-tab) {
-  border-radius: 14px 14px 0 0 !important;
+  border-radius: 18px 18px 0 0 !important;
+  padding-inline: 18px !important;
+}
+
+.config-tabs :deep(.ant-tabs-tab-active) {
+  background: rgba(255, 255, 255, 0.82) !important;
 }
 
 .config-grid {
@@ -874,14 +1077,30 @@ onUnmounted(() => {
 }
 
 .config-card {
-  padding: 20px;
+  padding: 22px;
 }
 
+.card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card-heading h3,
 .config-card h3,
 .advanced-header h3 {
-  margin: 0 0 16px;
-  color: var(--primary-color-dark);
+  margin: 0;
+  color: var(--text-primary);
   font-size: 20px;
+}
+
+.field-hint {
+  margin-top: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.7;
 }
 
 .hint-example {
@@ -892,11 +1111,11 @@ onUnmounted(() => {
   width: 100%;
   min-height: 96px;
   border: 1px dashed var(--border-color);
-  border-radius: 18px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.82);
   padding: 16px;
 }
 
@@ -911,7 +1130,7 @@ onUnmounted(() => {
 }
 
 .advanced-panel {
-  padding: 20px;
+  padding: 22px;
 }
 
 .advanced-header {
@@ -925,6 +1144,7 @@ onUnmounted(() => {
 .advanced-header p {
   margin: 0;
   color: var(--text-secondary);
+  line-height: 1.7;
 }
 
 .advanced-filter-form {
@@ -950,12 +1170,20 @@ onUnmounted(() => {
   word-break: break-all;
 }
 
+.config-tabs :deep(.ant-tabs-content-holder) {
+  background: transparent;
+}
+
+.config-tabs :deep(.ant-tabs-tabpane) {
+  padding-top: 4px;
+}
+
 .save-status {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  padding: 8px 16px;
-  border-radius: 12px;
+  padding: 10px 16px;
+  border-radius: 14px;
   font-size: 14px;
   z-index: 1000;
 }
@@ -979,7 +1207,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 992px) {
-  .intro-side {
+  .intro-side,
+  .completion-grid {
     grid-template-columns: 1fr;
     min-width: 0;
   }
@@ -990,10 +1219,17 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+  .entry-head,
+  .card-heading,
+  .advanced-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .config-card,
   .advanced-panel {
     padding: 16px;
-    border-radius: 20px;
+    border-radius: 8px;
   }
 
   .advanced-header {

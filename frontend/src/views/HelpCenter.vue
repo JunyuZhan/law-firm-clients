@@ -6,38 +6,68 @@
       :show-back="true"
       @back="goBack"
     />
-    <a-layout-content class="content">
+    <a-layout-content
+      id="main-content"
+      class="content"
+      tabindex="-1"
+    >
       <section class="help-hero">
-        <div class="eyebrow">
-          使用帮助
+        <div class="hero-copy">
+          <div class="eyebrow">
+            Support Desk
+          </div>
+          <h2 class="editorial-title">
+            常见问题与操作说明
+          </h2>
+          <p class="help-summary">
+            这里把访问说明、异常处理建议和联系路径整理成一套更清楚的支持入口，避免客户在不同页面之间来回找答案。
+          </p>
         </div>
-        <h2 class="editorial-title">
-          常见问题与操作说明
-        </h2>
-        <p class="help-summary">
-          这里汇总客户最常用的访问说明、异常处理建议和联系入口，帮助您更快找到项目、文件和消息通知。
-        </p>
+        <div class="hero-side">
+          <div class="hero-side-label">
+            Quick Guidance
+          </div>
+          <strong>先判断链接、再判断有效期、最后联系承办律师。</strong>
+          <p>帮助页负责把最常见的问题变成可执行步骤，而不是只堆一组问答。</p>
+        </div>
       </section>
 
       <section class="quick-grid">
-        <a-card class="quick-card">
+        <article class="quick-card">
           <span class="quick-label">当前访客</span>
           <strong>{{ visitorName }}</strong>
           <p>如果您刚访问过具体项目，系统会在这里同步最近一次识别到的客户名称。</p>
-        </a-card>
-        <a-card class="quick-card">
+        </article>
+        <article class="quick-card">
           <span class="quick-label">服务机构</span>
           <strong>{{ lawFirmName }}</strong>
           <p>如需人工协助，请优先联系承办律师，或通过律所官网查询公开联系方式。</p>
-        </a-card>
-        <a-card class="quick-card">
+        </article>
+        <article class="quick-card">
           <span class="quick-label">处理建议</span>
           <strong>{{ appSlogan }}</strong>
           <p>遇到访问异常时，优先确认链接完整性、项目有效期和消息通知中的最新提醒。</p>
-        </a-card>
+        </article>
       </section>
 
-      <a-card class="help-card">
+      <section class="support-path">
+        <article class="path-card">
+          <span class="panel-kicker">Support Path</span>
+          <h3>建议顺序：先看链接，再看有效期，最后联系承办律师</h3>
+          <p>帮助中心优先解决最常见的访问问题，只有在自助排查仍失败时，才进入人工协助路径。</p>
+        </article>
+      </section>
+
+      <section class="help-card">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow eyebrow--muted">
+              FAQ
+            </div>
+            <h3>高频问题</h3>
+          </div>
+          <p>先覆盖最常见的访问问题，让客户能在当前页面直接自助解决。</p>
+        </div>
         <a-collapse ghost>
           <a-collapse-panel
             v-for="item in faqItems"
@@ -47,23 +77,29 @@
             <p>{{ item.content }}</p>
           </a-collapse-panel>
         </a-collapse>
-      </a-card>
+      </section>
 
       <section class="guide-grid">
-        <a-card
-          class="guide-card"
-          title="遇到链接失效"
-        >
+        <article class="guide-card">
+          <div class="guide-head">
+            <div class="eyebrow eyebrow--muted">
+              Access Failure
+            </div>
+            <h3>遇到链接失效</h3>
+          </div>
           <ol class="guide-list">
             <li>确认访问链接是否完整，尤其是 `token` 参数没有被截断。</li>
             <li>检查项目是否已过期，或访问权限是否已被律所撤销。</li>
             <li>如仍无法访问，请联系承办律师重新发送链接。</li>
           </ol>
-        </a-card>
-        <a-card
-          class="guide-card"
-          title="需要更多帮助"
-        >
+        </article>
+        <article class="guide-card guide-card--steps">
+          <div class="guide-head">
+            <div class="eyebrow eyebrow--muted">
+              Contact
+            </div>
+            <h3>需要更多帮助</h3>
+          </div>
           <p class="contact-copy">
             如需进一步协助，请优先联系您的承办律师。
           </p>
@@ -82,7 +118,7 @@
           >
             当前未配置官网链接，请直接联系律所工作人员获取支持。
           </p>
-        </a-card>
+        </article>
       </section>
     </a-layout-content>
     <MobileBottomNav />
@@ -137,33 +173,98 @@ function goBack() {
 <style scoped>
 .help-center-container {
   min-height: 100vh;
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 .content {
-  padding: 16px;
+  display: grid;
+  gap: 16px;
 }
 
 .help-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 16px;
   margin-bottom: 16px;
 }
 
-.eyebrow {
-  margin-bottom: 8px;
+.hero-copy,
+.hero-side,
+.quick-card,
+.help-card,
+.guide-card {
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-copy,
+.hero-side {
+  padding: 20px;
+}
+
+.hero-side {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  background: #fafafa;
+}
+
+.hero-side-label,
+.eyebrow--muted {
+  color: var(--text-tertiary);
   font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--primary-color);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.hero-side strong {
+  color: var(--text-primary);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.hero-side p {
+  margin: 0;
+  line-height: 1.75;
+  color: var(--text-secondary);
 }
 
 .help-summary {
   margin: 8px 0 0;
   line-height: 1.7;
-  color: #666;
+  color: var(--text-secondary);
+}
+
+.support-path {
+  display: grid;
+  margin-bottom: 16px;
+}
+
+.path-card {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: rgba(248, 244, 237, 0.74);
+  box-shadow: var(--shadow-xs);
+}
+
+.path-card h3 {
+  margin: 8px 0 10px;
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+.path-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.8;
 }
 
 .help-card {
-  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 16px;
 }
 
 .quick-grid,
@@ -183,34 +284,62 @@ function goBack() {
 
 .quick-card,
 .guide-card {
-  border-radius: 20px;
+  padding: 20px;
 }
 
 .quick-label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
 }
 
 .quick-card strong {
   display: block;
-  margin-bottom: 10px;
-  color: var(--primary-color);
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: 18px;
 }
 
 .quick-card p,
 .contact-copy {
   margin: 0;
   line-height: 1.7;
-  color: #666;
+  color: var(--text-secondary);
+}
+
+.guide-card--steps {
+  background: rgba(252, 251, 248, 0.92);
+}
+
+.section-head,
+.guide-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-head h3,
+.guide-head h3 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.section-head p {
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.7;
+  color: var(--text-secondary);
 }
 
 .guide-list {
   margin: 0;
   padding-left: 18px;
   line-height: 1.8;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .contact-link {
@@ -219,13 +348,25 @@ function goBack() {
 }
 
 @media (max-width: 768px) {
-  .help-center-container {
-    padding-bottom: 70px;
-  }
-
+  .help-hero,
   .quick-grid,
   .guide-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hero-copy,
+  .hero-side,
+  .quick-card,
+  .path-card,
+  .help-card,
+  .guide-card {
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .section-head,
+  .guide-head {
+    display: grid;
   }
 }
 </style>

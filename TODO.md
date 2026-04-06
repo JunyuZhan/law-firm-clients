@@ -309,3 +309,199 @@ https://service.lawfirm.com/verify/letter?no=HF2024001&code=abc123...
 验证接口同时支持两种参数名：
 - `no` + `code`: 二维码扫描场景（推荐）
 - `applicationNo` + `code`: 兼容旧版本
+
+---
+
+## 六、系统治理与交付能力
+
+### 背景
+
+当前项目已经完成客户端门户、后台核心页和函件验证页的 UI 重构，但后台在“交付级能力”上仍缺少统一落点。参考同级项目 `law-firm-archive` 的最新实现，当前项目应继续补齐以下能力：
+
+- 系统信息 / 系统健康监视页面
+- 首次初始化向导
+- 用户手册 / 部署手册 / 冒烟测试文档入口
+- 业务管理员与运维管理员边界说明
+- 交付、升级与回归的后台承接入口
+
+### 任务 6.1：新增后端运行时信息接口
+
+**目标**: 为后台“系统信息”页提供产品版本、后端版本、提交号、构建时间、推荐部署方式等元信息。
+
+**建议文件**:
+- `backend/src/main/java/com/clientservice/interfaces/rest/SystemInfoController.java`
+- 或扩展现有 `backend/src/main/java/com/clientservice/interfaces/rest/SystemConfigController.java`
+
+**建议接口**:
+- `GET /api/admin/system/runtime-info`
+
+**返回建议**:
+- `applicationName`
+- `productVersion`
+- `backendVersion`
+- `commitSha`
+- `buildTime`
+- `recommendedMode`
+
+**状态**: [x] 已完成
+
+---
+
+### 任务 6.2：新增后端依赖健康状态接口
+
+**目标**: 基于 Spring Boot Actuator / HealthEndpoint 汇总关键依赖状态，用于后台监视系统健康。
+
+**建议文件**:
+- `backend/src/main/java/com/clientservice/interfaces/rest/SystemInfoController.java`
+- 或扩展现有 `backend/src/main/java/com/clientservice/interfaces/rest/SystemConfigController.java`
+
+**建议接口**:
+- `GET /api/admin/system/dependency-status`
+
+**建议依赖项**:
+- PostgreSQL
+- Redis
+- 文件存储（本地 / MinIO / OSS）
+- 邮件服务
+- 短信服务
+- 其他已启用外部依赖
+
+**返回建议**:
+- `overallStatus`
+- `items[]`
+  - `key`
+  - `label`
+  - `status`
+  - `details`
+
+**状态**: [x] 已完成
+
+---
+
+### 任务 6.3：新增后台“系统信息”页面
+
+**目标**: 独立承接系统健康、版本信息、运维边界和交付文档入口，不再全部堆在“系统维护”页中。
+
+**建议文件**:
+- `frontend/src/views/admin/SystemInfo.vue`
+
+**页面内容**:
+- 版本信息
+- 依赖状态 / 健康监视
+- 运维边界说明
+- 发布前验收清单
+- 文档入口
+
+**路由 / 导航**:
+- `frontend/src/router/index.ts`
+- `frontend/src/views/admin/AdminLayout.vue`
+
+**状态**: [x] 已完成
+
+---
+
+### 任务 6.4：新增后台“首次初始化向导”
+
+**目标**: 为新客户首次交付提供基础品牌和站点信息初始化入口，避免首次上线依赖手工改配置。
+
+**建议文件**:
+- `frontend/src/views/admin/InitialSetup.vue`
+
+**初始化内容**:
+- 系统名称
+- 英文名称
+- Logo
+- ICP 备案号
+- 版权说明
+- 门户首页/登录页展示文案
+
+**依赖能力**:
+- 读取当前站点配置
+- 批量保存配置
+- Logo 上传
+- 初始化完成状态提示
+- 下一步操作建议
+
+**路由 / 导航**:
+- `frontend/src/router/index.ts`
+- `frontend/src/views/admin/AdminLayout.vue`
+
+**状态**: [x] 已完成
+
+---
+
+### 任务 6.5：整理后台文档入口
+
+**目标**: 将交付与运维相关文档从仓库散落状态收束到后台可见入口。
+
+**建议接入文档**:
+- 用户手册
+- 部署 / 升级手册
+- 冒烟测试流程
+- 测试台账模板
+- API 对接说明
+
+**建议承接位置**:
+- `frontend/src/views/admin/SystemInfo.vue`
+
+**状态**: [x] 已完成
+
+---
+
+### 任务 6.6：明确业务管理员与运维管理员边界
+
+**目标**: 在后台中明确告知哪些动作由业务管理员负责，哪些动作必须由运维管理员执行，降低误操作风险。
+
+**建议展示内容**:
+- 业务管理员负责：系统配置、通知模板、API Key、备份查看、日常业务操作
+- 运维管理员负责：程序升级、镜像替换、容器重启、数据库迁移、回滚、部署目录维护
+- 所有正式升级必须先备份，再执行冒烟测试，再决定是否发布或回滚
+
+**建议承接位置**:
+- `frontend/src/views/admin/SystemInfo.vue`
+- `frontend/src/views/admin/SystemMaintenance.vue`
+
+**状态**: [x] 已完成
+
+---
+
+### 任务 6.7：整理交付与升级检查清单
+
+**目标**: 为首次交付、升级和回滚补齐标准检查清单，便于后续留痕和验收。
+
+**建议内容**:
+- 当前版本号 / 镜像标签 / 提交号一致性核对
+- 数据库初始化脚本核对
+- 升级前备份记录
+- 升级后冒烟测试结果
+- 是否需要回滚
+
+**建议落点**:
+- `docs/operations/`
+- 并在后台系统信息页提供入口
+
+**状态**: [x] 已完成
+
+---
+
+## 七、建议实施顺序（系统治理与交付能力）
+
+1. 任务 6.1：运行时信息接口
+2. 任务 6.2：依赖健康状态接口
+3. 任务 6.3：后台系统信息页
+4. 任务 6.5：接入文档入口
+5. 任务 6.6：补充运维边界说明
+6. 任务 6.4：首次初始化向导
+7. 任务 6.7：整理交付与升级检查清单
+
+---
+
+## 八、参考来源
+
+参考同级项目 `law-firm-archive` 的已落地能力：
+
+- 系统信息页：`law-firm-archive/frontend/src/views/system/SystemInfo.vue`
+- 首次初始化向导：`law-firm-archive/frontend/src/views/system/InitialSetup.vue`
+- 运行时信息与依赖健康接口：`law-firm-archive/backend/src/main/java/com/archivesystem/controller/ConfigController.java`
+- 部署与升级手册：`law-firm-archive/docs/deployment-upgrade-guide.md`
+- 部署后冒烟测试流程：`law-firm-archive/docs/deployment-smoke-test.md`

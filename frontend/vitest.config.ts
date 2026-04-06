@@ -11,6 +11,7 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/e2e/**',
       '**/test/backend-frontend-integration.test.js', // Node.js script, not a Vitest test
       '**/test/*.sh', // Shell scripts
       '**/test/*.html', // HTML files

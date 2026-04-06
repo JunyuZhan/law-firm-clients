@@ -1,95 +1,40 @@
 <template>
   <div class="login-page">
     <div class="login-shell">
-      <section class="login-showcase glass-panel">
-        <div class="showcase-top">
-          <div class="eyebrow">
-            管理端登录
-          </div>
-          <div class="brand-lockup">
-            <div class="logo">
-              <img
-                v-if="appConfigStore.logoUrl"
-                :src="appConfigStore.logoUrl"
-                alt="Logo"
-              >
-              <svg
-                v-else
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
-                <path d="M12 12L20 7.5" />
-                <path d="M12 12V21" />
-                <path d="M12 12L4 7.5" />
-              </svg>
-            </div>
-            <div>
-              <h1 class="editorial-title brand-title">
-                {{ appConfigStore.lawFirmName }}
-              </h1>
-              <p class="brand-subtitle">
-                {{ appConfigStore.appSlogan || '客户服务管理系统' }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="showcase-copy">
-          <h2 class="editorial-title showcase-title">
-            统一的客户门户，需要同样克制而可靠的后台入口
-          </h2>
-          <p class="showcase-text">
-            管理端负责项目、通知、文件与配置协同，因此登录页不再独立成另一种审美，而是回到同一套产品语言里。
-          </p>
-        </div>
-
-        <div class="showcase-metrics">
-          <div class="metric-chip">
-            <span>会话</span>
-            <strong>已保护</strong>
-          </div>
-          <div class="metric-chip">
-            <span>验证码</span>
-            <strong>已启用</strong>
-          </div>
-          <div class="metric-chip">
-            <span>工作台</span>
-            <strong>已统一</strong>
-          </div>
-        </div>
-
-        <div class="feature-list">
-          <div class="feature-item">
-            <span class="feature-index">01</span>
-            <div>
-              <h3>安全认证</h3>
-              <p>用户名密码、验证码与会话控制共同收敛到统一登录流程。</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <span class="feature-index">02</span>
-            <div>
-              <h3>运营效率</h3>
-              <p>进入后台后可直接处理项目、通知与系统配置，不必跨系统切换。</p>
-            </div>
-          </div>
-          <div class="feature-item">
-            <span class="feature-index">03</span>
-            <div>
-              <h3>品牌一致</h3>
-              <p>视觉规则与门户、后台 shell 对齐，减少“像三个产品”的割裂感。</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="login-panel glass-panel">
+        <div class="login-brand">
+          <div class="logo">
+            <img
+              v-if="appConfigStore.logoUrl"
+              :src="appConfigStore.logoUrl"
+              alt="Logo"
+            >
+            <svg
+              v-else
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
+              <path d="M12 12L20 7.5" />
+              <path d="M12 12V21" />
+              <path d="M12 12L4 7.5" />
+            </svg>
+          </div>
+          <div class="brand-copy">
+            <p class="brand-kicker">管理员登录</p>
+            <h1 class="editorial-title brand-title">
+              {{ appConfigStore.lawFirmName }}
+            </h1>
+          </div>
+        </div>
+
+        <a-divider class="brand-divider" />
+
         <div class="form-header">
           <div class="eyebrow">
-            登录
+            Sign In
           </div>
           <h2 class="editorial-title">
             欢迎回来
@@ -131,6 +76,7 @@
           </a-form-item>
 
           <a-form-item name="captchaText">
+            <label class="captcha-label">验证码</label>
             <div class="captcha-row">
               <a-input
                 v-model:value="form.captchaText"
@@ -139,7 +85,8 @@
                 class="login-input captcha-input"
                 @press-enter="handleLogin"
               />
-              <div
+              <button
+                type="button"
                 class="captcha-image"
                 @click="refreshCaptcha"
               >
@@ -149,7 +96,7 @@
                   alt="验证码"
                 >
                 <span v-else>加载中...</span>
-              </div>
+              </button>
             </div>
           </a-form-item>
 
@@ -209,7 +156,6 @@ import { getCaptcha } from '@/api/auth'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-import '@/styles/theme.css'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -312,53 +258,39 @@ onMounted(() => {
 .login-page {
   min-height: 100vh;
   padding: 24px;
-  background: linear-gradient(180deg, #f6f8fb 0%, #eef2f6 100%);
+  background:
+    radial-gradient(circle at top left, rgba(179, 138, 61, 0.08), transparent 28%),
+    linear-gradient(180deg, #f8f4ed 0%, #f3efe8 100%);
 }
 
 .login-shell {
   min-height: calc(100vh - 48px);
-  width: min(1360px, 100%);
+  width: min(520px, 100%);
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
-  gap: 24px;
+  display: block;
 }
 
-.login-showcase,
 .login-panel {
-  border-radius: 18px;
   padding: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.98);
 }
 
-.login-showcase {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: #10273d;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.showcase-top {
-  display: grid;
-  gap: 26px;
-}
-
-.brand-lockup {
+.login-brand {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .logo {
-  width: 72px;
-  height: 72px;
-  border-radius: 22px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -370,143 +302,92 @@ onMounted(() => {
 }
 
 .logo svg {
-  width: 38px;
-  height: 38px;
-  color: var(--accent-color);
+  width: 32px;
+  height: 32px;
+  color: var(--primary-color);
+}
+
+.brand-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.brand-kicker {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .brand-title {
-  margin: 0 0 6px;
-  font-size: clamp(30px, 4vw, 52px);
-  color: #fff;
-}
-
-.brand-subtitle {
   margin: 0;
-  color: rgba(255, 255, 255, 0.68);
-  line-height: 1.7;
-}
-
-.showcase-copy {
-  max-width: 640px;
-}
-
-.showcase-title {
-  margin: 0 0 18px;
-  font-size: clamp(34px, 5vw, 60px);
-  color: #fff;
-  line-height: 0.98;
-}
-
-.showcase-text {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.72);
-  line-height: 1.85;
-  font-size: 16px;
-}
-
-.showcase-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 28px;
-}
-
-.metric-chip {
-  padding: 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.metric-chip span {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.46);
-}
-
-.metric-chip strong {
-  display: block;
-  font-size: 20px;
-  line-height: 1.1;
-  color: #fff;
-}
-
-.feature-list {
-  display: grid;
-  gap: 14px;
-}
-
-.feature-item {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-  padding: 18px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.feature-index {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.46);
-}
-
-.feature-item h3 {
-  margin: 0 0 6px;
-  color: #fff;
-  font-size: 18px;
-}
-
-.feature-item p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.66);
-  line-height: 1.7;
+  font-size: clamp(20px, 3vw, 26px);
+  color: var(--lex-primary);
 }
 
 .login-panel {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: #fff;
-  border: 1px solid rgba(21, 33, 46, 0.08);
-  box-shadow: var(--shadow-sm);
+}
+
+.brand-divider {
+  margin: 0 0 18px !important;
+  border-color: rgba(15, 23, 42, 0.06);
 }
 
 .form-header {
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 .form-header h2 {
-  margin: 18px 0 10px;
-  font-size: clamp(30px, 4vw, 44px);
-  color: var(--primary-color-dark);
-  line-height: 1.02;
+  margin: 6px 0 4px;
+  font-size: 30px;
+  line-height: 1.12;
+  color: var(--lex-primary);
+  letter-spacing: 0.01em;
 }
 
 .form-header p {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.75;
+  line-height: 1.7;
 }
 
 .login-form :deep(.ant-form-item) {
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .login-input :deep(.ant-input),
 .login-input :deep(.ant-input-affix-wrapper) {
-  min-height: 54px;
+  min-height: 48px;
+  border-radius: 8px;
+  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: none;
+}
+
+.login-input :deep(.ant-input-affix-wrapper:hover),
+.login-input :deep(.ant-input-affix-wrapper:focus),
+.login-input :deep(.ant-input-affix-wrapper-focused),
+.login-input :deep(.ant-input:hover),
+.login-input :deep(.ant-input:focus) {
+  border-color: rgba(179, 138, 61, 0.4);
+  box-shadow: 0 0 0 3px rgba(179, 138, 61, 0.08);
 }
 
 .input-icon {
   color: var(--text-tertiary);
+}
+
+.captcha-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .captcha-row {
@@ -514,114 +395,84 @@ onMounted(() => {
   gap: 12px;
 }
 
-.login-form :deep(.ant-btn-primary) {
-  min-height: 52px;
-}
-
-.captcha-input {
-  flex: 1;
-}
-
 .captcha-image {
-  width: 132px;
-  height: 54px;
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  min-width: 128px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: #ffffff;
   overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .captcha-image:hover {
-  border-color: rgba(37, 77, 119, 0.35);
-  transform: translateY(-1px);
+  border-color: rgba(179, 138, 61, 0.32);
+  box-shadow: 0 0 0 3px rgba(179, 138, 61, 0.06);
 }
 
 .captcha-image img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
-.captcha-image span {
-  font-size: 12px;
-  color: var(--text-tertiary);
-}
-
-.login-button {
-  height: 54px;
-  font-size: 15px;
+.login-form :deep(.ant-btn-primary) {
+  min-height: 48px;
+  border-radius: 8px;
   font-weight: 600;
-  border-radius: 10px !important;
+  letter-spacing: 0.02em;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
 }
 
 .error-alert {
-  margin-top: 12px;
+  margin-top: 8px;
+  border-radius: 8px;
 }
 
 .form-footer {
-  margin-top: 28px;
-  text-align: center;
-  font-size: 13px;
+  margin-top: 22px;
   color: var(--text-tertiary);
-}
-
-.form-footer p {
-  margin: 4px 0;
+  font-size: 12px;
+  line-height: 1.8;
 }
 
 .icp-link a {
   color: inherit;
-  text-decoration: none;
 }
 
-.icp-link a:hover {
-  color: var(--primary-color);
-}
-
-@media (max-width: 1024px) {
-  .login-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .login-showcase {
-    min-height: auto;
-  }
-}
-
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .login-page {
-    padding: 12px;
+    padding: 16px;
   }
 
   .login-shell {
-    min-height: calc(100vh - 24px);
+    min-height: calc(100vh - 32px);
   }
 
-  .login-showcase,
   .login-panel {
-    padding: 22px;
-    border-radius: 14px;
+    padding: 20px;
   }
 
-  .brand-lockup {
-    align-items: flex-start;
+  .login-brand {
+    margin-bottom: 10px;
+  }
+
+  .brand-divider {
+    margin-bottom: 16px !important;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
   }
 
   .captcha-row {
     flex-direction: column;
   }
 
-  .showcase-metrics {
-    grid-template-columns: 1fr;
-  }
-
   .captcha-image {
-    width: 100%;
+    min-height: 52px;
   }
 }
 </style>

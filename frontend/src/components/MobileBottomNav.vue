@@ -1,8 +1,9 @@
 <template>
-  <div class="mobile-bottom-nav">
-    <div
+  <nav class="mobile-bottom-nav">
+    <button
       v-for="item in navItems"
       :key="item.key"
+      type="button"
       class="nav-item"
       :class="{ active: activeKey === item.key }"
       @click="handleClick(item)"
@@ -12,14 +13,14 @@
         class="nav-icon"
       />
       <span class="nav-label">{{ item.label }}</span>
-      <div
+      <span
         v-if="(item.badge ?? 0) > 0"
         class="nav-badge"
       >
-        {{ item.badge ?? 0 > 99 ? '99+' : item.badge }}
-      </div>
-    </div>
-  </div>
+        {{ (item.badge ?? 0) > 99 ? '99+' : item.badge }}
+      </span>
+    </button>
+  </nav>
 </template>
 
 <script setup lang="ts">
@@ -27,9 +28,9 @@ import { computed, type Component } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   HomeOutlined,
-  FileTextOutlined,
   FolderOutlined,
   BellOutlined,
+  QuestionCircleOutlined,
   UserOutlined,
 } from '@ant-design/icons-vue'
 
@@ -45,45 +46,19 @@ const router = useRouter()
 const route = useRoute()
 
 const navItems = computed<NavItem[]>(() => [
-  {
-    key: 'home',
-    label: '首页',
-    icon: HomeOutlined,
-    path: '/',
-  },
-  {
-    key: 'matter',
-    label: '我的项目',
-    icon: FileTextOutlined,
-    path: '/matters',
-  },
-  {
-    key: 'files',
-    label: '文件中心',
-    icon: FolderOutlined,
-    path: '/files',
-  },
-  {
-    key: 'notifications',
-    label: '消息通知',
-    icon: BellOutlined,
-    path: '/notifications',
-    badge: 0,
-  },
-  {
-    key: 'profile',
-    label: '个人中心',
-    icon: UserOutlined,
-    path: '/profile',
-  },
+  { key: 'home', label: '首页', icon: HomeOutlined, path: '/portal' },
+  { key: 'files', label: '文件', icon: FolderOutlined, path: '/files' },
+  { key: 'notifications', label: '消息', icon: BellOutlined, path: '/notifications', badge: 0 },
+  { key: 'help', label: '帮助', icon: QuestionCircleOutlined, path: '/help' },
+  { key: 'profile', label: '我的', icon: UserOutlined, path: '/profile' },
 ])
 
 const activeKey = computed(() => {
   const path = route.path
-  if (path === '/' || path.startsWith('/matter/')) return 'home'
-  if (path.startsWith('/matters')) return 'matter'
+  if (path === '/' || path === '/portal' || path.startsWith('/matter/')) return 'home'
   if (path.startsWith('/files')) return 'files'
   if (path.startsWith('/notifications')) return 'notifications'
+  if (path.startsWith('/help')) return 'help'
   if (path.startsWith('/profile')) return 'profile'
   return 'home'
 })
@@ -100,103 +75,64 @@ function handleClick(item: NavItem) {
 <style scoped>
 .mobile-bottom-nav {
   position: fixed;
-  bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px 0;
-  padding-bottom: env(safe-area-inset-bottom, 8px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+  bottom: 0;
+  display: none;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(0, 9, 24, 0.08);
+  background: rgba(252, 251, 248, 0.94);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 -10px 30px rgba(0, 9, 24, 0.08);
   z-index: 1000;
-  border-top: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 12px;
-  min-width: 60px;
-  cursor: pointer;
   position: relative;
-  transition: all 0.2s ease;
-  border-radius: 8px;
-  margin: 0 4px;
-}
-
-.nav-item:active {
-  background: rgba(212, 175, 55, 0.15);
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 4px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-tertiary);
 }
 
 .nav-item.active {
   color: var(--primary-color);
-}
-
-.nav-item:not(.active) {
-  color: #666;
+  background: rgba(0, 33, 64, 0.06);
 }
 
 .nav-icon {
-  font-size: 20px;
-  margin-bottom: 4px;
-  transition: transform 0.2s ease;
-}
-
-.nav-item.active .nav-icon {
-  transform: translateY(-2px);
+  font-size: 18px;
 }
 
 .nav-label {
   font-size: 11px;
-  font-weight: 500;
   line-height: 1.2;
 }
 
 .nav-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 2px;
+  right: 14px;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  background: var(--error-color, #ff4d4f);
+  border-radius: 999px;
+  background: var(--error-color);
   color: #fff;
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 16px;
-  text-align: center;
-  border-radius: 8px;
-  animation: badgePulse 0.3s ease;
 }
 
-@keyframes badgePulse {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* 移动端设备优化 */
 @media (max-width: 768px) {
   .mobile-bottom-nav {
-    display: flex;
-  }
-}
-
-/* 桌面端隐藏 */
-@media (min-width: 769px) {
-  .mobile-bottom-nav {
-    display: none;
+    display: grid;
   }
 }
 </style>

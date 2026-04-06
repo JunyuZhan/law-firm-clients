@@ -6,6 +6,7 @@ interface PortalVisitorProfile {
   clientId: number | null
   clientName: string
   lastMatterId: string
+  lastMatterToken: string
 }
 
 const STORAGE_KEY = 'portal_visitor_profile'
@@ -15,6 +16,7 @@ function getDefaultProfile(): PortalVisitorProfile {
     clientId: null,
     clientName: '',
     lastMatterId: '',
+    lastMatterToken: '',
   }
 }
 

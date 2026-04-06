@@ -3,60 +3,71 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          项目管理
+          Matter Operations
         </div>
         <h2 class="editorial-title intro-title">
           项目列表
         </h2>
         <p class="intro-text">
-          查看客户项目状态、访问有效期与访问链接，作为后台运营的核心工作台。
+          查看客户项目状态、访问有效期与访问链接。先判断风险和活跃度，再进入筛选和具体操作。
         </p>
       </div>
       <a-button @click="loadData">
         <template #icon>
           <ReloadOutlined />
         </template>
-        刷新
+        刷新数据
       </a-button>
+    </section>
+
+    <section class="stats-grid">
+      <article class="stats-card">
+        <span class="stats-label">总项目数</span>
+        <strong>{{ summaryStats.total }}</strong>
+        <p>当前返回结果中的全部项目</p>
+      </article>
+      <article class="stats-card success">
+        <span class="stats-label">有效访问</span>
+        <strong>{{ summaryStats.active }}</strong>
+        <p>客户仍可通过链接直接进入</p>
+      </article>
+      <article class="stats-card warning">
+        <span class="stats-label">已过期</span>
+        <strong>{{ summaryStats.expired }}</strong>
+        <p>建议优先检查是否需要续期</p>
+      </article>
+      <article class="stats-card danger">
+        <span class="stats-label">已撤销</span>
+        <strong>{{ summaryStats.revoked }}</strong>
+        <p>访问已被主动停用</p>
+      </article>
+    </section>
+
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Workstation</span>
+        <h3>优先跟进</h3>
+        <p>下面这些项目更值得先处理，帮助你快速判断续期、撤销与进一步跟进。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">7 日内到期</span>
+        <strong>{{ expiringSoonCount }}</strong>
+        <p>建议优先检查访问有效期是否需要延长。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">最近新建</span>
+        <strong>{{ recentCreatedCount }}</strong>
+        <p>用于识别刚进入工作台的新项目。</p>
+      </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head">
         <div>
-          <span class="panel-kicker">概览</span>
-          <h3>项目态势</h3>
-        </div>
-        <p>先看活跃度和风险，再进入筛选与操作。</p>
-      </div>
-
-      <div class="stats-grid matter-stats-grid">
-        <div class="stats-card">
-          <span class="stats-label">总项目数</span>
-          <strong>{{ summaryStats.total }}</strong>
-          <p>当前返回结果中的全部项目。</p>
-        </div>
-        <div class="stats-card active">
-          <span class="stats-label">有效访问</span>
-          <strong>{{ summaryStats.active }}</strong>
-          <p>客户仍可通过访问链接直接进入。</p>
-        </div>
-        <div class="stats-card expired-card">
-          <span class="stats-label">已过期</span>
-          <strong>{{ summaryStats.expired }}</strong>
-          <p>建议优先检查是否需要重新生成访问。</p>
-        </div>
-        <div class="stats-card revoked-card">
-          <span class="stats-label">已撤销</span>
-          <strong>{{ summaryStats.revoked }}</strong>
-          <p>访问已被主动停用。</p>
-        </div>
-      </div>
-
-      <div class="panel-head panel-head--compact">
-        <div>
           <span class="panel-kicker">Filters</span>
           <h3>精确筛选</h3>
         </div>
+        <p>按客户、状态和时间范围快速定位项目。</p>
       </div>
 
       <a-form
@@ -70,7 +81,7 @@
             v-model:value="searchForm.clientId"
             placeholder="请输入客户ID"
             allow-clear
-            style="width: 160px"
+            style="width: 180px"
           />
         </a-form-item>
         <a-form-item label="状态">
@@ -78,7 +89,7 @@
             v-model:value="searchForm.status"
             placeholder="请选择状态"
             allow-clear
-            style="width: 140px"
+            style="width: 150px"
           >
             <a-select-option value="ACTIVE">
               有效
@@ -116,12 +127,25 @@
     </section>
 
     <section class="table-panel">
+      <div class="panel-head panel-head--table">
+        <div>
+          <span class="panel-kicker">Data</span>
+          <h3>项目数据表</h3>
+        </div>
+        <p>表格保留核心字段，长链接用可读方式展示。</p>
+      </div>
+
+      <div class="table-summary dashboard-table-summary">
+        <span>显示 {{ dataSource.length }} 个项目</span>
+        <span>状态按有效、过期、撤销分组识别</span>
+      </div>
+
       <a-table
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        :scroll="{ x: 'max-content' }"
+        :scroll="{ x: 1080 }"
         row-key="id"
         @change="handleTableChange"
       >
@@ -144,6 +168,9 @@
             <span :class="{ expired: isExpired(record.expiresAt) }">
               {{ formatDate(record.expiresAt) }}
             </span>
+          </template>
+          <template v-else-if="column.key === 'clientName'">
+            <span class="client-name">{{ record.clientName }}</span>
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space>
@@ -208,16 +235,14 @@ const pagination = ref({
 })
 
 const columns = [
-  { title: '项目ID', key: 'id', dataIndex: 'id', ellipsis: true, width: 180, align: 'center' },
-  { title: '律所项目ID', key: 'lawFirmMatterId', dataIndex: 'lawFirmMatterId', width: 130, align: 'center' },
-  { title: '客户ID', key: 'clientId', dataIndex: 'clientId', width: 100, align: 'center' },
-  { title: '客户名称', key: 'clientName', dataIndex: 'clientName', ellipsis: true, width: 150, align: 'center' },
-  { title: '状态', key: 'status', width: 100, align: 'center' },
-  { title: '有效期（天）', key: 'validDays', dataIndex: 'validDays', width: 110, align: 'center' },
-  { title: '过期时间', key: 'expiresAt', width: 180, align: 'center' },
-  { title: '访问链接', key: 'accessUrl', ellipsis: true, width: 300, align: 'center' },
-  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 180, align: 'center' },
-  { title: '操作', key: 'action', width: 120, fixed: 'right', align: 'center' },
+  { title: '项目ID', key: 'id', dataIndex: 'id', ellipsis: true, width: 160, align: 'center' },
+  { title: '客户名称', key: 'clientName', dataIndex: 'clientName', ellipsis: true, width: 140, align: 'center' },
+  { title: '状态', key: 'status', width: 96, align: 'center' },
+  { title: '有效期（天）', key: 'validDays', dataIndex: 'validDays', width: 104, align: 'center' },
+  { title: '过期时间', key: 'expiresAt', width: 160, align: 'center' },
+  { title: '访问链接', key: 'accessUrl', ellipsis: true, width: 260, align: 'center' },
+  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
+  { title: '操作', key: 'action', width: 108, align: 'center' },
 ]
 
 const summaryStats = computed(() => {
@@ -229,6 +254,18 @@ const summaryStats = computed(() => {
     revoked: items.filter(item => item.status === 'REVOKED').length,
   }
 })
+
+const expiringSoonCount = computed(() => dataSource.value.filter(item => {
+  if (!item.expiresAt || item.status !== 'ACTIVE') return false
+  const diff = new Date(item.expiresAt).getTime() - Date.now()
+  return diff > 0 && diff <= 7 * 24 * 60 * 60 * 1000
+}).length)
+
+const recentCreatedCount = computed(() => dataSource.value.filter((item) => {
+  if (!item.createdAt) return false
+  const diff = Date.now() - new Date(item.createdAt).getTime()
+  return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000
+}).length)
 
 async function loadData() {
   loading.value = true
@@ -312,9 +349,16 @@ onMounted(() => {
   gap: 18px;
 }
 
-.filter-panel {
-  display: grid;
-  gap: 18px;
+.stats-card.success strong {
+  color: var(--success-color);
+}
+
+.stats-card.warning strong {
+  color: var(--warning-color);
+}
+
+.stats-card.danger strong {
+  color: var(--error-color);
 }
 
 .panel-head {
@@ -325,9 +369,9 @@ onMounted(() => {
 }
 
 .panel-head h3 {
-  margin: 6px 0 0;
-  font-size: 22px;
-  color: var(--primary-color-dark);
+  margin: 4px 0 0;
+  font-size: 18px;
+  color: var(--text-primary);
 }
 
 .panel-head p {
@@ -336,28 +380,17 @@ onMounted(() => {
   line-height: 1.7;
 }
 
-.panel-head--compact h3 {
-  font-size: 18px;
+.panel-head--table {
+  margin-bottom: 16px;
 }
 
 .panel-kicker {
   display: inline-block;
-  color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.matter-stats-grid .stats-card.active strong {
-  color: var(--success-color);
-}
-
-.matter-stats-grid .expired-card strong {
-  color: var(--warning-color);
-}
-
-.matter-stats-grid .revoked-card strong {
-  color: var(--error-color);
+  font-weight: 700;
 }
 
 .matter-filter-form {
@@ -379,8 +412,13 @@ onMounted(() => {
   word-break: break-all;
 }
 
+.client-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .expired {
-  color: #cf1322;
+  color: var(--error-color);
 }
 
 @media (max-width: 768px) {

@@ -31,9 +31,17 @@
       </a-space>
     </section>
 
-    <section class="guide-grid">
-      <article class="guide-card">
-        <h3>API 对接信息</h3>
+    <section class="guide-grid dashboard-guide-grid">
+      <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
+        <div class="guide-card__head dashboard-guide-head">
+          <div>
+            <span class="panel-kicker">Integration Entry</span>
+            <h3>API 对接信息</h3>
+          </div>
+          <a-tag color="processing">
+            主入口
+          </a-tag>
+        </div>
         <a-descriptions
           :column="1"
           size="small"
@@ -72,8 +80,13 @@
         </a-descriptions>
       </article>
 
-      <article class="guide-card">
-        <h3>回调配置</h3>
+      <article class="guide-card dashboard-guide-card">
+        <div class="guide-card__head dashboard-guide-head">
+          <div>
+            <span class="panel-kicker">Callback Chain</span>
+            <h3>回调配置</h3>
+          </div>
+        </div>
         <a-descriptions
           :column="1"
           size="small"
@@ -127,8 +140,26 @@
       </div>
     </section>
 
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Access Desk</span>
+        <h3>先确认主入口，再做启停、轮换与过期治理</h3>
+        <p>API 密钥页的重点是治理对接入口与可用密钥，而不是暴露更多 Secret 细节。创建后的完整 Secret 仍然只在成功弹窗里出现一次。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">启用率</span>
+        <strong>{{ enabledRate }}</strong>
+        <p>帮助快速判断当前对接密钥是否过多停用。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">永久有效</span>
+        <strong>{{ neverExpireCount }}</strong>
+        <p>没有设置过期时间的密钥数量。</p>
+      </article>
+    </section>
+
     <section class="filter-panel">
-      <div class="panel-head">
+      <div class="panel-head dashboard-panel-head">
         <div>
           <span class="panel-kicker">Access Control</span>
           <h3>筛选与治理</h3>
@@ -174,6 +205,14 @@
     </section>
 
     <section class="table-panel">
+      <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
+        <div>
+          <span class="panel-kicker">Key Ledger</span>
+          <h3>密钥治理台账</h3>
+        </div>
+        <p>核心操作只保留启停、编辑和删除，创建成功后的 Secret 独立弹窗展示，降低误暴露风险。</p>
+      </div>
+
       <a-table
         :columns="columns"
         :data-source="dataSource"
@@ -437,6 +476,11 @@ const keyStats = computed(() => ({
   disabled: dataSource.value.filter(item => !item.enabled).length,
   expired: dataSource.value.filter(item => isExpired(item.expiresAt)).length,
 }))
+const enabledRate = computed(() => {
+  if (!keyStats.value.total) return '0%'
+  return `${Math.round((keyStats.value.enabled / keyStats.value.total) * 100)}%`
+})
+const neverExpireCount = computed(() => dataSource.value.filter(item => !item.expiresAt).length)
 
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id', width: 80, align: 'center' },
@@ -632,56 +676,17 @@ onUnmounted(() => {
   gap: 18px;
 }
 
-.panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.panel-head h3 {
-  margin: 6px 0 0;
-  font-size: 22px;
-  color: var(--primary-color-dark);
-}
-
-.panel-head p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
 .panel-kicker {
   display: inline-block;
-  color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.guide-card {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-}
-
-.guide-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  font-weight: 700;
 }
 
 .guide-card {
   padding: 20px;
-}
-
-.guide-card h3 {
-  margin: 0 0 16px;
-  color: var(--primary-color-dark);
-  font-size: 20px;
 }
 
 .guide-card :deep(.ant-descriptions-bordered .ant-descriptions-item-label) {
@@ -745,16 +750,9 @@ onUnmounted(() => {
 }
 
 @media (max-width: 992px) {
-  .guide-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 768px) {
-  .panel-head {
-    display: grid;
-  }
-
   .guide-card {
     padding: 16px;
     border-radius: 20px;

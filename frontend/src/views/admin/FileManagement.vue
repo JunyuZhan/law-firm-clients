@@ -3,13 +3,13 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          文件管理工作台
+          File Operations
         </div>
         <h2 class="editorial-title intro-title">
           文件管理
         </h2>
         <p class="intro-text">
-          查看文件存量、状态与存储占用，集中处理删除、批量删除和过期清理。
+          查看文件存量、状态与存储占用，集中处理详情、删除、批量删除和过期清理。
         </p>
       </div>
       <a-space
@@ -36,29 +36,55 @@
     </section>
 
     <section class="stats-grid">
-      <div class="stats-card">
+      <article class="stats-card">
         <span class="stats-label">总文件数</span>
         <strong>{{ statistics.totalCount }}</strong>
-        <p>包含活跃和已删除文件的总量。</p>
-      </div>
-      <div class="stats-card success">
+        <p>含活跃与已删除文件</p>
+      </article>
+      <article class="stats-card success">
         <span class="stats-label">活跃文件</span>
         <strong>{{ statistics.activeCount }}</strong>
-        <p>当前仍在对外提供查看或下载的文件。</p>
-      </div>
-      <div class="stats-card danger">
+        <p>当前仍可查看或下载</p>
+      </article>
+      <article class="stats-card danger">
         <span class="stats-label">已删除</span>
         <strong>{{ statistics.deletedCount }}</strong>
-        <p>逻辑删除文件，适合进入物理清理流程。</p>
-      </div>
-      <div class="stats-card info">
+        <p>适合进入物理清理流程</p>
+      </article>
+      <article class="stats-card info">
         <span class="stats-label">存储空间</span>
         <strong>{{ statistics.activeSizeFormatted }}</strong>
-        <p>活跃文件正在占用的存储体积。</p>
-      </div>
+        <p>活跃文件占用空间</p>
+      </article>
+    </section>
+
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Archive Desk</span>
+        <h3>文件存量与清理优先级</h3>
+        <p>先看活跃文件、已删除文件和存储占用，再决定是批量删除还是启动过期清理流程。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="dashboard-spotlight-label">覆盖项目</span>
+        <strong>{{ statistics.matterCount }}</strong>
+        <p>用于观察文件是否集中在少数项目。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="dashboard-spotlight-label">删除占比</span>
+        <strong>{{ deletedRatio }}</strong>
+        <p>帮助判断是否值得立即做物理清理。</p>
+      </article>
     </section>
 
     <section class="filter-panel">
+      <div class="panel-head dashboard-panel-head">
+        <div>
+          <span class="panel-kicker">Filters</span>
+          <h3>筛选条件</h3>
+        </div>
+        <p>按项目、状态、类别和关键字快速定位文件。</p>
+      </div>
+
       <a-form
         layout="inline"
         class="filter-form"
@@ -68,7 +94,7 @@
             v-model:value="filters.matterId"
             placeholder="输入项目ID"
             allow-clear
-            style="width: 160px"
+            style="width: 180px"
             @press-enter="loadFiles"
           />
         </a-form-item>
@@ -77,7 +103,7 @@
             v-model:value="filters.status"
             placeholder="选择状态"
             allow-clear
-            style="width: 120px"
+            style="width: 130px"
             @change="loadFiles"
           >
             <a-select-option value="ACTIVE">
@@ -93,7 +119,7 @@
             v-model:value="filters.fileCategory"
             placeholder="选择类别"
             allow-clear
-            style="width: 140px"
+            style="width: 150px"
             @change="loadFiles"
           >
             <a-select-option value="EVIDENCE">
@@ -115,7 +141,7 @@
             v-model:value="filters.keyword"
             placeholder="文件名/描述"
             allow-clear
-            style="width: 180px"
+            style="width: 200px"
             @press-enter="loadFiles"
           />
         </a-form-item>
@@ -134,13 +160,26 @@
     </section>
 
     <section class="table-panel">
+      <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
+        <div>
+          <span class="panel-kicker">Data</span>
+          <h3>文件数据表</h3>
+        </div>
+        <p>保留高频字段，详情放入弹窗，避免表格过宽。</p>
+      </div>
+
+      <div class="table-summary dashboard-table-summary">
+        <span>当前结果 {{ files.length }} 条</span>
+        <span>已选择 {{ selectedRowKeys.length }} 条待处理文件</span>
+      </div>
+
       <a-table
         :columns="columns"
         :data-source="files"
         :loading="loading || statsLoading"
         :pagination="pagination"
         :row-selection="rowSelection"
-        :scroll="{ x: 'max-content' }"
+        :scroll="{ x: 920 }"
         row-key="id"
         @change="handleTableChange"
       >
@@ -187,7 +226,7 @@
                   size="small"
                   danger
                 >
-                  删除
+                  移除
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -322,6 +361,10 @@ const statistics = reactive<Statistics>({
   categoryStats: {},
 })
 const statsLoading = ref(false)
+const deletedRatio = computed(() => {
+  if (!statistics.totalCount) return '0%'
+  return `${Math.round((statistics.deletedCount / statistics.totalCount) * 100)}%`
+})
 
 const files = ref<FileItem[]>([])
 const loading = ref(false)
@@ -366,12 +409,12 @@ function handleResize() {
 
 const columns: TableProps['columns'] = [
   { title: '文件名', dataIndex: 'fileName', key: 'fileName', ellipsis: true },
-  { title: '项目ID', dataIndex: 'matterId', key: 'matterId', width: 140, ellipsis: true },
-  { title: '大小', dataIndex: 'fileSize', key: 'fileSize', width: 100 },
-  { title: '类别', dataIndex: 'fileCategory', key: 'fileCategory', width: 100 },
-  { title: '状态', dataIndex: 'status', key: 'status', width: 80 },
-  { title: '上传时间', dataIndex: 'uploadedAt', key: 'uploadedAt', width: 160 },
-  { title: '操作', key: 'action', width: 220, fixed: 'right', align: 'center' },
+  { title: '项目ID', dataIndex: 'matterId', key: 'matterId', width: 132, ellipsis: true },
+  { title: '大小', dataIndex: 'fileSize', key: 'fileSize', width: 96 },
+  { title: '类别', dataIndex: 'fileCategory', key: 'fileCategory', width: 96 },
+  { title: '状态', dataIndex: 'status', key: 'status', width: 84 },
+  { title: '上传时间', dataIndex: 'uploadedAt', key: 'uploadedAt', width: 148 },
+  { title: '操作', key: 'action', width: 140, align: 'center' },
 ]
 
 const loadStatistics = async () => {
@@ -527,16 +570,25 @@ onUnmounted(() => {
   gap: 18px;
 }
 
+.panel-kicker {
+  display: inline-block;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
 .stats-card.success strong {
-  color: #2f855a;
+  color: var(--success-color);
 }
 
 .stats-card.danger strong {
-  color: #c53030;
+  color: var(--error-color);
 }
 
 .stats-card.info strong {
-  color: #2b6cb0;
+  color: var(--lex-primary-soft);
 }
 
 .filter-form {
@@ -559,6 +611,8 @@ onUnmounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .btn-text {

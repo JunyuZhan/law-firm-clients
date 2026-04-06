@@ -1,7 +1,6 @@
 <template>
   <div class="matter-detail-container">
     <a-layout>
-      <!-- 统一的 Header 组件 -->
       <AppHeader
         variant="detail"
         :title="'项目详情'"
@@ -11,441 +10,526 @@
         :show-mobile-menu="false"
         @back="goBack"
       />
-      <a-layout-content class="content">
+      <a-layout-content
+        id="main-content"
+        class="content"
+        tabindex="-1"
+      >
         <a-spin :spinning="loading">
           <div
             v-if="matterDetail"
-            class="detail-card"
+            class="detail-shell"
           >
-            <!-- 动态渲染所有数据块 -->
-            <template
-              v-for="section in visibleSections"
-              :key="section.key"
-            >
-              <!-- 项目基本信息 -->
-              <a-card
-                v-if="section.key === 'matterInfo'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <a-descriptions
-                  :column="{ xs: 1, sm: 2 }"
-                  bordered
-                  size="small"
-                >
-                  <a-descriptions-item
-                    v-if="matterData.matterName"
-                    label="项目名称"
-                  >
-                    {{ matterData.matterName }}
-                  </a-descriptions-item>
-                  <a-descriptions-item
-                    v-if="matterData.matterNo"
-                    label="项目编号"
-                  >
-                    {{ matterData.matterNo }}
-                  </a-descriptions-item>
-                  <a-descriptions-item label="客户名称">
-                    {{ matterDetail.clientName }}
-                  </a-descriptions-item>
-                  <a-descriptions-item
-                    v-if="matterData.matterTypeName || matterData.matterType"
-                    label="项目类型"
-                  >
-                    {{ matterData.matterTypeName || matterData.matterType }}
-                  </a-descriptions-item>
-                  <a-descriptions-item label="项目状态">
-                    <a-tag :color="getStatusColor(String(matterData.status || matterDetail.status))">
-                      {{ matterData.statusName || matterData.status || matterDetail.status }}
-                    </a-tag>
-                  </a-descriptions-item>
-                  <a-descriptions-item label="有效期至">
-                    {{ formatDate(matterDetail.expiresAt) }}
-                  </a-descriptions-item>
-                  <a-descriptions-item
-                    v-if="matterData.createDate"
-                    label="委托日期"
-                  >
-                    {{ formatDate(String(matterData.createDate)) }}
-                  </a-descriptions-item>
-                  <a-descriptions-item label="创建时间">
-                    {{ formatDate(matterDetail.createdAt) }}
-                  </a-descriptions-item>
-                </a-descriptions>
-              </a-card>
-
-              <!-- 项目进度 -->
-              <a-card
-                v-else-if="section.key === 'progress'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <a-descriptions
-                  :column="1"
-                  bordered
-                  size="small"
-                >
-                  <a-descriptions-item
-                    v-if="matterData.currentStageName || matterData.currentStage"
-                    label="当前阶段"
-                  >
-                    <a-tag color="processing">
-                      {{ matterData.currentStageName || matterData.currentStage }}
-                    </a-tag>
-                  </a-descriptions-item>
-                  <a-descriptions-item
-                    v-if="matterData.progress !== undefined && matterData.progress !== null"
-                    label="整体进度"
-                  >
-                    <a-progress 
-                      :percent="matterData.progress" 
-                      :status="matterData.progress === 100 ? 'success' : 'active'" 
-                      style="width: 100%; max-width: 400px"
-                    />
-                  </a-descriptions-item>
-                  <a-descriptions-item
-                    v-if="matterData.lastUpdateTime"
-                    label="最后更新"
-                  >
-                    {{ formatDate(String(matterData.lastUpdateTime)) }}
-                  </a-descriptions-item>
-                </a-descriptions>
-              </a-card>
-
-              <!-- 承办律师 -->
-              <a-card
-                v-else-if="section.key === 'lawyers'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <!-- 主办律师 -->
-                <div
-                  v-if="matterData.leadLawyerName"
-                  class="lead-lawyer"
-                >
-                  <a-descriptions
-                    :column="1"
-                    size="small"
-                  >
-                    <a-descriptions-item label="主办律师">
-                      <strong>{{ matterData.leadLawyerName }}</strong>
-                      <span
-                        v-if="matterData.leadLawyerContact"
-                        style="margin-left: 16px; color: #666"
-                      >
-                        {{ matterData.leadLawyerContact }}
-                      </span>
-                    </a-descriptions-item>
-                  </a-descriptions>
+            <section class="hero-panel glass-panel">
+              <div class="hero-copy">
+                <div class="eyebrow">
+                  Matter Overview
                 </div>
-                <!-- 团队成员列表 -->
-                <a-list
-                  v-if="lawyerList.length > 0"
-                  :data-source="lawyerList"
-                  item-layout="horizontal"
-                  size="small"
-                >
-                  <template #renderItem="{ item }">
-                    <a-list-item>
-                      <a-list-item-meta>
-                        <template #title>
-                          {{ item.name }}
-                          <a-tag
-                            v-if="item.role || item.roleName"
-                            color="blue"
-                            style="margin-left: 8px"
-                          >
-                            {{ item.roleName || item.role }}
-                          </a-tag>
-                        </template>
-                        <template #description>
-                          <a-space wrap>
-                            <span v-if="item.phone || item.contact">
-                              <PhoneOutlined /> {{ item.phone || item.contact }}
-                            </span>
-                            <span v-if="item.email">
-                              <MailOutlined /> {{ item.email }}
-                            </span>
-                          </a-space>
-                        </template>
-                      </a-list-item-meta>
-                    </a-list-item>
-                  </template>
-                </a-list>
-              </a-card>
+                <h1 class="hero-title">
+                  {{ matterData.matterName || `项目 ${matterId}` }}
+                </h1>
+                <p class="hero-subtitle">
+                  {{ matterDetail.clientName }} 的项目访问页。当前状态、阶段、关键期限和文件协作都在同一视图内呈现。
+                </p>
 
-              <!-- 待办任务 -->
-              <a-card
-                v-else-if="section.key === 'tasks'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <template #extra>
-                  <span
-                    v-if="matterData.completedTaskCount !== undefined"
-                    style="color: #666"
-                  >
-                    已完成 {{ matterData.completedTaskCount ?? 0 }}/{{ matterData.totalTaskCount ?? 0 }}
+                <div class="hero-meta">
+                  <article class="hero-meta-item">
+                    <strong>项目编号</strong>
+                    <span>{{ matterData.matterNo || '未同步' }}</span>
+                  </article>
+                  <article class="hero-meta-item">
+                    <strong>项目类型</strong>
+                    <span>{{ matterData.matterTypeName || matterData.matterType || '未分类' }}</span>
+                  </article>
+                  <article class="hero-meta-item">
+                    <strong>有效期至</strong>
+                    <span>{{ formatDate(matterDetail.expiresAt) }}</span>
+                  </article>
+                </div>
+              </div>
+
+              <div class="hero-side">
+                <a-tag
+                  class="hero-status"
+                  :color="getStatusColor(displayStatusRaw)"
+                >
+                  {{ displayStatus }}
+                </a-tag>
+
+                <div class="hero-progress-card">
+                  <span class="hero-progress-label">当前阶段</span>
+                  <strong>{{ currentStageLabel }}</strong>
+                  <a-progress
+                    class="progress-bar"
+                    :percent="normalizedProgress"
+                    :status="normalizedProgress === 100 ? 'success' : 'active'"
+                  />
+                  <span class="hero-progress-foot">
+                    最后更新 {{ formatDate(displayLastUpdate) }}
                   </span>
-                </template>
-                <a-list
-                  :data-source="matterData.pendingTasks"
-                  item-layout="horizontal"
-                  size="small"
-                >
-                  <template #renderItem="{ item }">
-                    <a-list-item>
-                      <a-list-item-meta>
-                        <template #title>
-                          {{ item.title }}
-                          <a-tag
-                            v-if="item.statusName || item.status"
-                            :color="getTaskStatusColor(item.status)"
-                            style="margin-left: 8px"
-                          >
-                            {{ item.statusName || item.status }}
-                          </a-tag>
-                        </template>
-                        <template #description>
-                          <a-space>
-                            <span v-if="item.dueDate">
-                              <ClockCircleOutlined /> 截止：{{ formatDate(item.dueDate) }}
-                            </span>
-                            <a-progress
-                              v-if="item.progress !== undefined"
-                              :percent="item.progress"
-                              size="small"
-                              style="width: 100px"
-                            />
-                          </a-space>
-                        </template>
-                      </a-list-item-meta>
-                    </a-list-item>
-                  </template>
-                </a-list>
-              </a-card>
+                </div>
 
-              <!-- 关键期限 -->
-              <a-card
-                v-else-if="section.key === 'deadlines'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <a-timeline>
-                  <a-timeline-item
-                    v-for="(deadline, index) in (matterData.deadlines as Array<{title?: string; type?: string; isOverdue?: boolean; deadline?: string}>)"
-                    :key="index"
-                    :color="deadline.isOverdue ? 'red' : (deadline.deadline && isDeadlineNear(deadline.deadline) ? 'orange' : 'blue')"
-                  >
-                    <div class="deadline-item">
-                      <div class="deadline-title">
-                        {{ deadline.title }}
-                        <a-tag
-                          v-if="deadline.type"
-                          size="small"
-                          style="margin-left: 8px"
-                        >
-                          {{ String(deadline.type) }}
-                        </a-tag>
-                        <a-tag
-                          v-if="deadline.isOverdue"
-                          color="red"
-                          size="small"
-                          style="margin-left: 8px"
-                        >
-                          已逾期
-                        </a-tag>
-                      </div>
-                      <div class="deadline-date">
-                        <CalendarOutlined /> {{ formatDate(deadline.deadline) }}
-                      </div>
-                    </div>
-                  </a-timeline-item>
-                </a-timeline>
-              </a-card>
-
-              <!-- 费用信息 -->
-              <a-card
-                v-else-if="section.key === 'fees'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <a-row :gutter="16">
-                  <a-col
-                    :xs="24"
-                    :sm="8"
-                  >
-                    <a-statistic 
-                      title="合同金额" 
-                      :value="matterData.contractAmount" 
-                      prefix="¥"
-                      :precision="2"
-                    />
-                  </a-col>
-                  <a-col
-                    :xs="24"
-                    :sm="8"
-                  >
-                    <a-statistic 
-                      title="已收款" 
-                      :value="matterData.receivedAmount" 
-                      prefix="¥"
-                      :precision="2"
-                      :value-style="{ color: '#52c41a' }"
-                    />
-                  </a-col>
-                  <a-col
-                    :xs="24"
-                    :sm="8"
-                  >
-                    <a-statistic 
-                      title="待收款" 
-                      :value="matterData.pendingAmount" 
-                      prefix="¥"
-                      :precision="2"
-                      :value-style="{ color: '#faad14' }"
-                    />
-                  </a-col>
-                </a-row>
-              </a-card>
-
-              <!-- 文档列表 -->
-              <a-card
-                v-else-if="section.key === 'documents'"
-                :title="section.title"
-                style="margin-bottom: 24px"
-              >
-                <template #extra>
-                  <span style="color: #666">共 {{ (matterData.documentCount as number | undefined) || (matterData.documents as Array<any> | undefined)?.length || 0 }} 份</span>
-                </template>
-                <a-list
-                  :data-source="matterData.documents as Array<any> || []"
-                  item-layout="horizontal"
-                  size="small"
-                >
-                  <template #renderItem="{ item }">
-                    <a-list-item>
-                      <a-list-item-meta>
-                        <template #avatar>
-                          <FileTextOutlined style="font-size: 24px; color: #1890ff" />
-                        </template>
-                        <template #title>
-                          {{ item.title }}
-                        </template>
-                        <template #description>
-                          <a-space>
-                            <a-tag
-                              v-if="item.category"
-                              size="small"
-                            >
-                              {{ item.category }}
-                            </a-tag>
-                            <span v-if="item.createdAt">{{ formatDate(item.createdAt) }}</span>
-                          </a-space>
-                        </template>
-                      </a-list-item-meta>
-                    </a-list-item>
-                  </template>
-                </a-list>
-              </a-card>
-
-              <!-- 文件管理 -->
-              <a-card
-                v-else-if="section.key === 'files'"
-                :title="section.title"
-              >
-                <template #extra>
-                  <a-button 
-                    type="primary" 
-                    class="upload-btn"
+                <div class="hero-action-card">
+                  <span class="hero-progress-label">当前建议</span>
+                  <strong>{{ heroActionTitle }}</strong>
+                  <p>{{ heroActionDescription }}</p>
+                  <a-button
+                    type="primary"
+                    block
+                    class="hero-action-btn"
                     @click="showUploadModal = true"
                   >
-                    <template #icon>
-                      <UploadOutlined />
-                    </template>
-                    <span class="upload-btn-text">上传文件</span>
+                    上传补充文件
                   </a-button>
-                </template>
+                </div>
+              </div>
+            </section>
 
-                <a-table
-                  :columns="fileColumns"
-                  :data-source="fileList"
-                  :loading="fileLoading"
-                  :pagination="false"
-                  :scroll="{ x: 'max-content' }"
-                  row-key="id"
-                  size="small"
+            <section class="stats-grid overview-grid">
+              <article class="stats-card">
+                <span class="stats-label">访问状态</span>
+                <strong>{{ displayStatus }}</strong>
+                <p>链接权限状态</p>
+              </article>
+              <article class="stats-card">
+                <span class="stats-label">整体进度</span>
+                <strong>{{ normalizedProgress }}%</strong>
+                <p>{{ currentStageLabel }}</p>
+              </article>
+              <article class="stats-card">
+                <span class="stats-label">待办任务</span>
+                <strong>{{ pendingTaskCount }}</strong>
+                <p>{{ completedTasksLabel }}</p>
+              </article>
+              <article class="stats-card">
+                <span class="stats-label">文件数量</span>
+                <strong>{{ fileList.length }}</strong>
+                <p>当前项目文件</p>
+              </article>
+            </section>
+
+            <section class="detail-grid">
+              <div class="detail-main">
+                <a-card
+                  title="项目信息"
+                  class="detail-block"
                 >
-                  <template #bodyCell="{ column, record }">
-                    <template v-if="column.key === 'fileName'">
-                      <a @click="handlePreview(record)">{{ record.fileName }}</a>
-                    </template>
-                    <template v-else-if="column.key === 'fileSource'">
-                      <a-tag :color="record.fileSource === FILE_SOURCE_PUSHED ? 'blue' : 'green'">
-                        {{ record.fileSource === FILE_SOURCE_PUSHED ? '律所' : (isMobile ? '我的' : '我上传的') }}
+                  <a-descriptions
+                    :column="{ xs: 1, sm: 2 }"
+                    bordered
+                    size="small"
+                  >
+                    <a-descriptions-item label="项目名称">
+                      {{ matterData.matterName || '-' }}
+                    </a-descriptions-item>
+                    <a-descriptions-item label="项目编号">
+                      {{ matterData.matterNo || '-' }}
+                    </a-descriptions-item>
+                    <a-descriptions-item label="客户名称">
+                      {{ matterDetail.clientName }}
+                    </a-descriptions-item>
+                    <a-descriptions-item label="项目类型">
+                      {{ matterData.matterTypeName || matterData.matterType || '-' }}
+                    </a-descriptions-item>
+                    <a-descriptions-item label="项目状态">
+                      <a-tag :color="getStatusColor(displayStatusRaw)">
+                        {{ displayStatus }}
                       </a-tag>
-                    </template>
-                    <template v-else-if="column.key === 'fileSize'">
-                      {{ formatFileSize(record.fileSize) }}
-                    </template>
-                    <template v-else-if="column.key === 'uploadTime'">
-                      {{ formatDate(record.uploadedAt) }}
-                    </template>
-                    <template v-else-if="column.key === 'action'">
-                      <a-space
-                        class="file-actions"
-                        :size="4"
-                      >
-                        <a-tooltip title="预览">
-                          <a-button
-                            type="text"
-                            size="small"
-                            class="action-btn"
-                            @click="handlePreview(record)"
-                          >
-                            <template #icon>
-                              <EyeOutlined />
-                            </template>
-                            <span class="action-text">预览</span>
-                          </a-button>
-                        </a-tooltip>
-                        <a-tooltip title="下载">
-                          <a-button
-                            type="text"
-                            size="small"
-                            class="action-btn"
-                            @click="handleDownload(record)"
-                          >
-                            <template #icon>
-                              <DownloadOutlined />
-                            </template>
-                            <span class="action-text">下载</span>
-                          </a-button>
-                        </a-tooltip>
-                        <a-popconfirm
-                          title="确定要删除这个文件吗？"
-                          @confirm="handleDelete(record)"
-                        >
-                          <a-tooltip title="删除">
-                            <a-button
-                              type="text"
-                              size="small"
-                              danger
-                              class="action-btn"
-                            >
-                              <template #icon>
-                                <DeleteOutlined />
-                              </template>
-                              <span class="action-text">删除</span>
-                            </a-button>
-                          </a-tooltip>
-                        </a-popconfirm>
-                      </a-space>
-                    </template>
+                    </a-descriptions-item>
+                    <a-descriptions-item label="有效期至">
+                      {{ formatDate(matterDetail.expiresAt) }}
+                    </a-descriptions-item>
+                    <a-descriptions-item label="委托日期">
+                      {{ formatDate(String(matterData.createDate || '')) }}
+                    </a-descriptions-item>
+                    <a-descriptions-item label="创建时间">
+                      {{ formatDate(matterDetail.createdAt) }}
+                    </a-descriptions-item>
+                  </a-descriptions>
+                </a-card>
+
+                <a-card
+                  v-if="showProgressSection"
+                  title="项目进度"
+                  class="detail-block"
+                >
+                  <div class="progress-panel">
+                    <div class="progress-item">
+                      <span class="label">当前阶段</span>
+                      <a-tag color="processing">
+                        {{ currentStageLabel }}
+                      </a-tag>
+                    </div>
+                    <div class="progress-item progress-item-bar">
+                      <span class="label">整体进度</span>
+                      <a-progress
+                        class="progress-bar"
+                        :percent="normalizedProgress"
+                        :status="normalizedProgress === 100 ? 'success' : 'active'"
+                      />
+                    </div>
+                    <div class="progress-item">
+                      <span class="label">最后更新</span>
+                      <span>{{ formatDate(displayLastUpdate) }}</span>
+                    </div>
+                  </div>
+                </a-card>
+
+                <a-card
+                  v-if="recentActivityList.length > 0"
+                  title="最近动态"
+                  class="detail-block"
+                >
+                  <div class="activity-list">
+                    <article
+                      v-for="activity in recentActivityList"
+                      :key="activity.key"
+                      class="activity-item"
+                    >
+                      <div class="activity-dot" />
+                      <div class="activity-copy">
+                        <strong>{{ activity.title }}</strong>
+                        <p>{{ activity.description }}</p>
+                        <span>{{ activity.meta }}</span>
+                      </div>
+                    </article>
+                  </div>
+                </a-card>
+
+                <a-card
+                  v-if="showTasksSection"
+                  title="待办任务"
+                  class="detail-block"
+                >
+                  <template #extra>
+                    <span class="panel-extra">{{ completedTasksLabel }}</span>
                   </template>
-                </a-table>
-              </a-card>
-            </template>
+                  <a-list
+                    :data-source="pendingTasksList"
+                    item-layout="horizontal"
+                    size="small"
+                  >
+                    <template #renderItem="{ item }">
+                      <a-list-item>
+                        <a-list-item-meta>
+                          <template #title>
+                            <span class="task-title">{{ item.title }}</span>
+                            <a-tag
+                              v-if="item.statusName || item.status"
+                              :color="getTaskStatusColor(item.status)"
+                              class="inline-tag"
+                            >
+                              {{ item.statusName || item.status }}
+                            </a-tag>
+                          </template>
+                          <template #description>
+                            <a-space wrap>
+                              <span v-if="item.dueDate">
+                                <ClockCircleOutlined /> 截止：{{ formatDate(item.dueDate) }}
+                              </span>
+                              <a-progress
+                                v-if="item.progress !== undefined"
+                                :percent="item.progress"
+                                size="small"
+                                style="width: 120px"
+                              />
+                            </a-space>
+                          </template>
+                        </a-list-item-meta>
+                      </a-list-item>
+                    </template>
+                  </a-list>
+                </a-card>
+
+                <a-card
+                  v-if="showDeadlinesSection"
+                  title="关键期限"
+                  class="detail-block"
+                >
+                  <a-timeline>
+                    <a-timeline-item
+                      v-for="(deadline, index) in deadlinesList"
+                      :key="index"
+                      :color="deadline.isOverdue ? 'red' : (deadline.deadline && isDeadlineNear(deadline.deadline) ? 'orange' : 'blue')"
+                    >
+                      <div class="deadline-item">
+                        <div class="deadline-title">
+                          {{ deadline.title }}
+                          <a-tag
+                            v-if="deadline.type"
+                            size="small"
+                            class="inline-tag"
+                          >
+                            {{ String(deadline.type) }}
+                          </a-tag>
+                          <a-tag
+                            v-if="deadline.isOverdue"
+                            color="red"
+                            size="small"
+                            class="inline-tag"
+                          >
+                            已逾期
+                          </a-tag>
+                        </div>
+                        <div class="deadline-date">
+                          <CalendarOutlined /> {{ formatDate(deadline.deadline) }}
+                        </div>
+                      </div>
+                    </a-timeline-item>
+                  </a-timeline>
+                </a-card>
+
+                <a-card
+                  v-if="showDocumentsSection"
+                  title="文档列表"
+                  class="detail-block"
+                >
+                  <template #extra>
+                    <span class="panel-extra">共 {{ documentCount }} 份</span>
+                  </template>
+                  <a-list
+                    :data-source="documentsList"
+                    item-layout="horizontal"
+                    size="small"
+                  >
+                    <template #renderItem="{ item }">
+                      <a-list-item>
+                        <a-list-item-meta>
+                          <template #avatar>
+                            <FileTextOutlined class="doc-icon" />
+                          </template>
+                          <template #title>
+                            {{ item.title || item.name }}
+                          </template>
+                          <template #description>
+                            <a-space wrap>
+                              <a-tag
+                                v-if="item.category || item.type"
+                                size="small"
+                              >
+                                {{ item.category || item.type }}
+                              </a-tag>
+                              <span v-if="item.createdAt || item.uploadTime">
+                                {{ formatDate(item.createdAt || item.uploadTime) }}
+                              </span>
+                            </a-space>
+                          </template>
+                        </a-list-item-meta>
+                      </a-list-item>
+                    </template>
+                  </a-list>
+                </a-card>
+              </div>
+
+              <aside class="detail-side">
+                <a-card
+                  v-if="showLawyersSection"
+                  title="承办律师"
+                  class="detail-block"
+                >
+                  <div
+                    v-if="matterData.leadLawyerName"
+                    class="lead-lawyer"
+                  >
+                    <div class="side-kicker">
+                      主办律师
+                    </div>
+                    <strong>{{ matterData.leadLawyerName }}</strong>
+                    <p v-if="matterData.leadLawyerContact">
+                      {{ matterData.leadLawyerContact }}
+                    </p>
+                  </div>
+                  <a-list
+                    v-if="lawyerList.length > 0"
+                    :data-source="lawyerList"
+                    item-layout="horizontal"
+                    size="small"
+                  >
+                    <template #renderItem="{ item }">
+                      <a-list-item>
+                        <a-list-item-meta>
+                          <template #title>
+                            {{ item.name }}
+                            <a-tag
+                              v-if="item.role || item.roleName || item.title"
+                              color="blue"
+                              class="inline-tag"
+                            >
+                              {{ item.roleName || item.role || item.title }}
+                            </a-tag>
+                          </template>
+                          <template #description>
+                            <a-space wrap>
+                              <span v-if="item.phone || item.contact">
+                                <PhoneOutlined /> {{ item.phone || item.contact }}
+                              </span>
+                              <span v-if="item.email">
+                                <MailOutlined /> {{ item.email }}
+                              </span>
+                            </a-space>
+                          </template>
+                        </a-list-item-meta>
+                      </a-list-item>
+                    </template>
+                  </a-list>
+                </a-card>
+
+                <a-card
+                  v-if="showFeesSection"
+                  title="费用信息"
+                  class="detail-block"
+                >
+                  <div class="fee-stack">
+                    <div class="fee-item">
+                      <span>合同金额</span>
+                      <strong>¥{{ formatCurrency(matterData.contractAmount) }}</strong>
+                    </div>
+                    <div class="fee-item fee-item-success">
+                      <span>已收款</span>
+                      <strong>¥{{ formatCurrency(matterData.receivedAmount) }}</strong>
+                    </div>
+                    <div class="fee-item fee-item-warning">
+                      <span>待收款</span>
+                      <strong>¥{{ formatCurrency(matterData.pendingAmount) }}</strong>
+                    </div>
+                  </div>
+                </a-card>
+
+                <a-card
+                  title="访问说明"
+                  class="detail-block"
+                >
+                  <div class="note-list">
+                    <div class="note-item">
+                      <strong>访问有效期</strong>
+                      <p>{{ formatDate(matterDetail.expiresAt) }}</p>
+                    </div>
+                    <div class="note-item">
+                      <strong>文件协作</strong>
+                      <p>可查看律所推送文件，也可上传客户补充材料。</p>
+                    </div>
+                    <div class="note-item">
+                      <strong>问题处理</strong>
+                      <p>如信息异常，请联系承办律师核对项目数据。</p>
+                    </div>
+                  </div>
+                </a-card>
+
+                <a-card
+                  v-if="upcomingSnapshot.length > 0"
+                  title="关键快照"
+                  class="detail-block"
+                >
+                  <div class="snapshot-list">
+                    <article
+                      v-for="snapshot in upcomingSnapshot"
+                      :key="snapshot.key"
+                      class="snapshot-item"
+                    >
+                      <span class="snapshot-label">{{ snapshot.label }}</span>
+                      <strong>{{ snapshot.value }}</strong>
+                      <p>{{ snapshot.description }}</p>
+                    </article>
+                  </div>
+                </a-card>
+              </aside>
+            </section>
+
+            <a-card
+              title="文件管理"
+              class="detail-block files-block"
+            >
+              <template #extra>
+                <a-button
+                  type="primary"
+                  class="upload-btn"
+                  @click="showUploadModal = true"
+                >
+                  <template #icon>
+                    <UploadOutlined />
+                  </template>
+                  <span class="upload-btn-text">上传文件</span>
+                </a-button>
+              </template>
+
+              <a-table
+                :columns="fileColumns"
+                :data-source="fileList"
+                :loading="fileLoading"
+                :pagination="false"
+                :scroll="{ x: 920 }"
+                row-key="id"
+                size="small"
+              >
+                <template #bodyCell="{ column, record }">
+                  <template v-if="column.key === 'fileName'">
+                    <a @click="handlePreview(record)">{{ record.fileName }}</a>
+                  </template>
+                  <template v-else-if="column.key === 'fileSource'">
+                    <a-tag :color="record.fileSource === FILE_SOURCE_PUSHED ? 'blue' : 'green'">
+                      {{ record.fileSource === FILE_SOURCE_PUSHED ? '律所' : (isMobile ? '我的' : '我上传的') }}
+                    </a-tag>
+                  </template>
+                  <template v-else-if="column.key === 'fileSize'">
+                    {{ formatFileSize(record.fileSize) }}
+                  </template>
+                  <template v-else-if="column.key === 'uploadTime'">
+                    {{ formatDate(record.uploadedAt) }}
+                  </template>
+                  <template v-else-if="column.key === 'action'">
+                    <a-space
+                      class="file-actions"
+                      :size="4"
+                    >
+                      <a-tooltip title="预览">
+                        <a-button
+                          type="text"
+                          size="small"
+                          class="action-btn"
+                          @click="handlePreview(record)"
+                        >
+                          <template #icon>
+                            <EyeOutlined />
+                          </template>
+                          <span class="action-text">预览</span>
+                        </a-button>
+                      </a-tooltip>
+                      <a-tooltip title="下载">
+                        <a-button
+                          type="text"
+                          size="small"
+                          class="action-btn"
+                          @click="handleDownload(record)"
+                        >
+                          <template #icon>
+                            <DownloadOutlined />
+                          </template>
+                          <span class="action-text">下载</span>
+                        </a-button>
+                      </a-tooltip>
+                      <a-popconfirm
+                        title="确定要删除这个文件吗？"
+                        @confirm="handleDelete(record)"
+                      >
+                        <a-tooltip title="删除">
+                          <a-button
+                            type="text"
+                            size="small"
+                            danger
+                            class="action-btn"
+                          >
+                            <template #icon>
+                              <DeleteOutlined />
+                            </template>
+                            <span class="action-text">删除</span>
+                          </a-button>
+                        </a-tooltip>
+                      </a-popconfirm>
+                    </a-space>
+                  </template>
+                </template>
+              </a-table>
+            </a-card>
           </div>
 
           <a-empty
@@ -454,7 +538,6 @@
           />
         </a-spin>
 
-        <!-- 文件预览对话框 -->
         <a-modal
           v-model:open="showPreviewModal"
           :title="previewFileInfo?.fileName || '文件预览'"
@@ -512,7 +595,6 @@
           </div>
         </a-modal>
 
-        <!-- 文件上传对话框 -->
         <a-modal
           v-model:open="showUploadModal"
           title="上传文件"
@@ -575,7 +657,6 @@
           </a-form>
         </a-modal>
       </a-layout-content>
-      <!-- 移动端底部导航 -->
       <MobileBottomNav />
     </a-layout>
   </div>
@@ -627,7 +708,6 @@ const lawFirmName = LAW_FIRM_NAME
 const fileList = ref<FileInfo[]>([])
 const showUploadModal = ref(false)
 
-// 响应式窗口宽度
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 const isMobile = computed(() => windowWidth.value <= 768)
 const uploadForm = ref({
@@ -646,99 +726,130 @@ const previewWidth = ref(800)
 
 const matterId = computed(() => route.params.id as string)
 const token = computed(() => route.query.token as string)
-
-// 提取 matterData（使用MatterData接口提供类型安全）
 const matterData = computed<MatterData>(() => matterDetail.value?.matterData || {})
 
-// 提取欢迎文本
 const welcomeText = computed(() => {
   if (!matterDetail.value?.clientName) return ''
   return `尊敬的${matterDetail.value.clientName}：欢迎使用${lawFirmName}客户服务系统。`
 })
 
-// 提取律师信息
 const lawyerList = computed(() => {
   const data = matterData.value
   const lawyers = data.lawyers || data.lawyerList || data.teamMembers || []
   return Array.isArray(lawyers) ? lawyers : []
 })
 
-// 定义所有可能的数据块
-interface Section {
-  key: string
-  title: string
-  visible: () => boolean
-}
-
-const allSections: Section[] = [
-  {
-    key: 'matterInfo',
-    title: '项目信息',
-    visible: () => true, // 始终显示
-  },
-  {
-    key: 'progress',
-    title: '项目进度',
-    visible: () => {
-      const data = matterData.value
-      return !!(data.currentStage || data.currentStageName || data.progress !== undefined || data.lastUpdateTime)
-    },
-  },
-  {
-    key: 'lawyers',
-    title: '承办律师',
-    visible: () => {
-      const data = matterData.value
-      return !!(data.leadLawyerName || lawyerList.value.length > 0)
-    },
-  },
-  {
-    key: 'tasks',
-    title: '待办任务',
-    visible: () => {
-      const data = matterData.value
-      return Array.isArray(data.pendingTasks) && data.pendingTasks.length > 0
-    },
-  },
-  {
-    key: 'deadlines',
-    title: '关键期限',
-    visible: () => {
-      const data = matterData.value
-      return Array.isArray(data.deadlines) && data.deadlines.length > 0
-    },
-  },
-  {
-    key: 'fees',
-    title: '费用信息',
-    visible: () => {
-      const data = matterData.value
-      return data.contractAmount !== undefined || data.receivedAmount !== undefined || data.pendingAmount !== undefined
-    },
-  },
-  {
-    key: 'documents',
-    title: '文档列表',
-    visible: () => {
-      const data = matterData.value
-      return Array.isArray(data.documents) && data.documents.length > 0
-    },
-  },
-  {
-    key: 'files',
-    title: '文件管理',
-    visible: () => true, // 始终显示（客户可以上传文件）
-  },
-]
-
-// 计算可见的数据块
-const visibleSections = computed(() => {
-  return allSections.filter(section => section.visible())
+const currentStageLabel = computed(() => String(matterData.value.currentStageName || matterData.value.currentStage || '待更新'))
+const displayStatusRaw = computed(() => String(matterData.value.status || matterDetail.value?.status || 'UNKNOWN'))
+const displayStatus = computed(() => String(matterData.value.statusName || matterData.value.status || matterDetail.value?.status || '未知状态'))
+const normalizedProgress = computed(() => {
+  const raw = Number(matterData.value.progress ?? 0)
+  if (Number.isNaN(raw)) return 0
+  return Math.max(0, Math.min(100, raw))
 })
+const displayLastUpdate = computed(() => String(matterData.value.lastUpdateTime || matterDetail.value?.createdAt || ''))
+const pendingTasksList = computed(() => Array.isArray(matterData.value.pendingTasks) ? matterData.value.pendingTasks : [])
+const deadlinesList = computed(() => Array.isArray(matterData.value.deadlines) ? matterData.value.deadlines : [])
+const documentsList = computed(() => Array.isArray(matterData.value.documents) ? matterData.value.documents : [])
+const pendingTaskCount = computed(() => pendingTasksList.value.length)
+const completedTasksLabel = computed(() => {
+  if (matterData.value.completedTaskCount !== undefined || matterData.value.totalTaskCount !== undefined) {
+    return `已完成 ${matterData.value.completedTaskCount ?? 0}/${matterData.value.totalTaskCount ?? 0}`
+  }
+  return '等待任务同步'
+})
+const documentCount = computed(() => Number(matterData.value.documentCount ?? documentsList.value.length ?? 0))
+const heroActionTitle = computed(() => {
+  if (pendingTaskCount.value > 0) return '补齐待办相关材料'
+  if (fileList.value.length === 0) return '上传首批项目文件'
+  return '继续查看最新进展'
+})
+const heroActionDescription = computed(() => {
+  if (pendingTaskCount.value > 0) return `当前仍有 ${pendingTaskCount.value} 项待办，建议先核对截止时间并补充所需资料。`
+  if (fileList.value.length === 0) return '当前项目暂未显示文件，可先上传补充材料或等待律所推送。'
+  return '项目状态、文件快照和最近动态已经同步，可继续留意后续更新。'
+})
+const recentActivityList = computed(() => {
+  const activities: Array<{ key: string; title: string; description: string; meta: string }> = []
 
-// 文件表格列（响应式）
+  if (displayLastUpdate.value) {
+    activities.push({
+      key: 'last-update',
+      title: '项目状态已同步',
+      description: `当前阶段为 ${currentStageLabel.value}，整体进度 ${normalizedProgress.value}%。`,
+      meta: `更新于 ${formatDate(displayLastUpdate.value)}`,
+    })
+  }
+
+  pendingTasksList.value.slice(0, 2).forEach((task, index) => {
+    activities.push({
+      key: `task-${index}`,
+      title: task.title || '待办事项',
+      description: `任务状态：${String(task.status || '待处理')}`,
+      meta: task.dueDate ? `截止于 ${formatDate(task.dueDate)}` : '等待时间同步',
+    })
+  })
+
+  documentsList.value.slice(0, 2).forEach((doc, index) => {
+    const extendedDoc = doc as {
+      title?: string
+      name?: string
+      category?: string
+      type?: string
+      createdAt?: string
+      uploadTime?: string
+    }
+    activities.push({
+      key: `doc-${index}`,
+      title: extendedDoc.title || extendedDoc.name || '文件已同步',
+      description: `文档类型：${String(extendedDoc.category || extendedDoc.type || '未分类')}`,
+      meta: extendedDoc.createdAt || extendedDoc.uploadTime ? formatDate(String(extendedDoc.createdAt || extendedDoc.uploadTime || '')) : '等待时间同步',
+    })
+  })
+
+  return activities.slice(0, 4)
+})
+const upcomingSnapshot = computed(() => {
+  const snapshots: Array<{ key: string; label: string; value: string; description: string }> = [
+    {
+      key: 'expiry',
+      label: '访问有效期',
+      value: formatDate(matterDetail.value?.expiresAt || ''),
+      description: '超过有效期后需要由律所重新发送访问链接。',
+    },
+    {
+      key: 'documents',
+      label: '文件快照',
+      value: `${fileList.value.length} 份`,
+      description: '包含律所推送文件与客户补充材料。',
+    },
+    {
+      key: 'progress',
+      label: '项目进度',
+      value: `${normalizedProgress.value}%`,
+      description: currentStageLabel.value,
+    },
+  ]
+
+  return snapshots.filter(item => item.value && item.value !== 'Invalid Date')
+})
+const showProgressSection = computed(() => {
+  const data = matterData.value
+  return !!(data.currentStage || data.currentStageName || data.progress !== undefined || data.lastUpdateTime)
+})
+const showLawyersSection = computed(() => {
+  const data = matterData.value
+  return !!(data.leadLawyerName || lawyerList.value.length > 0)
+})
+const showTasksSection = computed(() => pendingTasksList.value.length > 0)
+const showDeadlinesSection = computed(() => deadlinesList.value.length > 0)
+const showFeesSection = computed(() => {
+  const data = matterData.value
+  return data.contractAmount !== undefined || data.receivedAmount !== undefined || data.pendingAmount !== undefined
+})
+const showDocumentsSection = computed(() => documentsList.value.length > 0)
+
 const fileColumns = computed(() => {
-  // 移动端精简列
   if (isMobile.value) {
     return [
       { title: '文件名', key: 'fileName', dataIndex: 'fileName', ellipsis: true },
@@ -746,7 +857,6 @@ const fileColumns = computed(() => {
       { title: '操作', key: 'action', width: 100 },
     ]
   }
-  // 桌面端完整列
   return [
     { title: '文件名', key: 'fileName', dataIndex: 'fileName', ellipsis: true },
     { title: '来源', key: 'fileSource', dataIndex: 'fileSource', width: 100 },
@@ -757,9 +867,7 @@ const fileColumns = computed(() => {
   ]
 })
 
-// 加载项目详情
 async function loadMatterDetail() {
-  // 调试信息：验证参数是否正确获取（安全修复：不记录完整 token）
   const maskedToken = token.value ? token.value.substring(0, 8) + '****' : 'null'
   logger.debug('[MatterDetail] 路由信息:', {
     path: route.path,
@@ -784,6 +892,7 @@ async function loadMatterDetail() {
       clientId: res.data.clientId ?? null,
       clientName: res.data.clientName || '',
       lastMatterId: res.data.id || matterId.value,
+      lastMatterToken: token.value || '',
     })
     await loadFileList()
     logger.debug('[MatterDetail] 数据加载成功')
@@ -797,7 +906,6 @@ async function loadMatterDetail() {
   }
 }
 
-// 加载文件列表
 async function loadFileList() {
   if (!matterId.value || !token.value) return
 
@@ -813,22 +921,18 @@ async function loadFileList() {
   }
 }
 
-// 允许的文件类型和大小限制
 const ALLOWED_FILE_TYPES = [
   '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
   '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.txt', '.zip', '.rar'
 ]
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024
 
-// 上传前检查：文件类型和大小验证
 function beforeUpload(file: File) {
-  // 文件大小检查
   if (file.size > MAX_FILE_SIZE) {
     message.error(`文件大小不能超过 ${MAX_FILE_SIZE / 1024 / 1024}MB`)
     return false
   }
 
-  // 文件类型检查
   const fileName = file.name.toLowerCase()
   const ext = fileName.substring(fileName.lastIndexOf('.'))
   if (!ALLOWED_FILE_TYPES.includes(ext)) {
@@ -840,7 +944,6 @@ function beforeUpload(file: File) {
   return false
 }
 
-// 上传文件
 async function handleUpload() {
   if (!uploadForm.value.file) {
     message.warning('请选择文件')
@@ -880,7 +983,6 @@ async function handleUpload() {
   }
 }
 
-// 重置上传表单
 function resetUploadForm() {
   uploadForm.value = {
     file: null,
@@ -892,21 +994,19 @@ function resetUploadForm() {
   uploading.value = false
 }
 
-// 预览文件
 async function handlePreview(file: FileInfo) {
   if (!file || !file.id || !matterId.value || !token.value) return
 
   previewFileInfo.value = file
   previewUrl.value = previewFile(file.id, matterId.value, token.value)
 
-  // 根据屏幕宽度和设备类型设置预览宽度
-  const isMobile = window.innerWidth <= 768
+  const mobile = window.innerWidth <= 768
   if (isImageFile(file)) {
-    previewWidth.value = isMobile ? window.innerWidth - 32 : 900
+    previewWidth.value = mobile ? window.innerWidth - 32 : 900
   } else if (isPdfFile(file)) {
-    previewWidth.value = isMobile ? window.innerWidth - 32 : 1000
+    previewWidth.value = mobile ? window.innerWidth - 32 : 1000
   } else {
-    previewWidth.value = isMobile ? window.innerWidth - 32 : 800
+    previewWidth.value = mobile ? window.innerWidth - 32 : 800
   }
 
   if (isTextFile(file)) {
@@ -927,8 +1027,8 @@ async function handlePreview(file: FileInfo) {
 
 function isImageFile(file: FileInfo): boolean {
   const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp']
-  return imageTypes.includes(file.fileType || '') || 
-         /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(file.fileName || '')
+  return imageTypes.includes(file.fileType || '') ||
+    /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(file.fileName || '')
 }
 
 function isPdfFile(file: FileInfo): boolean {
@@ -938,12 +1038,12 @@ function isPdfFile(file: FileInfo): boolean {
 function isTextFile(file: FileInfo): boolean {
   const textTypes = ['text/plain', 'text/html', 'text/css', 'text/javascript', 'application/json', 'text/xml']
   return textTypes.includes(file.fileType || '') ||
-         /\.(txt|html|css|js|json|xml|md)$/i.test(file.fileName || '')
+    /\.(txt|html|css|js|json|xml|md)$/i.test(file.fileName || '')
 }
 
 async function handleDownload(file: FileInfo | null) {
   if (!file || !matterId.value || !token.value) return
-  
+
   try {
     await downloadFile(file.id, matterId.value, token.value, file.fileName)
     message.success('文件下载成功')
@@ -966,7 +1066,6 @@ async function handleDelete(file: FileInfo) {
   }
 }
 
-// 客户门户日期格式（不显示秒）
 function formatDate(date: string | undefined) {
   return formatDateTime(date, 'YYYY-MM-DD HH:mm')
 }
@@ -979,7 +1078,12 @@ function formatFileSize(bytes: number) {
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
 }
 
-// 使用统一的状态工具函数
+function formatCurrency(value: unknown) {
+  const amount = Number(value ?? 0)
+  if (Number.isNaN(amount)) return '0.00'
+  return amount.toFixed(2)
+}
+
 const getStatusColor = getMatterStatusColor
 const getTaskStatusColor = getTaskStatusColorUtil
 
@@ -993,13 +1097,11 @@ function goBack() {
   router.push('/portal')
 }
 
-// 窗口大小变化监听
 let resizeHandler: (() => void) | null = null
 
 onMounted(() => {
   loadMatterDetail()
-  
-  // 监听窗口大小变化
+
   resizeHandler = () => {
     windowWidth.value = window.innerWidth
   }
@@ -1016,68 +1118,161 @@ onUnmounted(() => {
 <style scoped>
 .matter-detail-container {
   min-height: 100vh;
-  background: var(--bg-secondary);
+  background: transparent;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .content {
-  padding: 32px 24px;
-  max-width: 1200px;
+  width: min(var(--shell-max-width), calc(100vw - 2 * var(--shell-gutter)));
   margin: 0 auto;
+  padding: 24px 0 110px;
 }
 
-.detail-card {
-  background: transparent;
-  padding: 0;
+.detail-shell {
+  display: grid;
+  gap: 18px;
 }
 
-.detail-card :deep(.ant-card) {
-  border-radius: var(--radius-md, 8px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid var(--border-color, #e8e8e8);
-  transition: all 0.3s ease;
+.hero-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 20px;
+  padding: 28px;
 }
 
-.detail-card :deep(.ant-card:hover) {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.detail-card :deep(.ant-card-head) {
-  background: linear-gradient(90deg, var(--bg-primary, #fff) 0%, var(--bg-secondary, #f5f5f5) 100%);
-  border-bottom: 2px solid var(--primary-color-light, #69c0ff);
-  padding: 12px 24px;
-}
-
-.detail-card :deep(.ant-card-head-title) {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary, #333);
-}
-
-/* 进度区域 */
-.progress-section {
-  display: flex;
-  flex-direction: column;
+.hero-copy {
+  display: grid;
   gap: 16px;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.02;
+}
+
+.hero-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 720px;
+}
+
+.hero-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hero-meta-item {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.hero-meta-item strong {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.hero-meta-item span {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.hero-side {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+
+.hero-status {
+  justify-self: start;
+  padding-inline: 12px !important;
+}
+
+.hero-progress-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 8px;
+  background: rgba(252, 251, 248, 0.82);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+}
+
+.hero-action-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 9, 24, 0.98) 0%, rgba(0, 33, 64, 0.96) 100%);
+  color: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-action-card strong {
+  color: #fff;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.hero-action-card p {
+  margin: 0;
+  line-height: 1.8;
+}
+
+.hero-action-btn {
+  margin-top: 4px;
+}
+
+.hero-progress-label,
+.panel-extra,
+.side-kicker {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.hero-progress-card strong {
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.hero-progress-foot {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.overview-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.detail-main,
+.detail-side {
+  display: grid;
+  gap: 18px;
+}
+
+.detail-block {
+  margin: 0;
+}
+
+.progress-panel,
+.fee-stack,
+.note-list,
+.activity-list,
+.snapshot-list {
+  display: grid;
+  gap: 14px;
 }
 
 .progress-item {
@@ -1086,35 +1281,146 @@ onUnmounted(() => {
   gap: 12px;
 }
 
-.progress-item .label {
-  color: #666;
-  min-width: 80px;
+.progress-item-bar {
+  align-items: flex-start;
 }
 
-/* 期限项 */
+.label {
+  min-width: 84px;
+  color: var(--text-secondary);
+}
+
+.progress-bar {
+  width: 100%;
+}
+
+.lead-lawyer {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(15, 23, 42, 0.1);
+}
+
+.lead-lawyer strong {
+  display: block;
+  margin: 6px 0 4px;
+  color: var(--text-primary);
+}
+
+.lead-lawyer p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.inline-tag {
+  margin-left: 8px;
+}
+
+.task-title {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .deadline-item {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 4px;
 }
 
 .deadline-title {
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .deadline-date {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 13px;
 }
 
-/* 主办律师 */
-.lead-lawyer {
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px dashed #e8e8e8;
+.activity-item,
+.snapshot-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.03);
 }
 
-/* 文件操作按钮 */
+.activity-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--accent-color);
+  box-shadow: 0 0 0 6px rgba(179, 138, 61, 0.08);
+}
+
+.activity-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.activity-copy strong,
+.snapshot-item strong {
+  color: var(--lex-primary);
+}
+
+.activity-copy p,
+.snapshot-item p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.activity-copy span,
+.snapshot-label {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.doc-icon {
+  font-size: 24px;
+  color: var(--primary-color);
+}
+
+.fee-item,
+.note-item {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.04);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+}
+
+.fee-item span,
+.note-item strong {
+  color: var(--text-secondary);
+}
+
+.fee-item strong {
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.fee-item-success strong {
+  color: var(--success-color);
+}
+
+.fee-item-warning strong {
+  color: var(--warning-color);
+}
+
+.note-item p {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.files-block {
+  margin-top: 4px;
+}
+
 .file-actions {
   flex-wrap: nowrap;
 }
@@ -1131,113 +1437,9 @@ onUnmounted(() => {
   font-size: 14px;
 }
 
+.upload-btn-text,
 .action-text {
-  display: inline;
-}
-
-/* 上传按钮 */
-.upload-btn-text {
   display: inline-block;
-}
-
-/* 进度条 */
-.progress-bar {
-  max-width: 100%;
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .progress-bar {
-    max-width: 100%;
-  }
-}
-
-/* 预览模态框 */
-:deep(.preview-modal-wrapper) {
-  .ant-modal {
-    margin: 0;
-    max-width: 100vw;
-    top: 0;
-    padding-bottom: 0;
-  }
-  
-  .ant-modal-content {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .ant-modal-body {
-    flex: 1;
-    overflow: auto;
-    padding: 16px;
-  }
-  
-  .ant-modal-footer {
-    padding: 12px 16px;
-    border-top: 1px solid #f0f0f0;
-  }
-}
-
-@media (min-width: 769px) {
-  :deep(.preview-modal-wrapper .ant-modal) {
-    margin: 0 auto;
-    top: 50px;
-    padding-bottom: 24px;
-  }
-  
-  :deep(.preview-modal-wrapper .ant-modal-content) {
-    height: auto;
-  }
-  
-  :deep(.preview-modal-wrapper .ant-modal-body) {
-    padding: 24px;
-  }
-}
-
-/* 上传模态框移动端优化 */
-:deep(.upload-modal-wrapper .ant-modal) {
-  margin: 0;
-  max-width: 100vw;
-  top: 0;
-  padding-bottom: 0;
-}
-
-:deep(.upload-modal-wrapper .ant-modal-content) {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-:deep(.upload-modal-wrapper .ant-modal-body) {
-  flex: 1;
-  overflow: auto;
-  padding: 16px;
-}
-
-:deep(.upload-modal-wrapper .ant-modal-footer) {
-  padding: 12px 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-@media (min-width: 769px) {
-  :deep(.upload-modal-wrapper .ant-modal) {
-    margin: 0 auto;
-    top: 50px;
-    padding-bottom: 24px;
-  }
-  
-  :deep(.upload-modal-wrapper .ant-modal-content) {
-    height: auto;
-  }
-  
-  :deep(.upload-modal-wrapper .ant-modal-body) {
-    padding: 24px;
-  }
-  
-  :deep(.upload-modal-wrapper .ant-modal-footer) {
-    padding: 10px 16px;
-  }
 }
 
 .preview-modal-footer {
@@ -1245,166 +1447,62 @@ onUnmounted(() => {
   justify-content: flex-end;
 }
 
-.preview-modal-footer :deep(.ant-space-item) {
-  flex: 1;
+@media (max-width: 1024px) {
+  .hero-panel,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .overview-grid,
+  .hero-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.preview-modal-footer :deep(.ant-btn) {
-  width: 100%;
-}
-
-/* 响应式设计 */
 @media (max-width: 768px) {
-  
   .content {
-    padding: 16px 12px;
+    padding: 18px 0 110px;
   }
-  
-  .detail-card :deep(.ant-card) {
-    margin-bottom: 16px;
+
+  .hero-panel {
+    padding: 22px;
   }
-  
-  .detail-card :deep(.ant-card-head) {
-    padding: 12px 16px;
+
+  .overview-grid,
+  .hero-meta {
+    grid-template-columns: 1fr;
   }
-  
-  .detail-card :deep(.ant-card-head-title) {
-    font-size: 14px;
+
+  .activity-item,
+  .snapshot-item {
+    grid-template-columns: 1fr;
   }
-  
-  .detail-card :deep(.ant-card-body) {
-    padding: 12px;
-  }
-  
-  /* 描述列表移动端优化 - 防止标签被截断 */
-  .detail-card :deep(.ant-descriptions) {
-    font-size: 13px;
-  }
-  
-  .detail-card :deep(.ant-descriptions-item-label) {
-    padding: 8px 8px !important;
-    min-width: 70px;
-    white-space: nowrap;
-  }
-  
-  .detail-card :deep(.ant-descriptions-item-content) {
-    padding: 8px 8px !important;
-    word-break: break-all;
-  }
-  
+
   .progress-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
   }
-  
-  .progress-item .label {
+
+  .label {
     min-width: auto;
   }
-  
-  /* 文件表格移动端优化 */
-  .detail-card :deep(.ant-table) {
-    font-size: 12px;
-  }
-  
-  .detail-card :deep(.ant-table-thead > tr > th) {
-    padding: 8px 6px;
-    font-size: 12px;
-  }
-  
-  .detail-card :deep(.ant-table-tbody > tr > td) {
-    padding: 8px 6px;
-  }
-  
-  /* 文件来源标签移动端 */
-  .detail-card :deep(.ant-tag) {
-    margin: 0;
-    padding: 0 4px;
-    font-size: 11px;
-  }
-  
-  /* 文件操作按钮移动端 - 只显示图标 */
+
   .file-actions {
-    flex-wrap: nowrap;
     gap: 2px !important;
   }
-  
+
   .action-btn {
     padding: 2px 4px !important;
-    min-width: auto !important;
+    min-width: 28px !important;
     height: 28px !important;
   }
-  
-  .action-btn :deep(.anticon) {
-    font-size: 14px;
-  }
-  
+
   .action-text {
     display: none;
   }
-  
-  /* 上传按钮移动端 */
+
   .upload-btn {
     width: 100%;
-  }
-  
-  .upload-btn-text {
-    display: inline;
-  }
-  
-  /* 费用统计移动端 */
-  .detail-card :deep(.ant-statistic-title) {
-    font-size: 12px;
-  }
-  
-  .detail-card :deep(.ant-statistic-content) {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-
-  
-  .back-btn {
-    padding: 4px 8px;
-  }
-  
-  .content {
-    padding: 12px 8px;
-  }
-  
-  .detail-card :deep(.ant-card-head) {
-    padding: 10px 12px;
-  }
-  
-  .detail-card :deep(.ant-card-body) {
-    padding: 12px;
-  }
-  
-  /* 文件表格超小屏 */
-  .detail-card :deep(.ant-table-thead > tr > th),
-  .detail-card :deep(.ant-table-tbody > tr > td) {
-    padding: 6px 2px;
-    font-size: 11px;
-  }
-  
-  /* 预览模态框超小屏 */
-  :deep(.preview-modal-wrapper .ant-modal-body) {
-    padding: 12px;
-  }
-  
-  :deep(.preview-modal-wrapper .ant-modal-footer) {
-    padding: 8px 12px;
-  }
-  
-  .preview-modal-footer :deep(.ant-btn) {
-    font-size: 14px;
-    height: 36px;
-  }
-
-  /* 为底部导航留出空间 */
-  .matter-detail-container {
-    padding-bottom: 70px;
   }
 }
 </style>

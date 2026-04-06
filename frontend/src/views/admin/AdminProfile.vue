@@ -51,6 +51,67 @@
       </div>
     </section>
 
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="section-kicker">Account Desk</span>
+        <h3>先确认身份信息，再做密码轮换</h3>
+        <p>个人中心的重点是确认账号身份、邮箱可用性和安全动作是否就绪，而不是在这里承载更多业务入口。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">资料完整度</span>
+        <strong>{{ profileReadiness }}</strong>
+        <p>用户名、真实姓名和邮箱当前补全程度。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">安全动作</span>
+        <strong>2 项</strong>
+        <p>密码修改与退出登录都在同一页面内完成。</p>
+      </article>
+    </section>
+
+    <section class="guide-grid dashboard-guide-grid">
+      <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
+        <div class="guide-card__head dashboard-guide-head">
+          <div>
+            <div class="section-kicker">
+              Admin Identity
+            </div>
+            <h3>账户视图</h3>
+          </div>
+        </div>
+        <div class="guide-points">
+          <div class="guide-point">
+            <span>01</span>
+            <strong>当前账号拥有后台治理权限，建议保持唯一责任人使用。</strong>
+          </div>
+          <div class="guide-point">
+            <span>02</span>
+            <strong>邮箱建议保持可用，便于接收系统通知和安全提醒。</strong>
+          </div>
+          <div class="guide-point">
+            <span>03</span>
+            <strong>密码变更后会立即退出当前会话，避免旧凭证继续使用。</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="guide-card dashboard-guide-card">
+        <div class="guide-card__head dashboard-guide-head">
+          <div>
+            <div class="section-kicker">
+              Security Rules
+            </div>
+            <h3>安全建议</h3>
+          </div>
+        </div>
+        <ul class="security-list">
+          <li>密码至少 8 位，并避免与其他系统复用。</li>
+          <li>修改密码后建议重新确认后台登录状态是否正常。</li>
+          <li>如发现异常登录，请立即更换密码并检查登录日志。</li>
+        </ul>
+      </article>
+    </section>
+
     <section class="profile-grid">
       <article class="profile-card identity-card">
         <div class="identity-hero">
@@ -198,6 +259,10 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const userInfo = computed<Partial<UserInfo>>(() => authStore.user || {})
+const profileReadiness = computed(() => {
+  const fields = [userInfo.value.username, userInfo.value.realName, userInfo.value.email].filter(Boolean).length
+  return `${fields}/3`
+})
 const activeTab = ref('password')
 const passwordFormRef = ref<FormInstance>()
 const changingPassword = ref(false)
@@ -262,12 +327,62 @@ const handleLogout = () => {
   gap: 18px;
 }
 
+.guide-card,
 .profile-card {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
+  background: rgba(252, 251, 248, 0.82);
+  border: 1px solid rgba(0, 9, 24, 0.05);
+  border-radius: 8px;
   box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
+}
+
+.guide-card,
+.profile-card {
+  padding: 20px;
+}
+
+.guide-card {
+  display: grid;
+  gap: 18px;
+}
+
+.guide-points {
+  display: grid;
+  gap: 12px;
+}
+
+.guide-point {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.03);
+  border: 1px solid var(--border-color-light);
+}
+
+.guide-point span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(179, 138, 61, 0.12);
+  border: 1px solid rgba(179, 138, 61, 0.14);
+  color: var(--accent-color-deep);
+  font-size: 12px;
+}
+
+.guide-point strong {
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.security-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+  line-height: 1.9;
 }
 
 .profile-grid {
@@ -276,43 +391,37 @@ const handleLogout = () => {
   gap: 18px;
 }
 
-.profile-card {
-  padding: 24px;
-}
-
 .identity-card {
   display: grid;
-  gap: 24px;
+  gap: 16px;
 }
 
 .identity-hero {
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(21, 33, 46, 0.08);
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color-light);
 }
 
 .profile-avatar {
   flex-shrink: 0;
-  color: #fff;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-light));
-  box-shadow: var(--shadow-sm);
+  color: var(--lex-primary-soft);
+  background: rgba(0, 33, 64, 0.08);
+  border: 1px solid rgba(0, 33, 64, 0.12);
 }
 
 .identity-kicker,
 .section-kicker {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 12px;
 }
 
 .identity-copy h3,
 .section-header h3 {
   margin: 0;
-  font-size: 28px;
+  font-size: 20px;
 }
 
 .identity-copy p,
@@ -331,10 +440,10 @@ const handleLogout = () => {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(21, 33, 46, 0.08);
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.03);
+  border: 1px solid var(--border-color-light);
 }
 
 .meta-item span {
@@ -356,12 +465,12 @@ const handleLogout = () => {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .password-form {
   max-width: 520px;
-  padding-top: 12px;
+  padding-top: 8px;
 }
 
 .password-actions {
@@ -386,7 +495,7 @@ const handleLogout = () => {
 
 @media (max-width: 640px) {
   .profile-card {
-    padding: 20px;
+    padding: 16px;
   }
 
   .meta-item {

@@ -3,30 +3,95 @@
     <section class="page-intro">
       <div>
         <div class="eyebrow">
-          通知管理
+          Notification Ops
         </div>
         <h2 class="editorial-title intro-title">
           通知记录
         </h2>
         <p class="intro-text">
-          查看短信、微信与邮件发送状态，定位失败原因，并按项目维度触发重试。
+          查看短信、微信与邮件发送状态，优先定位失败原因，再决定是否重试。
         </p>
       </div>
       <a-button @click="loadData">
         <template #icon>
           <ReloadOutlined />
         </template>
-        刷新
+        刷新数据
       </a-button>
     </section>
 
-    <section class="filter-panel">
-      <div class="panel-head">
-        <div>
-          <span class="panel-kicker">筛选与概览</span>
-          <h3>发送态势</h3>
+    <section class="stats-grid">
+      <article class="stats-card">
+        <span class="stats-label">总数</span>
+        <strong>{{ statistics.total }}</strong>
+        <p>当前筛选结果中的全部通知</p>
+      </article>
+      <article class="stats-card success">
+        <span class="stats-label">成功</span>
+        <strong>{{ statistics.success }}</strong>
+        <p>已完成发送并收到成功结果</p>
+      </article>
+      <article class="stats-card danger">
+        <span class="stats-label">失败</span>
+        <strong>{{ statistics.failed }}</strong>
+        <p>优先处理失败原因与重试</p>
+      </article>
+      <article class="stats-card info">
+        <span class="stats-label">待发送</span>
+        <strong>{{ statistics.pending }}</strong>
+        <p>仍在等待异步发送或回执</p>
+      </article>
+    </section>
+
+    <section class="channel-grid">
+      <article class="channel-card">
+        <div class="channel-title">短信</div>
+        <div class="channel-total">
+          {{ statisticsData?.byType?.SMS?.total || statisticsData?.sms?.total || 0 }}
         </div>
-        <p>按项目、渠道和状态定位异常，再决定是否触发重试。</p>
+        <p>成功 {{ statisticsData?.byType?.SMS?.success || statisticsData?.sms?.success || 0 }} / 失败 {{ statisticsData?.byType?.SMS?.failed || statisticsData?.sms?.failed || 0 }}</p>
+      </article>
+      <article class="channel-card">
+        <div class="channel-title">微信</div>
+        <div class="channel-total">
+          {{ statisticsData?.byType?.WECHAT?.total || statisticsData?.wechat?.total || 0 }}
+        </div>
+        <p>成功 {{ statisticsData?.byType?.WECHAT?.success || statisticsData?.wechat?.success || 0 }} / 失败 {{ statisticsData?.byType?.WECHAT?.failed || statisticsData?.wechat?.failed || 0 }}</p>
+      </article>
+      <article class="channel-card">
+        <div class="channel-title">邮件</div>
+        <div class="channel-total">
+          {{ statisticsData?.byType?.EMAIL?.total || statisticsData?.email?.total || 0 }}
+        </div>
+        <p>成功 {{ statisticsData?.byType?.EMAIL?.success || statisticsData?.email?.success || 0 }} / 失败 {{ statisticsData?.byType?.EMAIL?.failed || statisticsData?.email?.failed || 0 }}</p>
+      </article>
+    </section>
+
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Delivery Desk</span>
+        <h3>先看失败与待发送，再决定是否重试</h3>
+        <p>通知记录页的重点不是堆更多字段，而是优先暴露失败量、待发送量和渠道分布，帮助快速判断问题是在模板、通道还是接收侧。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">失败率</span>
+        <strong>{{ failureRate }}</strong>
+        <p>便于快速识别当前发送链路是否异常。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">可重试</span>
+        <strong>{{ retryableCount }}</strong>
+        <p>当前仍可继续重试的失败记录数量。</p>
+      </article>
+    </section>
+
+    <section class="filter-panel">
+      <div class="panel-head dashboard-panel-head">
+        <div>
+          <span class="panel-kicker">Filters</span>
+          <h3>筛选条件</h3>
+        </div>
+        <p>按项目、客户、渠道和状态快速定位异常通知。</p>
       </div>
 
       <a-form
@@ -58,15 +123,9 @@
             allow-clear
             style="width: 150px"
           >
-            <a-select-option value="SMS">
-              短信
-            </a-select-option>
-            <a-select-option value="WECHAT">
-              微信
-            </a-select-option>
-            <a-select-option value="EMAIL">
-              邮件
-            </a-select-option>
+            <a-select-option value="SMS">短信</a-select-option>
+            <a-select-option value="WECHAT">微信</a-select-option>
+            <a-select-option value="EMAIL">邮件</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="状态">
@@ -76,15 +135,9 @@
             allow-clear
             style="width: 120px"
           >
-            <a-select-option value="PENDING">
-              待发送
-            </a-select-option>
-            <a-select-option value="SUCCESS">
-              成功
-            </a-select-option>
-            <a-select-option value="FAILED">
-              失败
-            </a-select-option>
+            <a-select-option value="PENDING">待发送</a-select-option>
+            <a-select-option value="SUCCESS">成功</a-select-option>
+            <a-select-option value="FAILED">失败</a-select-option>
           </a-select>
         </a-form-item>
         <a-form-item label="时间范围">
@@ -97,10 +150,7 @@
         </a-form-item>
         <a-form-item class="filter-actions">
           <a-space>
-            <a-button
-              type="primary"
-              html-type="submit"
-            >
+            <a-button type="primary" html-type="submit">
               查询
             </a-button>
             <a-button @click="handleReset">
@@ -111,66 +161,21 @@
       </a-form>
     </section>
 
-    <section class="stats-grid">
-      <div class="stats-card">
-        <span class="stats-label">总数</span>
-        <strong>{{ statistics.total }}</strong>
-        <p>当前筛选范围内的全部通知记录。</p>
-      </div>
-      <div class="stats-card success">
-        <span class="stats-label">成功</span>
-        <strong>{{ statistics.success }}</strong>
-        <p>已完成发送并返回成功结果。</p>
-      </div>
-      <div class="stats-card danger">
-        <span class="stats-label">失败</span>
-        <strong>{{ statistics.failed }}</strong>
-        <p>优先关注失败原因与重试队列。</p>
-      </div>
-      <div class="stats-card info">
-        <span class="stats-label">待发送</span>
-        <strong>{{ statistics.pending }}</strong>
-        <p>仍在等待异步发送或回执确认。</p>
-      </div>
-    </section>
-
-    <section class="channel-grid">
-      <article class="channel-card">
-        <div class="channel-title">
-          短信
-        </div>
-        <div class="channel-total">
-          {{ statisticsData?.byType?.SMS?.total || statisticsData?.sms?.total || 0 }}
-        </div>
-        <p>成功 {{ statisticsData?.byType?.SMS?.success || statisticsData?.sms?.success || 0 }} / 失败 {{ statisticsData?.byType?.SMS?.failed || statisticsData?.sms?.failed || 0 }}</p>
-      </article>
-      <article class="channel-card">
-        <div class="channel-title">
-          微信
-        </div>
-        <div class="channel-total">
-          {{ statisticsData?.byType?.WECHAT?.total || statisticsData?.wechat?.total || 0 }}
-        </div>
-        <p>成功 {{ statisticsData?.byType?.WECHAT?.success || statisticsData?.wechat?.success || 0 }} / 失败 {{ statisticsData?.byType?.WECHAT?.failed || statisticsData?.wechat?.failed || 0 }}</p>
-      </article>
-      <article class="channel-card">
-        <div class="channel-title">
-          邮件
-        </div>
-        <div class="channel-total">
-          {{ statisticsData?.byType?.EMAIL?.total || statisticsData?.email?.total || 0 }}
-        </div>
-        <p>成功 {{ statisticsData?.byType?.EMAIL?.success || statisticsData?.email?.success || 0 }} / 失败 {{ statisticsData?.byType?.EMAIL?.failed || statisticsData?.email?.failed || 0 }}</p>
-      </article>
-    </section>
-
     <section class="table-panel">
+      <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
+        <div>
+          <span class="panel-kicker">Data</span>
+          <h3>发送记录表</h3>
+        </div>
+        <p>失败重试和错误信息都保留在同一张表里。</p>
+      </div>
+
       <a-table
         :columns="columns"
         :data-source="dataSource"
         :loading="loading || statisticsLoading"
         :pagination="pagination"
-        :scroll="{ x: 'max-content' }"
+        :scroll="{ x: 1100 }"
         row-key="id"
         @change="handleTableChange"
       >
@@ -277,18 +282,25 @@ const statistics = computed(() => {
 
   return stats
 })
+const failureRate = computed(() => {
+  if (!statistics.value.total) return '0%'
+  return `${Math.round((statistics.value.failed / statistics.value.total) * 100)}%`
+})
+const retryableCount = computed(() => dataSource.value.filter(record =>
+  record.status === 'FAILED' && (record.retryCount || 0) < (record.maxRetries || 3),
+).length)
 
 const columns = [
-  { title: 'ID', key: 'id', dataIndex: 'id', width: 80, align: 'center' },
-  { title: '项目ID', key: 'matterId', dataIndex: 'matterId', ellipsis: true, width: 180, align: 'center' },
-  { title: '通知类型', key: 'notificationType', width: 110, align: 'center' },
-  { title: '接收人', key: 'recipient', ellipsis: true, width: 150, align: 'center' },
-  { title: '状态', key: 'status', width: 100, align: 'center' },
-  { title: '发送时间', key: 'sentAt', dataIndex: 'sentAt', width: 180, align: 'center' },
-  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 180, align: 'center' },
-  { title: '重试信息', key: 'retryInfo', width: 220, align: 'center' },
-  { title: '错误信息', key: 'errorMessage', dataIndex: 'errorMessage', ellipsis: true, width: 200, align: 'center' },
-  { title: '操作', key: 'action', width: 100, align: 'center', fixed: 'right' },
+  { title: 'ID', key: 'id', dataIndex: 'id', width: 72, align: 'center' },
+  { title: '项目ID', key: 'matterId', dataIndex: 'matterId', ellipsis: true, width: 150, align: 'center' },
+  { title: '通知类型', key: 'notificationType', width: 100, align: 'center' },
+  { title: '接收人', key: 'recipient', ellipsis: true, width: 140, align: 'center' },
+  { title: '状态', key: 'status', width: 92, align: 'center' },
+  { title: '发送时间', key: 'sentAt', dataIndex: 'sentAt', width: 160, align: 'center' },
+  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
+  { title: '重试信息', key: 'retryInfo', width: 180, align: 'center' },
+  { title: '错误信息', key: 'errorMessage', dataIndex: 'errorMessage', ellipsis: true, width: 180, align: 'center' },
+  { title: '操作', key: 'action', width: 88, align: 'center' },
 ]
 
 async function loadData() {
@@ -431,32 +443,16 @@ onMounted(() => {
   gap: 18px;
 }
 
-.channel-card {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
+.stats-card.success strong {
+  color: var(--success-color);
 }
 
-.panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 16px;
-  margin-bottom: 18px;
+.stats-card.danger strong {
+  color: var(--error-color);
 }
 
-.panel-head h3 {
-  margin: 6px 0 0;
-  font-size: 22px;
-  color: var(--primary-color-dark);
-}
-
-.panel-head p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
+.stats-card.info strong {
+  color: var(--primary-color);
 }
 
 .panel-kicker {
@@ -482,15 +478,16 @@ onMounted(() => {
 
 .channel-grid {
   display: grid;
-  gap: 16px;
-}
-
-.channel-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .channel-card {
   padding: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
 .channel-title {
@@ -504,7 +501,7 @@ onMounted(() => {
 
 .channel-total {
   display: block;
-  color: var(--primary-color-dark);
+  color: var(--text-primary);
   font-size: 28px;
   line-height: 1.1;
 }
@@ -526,15 +523,6 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .channel-card {
-    padding: 16px;
-    border-radius: 20px;
-  }
-
-  .panel-head {
-    display: grid;
-  }
-
   .notification-filter-form {
     display: grid;
   }

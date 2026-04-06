@@ -113,3 +113,33 @@ export interface BrandConfig {
 export function getBrandConfig(): Promise<ApiResponse<BrandConfig>> {
   return request.get('/api/public/config/brand')
 }
+
+export interface SystemRuntimeInfo {
+  applicationName: string
+  productVersion: string
+  backendVersion: string
+  commitSha: string
+  buildTime: string
+  recommendedMode: string
+  serverTime: string
+}
+
+export interface DependencyStatusItem {
+  key: string
+  label: string
+  status: string
+  details: Record<string, string | number | boolean>
+}
+
+export interface SystemDependencyStatus {
+  overallStatus: string
+  items: DependencyStatusItem[]
+}
+
+export function getSystemRuntimeInfo(): Promise<ApiResponse<SystemRuntimeInfo>> {
+  return request.get('/api/admin/system/runtime-info')
+}
+
+export function getSystemDependencyStatus(): Promise<ApiResponse<SystemDependencyStatus>> {
+  return request.get('/api/admin/system/dependency-status')
+}

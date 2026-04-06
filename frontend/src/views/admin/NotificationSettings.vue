@@ -20,13 +20,69 @@
       </a-button>
     </section>
 
-    <section class="info-panel">
-      <a-alert
-        message="配置说明"
-        description="系统优先使用数据库中的通知配置；当数据库中不存在对应键时，才会回退到 application.yml 中的默认值。"
-        type="info"
-        show-icon
-      />
+    <section class="overview-grid">
+      <article class="config-card overview-card overview-card--wide">
+        <div class="overview-card__head">
+          <div>
+            <div class="panel-kicker">
+              Config Logic
+            </div>
+            <h3>配置生效逻辑</h3>
+          </div>
+          <a-tag color="processing">
+            即时生效
+          </a-tag>
+        </div>
+        <p>
+          系统优先读取数据库中的通知配置；当数据库缺少对应键时，才会回退到
+          <code>application.yml</code>
+          默认值。
+        </p>
+        <div class="overview-points">
+          <div class="overview-point">
+            <span>1</span>
+            <strong>先启用渠道，再完善凭证和模板映射。</strong>
+          </div>
+          <div class="overview-point">
+            <span>2</span>
+            <strong>保存后无需重启服务，立即进入发送链路。</strong>
+          </div>
+          <div class="overview-point">
+            <span>3</span>
+            <strong>模板内容建议在“通知模板管理”中继续细化。</strong>
+          </div>
+        </div>
+      </article>
+
+      <article class="config-card overview-card">
+        <div class="overview-card__head">
+          <div>
+            <div class="panel-kicker">
+              Governance
+            </div>
+            <h3>治理建议</h3>
+          </div>
+        </div>
+        <div class="governance-list">
+          <div class="governance-item">
+            <span>邮件</span>
+            <strong>优先确认 SMTP 与发件人名一致。</strong>
+          </div>
+          <div class="governance-item">
+            <span>短信</span>
+            <strong>服务商切换时同步更新签名和模板标识。</strong>
+          </div>
+          <div class="governance-item">
+            <span>微信</span>
+            <strong>模板 ID 可在这里设默认，也可下沉到模板库。</strong>
+          </div>
+        </div>
+        <router-link to="/admin/notification-templates">
+          <a-button block>
+            前往通知模板管理
+          </a-button>
+        </router-link>
+      </article>
     </section>
 
     <section class="stats-grid">
@@ -52,15 +108,46 @@
       </div>
     </section>
 
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Channel Desk</span>
+        <h3>先启用通道，再补凭证，再做模板映射</h3>
+        <p>这个页面更适合做渠道开关与基础凭证管理，复杂模板内容继续交给模板库，避免在配置页里混入过多文案治理。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">启用率</span>
+        <strong>{{ enabledChannelRate }}</strong>
+        <p>反映当前通知体系已上线的渠道比例。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">凭证完成度</span>
+        <strong>{{ credentialReadiness }}</strong>
+        <p>按邮件、短信、微信的关键凭证完整度估算。</p>
+      </article>
+    </section>
+
     <a-spin :spinning="loading">
+      <section class="section-shell-card">
+        <div class="section-head dashboard-section-head">
+          <div>
+            <span class="panel-kicker">Channel Matrix</span>
+            <h3>通知通道工作台</h3>
+          </div>
+          <p>每个通道都保持相同的阅读顺序：状态判断、关键凭证、模板接入、保存落地。</p>
+        </div>
+      </section>
+
       <section class="channel-grid">
-        <article class="channel-card">
+        <article class="channel-card channel-card--email">
           <div class="channel-header">
             <div>
               <div class="channel-kicker">
                 Email
               </div>
               <h3>邮件通知</h3>
+              <p class="channel-description">
+                用于项目变更通知、访问链接发送和正式邮件触达。
+              </p>
             </div>
             <div class="channel-switch">
               <a-switch
@@ -68,6 +155,17 @@
                 @change="handleEmailEnabledChange"
               />
               <span>{{ emailForm.enabled ? '已启用' : '已禁用' }}</span>
+            </div>
+          </div>
+
+          <div class="channel-meta">
+            <div class="channel-meta-item">
+              <span>接入状态</span>
+              <strong>{{ emailForm.smtpHost ? 'SMTP 已配置' : '等待配置' }}</strong>
+            </div>
+            <div class="channel-meta-item">
+              <span>发件身份</span>
+              <strong>{{ emailForm.fromName || emailForm.from || '未设置' }}</strong>
             </div>
           </div>
 
@@ -142,13 +240,16 @@
           </a-form>
         </article>
 
-        <article class="channel-card">
+        <article class="channel-card channel-card--sms">
           <div class="channel-header">
             <div>
               <div class="channel-kicker">
                 SMS
               </div>
               <h3>短信通知</h3>
+              <p class="channel-description">
+                适合高到达率提醒，注意模板字段和服务商控制台保持严格一致。
+              </p>
             </div>
             <div class="channel-switch">
               <a-switch
@@ -156,6 +257,17 @@
                 @change="handleSmsEnabledChange"
               />
               <span>{{ smsForm.enabled ? '已启用' : '已禁用' }}</span>
+            </div>
+          </div>
+
+          <div class="channel-meta">
+            <div class="channel-meta-item">
+              <span>服务商</span>
+              <strong>{{ smsForm.provider === 'tencent' ? '腾讯云' : '阿里云' }}</strong>
+            </div>
+            <div class="channel-meta-item">
+              <span>模板映射</span>
+              <strong>{{ smsForm.provider === 'tencent' ? (smsForm.tencent.templateId || '未设置') : (smsForm.aliyun.templateCode || '未设置') }}</strong>
             </div>
           </div>
 
@@ -269,13 +381,16 @@
           </a-form>
         </article>
 
-        <article class="channel-card">
+        <article class="channel-card channel-card--wechat">
           <div class="channel-header">
             <div>
               <div class="channel-kicker">
                 WeChat
               </div>
               <h3>微信通知</h3>
+              <p class="channel-description">
+                适合模板消息推送，默认模板可在这里维护，复杂内容建议交给模板库。
+              </p>
             </div>
             <div class="channel-switch">
               <a-switch
@@ -283,6 +398,17 @@
                 @change="handleWechatEnabledChange"
               />
               <span>{{ wechatForm.enabled ? '已启用' : '已禁用' }}</span>
+            </div>
+          </div>
+
+          <div class="channel-meta">
+            <div class="channel-meta-item">
+              <span>公众号凭证</span>
+              <strong>{{ wechatForm.appId ? '已填 AppID' : '待配置' }}</strong>
+            </div>
+            <div class="channel-meta-item">
+              <span>默认模板</span>
+              <strong>{{ wechatForm.templateId || '未设置' }}</strong>
             </div>
           </div>
 
@@ -383,6 +509,19 @@ const wechatForm = ref({
 const enabledChannelCount = computed(() =>
   [emailForm.value.enabled, smsForm.value.enabled, wechatForm.value.enabled].filter(Boolean).length,
 )
+const enabledChannelRate = computed(() => `${Math.round((enabledChannelCount.value / 3) * 100)}%`)
+const credentialReadiness = computed(() => {
+  let ready = 0
+  if (emailForm.value.smtpHost && emailForm.value.from) ready += 1
+  if (
+    (smsForm.value.provider === 'aliyun' && smsForm.value.aliyun.accessKeyId && smsForm.value.aliyun.templateCode)
+    || (smsForm.value.provider === 'tencent' && smsForm.value.tencent.secretId && smsForm.value.tencent.templateId)
+  ) {
+    ready += 1
+  }
+  if (wechatForm.value.appId && wechatForm.value.templateId) ready += 1
+  return `${ready}/3`
+})
 
 function findConfigValue(configs: SysConfigInfo[], key: string): string | null {
   const config = configs.find(c => c.configKey === key)
@@ -557,49 +696,131 @@ onMounted(() => {
   gap: 18px;
 }
 
-.info-panel,
-.channel-card {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-}
-
-.info-panel {
-  padding: 18px;
-}
-
+.overview-grid,
 .channel-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 
-.channel-card {
-  padding: 20px;
+.overview-grid {
+  grid-template-columns: 1.5fr 1fr;
 }
 
+.overview-card {
+  display: grid;
+  gap: 18px;
+}
+
+.overview-card__head,
 .channel-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 18px;
+  gap: 16px;
 }
 
+.overview-card h3,
+.channel-header h3 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  color: var(--text-primary);
+}
+
+.overview-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.overview-card--wide {
+  background: linear-gradient(180deg, rgba(252, 251, 248, 0.92), rgba(252, 251, 248, 0.82));
+}
+
+.panel-kicker,
 .channel-kicker {
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-tertiary);
-  margin-bottom: 6px;
+  letter-spacing: 0.12em;
+  color: var(--lex-accent-strong);
+  font-weight: 700;
 }
 
-.channel-header h3 {
-  margin: 0;
-  color: var(--primary-color-dark);
-  font-size: 22px;
+.overview-points,
+.governance-list {
+  display: grid;
+  gap: 12px;
+}
+
+.overview-point,
+.governance-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.03);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+}
+
+.overview-point span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(30, 64, 175, 0.1);
+  color: var(--primary-color);
+  font-weight: 700;
+  flex: none;
+}
+
+.overview-point strong,
+.governance-item strong {
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.governance-item {
+  display: grid;
+  gap: 6px;
+}
+
+.governance-item span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.section-shell-card,
+.channel-card {
+  padding: 22px;
+  background: rgba(252, 251, 248, 0.82);
+  border: 1px solid rgba(0, 9, 24, 0.05);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.channel-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.channel-card {
+  display: grid;
+  gap: 18px;
+}
+
+.channel-card--email {
+  background: linear-gradient(180deg, rgba(0, 33, 64, 0.08), rgba(252, 251, 248, 0.82) 28%), rgba(252, 251, 248, 0.82);
+}
+
+.channel-card--sms {
+  background: linear-gradient(180deg, rgba(179, 138, 61, 0.1), rgba(252, 251, 248, 0.82) 28%), rgba(252, 251, 248, 0.82);
+}
+
+.channel-card--wechat {
+  background: linear-gradient(180deg, rgba(63, 111, 77, 0.1), rgba(252, 251, 248, 0.82) 28%), rgba(252, 251, 248, 0.82);
 }
 
 .channel-switch {
@@ -607,6 +828,37 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   color: var(--text-secondary);
+}
+
+.channel-description {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.channel-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.channel-meta-item {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(0, 9, 24, 0.03);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+}
+
+.channel-meta-item span {
+  display: block;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.channel-meta-item strong {
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
 .channel-form :deep(.ant-form-item:last-child) {
@@ -621,25 +873,43 @@ onMounted(() => {
   color: var(--text-tertiary);
 }
 
+.field-note {
+  margin-top: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
 .inline-alert {
   margin-bottom: 16px;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
   .channel-grid {
     grid-template-columns: 1fr;
   }
 }
 
+@media (max-width: 1100px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
-  .info-panel,
+  .section-shell-card,
   .channel-card {
     padding: 16px;
-    border-radius: 20px;
+    border-radius: 22px;
   }
 
+  .overview-card__head,
   .channel-header {
     flex-direction: column;
+  }
+
+  .channel-meta {
+    grid-template-columns: 1fr;
   }
 }
 </style>

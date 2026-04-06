@@ -1,5 +1,8 @@
 <template>
-  <a-layout class="admin-layout">
+  <a-layout
+    class="admin-layout"
+    :style="layoutStyle"
+  >
     <div
       v-if="isMobile && !collapsed"
       class="mobile-overlay"
@@ -7,7 +10,7 @@
     />
     <a-layout-sider
       v-model:collapsed="collapsed"
-      :width="240"
+      :width="expandedSidebarWidth"
       theme="dark"
       class="sider"
       :class="{ 'mobile-sidebar': isMobile }"
@@ -17,7 +20,7 @@
           v-if="!collapsed"
           class="logo-content"
         >
-          <div class="logo-icon">
+          <div class="logo-brand-mark">
             <img
               :src="logoUrl"
               alt="Logo"
@@ -25,11 +28,9 @@
             >
           </div>
           <div class="logo-text">
-            <span class="logo-kicker">管理工作台</span>
-            <a-typography-title :level="4">
-              {{ appShortName }}
-            </a-typography-title>
-            <a-typography-text>{{ appShortNameEn || appShortName }}</a-typography-text>
+            <span class="logo-kicker">Admin Console</span>
+            <strong>{{ appShortName || '客户服务系统' }}</strong>
+            <span class="logo-caption">{{ appShortNameEn || 'Law Firm Clients' }}</span>
           </div>
         </div>
         <div
@@ -55,9 +56,9 @@
         v-if="!collapsed"
         class="sider-footer"
       >
-        <span class="sider-footer-label">统一管理空间</span>
+        <span class="sider-footer-label">Workspace</span>
         <strong>{{ appShortName || '客户服务系统' }}</strong>
-        <p>项目、文件、通知与系统配置在同一控制台内完成。</p>
+        <p>项目、文件、通知、配置统一在一套控制台内处理。</p>
       </div>
     </a-layout-sider>
     <a-layout class="main-layout">
@@ -119,10 +120,10 @@
           </a-button>
 
           <div class="header-title-block">
-            <span class="header-eyebrow">管理后台</span>
+            <span class="header-eyebrow">Operations Console</span>
             <div class="header-title-row">
               <span class="page-title">{{ currentPageTitle }}</span>
-              <span class="header-caption">统一查看项目、通知、文件与系统配置</span>
+              <span class="header-caption">项目、通知、文件和系统配置统一控制</span>
               <span class="header-status-pill">{{ headerStatusLabel }}</span>
             </div>
           </div>
@@ -172,9 +173,15 @@
           </a-space>
         </div>
       </a-layout-header>
-      <a-layout-content class="content">
-        <div class="content-wrapper fade-in">
-          <router-view />
+      <a-layout-content
+        id="main-content"
+        class="content"
+        tabindex="-1"
+      >
+        <div class="content-shell fade-in">
+          <div class="content-wrapper">
+            <router-view />
+          </div>
         </div>
       </a-layout-content>
     </a-layout>
@@ -199,6 +206,8 @@ import {
   ToolOutlined,
   UpCircleOutlined,
   SafetyCertificateOutlined,
+  InfoCircleOutlined,
+  CompassOutlined,
 } from '@ant-design/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { Modal } from 'ant-design-vue'
@@ -247,6 +256,17 @@ const headerStatusLabel = computed(() => {
 
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 const isMobile = computed(() => windowWidth.value <= 768)
+const expandedSidebarWidth = computed(() => (windowWidth.value <= 1024 ? 200 : 240))
+const currentSidebarWidth = computed(() => {
+  if (isMobile.value) {
+    return 0
+  }
+  return collapsed.value ? 80 : expandedSidebarWidth.value
+})
+const layoutStyle = computed(() => ({
+  '--sidebar-width': `${currentSidebarWidth.value}px`,
+  '--sidebar-expanded-width': `${expandedSidebarWidth.value}px`,
+}))
 
 let resizeHandler: (() => void) | null = null
 
@@ -517,6 +537,18 @@ const menuItems: MenuProps['items'] = [
     title: '文件管理',
   },
   {
+    key: '/admin/setup',
+    icon: () => h(CompassOutlined),
+    label: '首次初始化',
+    title: '首次初始化',
+  },
+  {
+    key: '/admin/system-info',
+    icon: () => h(InfoCircleOutlined),
+    label: '系统信息',
+    title: '系统信息',
+  },
+  {
     key: '/admin/letter-verifications',
     icon: () => h(SafetyCertificateOutlined),
     label: '函件验证',
@@ -587,11 +619,11 @@ async function handleLogout() {
 <style>
 .admin-layout {
   min-height: 100vh;
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 .fade-in {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.24s linear;
 }
 
 @keyframes fadeIn {
@@ -609,21 +641,17 @@ async function handleLogout() {
 <style scoped>
 .admin-layout {
   position: relative;
-  background:
-    radial-gradient(circle at top right, rgba(63, 109, 153, 0.14), transparent 26%),
-    radial-gradient(circle at bottom left, rgba(201, 164, 76, 0.12), transparent 18%),
-    var(--bg-secondary);
+  background: transparent;
 }
 
 .update-banner {
-  background: linear-gradient(90deg, rgba(24, 58, 90, 0.96) 0%, rgba(49, 92, 130, 0.94) 100%);
-  color: #fff;
-  padding: 12px 28px;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(196, 160, 92, 0.16);
+  width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
+  margin: 20px auto 0;
+  padding: 14px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(179, 138, 61, 0.2);
+  background: rgba(251, 246, 232, 0.92);
+  box-shadow: var(--shadow-xs);
 }
 
 .update-content {
@@ -634,61 +662,53 @@ async function handleLogout() {
 }
 
 .update-icon {
-  font-size: 20px;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  font-size: 16px;
+  color: var(--accent-color-deep);
 }
 
 .update-text {
   flex: 1;
   font-size: 14px;
+  color: var(--text-primary);
 }
 
 .update-text strong {
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .current-version {
-  opacity: 0.8;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .update-banner :deep(.ant-btn) {
-  border-color: rgba(255, 255, 255, 0.5);
-  color: #fff;
+  border-color: rgba(15, 23, 42, 0.12);
+  color: var(--text-primary);
 }
 
 .update-banner :deep(.ant-btn:hover) {
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-color-light);
+  background: rgba(252, 251, 248, 1);
 }
 
 .update-banner :deep(.ant-btn-primary) {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.update-banner :deep(.ant-btn-primary:hover) {
-  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
 }
 
 .sider {
-  background: linear-gradient(180deg, rgba(10, 24, 37, 0.98) 0%, rgba(16, 39, 61, 0.98) 100%) !important;
-  box-shadow: none;
+  background:
+    linear-gradient(180deg, rgba(0, 9, 24, 0.98) 0%, rgba(0, 19, 37, 0.98) 100%) !important;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   height: 100vh;
-  width: 240px;
+  width: var(--sidebar-expanded-width);
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 100;
-  transition: width 0.2s;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  transition: width 0.24s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .sider.ant-layout-sider-collapsed {
@@ -701,63 +721,47 @@ async function handleLogout() {
   height: 100%;
 }
 
-.sider::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sider::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sider::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-}
-
-.sider::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
 .logo {
-  min-height: 108px;
+  min-height: 92px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, rgba(15, 35, 53, 0.92) 0%, rgba(17, 41, 63, 0.72) 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.3s ease;
-  position: relative;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
-}
-
-.logo::after {
-  content: '';
-  position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(196, 160, 92, 0), rgba(196, 160, 92, 0.44), rgba(196, 160, 92, 0));
 }
 
 .logo-content {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 24px 18px;
+  gap: 14px;
+  padding: 20px 18px 18px;
   width: 100%;
 }
 
+.logo-brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(179, 138, 61, 0.16));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
 .logo-image {
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
 }
 
 .logo-image-collapsed {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
   display: block;
 }
@@ -770,25 +774,29 @@ async function handleLogout() {
 
 .logo-kicker {
   display: inline-block;
-  margin-bottom: 6px;
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+  font-size: 11px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(179, 138, 61, 0.84);
+  letter-spacing: 0.14em;
+  font-weight: 700;
 }
 
-.logo-text :deep(h4) {
-  color: #fff !important;
-  margin: 0 !important;
-  line-height: 1.25 !important;
+.logo-text strong {
+  display: block;
+  margin-bottom: 2px;
+  color: #fff;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.logo-caption {
+  display: block;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.logo-text :deep(.ant-typography) {
-  color: rgba(255, 255, 255, 0.62) !important;
-  font-size: 12px;
 }
 
 .logo-collapsed {
@@ -801,30 +809,29 @@ async function handleLogout() {
 .admin-menu {
   flex: 1;
   border-right: none;
-  padding: 18px 10px 20px;
+  padding: 18px 10px 12px;
   background: transparent !important;
 }
 
 .admin-menu :deep(.ant-menu-item) {
-  margin: 4px 6px;
-  border-radius: 16px;
-  height: 50px;
-  line-height: 50px;
-  transition: all 0.2s ease;
+  margin: 6px 4px;
+  border-radius: 6px;
+  height: 44px;
+  line-height: 44px;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.78) !important;
   font-weight: 500;
 }
 
 .admin-menu :deep(.ant-menu-item:hover) {
-  background: rgba(255, 255, 255, 0.08) !important;
-  transform: translateX(2px);
+  background: rgba(255, 255, 255, 0.06) !important;
 }
 
 .admin-menu :deep(.ant-menu-item-selected) {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(179, 138, 61, 0.18), rgba(179, 138, 61, 0.1)) !important;
+  border: 0;
   color: #fff !important;
+  box-shadow: inset 0 0 0 1px rgba(179, 138, 61, 0.18);
 }
 
 .admin-menu :deep(.ant-menu-item-selected::after) {
@@ -832,16 +839,15 @@ async function handleLogout() {
 }
 
 .admin-menu :deep(.ant-menu-item-selected .anticon) {
-  color: var(--accent-color) !important;
+  color: #fff !important;
 }
 
 .sider-footer {
-  margin: 10px 18px 20px;
-  padding: 18px 16px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  margin: 12px;
+  padding: 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.8);
 }
 
@@ -850,7 +856,7 @@ async function handleLogout() {
   margin-bottom: 6px;
   color: rgba(255, 255, 255, 0.48);
   font-size: 10px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
@@ -866,18 +872,14 @@ async function handleLogout() {
   margin: 0;
   color: rgba(255, 255, 255, 0.64);
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .main-layout {
-  margin-left: 240px;
-  transition: margin-left 0.2s;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.24s ease;
   min-height: 100vh;
   background: transparent !important;
-}
-
-.admin-layout .sider.ant-layout-sider-collapsed ~ .main-layout {
-  margin-left: 80px;
 }
 
 .header {
@@ -886,34 +888,33 @@ async function handleLogout() {
   position: sticky;
   top: 0;
   z-index: 99;
+  border-bottom: 0;
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-height: 92px;
-  width: min(var(--shell-max-width), calc(100vw - 240px - 2 * var(--shell-gutter)));
+  gap: 12px;
+  min-height: 84px;
+  width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
   margin: 0 auto;
-  padding: 18px 0 10px;
+  padding: 18px 0 12px;
 }
 
 .collapse-btn {
-  color: var(--text-primary);
-  font-size: 18px;
-  transition: all 0.2s ease;
+  color: var(--lex-primary);
+  font-size: 16px;
   cursor: pointer;
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.78) !important;
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(16px);
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(252, 251, 248, 0.86) !important;
+  border: 1px solid var(--border-color-light);
 }
 
 .collapse-btn:hover {
-  color: var(--primary-color);
-  background: rgba(255, 255, 255, 0.92) !important;
+  color: var(--accent-color-deep);
+  background: rgba(252, 251, 248, 1) !important;
 }
 
 .header-title-block {
@@ -922,11 +923,12 @@ async function handleLogout() {
 
 .header-eyebrow {
   display: inline-block;
-  margin-bottom: 8px;
-  color: var(--text-tertiary);
-  font-size: 11px;
+  margin-bottom: 6px;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
+  font-weight: 700;
 }
 
 .header-title-row {
@@ -937,30 +939,30 @@ async function handleLogout() {
 }
 
 .page-title {
-  font-size: 30px;
-  font-weight: 600;
-  color: var(--primary-color-dark);
-  line-height: 1.1;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--lex-primary);
+  line-height: 1.3;
+  font-family: var(--font-heading);
 }
 
 .header-caption {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .header-status-pill {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 30px;
+  padding: 0 10px;
   border-radius: 999px;
-  background: rgba(196, 160, 92, 0.12);
-  border: 1px solid rgba(196, 160, 92, 0.18);
+  background: rgba(179, 138, 61, 0.12);
+  border: 1px solid rgba(179, 138, 61, 0.12);
   color: var(--accent-color-deep);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .header-actions {
@@ -972,18 +974,16 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.76) !important;
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  background: rgba(252, 251, 248, 0.86) !important;
+  border: 1px solid var(--border-color-light);
+  border-radius: 999px;
   cursor: pointer;
-  min-height: 46px;
-  backdrop-filter: blur(14px);
+  min-height: 40px;
 }
 
 .header-btn:hover {
-  color: var(--primary-color);
-  background: rgba(255, 255, 255, 0.92) !important;
+  color: var(--accent-color-deep);
+  background: rgba(252, 251, 248, 1) !important;
 }
 
 .header-actions :deep(.ant-badge) {
@@ -1000,26 +1000,29 @@ async function handleLogout() {
 }
 
 .content {
-  padding: 0 0 24px;
+  padding: 4px 0 28px;
   min-height: calc(100vh - 120px);
 }
 
-.content-wrapper {
-  width: min(var(--shell-max-width), calc(100vw - 240px - 2 * var(--shell-gutter)));
+.content-shell {
+  width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid var(--border-color);
-  border-radius: 26px;
+  min-height: calc(100vh - 140px);
+}
+
+.content-wrapper {
+  background: rgba(252, 251, 248, 0.84);
+  border: 1px solid rgba(0, 9, 24, 0.06);
+  border-radius: 8px;
   padding: 24px;
-  min-height: calc(100vh - 160px);
-  box-shadow: var(--shadow-md);
-  backdrop-filter: blur(22px);
+  min-height: calc(100vh - 140px);
+  box-shadow: var(--shadow-sm);
 }
 
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(2, 6, 23, 0.45);
   z-index: 999;
 }
 
@@ -1028,21 +1031,8 @@ async function handleLogout() {
 }
 
 @media (max-width: 1024px) {
-  .sider {
-    width: 200px !important;
-  }
-
-  .main-layout {
-    margin-left: 200px;
-  }
-
-  .admin-layout :deep(.ant-layout-sider-collapsed) ~ .main-layout {
-    margin-left: 80px;
-  }
-
-  .header-content,
-  .content-wrapper {
-    width: min(var(--shell-max-width), calc(100vw - 200px - 2 * 20px));
+  .header-title-row {
+    gap: 10px;
   }
 }
 
@@ -1068,10 +1058,20 @@ async function handleLogout() {
     transform: translateX(-100%) !important;
   }
 
+  .header {
+    padding-top: 0;
+  }
+
+  .update-banner,
+  .header-content,
+  .content-shell {
+    width: min(var(--shell-max-width), calc(100vw - 2 * var(--shell-gutter)));
+  }
+
   .header-content {
-    width: min(var(--shell-max-width), calc(100vw - 2 * 16px));
-    padding: 14px 0 8px;
-    min-height: 76px;
+    min-height: 64px;
+    padding: 16px 0 10px;
+    align-items: flex-start;
   }
 
   .header-caption,
@@ -1083,19 +1083,15 @@ async function handleLogout() {
     font-size: 20px;
   }
 
-  .content {
-    padding-bottom: 20px;
-  }
-
   .content-wrapper {
-    width: min(var(--shell-max-width), calc(100vw - 2 * 16px));
-    border-radius: 20px;
-    padding: 16px;
-    min-height: calc(100vh - 128px);
+    padding: 18px;
+    min-height: calc(100vh - 104px);
   }
 
   .update-banner {
-    padding: 10px 16px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 8px;
   }
 }
 </style>

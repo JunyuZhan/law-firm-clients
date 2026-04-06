@@ -152,7 +152,7 @@ describe('AppHeader', () => {
 
     expect(wrapper.find('.logo-section').exists()).toBe(true)
     expect(wrapper.find('.logo-text h1').text().trim()).toBe('北京某某律师事务所')
-    expect(wrapper.find('.logo-text p').text().trim()).toBe('客户服务系统')
+    expect(wrapper.find('.logo-text p').text().trim()).toBe(appConfigStore.appShortName || '客户服务系统')
   })
 
   it('does not render logo section for detail variant', () => {

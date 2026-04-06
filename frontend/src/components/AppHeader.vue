@@ -1,16 +1,15 @@
 <template>
-  <a-layout-header
+  <header
     class="app-header"
     :class="[variant, variant === 'detail' ? 'has-welcome' : '']"
   >
-    <div class="header-content">
-      <!-- 左侧：返回按钮或Logo -->
+    <div class="header-backdrop" />
+    <div class="header-content section-shell">
       <div class="header-left">
         <slot name="left">
-          <!-- 返回按钮（默认） -->
           <a-button
             v-if="showBack"
-            type="text"
+            type="default"
             class="header-btn back-btn"
             @click="$emit('back')"
           >
@@ -25,36 +24,38 @@
         </slot>
       </div>
 
-      <!-- 中间：标题或Logo区域 -->
       <div class="header-center">
         <slot name="center">
-          <!-- Logo（默认） -->
           <div
-            v-if="variant === 'portal'"
+            v-if="variant === 'portal' && !title"
             class="logo-section"
           >
-            <div class="logo-icon-wrapper">
-              <div class="logo-icon">
-                <img
-                  :src="logoUrl"
-                  alt="Logo"
-                  class="logo-image"
-                >
-              </div>
+            <div class="logo-icon">
+              <img
+                :src="logoUrl"
+                alt="Logo"
+                class="logo-image"
+              >
             </div>
             <div class="logo-text">
+              <span class="brand-kicker">Secure Portal</span>
               <h1>{{ lawFirmName }}</h1>
-              <p>客户服务系统</p>
+              <p>{{ title || portalSystemLabel }}</p>
             </div>
           </div>
 
-          <!-- 页面标题（默认） -->
           <div
             v-else-if="title"
             class="title-section"
           >
             <div
-              v-if="welcomeText"
+              v-if="variant === 'portal'"
+              class="welcome-text"
+            >
+              {{ lawFirmName }}
+            </div>
+            <div
+              v-else-if="welcomeText"
               class="welcome-text"
             >
               {{ welcomeText }}
@@ -62,29 +63,21 @@
             <h1 class="page-title">
               {{ title }}
             </h1>
+            <p
+              v-if="variant !== 'default'"
+              class="page-caption"
+            >
+              {{ variant === 'portal' ? portalSubtitle : detailSubtitle }}
+            </p>
           </div>
         </slot>
       </div>
 
-      <!-- 右侧：操作按钮 -->
       <div class="header-right">
         <slot name="right">
-          <!-- 移动端菜单按钮 -->
-          <a-button
-            v-if="showMobileMenu"
-            type="text"
-            class="header-btn mobile-menu-btn"
-            @click="$emit('menu-click')"
-          >
-            <template #icon>
-              <MenuOutlined />
-            </template>
-          </a-button>
-
-          <!-- 管理员入口按钮 -->
           <a-button
             v-if="showAdminButton"
-            type="text"
+            type="default"
             class="header-btn admin-link"
             :title="'管理员入口'"
             @click="$emit('admin-click')"
@@ -93,10 +86,21 @@
               <SettingOutlined />
             </template>
           </a-button>
+
+          <a-button
+            v-if="showMobileMenu"
+            type="default"
+            class="header-btn mobile-menu-btn"
+            @click="$emit('menu-click')"
+          >
+            <template #icon>
+              <MenuOutlined />
+            </template>
+          </a-button>
         </slot>
       </div>
     </div>
-  </a-layout-header>
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -115,7 +119,16 @@ interface Props {
   showAdminButton?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  variant: 'default',
+  title: '',
+  welcomeText: '',
+  showBack: false,
+  showBackText: false,
+  backText: '返回',
+  showMobileMenu: false,
+  showAdminButton: false,
+})
 
 defineEmits<{
   (e: 'back'): void
@@ -123,335 +136,230 @@ defineEmits<{
   (e: 'admin-click'): void
 }>()
 
-// 从全局配置 store 获取配置
 const appConfigStore = useAppConfigStore()
 const logoUrl = computed(() => appConfigStore.logoUrl)
-const lawFirmName = computed(() => appConfigStore.lawFirmName)
+const lawFirmName = computed(() => appConfigStore.lawFirmName || '律师事务所')
+const portalSystemLabel = computed(() => appConfigStore.appShortName || '客户服务系统')
+const portalSubtitle = computed(() => appConfigStore.appSlogan || '客户服务系统')
+const detailSubtitle = computed(() => '安全访问、进度追踪与受控文件分发')
 </script>
 
 <style scoped>
 .app-header {
-  background:
-    linear-gradient(135deg, rgba(12, 27, 43, 0.98) 0%, rgba(18, 44, 68, 0.96) 44%, rgba(34, 74, 110, 0.94) 100%) !important;
-  padding: 0;
-  box-shadow: 0 18px 48px rgba(10, 20, 30, 0.16);
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 100;
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(196, 160, 92, 0.18);
-  min-height: 94px;
-  height: auto;
-  line-height: normal !important;
-  overflow: hidden;
+  padding: 0;
+  background: transparent;
 }
 
-.app-header::before,
-.app-header::after {
-  content: '';
+.header-backdrop {
   position: absolute;
+  inset: 0;
+  background: rgba(249, 247, 242, 0.72);
+  backdrop-filter: blur(var(--backdrop-blur));
+  border-bottom: 1px solid rgba(0, 9, 24, 0.06);
   pointer-events: none;
 }
 
-.app-header::before {
-  inset: 0;
-  background:
-    radial-gradient(circle at 14% 18%, rgba(196, 160, 92, 0.12), transparent 24%),
-    radial-gradient(circle at 86% 0%, rgba(98, 137, 173, 0.16), transparent 26%);
-}
-
-.app-header::after {
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(196, 160, 92, 0) 0%, rgba(196, 160, 92, 0.5) 50%, rgba(196, 160, 92, 0) 100%);
-}
-
 .header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 32px;
-  min-height: 94px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
   position: relative;
-  z-index: 1;
-}
-
-/* 左侧区域 */
-.header-left {
-  display: flex;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  gap: 18px;
+  padding: 16px 0;
 }
 
-/* 中间区域 */
-.header-center {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0;
+.app-header.has-welcome .header-content {
+  min-height: 82px;
 }
 
-/* 右侧区域 */
+.header-left,
 .header-right {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  min-width: fit-content;
 }
 
-/* Logo 样式（Portal variant） */
+.header-center {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
 .logo-section {
   display: flex;
   align-items: center;
   gap: 18px;
-}
-
-.logo-icon-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
+  min-width: 0;
 }
 
 .logo-icon {
+  width: 62px;
+  height: 62px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 58px;
-  height: 58px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-  border-radius: 16px;
-  transition: all 0.3s ease;
-  padding: 8px;
-  border: 1px solid rgba(196, 160, 92, 0.24);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.04);
-}
-
-.logo-icon:hover {
-  transform: translateY(-1px);
-  border-color: var(--accent-color);
-  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.18);
-  background: linear-gradient(180deg, rgba(196, 160, 92, 0.1), rgba(255, 255, 255, 0.03));
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .logo-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  display: block;
 }
 
 .logo-text {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  gap: 4px !important;
+  min-width: 0;
+}
+
+.brand-kicker {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: var(--lex-accent-strong);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .logo-text h1 {
-  font-size: 19px !important;
-  font-weight: 600 !important;
-  color: #fff !important;
-  margin: 0 !important;
-  line-height: 1.2 !important;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--lex-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .logo-text p {
-  font-size: 12px !important;
-  color: rgba(255, 255, 255, 0.72) !important;
-  margin: 0 !important;
-  font-weight: 500 !important;
-  line-height: 1.4 !important;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* 标题样式（Detail variant） */
 .title-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   min-width: 0;
+  display: grid;
+  gap: 4px;
 }
 
 .welcome-text {
-  color: rgba(255, 255, 255, 0.74);
-  font-size: 13px;
-  font-weight: 400;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
   line-height: 1.5;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  letter-spacing: 0.04em;
-}
-
-/* Detail variant 时的header高度优化 */
-.app-header.has-welcome {
-  min-height: 120px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .page-title {
-  color: #fff;
-  font-size: 24px;
-  font-weight: 600;
   margin: 0;
-  line-height: 1.2;
+  font-size: 20px;
+  line-height: 1.3;
+  color: var(--lex-primary);
 }
 
-/* Header 按钮通用样式 */
+.page-caption {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .header-btn {
-  color: rgba(255, 255, 255, 0.88) !important;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  padding: 9px;
-  min-width: 42px;
-  min-height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  min-width: 40px;
+  min-height: 40px;
+  padding-inline: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color-light);
+  background: rgba(252, 251, 248, 0.8) !important;
+  color: var(--lex-primary) !important;
 }
 
 .header-btn:hover {
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(196, 160, 92, 0.24);
-}
-
-.back-btn {
-  flex-shrink: 0;
+  background: rgba(252, 251, 248, 1) !important;
+  color: var(--accent-color-deep) !important;
+  transform: translateY(-1px);
 }
 
 .back-btn-text {
   margin-left: 4px;
-  white-space: nowrap;
 }
 
-.mobile-menu-btn {
-  font-size: 20px;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.admin-link {
-  padding: 8px;
-  border-radius: 8px;
-}
-
-/* 响应式 - 移动端 */
 @media (max-width: 768px) {
-  .app-header {
-    min-height: 70px;
-  }
-
-  .app-header.has-welcome {
-    min-height: 100px;
-  }
-
   .header-content {
-    padding: 0 16px;
-    min-height: 70px;
+    min-height: 56px;
+    gap: 12px;
+    padding: 12px 0;
   }
 
-  .logo-section {
-    gap: 12px;
+  .app-header.has-welcome .header-content {
+    min-height: 72px;
   }
 
   .logo-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 52px;
+    height: 52px;
   }
 
   .logo-text h1 {
-    font-size: 17px;
+    font-size: 16px;
   }
 
+  .brand-kicker,
   .logo-text p {
-    font-size: 10px;
+    display: none;
   }
 
   .title-section {
     gap: 2px;
   }
 
+  .welcome-text,
+  .page-caption {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .welcome-text {
-    font-size: 12px;
-    line-height: 1.4;
+    font-size: 10px;
+    letter-spacing: 0.1em;
   }
 
   .page-title {
     font-size: 18px;
   }
 
-  .back-btn-text {
+  .page-caption {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .header-btn {
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .back-btn-text,
+  .admin-link-text {
     display: none;
   }
 
-  .admin-link {
-    display: none;
-  }
-
+  .admin-link,
   .mobile-menu-btn {
     display: inline-flex !important;
-    color: #fff !important;
-  }
-}
-
-/* 小屏手机额外优化 */
-@media (max-width: 480px) {
-  .header-content {
-    padding: 0 12px;
-    min-height: 70px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .app-header.has-welcome {
-    min-height: 90px;
-  }
-
-  .logo-icon {
-    width: 36px;
-    height: 36px;
-    padding: 6px;
-  }
-
-  .logo-text h1 {
-    font-size: 16px;
-  }
-
-  .welcome-text {
-    font-size: 11px;
-    line-height: 1.3;
-  }
-
-  .page-title {
-    font-size: 16px;
-  }
-
-  .back-btn-text {
-    display: none;
-  }
-
-  .admin-link {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: inline-flex !important;
-    color: #fff !important;
   }
 }
 </style>

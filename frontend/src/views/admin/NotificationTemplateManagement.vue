@@ -32,24 +32,43 @@
     </section>
 
     <section class="guide-panel">
-      <a-alert
-        type="info"
-        show-icon
-        closable
-      >
-        <template #message>
-          <div>
-            <strong>通知模板使用说明</strong>
-            <ul class="guide-list">
-              <li><strong>模板内容</strong> 就是客户最终收到的消息结构，发送前会自动替换变量。</li>
-              <li><strong>短信模板</strong> 需与阿里云/腾讯云平台的模板代码和变量命名保持一致。</li>
-              <li><strong>微信模板</strong> 使用 JSON 结构，需符合微信模板消息字段格式。</li>
-              <li><strong>邮件模板</strong> 支持 HTML，可直接组合品牌化邮件内容。</li>
-              <li><strong>支持变量</strong>：<code>${matterName}</code>、<code>${accessUrl}</code>、<code>${clientName}</code>、<code>${validDays}</code></li>
-            </ul>
+      <div class="guide-grid dashboard-guide-grid">
+        <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
+          <div class="guide-card__head dashboard-guide-head">
+            <div>
+              <span class="panel-kicker">Template Rules</span>
+              <h3>模板使用说明</h3>
+            </div>
+            <a-tag color="processing">
+              统一管理
+            </a-tag>
           </div>
-        </template>
-      </a-alert>
+          <ul class="guide-list">
+            <li><strong>模板内容</strong> 就是客户最终收到的消息结构，发送前会自动替换变量。</li>
+            <li><strong>短信模板</strong> 需与阿里云/腾讯云平台的模板代码和变量命名保持一致。</li>
+            <li><strong>微信模板</strong> 使用 JSON 结构，需符合微信模板消息字段格式。</li>
+            <li><strong>邮件模板</strong> 支持 HTML，可直接组合品牌化邮件内容。</li>
+          </ul>
+        </article>
+
+        <article class="guide-card dashboard-guide-card">
+          <div class="guide-card__head dashboard-guide-head">
+            <div>
+              <span class="panel-kicker">Variables</span>
+              <h3>常用变量</h3>
+            </div>
+          </div>
+          <div class="token-cloud">
+            <code>${matterName}</code>
+            <code>${accessUrl}</code>
+            <code>${clientName}</code>
+            <code>${validDays}</code>
+          </div>
+          <p class="guide-note">
+            变量命名尽量稳定，避免在模板和业务代码之间出现重复含义或顺序错位。
+          </p>
+        </article>
+      </div>
     </section>
 
     <section class="stats-grid">
@@ -75,8 +94,26 @@
       </div>
     </section>
 
+    <section class="spotlight-grid dashboard-spotlight-grid">
+      <article class="spotlight-card dashboard-spotlight-card">
+        <span class="panel-kicker">Template Desk</span>
+        <h3>模板库存与治理优先级</h3>
+        <p>先判断渠道分布、启用比例和服务商映射，再决定是新增模板还是修订现有模板。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">启用率</span>
+        <strong>{{ enabledRate }}</strong>
+        <p>帮助识别模板库中停用内容是否过多。</p>
+      </article>
+      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
+        <span class="spotlight-label dashboard-spotlight-label">多渠道覆盖</span>
+        <strong>{{ channelCoverage }}</strong>
+        <p>短信、微信、邮件当前已覆盖的渠道数量。</p>
+      </article>
+    </section>
+
     <section class="filter-panel">
-      <div class="panel-head">
+      <div class="panel-head dashboard-panel-head">
         <div>
           <span class="panel-kicker">Library Search</span>
           <h3>筛选模板库</h3>
@@ -158,12 +195,25 @@
     </section>
 
     <section class="table-panel">
+      <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
+        <div>
+          <span class="panel-kicker">Template Ledger</span>
+          <h3>模板库清单</h3>
+        </div>
+        <p>表格保留治理动作，内容预览做截断展示，避免长文本打乱阅读节奏。</p>
+      </div>
+
+      <div class="table-summary dashboard-table-summary">
+        <span>当前模板 {{ dataSource.length }} 条</span>
+        <span>启用模板 {{ templateStats.enabled }} 条</span>
+      </div>
+
       <a-table
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        :scroll="{ x: 'max-content' }"
+        :scroll="{ x: 1080 }"
         row-key="id"
         @change="handleTableChange"
       >
@@ -205,7 +255,7 @@
                   size="small"
                   danger
                 >
-                  删除
+                  移除
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -457,18 +507,30 @@ const templateStats = computed(() => ({
   email: dataSource.value.filter(item => item.templateType === 'EMAIL').length,
   providers: dataSource.value.filter(item => !!item.provider).length,
 }))
+const enabledRate = computed(() => {
+  if (!templateStats.value.total) return '0%'
+  return `${Math.round((templateStats.value.enabled / templateStats.value.total) * 100)}%`
+})
+const channelCoverage = computed(() => {
+  const channels = [
+    templateStats.value.sms > 0,
+    templateStats.value.wechat > 0,
+    templateStats.value.email > 0,
+  ].filter(Boolean).length
+  return `${channels}/3`
+})
 
 const columns = [
-  { title: 'ID', key: 'id', dataIndex: 'id', width: 80, align: 'center' },
-  { title: '模板名称', key: 'templateName', dataIndex: 'templateName', ellipsis: true, width: 150, align: 'center' },
-  { title: '模板类型', key: 'templateType', width: 110, align: 'center' },
-  { title: '模板代码', key: 'templateCode', dataIndex: 'templateCode', ellipsis: true, width: 150, align: 'center' },
-  { title: '服务商', key: 'provider', width: 110, align: 'center' },
-  { title: '签名名称', key: 'signName', dataIndex: 'signName', ellipsis: true, width: 120, align: 'center' },
-  { title: '模板内容', key: 'templateContent', ellipsis: true, width: 200, align: 'center' },
-  { title: '状态', key: 'enabled', width: 80, align: 'center' },
-  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 180, align: 'center' },
-  { title: '操作', key: 'action', width: 150, align: 'center', fixed: 'right' },
+  { title: 'ID', key: 'id', dataIndex: 'id', width: 72, align: 'center' },
+  { title: '模板名称', key: 'templateName', dataIndex: 'templateName', ellipsis: true, width: 140, align: 'center' },
+  { title: '模板类型', key: 'templateType', width: 100, align: 'center' },
+  { title: '模板代码', key: 'templateCode', dataIndex: 'templateCode', ellipsis: true, width: 140, align: 'center' },
+  { title: '服务商', key: 'provider', width: 100, align: 'center' },
+  { title: '签名名称', key: 'signName', dataIndex: 'signName', ellipsis: true, width: 110, align: 'center' },
+  { title: '模板内容', key: 'templateContent', ellipsis: true, width: 180, align: 'center' },
+  { title: '状态', key: 'enabled', width: 76, align: 'center' },
+  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
+  { title: '操作', key: 'action', width: 116, align: 'center' },
 ]
 
 async function loadData() {
@@ -774,49 +836,51 @@ onUnmounted(() => {
   gap: 18px;
 }
 
-.panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 16px;
-  margin-bottom: 18px;
-}
-
-.panel-head h3 {
-  margin: 6px 0 0;
-  font-size: 22px;
-  color: var(--primary-color-dark);
-}
-
-.panel-head p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
 .panel-kicker {
   display: inline-block;
-  color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  font-weight: 700;
 }
 
 .guide-panel {
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
+  background: transparent;
 }
 
-.guide-panel {
+.guide-card {
+  display: grid;
+  gap: 18px;
   padding: 20px;
 }
 
 .guide-list {
-  margin: 8px 0 0 20px;
+  margin: 0 0 0 20px;
   padding: 0;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.token-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.token-cloud code {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(30, 64, 175, 0.08);
+  border: 1px solid rgba(30, 64, 175, 0.12);
+  color: var(--primary-color-dark);
+  font-size: 13px;
+}
+
+.guide-note {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
 .template-filter-form {
@@ -836,10 +900,18 @@ onUnmounted(() => {
   word-break: break-all;
   max-width: 300px;
   display: inline-block;
+  color: var(--text-secondary);
 }
 
 .template-hints {
   margin-top: 8px;
+}
+
+.field-note {
+  margin-top: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.7;
 }
 
 .hint-alert {
@@ -851,13 +923,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .panel-head {
-    display: grid;
-  }
-
-  .guide-panel {
+  .guide-card {
     padding: 16px;
-    border-radius: 20px;
   }
 
   .template-filter-form {

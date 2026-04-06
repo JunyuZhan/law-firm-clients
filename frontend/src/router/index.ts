@@ -78,6 +78,18 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true },
     children: [
       {
+        path: 'setup',
+        name: 'InitialSetup',
+        component: () => import('@/views/admin/InitialSetup.vue'),
+        meta: { title: '首次初始化' },
+      },
+      {
+        path: 'system-info',
+        name: 'SystemInfo',
+        component: () => import('@/views/admin/SystemInfo.vue'),
+        meta: { title: '系统信息' },
+      },
+      {
         path: 'notifications',
         name: 'NotificationHistory',
         component: () => import('@/views/admin/NotificationHistory.vue'),
