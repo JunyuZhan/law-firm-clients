@@ -2,14 +2,11 @@
   <div class="matter-list-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Matter Operations
-        </div>
         <h2 class="editorial-title intro-title">
           项目列表
         </h2>
         <p class="intro-text">
-          查看客户项目状态、访问有效期与访问链接。先判断风险和活跃度，再进入筛选和具体操作。
+          查看客户项目状态、访问有效期与访问链接。先看整体分布，再进入筛选和具体操作。
         </p>
       </div>
       <a-button @click="loadData">
@@ -43,29 +40,10 @@
       </article>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Workstation</span>
-        <h3>优先跟进</h3>
-        <p>下面这些项目更值得先处理，帮助你快速判断续期、撤销与进一步跟进。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">7 日内到期</span>
-        <strong>{{ expiringSoonCount }}</strong>
-        <p>建议优先检查访问有效期是否需要延长。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">最近新建</span>
-        <strong>{{ recentCreatedCount }}</strong>
-        <p>用于识别刚进入工作台的新项目。</p>
-      </article>
-    </section>
-
     <section class="filter-panel">
       <div class="panel-head">
         <div>
-          <span class="panel-kicker">Filters</span>
-          <h3>精确筛选</h3>
+          <h3>筛选项目</h3>
         </div>
         <p>按客户、状态和时间范围快速定位项目。</p>
       </div>
@@ -129,7 +107,6 @@
     <section class="table-panel">
       <div class="panel-head panel-head--table">
         <div>
-          <span class="panel-kicker">Data</span>
           <h3>项目数据表</h3>
         </div>
         <p>表格保留核心字段，长链接用可读方式展示。</p>
@@ -255,18 +232,6 @@ const summaryStats = computed(() => {
   }
 })
 
-const expiringSoonCount = computed(() => dataSource.value.filter(item => {
-  if (!item.expiresAt || item.status !== 'ACTIVE') return false
-  const diff = new Date(item.expiresAt).getTime() - Date.now()
-  return diff > 0 && diff <= 7 * 24 * 60 * 60 * 1000
-}).length)
-
-const recentCreatedCount = computed(() => dataSource.value.filter((item) => {
-  if (!item.createdAt) return false
-  const diff = Date.now() - new Date(item.createdAt).getTime()
-  return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000
-}).length)
-
 async function loadData() {
   loading.value = true
   try {
@@ -346,7 +311,7 @@ onMounted(() => {
 <style scoped>
 .matter-list-container {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .stats-card.success strong {
@@ -384,15 +349,6 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.panel-kicker {
-  display: inline-block;
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
 .matter-filter-form {
   display: flex;
   gap: 12px 8px;
@@ -428,6 +384,7 @@ onMounted(() => {
 
   .matter-filter-form {
     display: grid;
+    gap: 12px;
   }
 
   .matter-filter-form :deep(.ant-form-item) {

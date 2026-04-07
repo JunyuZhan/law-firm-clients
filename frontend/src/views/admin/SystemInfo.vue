@@ -2,9 +2,6 @@
   <div class="system-info-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Delivery Center
-        </div>
         <h2 class="editorial-title intro-title">
           系统信息
         </h2>
@@ -23,33 +20,6 @@
           刷新健康状态
         </a-button>
       </div>
-    </section>
-
-    <section class="quick-links">
-      <article class="quick-link-card">
-        <div class="quick-link-head">
-          <div>
-            <span class="panel-kicker">Quick Actions</span>
-            <h3>交付闭环</h3>
-          </div>
-          <span class="quick-link-badge">推荐路径</span>
-        </div>
-        <p>先完成站点初始化，再进入系统配置补齐参数，最后回到运维中心执行升级、备份和日志核查。</p>
-        <a-space wrap>
-          <a-button
-            type="primary"
-            @click="goTo('/admin/setup')"
-          >
-            前往首次初始化
-          </a-button>
-          <a-button @click="goTo('/admin/config')">
-            打开系统配置
-          </a-button>
-          <a-button @click="goTo('/admin/maintenance')">
-            打开系统维护
-          </a-button>
-        </a-space>
-      </article>
     </section>
 
     <section class="stats-grid">
@@ -75,19 +45,10 @@
       </div>
     </section>
 
-    <section class="delivery-path config-card">
-      <div>
-        <span class="panel-kicker">Delivery Sequence</span>
-        <h3>建议顺序：初始化 → 配置 → 健康检查 → 交付留档</h3>
-        <p>系统信息页负责把版本、依赖、边界和文档入口串起来，方便交付前核查和升级前复盘。</p>
-      </div>
-    </section>
-
     <section class="info-grid">
       <article class="config-card">
         <div class="section-head">
           <div>
-            <span class="panel-kicker">Runtime</span>
             <h3>版本与构建信息</h3>
           </div>
         </div>
@@ -120,7 +81,6 @@
       <article class="config-card">
         <div class="section-head">
           <div>
-            <span class="panel-kicker">Dependencies</span>
             <h3>关键依赖状态</h3>
           </div>
         </div>
@@ -160,7 +120,6 @@
       <article class="config-card">
         <div class="section-head">
           <div>
-            <span class="panel-kicker">Boundary</span>
             <h3>运维边界</h3>
           </div>
         </div>
@@ -174,7 +133,6 @@
       <article class="config-card">
         <div class="section-head">
           <div>
-            <span class="panel-kicker">Release</span>
             <h3>发布前验收</h3>
           </div>
         </div>
@@ -192,7 +150,6 @@
     <section class="config-card">
       <div class="section-head">
         <div>
-          <span class="panel-kicker">Documents</span>
           <h3>交付文档入口</h3>
         </div>
         <p>后台先给出统一文档位置，方便交付、升级和回归测试时快速取用。</p>
@@ -237,14 +194,11 @@
 <script setup lang="ts">
 import { onMounted, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
 import {
   getSystemDependencyStatus,
   getSystemRuntimeInfo,
   type DependencyStatusItem,
 } from '@/api/config'
-
-const router = useRouter()
 
 const runtimeInfo = reactive({
   applicationName: '',
@@ -360,10 +314,6 @@ async function copyDocPath(path: string) {
   }
 }
 
-function goTo(path: string) {
-  router.push(path)
-}
-
 onMounted(() => {
   loadRuntimeInfo()
   loadDependencyStatus()
@@ -376,71 +326,10 @@ onMounted(() => {
   gap: 18px;
 }
 
-.intro-actions,
-.quick-links {
+.intro-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.quick-link-card {
-  padding: 20px 22px;
-  border-radius: 8px;
-  background:
-    linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(245, 158, 11, 0.08)),
-    rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(37, 99, 235, 0.14);
-}
-
-.quick-link-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.quick-link-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(37, 99, 235, 0.12);
-  color: var(--lex-primary-soft);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.quick-link-card h3 {
-  margin: 8px 0 10px;
-  font-size: 22px;
-  color: var(--text-primary);
-}
-
-.quick-link-card p {
-  margin: 0 0 16px;
-  max-width: 720px;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.delivery-path {
-  display: grid;
-  gap: 8px;
-}
-
-.delivery-path h3 {
-  margin: 0;
-  font-size: 24px;
-  color: var(--text-primary);
-}
-
-.delivery-path p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.8;
 }
 
 .info-grid {
@@ -468,13 +357,6 @@ onMounted(() => {
   max-width: 420px;
   color: var(--text-secondary);
   line-height: 1.75;
-}
-
-.panel-kicker {
-  color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
 }
 
 .dependency-summary {

@@ -2,9 +2,6 @@
   <div class="system-maintenance">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          运维中心
-        </div>
         <h2 class="editorial-title intro-title">
           系统维护
         </h2>
@@ -45,108 +42,6 @@
         <strong>{{ gitInfo.hasUpdate ? '可升级' : gitInfo.currentVersion ? '最新' : '未检查' }}</strong>
         <p>仓库版本检查结果与升级建议。</p>
       </article>
-    </section>
-
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Ops Desk</span>
-        <h3>先确认系统健康，再执行升级、备份与审计导出</h3>
-        <p>这个页面的核心不是堆更多动作，而是把健康状态、版本检查和日志追踪放进同一个处理顺序里，减少误操作。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">健康项通过</span>
-        <strong>{{ healthyChecks }}/3</strong>
-        <p>数据库、存储、版本状态三项当前通过数。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">待处理备份</span>
-        <strong>{{ backups.length }}</strong>
-        <p>当前可下载或清理的备份文件数量。</p>
-      </article>
-    </section>
-
-    <section class="guide-grid dashboard-guide-grid">
-      <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <span class="panel-kicker">Ops Workflow</span>
-            <h3>运维处理顺序</h3>
-          </div>
-        </div>
-        <div class="guide-steps">
-          <div class="guide-step">
-            <span>01</span>
-            <strong>先看数据库、存储和系统状态，确认是否存在基础设施异常。</strong>
-          </div>
-          <div class="guide-step">
-            <span>02</span>
-            <strong>升级前先拉取版本信息，再执行备份，最后按指南进行更新。</strong>
-          </div>
-          <div class="guide-step">
-            <span>03</span>
-            <strong>如果有安全或访问问题，优先回到下方日志区查看登录与下载轨迹。</strong>
-          </div>
-        </div>
-      </article>
-
-      <article class="guide-card dashboard-guide-card">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <span class="panel-kicker">Risk Control</span>
-            <h3>操作提醒</h3>
-          </div>
-        </div>
-        <ul class="guide-list">
-          <li>升级和备份都建议在低峰期执行。</li>
-          <li>导出日志前先收紧筛选条件，避免一次拉取过大数据集。</li>
-          <li>命令行操作仅用于高级场景，优先使用页面内能力完成常规运维。</li>
-        </ul>
-      </article>
-
-      <article class="guide-card dashboard-guide-card">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <span class="panel-kicker">Connected Pages</span>
-            <h3>治理入口</h3>
-          </div>
-        </div>
-        <p class="guide-copy">
-          如果当前是在做新站点交付，建议先完成首次初始化，再去系统信息页确认版本、依赖状态和交付文档入口。
-        </p>
-        <a-space wrap>
-          <a-button
-            type="primary"
-            @click="goTo('/admin/system-info')"
-          >
-            系统信息
-          </a-button>
-          <a-button @click="goTo('/admin/setup')">
-            首次初始化
-          </a-button>
-          <a-button @click="goTo('/admin/config')">
-            系统配置
-          </a-button>
-        </a-space>
-      </article>
-    </section>
-
-    <section class="maintenance-path config-card">
-      <div>
-        <span class="panel-kicker">Recommended Path</span>
-        <h3>建议顺序：健康检查 → 版本检查 → 备份 → 日志排查</h3>
-        <p>先确认基础状态，再决定是否升级；如果涉及风险事件，再回到日志区核查登录与下载轨迹。</p>
-      </div>
-      <a-space wrap>
-        <a-button @click="goTo('/admin/system-info')">
-          系统信息
-        </a-button>
-        <a-button @click="goTo('/admin/setup')">
-          首次初始化
-        </a-button>
-        <a-button @click="goTo('/admin/config')">
-          系统配置
-        </a-button>
-      </a-space>
     </section>
 
     <a-row
@@ -277,7 +172,6 @@
 
       <div class="section-head dashboard-section-head">
         <div>
-          <span class="panel-kicker">Version Control</span>
           <h3>升级与版本检查</h3>
         </div>
         <p>先确认当前版本与远端版本差异，再决定是否进入升级指南。</p>
@@ -491,10 +385,18 @@
 
       <div class="section-head dashboard-section-head">
         <div>
-          <span class="panel-kicker">Backup Center</span>
           <h3>备份管理</h3>
         </div>
         <p>页面内可直接创建、下载和删除备份文件，用于升级前留档和恢复准备。</p>
+      </div>
+
+      <div class="compact-info-row">
+        <a-alert
+          message="备份说明"
+          description="点击「创建备份」会导出数据库中的所有数据为 SQL 文件。建议定期备份，特别是在升级系统前。"
+          type="info"
+          show-icon
+        />
       </div>
 
       <div class="backup-summary">
@@ -507,14 +409,6 @@
           <strong>升级前先创建新备份</strong>
         </div>
       </div>
-
-      <a-alert
-        message="备份说明"
-        description="点击「创建备份」会导出数据库中的所有数据为 SQL 文件。建议定期备份，特别是在升级系统前。"
-        type="info"
-        show-icon
-        style="margin-bottom: 16px"
-      />
 
       <a-table
         :columns="backupColumns"
@@ -558,10 +452,13 @@
     >
       <div class="section-head dashboard-section-head">
         <div>
-          <span class="panel-kicker">Audit Logs</span>
           <h3>访问与审计日志</h3>
         </div>
         <p>登录日志和下载日志按时间与对象筛选，便于快速排查异常行为。</p>
+      </div>
+
+      <div class="compact-info-row compact-info-row--subtle">
+        <span>优先按时间范围收窄结果，再导出 CSV。</span>
       </div>
 
       <a-tabs v-model:active-key="logActiveTab">
@@ -571,7 +468,6 @@
           tab="登录日志"
         >
           <div class="log-filter-card">
-            <div class="panel-kicker">Login Filter</div>
             <a-form
               layout="inline"
               :model="loginLogFilter"
@@ -647,7 +543,6 @@
           tab="下载日志"
         >
           <div class="log-filter-card">
-            <div class="panel-kicker">Download Filter</div>
             <a-form
               layout="inline"
               :model="downloadLogFilter"
@@ -730,15 +625,9 @@
     >
       <div class="section-head dashboard-section-head">
         <div>
-          <span class="panel-kicker">Advanced Ops</span>
           <h3>命令行操作</h3>
         </div>
         <p>保留给熟悉部署环境的管理员，用于升级、备份、查看日志和重启服务。</p>
-      </div>
-
-      <div class="advanced-ops-tip">
-        <span class="panel-kicker">Advanced Only</span>
-        <p>以下命令适合熟悉部署目录和服务器权限的管理员使用；常规升级、备份与排查请优先使用本页已有操作。</p>
       </div>
 
       <a-collapse>
@@ -908,14 +797,6 @@ function goTo(path: string) {
 // 状态数据
 const loading = ref(false)
 const status = ref<SystemStatus>({})
-const healthyChecks = computed(() => {
-  let count = 0
-  if (status.value.database?.connected) count += 1
-  if (status.value.storage?.available) count += 1
-  if (gitInfo.value.currentVersion) count += 1
-  return count
-})
-
 // Git 信息与升级相关
 const gitLoading = ref(false)
 const gitInfo = ref<GitInfo>({})
@@ -1428,94 +1309,14 @@ onMounted(() => {
   box-shadow: var(--shadow-sm);
 }
 
-.maintenance-path {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
-
-.maintenance-path h3 {
-  margin: 6px 0 8px;
-  font-size: 24px;
-  color: var(--text-primary);
-}
-
-.maintenance-path p {
-  margin: 0;
-  max-width: 780px;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.guide-card {
-  display: grid;
-  gap: 18px;
-  padding: 22px;
-}
-
-.guide-copy {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.panel-kicker {
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.guide-steps {
-  display: grid;
-  gap: 12px;
-}
-
-.guide-step {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 14px 16px;
-  border-radius: 8px;
-  background: rgba(0, 9, 24, 0.03);
-  border: 1px solid rgba(0, 9, 24, 0.06);
-}
-
-.guide-step span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: rgba(30, 64, 175, 0.1);
-  color: var(--primary-color);
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
-
-.guide-step strong {
-  color: var(--text-primary);
-  line-height: 1.7;
-}
-
-.guide-list {
-  margin: 0;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  line-height: 1.9;
-}
-
 .ops-overview {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 12px;
 }
 
 .ops-metric {
-  padding: 20px 22px;
+  padding: 16px 18px;
 }
 
 .ops-metric span {
@@ -1526,8 +1327,8 @@ onMounted(() => {
 
 .ops-metric strong {
   display: block;
-  margin-top: 12px;
-  font-size: 30px;
+  margin-top: 10px;
+  font-size: 24px;
   font-family: var(--font-heading);
 }
 
@@ -1544,7 +1345,7 @@ onMounted(() => {
 }
 
 .maintenance-card :deep(.ant-card-head-title) {
-  font-size: 20px;
+  font-size: 18px;
   font-family: var(--font-heading);
 }
 
@@ -1702,15 +1503,14 @@ onMounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .maintenance-path,
+  .compact-info-row--subtle,
   .backup-summary,
   .upgrade-summary {
     grid-template-columns: 1fr;
     display: grid;
   }
 
-  .log-filter-card,
-  .advanced-ops-tip {
+  .log-filter-card {
     padding: 14px;
   }
 
@@ -1724,20 +1524,37 @@ onMounted(() => {
   line-height: 1.5;
 }
 
+.compact-info-row {
+  margin-bottom: 12px;
+}
+
+.compact-info-row--subtle {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: rgba(248, 244, 237, 0.72);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
 .backup-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .backup-summary-item {
   display: grid;
-  gap: 6px;
-  padding: 14px 16px;
+  gap: 4px;
+  padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.7);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 237, 0.76);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .backup-summary-item span {
@@ -1747,24 +1564,24 @@ onMounted(() => {
 
 .backup-summary-item strong {
   color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .upgrade-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .upgrade-summary-item {
   display: grid;
-  gap: 6px;
-  padding: 14px 16px;
+  gap: 4px;
+  padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.7);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 237, 0.76);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .upgrade-summary-item span {
@@ -1774,8 +1591,8 @@ onMounted(() => {
 
 .upgrade-summary-item strong {
   color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .upgrade-actions {
@@ -1988,12 +1805,12 @@ onMounted(() => {
 /* 日志筛选表单移动端优化 */
 .log-filter-card {
   display: grid;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 16px;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.64);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 237, 0.76);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .log-filter-form {
@@ -2004,21 +1821,6 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.advanced-ops-tip {
-  display: grid;
-  gap: 6px;
-  margin-bottom: 16px;
-  padding: 16px;
-  border-radius: 8px;
-  background: rgba(248, 244, 237, 0.64);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-.advanced-ops-tip p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.75;
-}
 
 @media (max-width: 768px) {
   .log-filter-form :deep(.ant-form-item) {

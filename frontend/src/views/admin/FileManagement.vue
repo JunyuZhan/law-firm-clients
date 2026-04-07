@@ -2,9 +2,6 @@
   <div class="file-management">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          File Operations
-        </div>
         <h2 class="editorial-title intro-title">
           文件管理
         </h2>
@@ -58,28 +55,9 @@
       </article>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Archive Desk</span>
-        <h3>文件存量与清理优先级</h3>
-        <p>先看活跃文件、已删除文件和存储占用，再决定是批量删除还是启动过期清理流程。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="dashboard-spotlight-label">覆盖项目</span>
-        <strong>{{ statistics.matterCount }}</strong>
-        <p>用于观察文件是否集中在少数项目。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="dashboard-spotlight-label">删除占比</span>
-        <strong>{{ deletedRatio }}</strong>
-        <p>帮助判断是否值得立即做物理清理。</p>
-      </article>
-    </section>
-
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
         <div>
-          <span class="panel-kicker">Filters</span>
           <h3>筛选条件</h3>
         </div>
         <p>按项目、状态、类别和关键字快速定位文件。</p>
@@ -162,7 +140,6 @@
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
         <div>
-          <span class="panel-kicker">Data</span>
           <h3>文件数据表</h3>
         </div>
         <p>保留高频字段，详情放入弹窗，避免表格过宽。</p>
@@ -361,11 +338,6 @@ const statistics = reactive<Statistics>({
   categoryStats: {},
 })
 const statsLoading = ref(false)
-const deletedRatio = computed(() => {
-  if (!statistics.totalCount) return '0%'
-  return `${Math.round((statistics.deletedCount / statistics.totalCount) * 100)}%`
-})
-
 const files = ref<FileItem[]>([])
 const loading = ref(false)
 const filters = reactive({
@@ -568,15 +540,6 @@ onUnmounted(() => {
 .file-management {
   display: grid;
   gap: 18px;
-}
-
-.panel-kicker {
-  display: inline-block;
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
 }
 
 .stats-card.success strong {

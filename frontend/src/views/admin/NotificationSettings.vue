@@ -2,9 +2,6 @@
   <div class="notification-settings-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Channel Configuration
-        </div>
         <h2 class="editorial-title intro-title">
           通知配置
         </h2>
@@ -24,10 +21,7 @@
       <article class="config-card overview-card overview-card--wide">
         <div class="overview-card__head">
           <div>
-            <div class="panel-kicker">
-              Config Logic
-            </div>
-            <h3>配置生效逻辑</h3>
+            <h3>配置说明</h3>
           </div>
           <a-tag color="processing">
             即时生效
@@ -36,49 +30,10 @@
         <p>
           系统优先读取数据库中的通知配置；当数据库缺少对应键时，才会回退到
           <code>application.yml</code>
-          默认值。
+          默认值。建议先启用渠道，再补充凭证和模板映射。
         </p>
-        <div class="overview-points">
-          <div class="overview-point">
-            <span>1</span>
-            <strong>先启用渠道，再完善凭证和模板映射。</strong>
-          </div>
-          <div class="overview-point">
-            <span>2</span>
-            <strong>保存后无需重启服务，立即进入发送链路。</strong>
-          </div>
-          <div class="overview-point">
-            <span>3</span>
-            <strong>模板内容建议在“通知模板管理”中继续细化。</strong>
-          </div>
-        </div>
-      </article>
-
-      <article class="config-card overview-card">
-        <div class="overview-card__head">
-          <div>
-            <div class="panel-kicker">
-              Governance
-            </div>
-            <h3>治理建议</h3>
-          </div>
-        </div>
-        <div class="governance-list">
-          <div class="governance-item">
-            <span>邮件</span>
-            <strong>优先确认 SMTP 与发件人名一致。</strong>
-          </div>
-          <div class="governance-item">
-            <span>短信</span>
-            <strong>服务商切换时同步更新签名和模板标识。</strong>
-          </div>
-          <div class="governance-item">
-            <span>微信</span>
-            <strong>模板 ID 可在这里设默认，也可下沉到模板库。</strong>
-          </div>
-        </div>
         <router-link to="/admin/notification-templates">
-          <a-button block>
+          <a-button>
             前往通知模板管理
           </a-button>
         </router-link>
@@ -108,29 +63,10 @@
       </div>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Channel Desk</span>
-        <h3>先启用通道，再补凭证，再做模板映射</h3>
-        <p>这个页面更适合做渠道开关与基础凭证管理，复杂模板内容继续交给模板库，避免在配置页里混入过多文案治理。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">启用率</span>
-        <strong>{{ enabledChannelRate }}</strong>
-        <p>反映当前通知体系已上线的渠道比例。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">凭证完成度</span>
-        <strong>{{ credentialReadiness }}</strong>
-        <p>按邮件、短信、微信的关键凭证完整度估算。</p>
-      </article>
-    </section>
-
     <a-spin :spinning="loading">
       <section class="section-shell-card">
         <div class="section-head dashboard-section-head">
           <div>
-            <span class="panel-kicker">Channel Matrix</span>
             <h3>通知通道工作台</h3>
           </div>
           <p>每个通道都保持相同的阅读顺序：状态判断、关键凭证、模板接入、保存落地。</p>
@@ -509,19 +445,6 @@ const wechatForm = ref({
 const enabledChannelCount = computed(() =>
   [emailForm.value.enabled, smsForm.value.enabled, wechatForm.value.enabled].filter(Boolean).length,
 )
-const enabledChannelRate = computed(() => `${Math.round((enabledChannelCount.value / 3) * 100)}%`)
-const credentialReadiness = computed(() => {
-  let ready = 0
-  if (emailForm.value.smtpHost && emailForm.value.from) ready += 1
-  if (
-    (smsForm.value.provider === 'aliyun' && smsForm.value.aliyun.accessKeyId && smsForm.value.aliyun.templateCode)
-    || (smsForm.value.provider === 'tencent' && smsForm.value.tencent.secretId && smsForm.value.tencent.templateId)
-  ) {
-    ready += 1
-  }
-  if (wechatForm.value.appId && wechatForm.value.templateId) ready += 1
-  return `${ready}/3`
-})
 
 function findConfigValue(configs: SysConfigInfo[], key: string): string | null {
   const config = configs.find(c => c.configKey === key)
@@ -736,7 +659,6 @@ onMounted(() => {
   background: linear-gradient(180deg, rgba(252, 251, 248, 0.92), rgba(252, 251, 248, 0.82));
 }
 
-.panel-kicker,
 .channel-kicker {
   font-size: 12px;
   text-transform: uppercase;
@@ -745,53 +667,6 @@ onMounted(() => {
   font-weight: 700;
 }
 
-.overview-points,
-.governance-list {
-  display: grid;
-  gap: 12px;
-}
-
-.overview-point,
-.governance-item {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 14px 16px;
-  border-radius: 8px;
-  background: rgba(0, 9, 24, 0.03);
-  border: 1px solid rgba(0, 9, 24, 0.06);
-}
-
-.overview-point span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: rgba(30, 64, 175, 0.1);
-  color: var(--primary-color);
-  font-weight: 700;
-  flex: none;
-}
-
-.overview-point strong,
-.governance-item strong {
-  color: var(--text-primary);
-  line-height: 1.7;
-}
-
-.governance-item {
-  display: grid;
-  gap: 6px;
-}
-
-.governance-item span {
-  color: var(--text-tertiary);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
 
 .section-shell-card,
 .channel-card {

@@ -33,9 +33,6 @@
         <a-divider class="brand-divider" />
 
         <div class="form-header">
-          <div class="eyebrow">
-            Sign In
-          </div>
           <h2 class="editorial-title">
             欢迎回来
           </h2>

@@ -28,9 +28,7 @@
             >
           </div>
           <div class="logo-text">
-            <span class="logo-kicker">Admin Console</span>
             <strong>{{ appShortName || '客户服务系统' }}</strong>
-            <span class="logo-caption">{{ appShortNameEn || 'Law Firm Clients' }}</span>
           </div>
         </div>
         <div
@@ -52,14 +50,6 @@
         class="admin-menu"
         @click="handleMenuClick"
       />
-      <div
-        v-if="!collapsed"
-        class="sider-footer"
-      >
-        <span class="sider-footer-label">Workspace</span>
-        <strong>{{ appShortName || '客户服务系统' }}</strong>
-        <p>项目、文件、通知、配置统一在一套控制台内处理。</p>
-      </div>
     </a-layout-sider>
     <a-layout class="main-layout">
       <div
@@ -120,10 +110,8 @@
           </a-button>
 
           <div class="header-title-block">
-            <span class="header-eyebrow">Operations Console</span>
             <div class="header-title-row">
               <span class="page-title">{{ currentPageTitle }}</span>
-              <span class="header-caption">项目、通知、文件和系统配置统一控制</span>
               <span class="header-status-pill">{{ headerStatusLabel }}</span>
             </div>
           </div>
@@ -223,7 +211,6 @@ const authStore = useAuthStore()
 const appConfigStore = useAppConfigStore()
 
 const appShortName = computed(() => appConfigStore.appShortName)
-const appShortNameEn = computed(() => appConfigStore.appShortNameEn)
 const logoUrl = computed(() => appConfigStore.logoUrl)
 const logoCollapsedUrl = ref(LOGO_COLLAPSED_URL)
 
@@ -242,16 +229,6 @@ const updateInfo = ref({
 const currentPageTitle = computed(() => {
   const matched = route.matched.find(r => r.meta?.title)
   return matched?.meta?.title as string || '管理后台'
-})
-
-const headerStatusLabel = computed(() => {
-  if (route.path.includes('/maintenance')) {
-    return '系统维护'
-  }
-  if (route.path.includes('/config') || route.path.includes('/api-keys')) {
-    return '受保护配置'
-  }
-  return '安全会话'
 })
 
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -772,31 +749,11 @@ async function handleLogout() {
   overflow: hidden;
 }
 
-.logo-kicker {
-  display: inline-block;
-  margin-bottom: 4px;
-  font-size: 11px;
-  text-transform: uppercase;
-  color: rgba(179, 138, 61, 0.84);
-  letter-spacing: 0.14em;
-  font-weight: 700;
-}
-
 .logo-text strong {
   display: block;
-  margin-bottom: 2px;
   color: #fff;
   font-size: 16px;
   line-height: 1.2;
-}
-
-.logo-caption {
-  display: block;
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .logo-collapsed {
@@ -921,20 +878,10 @@ async function handleLogout() {
   flex: 1;
 }
 
-.header-eyebrow {
-  display: inline-block;
-  margin-bottom: 6px;
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
 .header-title-row {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
+  align-items: center;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -946,24 +893,6 @@ async function handleLogout() {
   font-family: var(--font-heading);
 }
 
-.header-caption {
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.header-status-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 30px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(179, 138, 61, 0.12);
-  border: 1px solid rgba(179, 138, 61, 0.12);
-  color: var(--accent-color-deep);
-  font-size: 12px;
-  font-weight: 600;
-}
 
 .header-actions {
   margin-left: auto;

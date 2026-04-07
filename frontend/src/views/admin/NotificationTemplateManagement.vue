@@ -2,9 +2,6 @@
   <div class="notification-template-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Template Library
-        </div>
         <h2 class="editorial-title intro-title">
           通知模板管理
         </h2>
@@ -36,7 +33,6 @@
         <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
           <div class="guide-card__head dashboard-guide-head">
             <div>
-              <span class="panel-kicker">Template Rules</span>
               <h3>模板使用说明</h3>
             </div>
             <a-tag color="processing">
@@ -49,24 +45,12 @@
             <li><strong>微信模板</strong> 使用 JSON 结构，需符合微信模板消息字段格式。</li>
             <li><strong>邮件模板</strong> 支持 HTML，可直接组合品牌化邮件内容。</li>
           </ul>
-        </article>
-
-        <article class="guide-card dashboard-guide-card">
-          <div class="guide-card__head dashboard-guide-head">
-            <div>
-              <span class="panel-kicker">Variables</span>
-              <h3>常用变量</h3>
-            </div>
-          </div>
           <div class="token-cloud">
             <code>${matterName}</code>
             <code>${accessUrl}</code>
             <code>${clientName}</code>
             <code>${validDays}</code>
           </div>
-          <p class="guide-note">
-            变量命名尽量稳定，避免在模板和业务代码之间出现重复含义或顺序错位。
-          </p>
         </article>
       </div>
     </section>
@@ -94,28 +78,9 @@
       </div>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Template Desk</span>
-        <h3>模板库存与治理优先级</h3>
-        <p>先判断渠道分布、启用比例和服务商映射，再决定是新增模板还是修订现有模板。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">启用率</span>
-        <strong>{{ enabledRate }}</strong>
-        <p>帮助识别模板库中停用内容是否过多。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">多渠道覆盖</span>
-        <strong>{{ channelCoverage }}</strong>
-        <p>短信、微信、邮件当前已覆盖的渠道数量。</p>
-      </article>
-    </section>
-
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
         <div>
-          <span class="panel-kicker">Library Search</span>
           <h3>筛选模板库</h3>
         </div>
         <p>按渠道、服务商和启用状态定位模板，降低误改风险。</p>
@@ -197,7 +162,6 @@
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
         <div>
-          <span class="panel-kicker">Template Ledger</span>
           <h3>模板库清单</h3>
         </div>
         <p>表格保留治理动作，内容预览做截断展示，避免长文本打乱阅读节奏。</p>
@@ -507,19 +471,6 @@ const templateStats = computed(() => ({
   email: dataSource.value.filter(item => item.templateType === 'EMAIL').length,
   providers: dataSource.value.filter(item => !!item.provider).length,
 }))
-const enabledRate = computed(() => {
-  if (!templateStats.value.total) return '0%'
-  return `${Math.round((templateStats.value.enabled / templateStats.value.total) * 100)}%`
-})
-const channelCoverage = computed(() => {
-  const channels = [
-    templateStats.value.sms > 0,
-    templateStats.value.wechat > 0,
-    templateStats.value.email > 0,
-  ].filter(Boolean).length
-  return `${channels}/3`
-})
-
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id', width: 72, align: 'center' },
   { title: '模板名称', key: 'templateName', dataIndex: 'templateName', ellipsis: true, width: 140, align: 'center' },

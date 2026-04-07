@@ -2,9 +2,6 @@
   <div class="admin-profile">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Profile & Security
-        </div>
         <h2 class="editorial-title intro-title">
           个人中心
         </h2>
@@ -51,67 +48,6 @@
       </div>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="section-kicker">Account Desk</span>
-        <h3>先确认身份信息，再做密码轮换</h3>
-        <p>个人中心的重点是确认账号身份、邮箱可用性和安全动作是否就绪，而不是在这里承载更多业务入口。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">资料完整度</span>
-        <strong>{{ profileReadiness }}</strong>
-        <p>用户名、真实姓名和邮箱当前补全程度。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">安全动作</span>
-        <strong>2 项</strong>
-        <p>密码修改与退出登录都在同一页面内完成。</p>
-      </article>
-    </section>
-
-    <section class="guide-grid dashboard-guide-grid">
-      <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <div class="section-kicker">
-              Admin Identity
-            </div>
-            <h3>账户视图</h3>
-          </div>
-        </div>
-        <div class="guide-points">
-          <div class="guide-point">
-            <span>01</span>
-            <strong>当前账号拥有后台治理权限，建议保持唯一责任人使用。</strong>
-          </div>
-          <div class="guide-point">
-            <span>02</span>
-            <strong>邮箱建议保持可用，便于接收系统通知和安全提醒。</strong>
-          </div>
-          <div class="guide-point">
-            <span>03</span>
-            <strong>密码变更后会立即退出当前会话，避免旧凭证继续使用。</strong>
-          </div>
-        </div>
-      </article>
-
-      <article class="guide-card dashboard-guide-card">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <div class="section-kicker">
-              Security Rules
-            </div>
-            <h3>安全建议</h3>
-          </div>
-        </div>
-        <ul class="security-list">
-          <li>密码至少 8 位，并避免与其他系统复用。</li>
-          <li>修改密码后建议重新确认后台登录状态是否正常。</li>
-          <li>如发现异常登录，请立即更换密码并检查登录日志。</li>
-        </ul>
-      </article>
-    </section>
-
     <section class="profile-grid">
       <article class="profile-card identity-card">
         <div class="identity-hero">
@@ -124,9 +60,6 @@
             </template>
           </a-avatar>
           <div class="identity-copy">
-            <div class="identity-kicker">
-              Administrator
-            </div>
             <h3>{{ userInfo.realName || userInfo.username || '管理员' }}</h3>
             <p>账号用于管理项目、通知、文件和系统配置。</p>
           </div>
@@ -155,9 +88,6 @@
       <article class="profile-card security-card">
         <div class="section-header">
           <div>
-            <div class="section-kicker">
-              Security
-            </div>
             <h3>安全设置</h3>
           </div>
           <div class="section-note">
@@ -259,10 +189,6 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 const userInfo = computed<Partial<UserInfo>>(() => authStore.user || {})
-const profileReadiness = computed(() => {
-  const fields = [userInfo.value.username, userInfo.value.realName, userInfo.value.email].filter(Boolean).length
-  return `${fields}/3`
-})
 const activeTab = ref('password')
 const passwordFormRef = ref<FormInstance>()
 const changingPassword = ref(false)

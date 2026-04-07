@@ -2,9 +2,6 @@
   <div class="initial-setup-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Setup Wizard
-        </div>
         <h2 class="editorial-title intro-title">
           首次初始化
         </h2>
@@ -30,15 +27,17 @@
     </section>
 
     <section class="status-strip config-card">
-      <a-alert
-        :message="setupStatus.title"
-        :type="setupStatus.type"
-        show-icon
-        :closable="false"
-      />
-      <div class="status-actions">
-        <span class="status-label">交付路径</span>
-        <strong>首次初始化 → 系统信息 → 系统配置</strong>
+      <div class="status-strip-grid">
+        <a-alert
+          :message="setupStatus.title"
+          :type="setupStatus.type"
+          show-icon
+          :closable="false"
+        />
+        <div class="status-actions">
+          <span class="status-label">交付路径</span>
+          <strong>首次初始化 → 系统信息 → 系统配置</strong>
+        </div>
       </div>
     </section>
 
@@ -46,7 +45,6 @@
       <article class="config-card">
         <div class="section-head">
           <div>
-            <span class="panel-kicker">Brand Setup</span>
             <h3>基础品牌初始化</h3>
           </div>
         </div>
@@ -123,7 +121,6 @@
       <article class="config-card preview-card">
         <div class="section-head">
           <div>
-            <span class="panel-kicker">Preview</span>
             <h3>效果预览</h3>
           </div>
         </div>
@@ -158,7 +155,6 @@
         </div>
 
         <div class="next-step-card">
-          <div class="panel-kicker">Next Step</div>
           <ul class="plain-list">
             <li>初始化完成后，可进入“系统信息”页确认版本和文档入口是否齐全。</li>
             <li>再进入“系统配置”补充基础 URL、回调和通知策略。</li>
@@ -303,7 +299,13 @@ onMounted(() => {
 
 .status-strip {
   display: grid;
+}
+
+.status-strip-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.85fr);
   gap: 12px;
+  align-items: stretch;
 }
 
 .status-actions {
@@ -311,8 +313,8 @@ onMounted(() => {
   gap: 4px;
   padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.72);
-  border: 1px solid rgba(179, 138, 61, 0.12);
+  background: rgba(248, 244, 237, 0.8);
+  border: 1px solid rgba(179, 138, 61, 0.18);
 }
 
 .status-label {
@@ -330,8 +332,8 @@ onMounted(() => {
 
 .setup-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+  gap: 16px;
   align-items: start;
 }
 
@@ -339,13 +341,13 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .section-head h3 {
-  margin: 6px 0 0;
-  font-size: 24px;
+  margin: 0;
+  font-size: 20px;
   color: var(--text-primary);
 }
 
@@ -367,8 +369,8 @@ onMounted(() => {
 
 .preview-box {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 14px;
+  padding: 18px;
   border-radius: 8px;
   background:
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 28%),
@@ -427,7 +429,7 @@ onMounted(() => {
 
 .preview-copy strong {
   color: var(--text-primary);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.45;
 }
 
@@ -448,11 +450,11 @@ onMounted(() => {
 .next-step-card {
   display: grid;
   gap: 6px;
-  margin-top: 18px;
-  padding: 16px;
+  margin-top: 14px;
+  padding: 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.66);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 237, 0.74);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .plain-list {
@@ -463,6 +465,7 @@ onMounted(() => {
 }
 
 @media (max-width: 960px) {
+  .status-strip-grid,
   .setup-grid {
     grid-template-columns: 1fr;
   }

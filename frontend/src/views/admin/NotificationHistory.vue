@@ -2,9 +2,6 @@
   <div class="notification-history-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Notification Ops
-        </div>
         <h2 class="editorial-title intro-title">
           通知记录
         </h2>
@@ -67,28 +64,9 @@
       </article>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Delivery Desk</span>
-        <h3>先看失败与待发送，再决定是否重试</h3>
-        <p>通知记录页的重点不是堆更多字段，而是优先暴露失败量、待发送量和渠道分布，帮助快速判断问题是在模板、通道还是接收侧。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">失败率</span>
-        <strong>{{ failureRate }}</strong>
-        <p>便于快速识别当前发送链路是否异常。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">可重试</span>
-        <strong>{{ retryableCount }}</strong>
-        <p>当前仍可继续重试的失败记录数量。</p>
-      </article>
-    </section>
-
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
         <div>
-          <span class="panel-kicker">Filters</span>
           <h3>筛选条件</h3>
         </div>
         <p>按项目、客户、渠道和状态快速定位异常通知。</p>
@@ -164,7 +142,6 @@
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
         <div>
-          <span class="panel-kicker">Data</span>
           <h3>发送记录表</h3>
         </div>
         <p>失败重试和错误信息都保留在同一张表里。</p>
@@ -282,14 +259,6 @@ const statistics = computed(() => {
 
   return stats
 })
-const failureRate = computed(() => {
-  if (!statistics.value.total) return '0%'
-  return `${Math.round((statistics.value.failed / statistics.value.total) * 100)}%`
-})
-const retryableCount = computed(() => dataSource.value.filter(record =>
-  record.status === 'FAILED' && (record.retryCount || 0) < (record.maxRetries || 3),
-).length)
-
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id', width: 72, align: 'center' },
   { title: '项目ID', key: 'matterId', dataIndex: 'matterId', ellipsis: true, width: 150, align: 'center' },
@@ -453,14 +422,6 @@ onMounted(() => {
 
 .stats-card.info strong {
   color: var(--primary-color);
-}
-
-.panel-kicker {
-  display: inline-block;
-  color: var(--text-tertiary);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
 }
 
 .notification-filter-form {

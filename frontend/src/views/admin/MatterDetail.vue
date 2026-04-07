@@ -22,9 +22,6 @@
           </div>
 
           <div class="hero-copy">
-            <div class="eyebrow">
-              Matter Detail
-            </div>
             <h2 class="editorial-title hero-title">
               {{ matterDetail.clientName || '项目详情' }}
             </h2>

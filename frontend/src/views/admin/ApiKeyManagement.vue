@@ -2,9 +2,6 @@
   <div class="api-key-management-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Integration Access
-        </div>
         <h2 class="editorial-title intro-title">
           API 密钥管理
         </h2>
@@ -35,7 +32,6 @@
       <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
         <div class="guide-card__head dashboard-guide-head">
           <div>
-            <span class="panel-kicker">Integration Entry</span>
             <h3>API 对接信息</h3>
           </div>
           <a-tag color="processing">
@@ -78,38 +74,9 @@
             </ol>
           </a-descriptions-item>
         </a-descriptions>
-      </article>
-
-      <article class="guide-card dashboard-guide-card">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <span class="panel-kicker">Callback Chain</span>
-            <h3>回调配置</h3>
-          </div>
-        </div>
-        <a-descriptions
-          :column="1"
-          size="small"
-          bordered
-        >
-          <a-descriptions-item label="功能说明">
-            客户访问项目或下载文件时，系统会自动通知律所系统记录日志。
-          </a-descriptions-item>
-          <a-descriptions-item label="配置项">
-            <ul class="guide-list">
-              <li><b>默认主链路</b>：律所系统推送项目时会自动下发回调地址，并按该项目来源 API key 自动回调</li>
-              <li><b>启用回调</b>：开启或关闭回调功能</li>
-              <li><b>律所系统地址</b>：仅历史项目或特殊场景下手工覆盖时使用</li>
-              <li><b>回调密钥</b>：仅旧链路兜底使用；新链路优先复用该 API key 对应的 Secret</li>
-            </ul>
-          </a-descriptions-item>
-        </a-descriptions>
         <div class="guide-footer">
           <router-link to="/admin/config">
             <a-button type="default">
-              <template #icon>
-                <SettingOutlined />
-              </template>
               前往系统配置
             </a-button>
           </router-link>
@@ -140,28 +107,9 @@
       </div>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Access Desk</span>
-        <h3>先确认主入口，再做启停、轮换与过期治理</h3>
-        <p>API 密钥页的重点是治理对接入口与可用密钥，而不是暴露更多 Secret 细节。创建后的完整 Secret 仍然只在成功弹窗里出现一次。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">启用率</span>
-        <strong>{{ enabledRate }}</strong>
-        <p>帮助快速判断当前对接密钥是否过多停用。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">永久有效</span>
-        <strong>{{ neverExpireCount }}</strong>
-        <p>没有设置过期时间的密钥数量。</p>
-      </article>
-    </section>
-
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
         <div>
-          <span class="panel-kicker">Access Control</span>
           <h3>筛选与治理</h3>
         </div>
         <p>根据启用状态快速筛出需要轮换、停用或检查的密钥。</p>
@@ -207,7 +155,6 @@
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
         <div>
-          <span class="panel-kicker">Key Ledger</span>
           <h3>密钥治理台账</h3>
         </div>
         <p>核心操作只保留启停、编辑和删除，创建成功后的 Secret 独立弹窗展示，降低误暴露风险。</p>
@@ -404,7 +351,7 @@
 import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import { ReloadOutlined, PlusOutlined, SettingOutlined } from '@ant-design/icons-vue'
+import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import {
   getApiKeyList,
   createApiKey,
@@ -476,12 +423,6 @@ const keyStats = computed(() => ({
   disabled: dataSource.value.filter(item => !item.enabled).length,
   expired: dataSource.value.filter(item => isExpired(item.expiresAt)).length,
 }))
-const enabledRate = computed(() => {
-  if (!keyStats.value.total) return '0%'
-  return `${Math.round((keyStats.value.enabled / keyStats.value.total) * 100)}%`
-})
-const neverExpireCount = computed(() => dataSource.value.filter(item => !item.expiresAt).length)
-
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id', width: 80, align: 'center' },
   { title: '密钥名称', key: 'keyName', dataIndex: 'keyName', ellipsis: true, width: 150, align: 'center' },

@@ -2,9 +2,6 @@
   <div class="system-config-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          配置中心
-        </div>
         <h2 class="editorial-title intro-title">
           系统配置
         </h2>
@@ -29,38 +26,11 @@
       </div>
     </section>
 
-    <section class="config-entry-strip">
-      <article class="entry-card">
-        <div class="entry-head">
-          <div>
-            <span class="panel-kicker">Delivery Flow</span>
-            <h3>先初始化，再补配置，再做验收</h3>
-          </div>
-          <span class="entry-badge">推荐顺序</span>
-        </div>
-        <p>首次交付时建议先通过初始化向导落品牌，再在这里补充系统参数，最后到系统信息与系统维护页面完成巡检和上线前核查。</p>
-        <a-space wrap>
-          <a-button
-            type="primary"
-            @click="goTo('/admin/setup')"
-          >
-            打开首次初始化
-          </a-button>
-          <a-button @click="goTo('/admin/system-info')">
-            查看系统信息
-          </a-button>
-          <a-button @click="goTo('/admin/maintenance')">
-            打开系统维护
-          </a-button>
-        </a-space>
-      </article>
-    </section>
-
     <section class="completion-strip config-card">
       <div class="completion-head">
         <div>
-          <span class="panel-kicker">Completion</span>
-          <h3>先补齐品牌和门户字段，再进入系统级参数</h3>
+          <h3>配置完整度</h3>
+          <p>先补齐品牌和门户字段，再进入系统级参数。</p>
         </div>
       </div>
       <div class="completion-grid">
@@ -82,24 +52,6 @@
       </div>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Config Desk</span>
-        <h3>品牌、门户与系统参数的落地顺序</h3>
-        <p>先确认品牌与门户字段完整度，再核对基础 URL 与回调策略，最后才进入底层高级配置，避免交付时先改细项后返工。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">品牌完成度</span>
-        <strong>{{ brandCompletionRate }}</strong>
-        <p>系统名称、简称和 Logo 是否已具备上线条件。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">门户完成度</span>
-        <strong>{{ portalCompletionRate }}</strong>
-        <p>首页信息与页脚信息当前补全程度。</p>
-      </article>
-    </section>
-
     <a-tabs
       v-model:active-key="activeTab"
       type="card"
@@ -113,8 +65,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <span class="panel-kicker">Brand Naming</span>
-                <h3>系统名称</h3>
+          <h3>系统名称</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -154,8 +105,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <span class="panel-kicker">Brand Asset</span>
-                <h3>Logo 设置</h3>
+          <h3>Logo 设置</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -198,8 +148,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <span class="panel-kicker">Firm Profile</span>
-                <h3>律所信息</h3>
+          <h3>律所信息</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -229,8 +178,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <span class="panel-kicker">Portal Content</span>
-                <h3>页面内容</h3>
+          <h3>页面内容</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -277,8 +225,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <span class="panel-kicker">System Endpoint</span>
-                <h3>系统地址</h3>
+          <h3>系统地址</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -300,8 +247,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <span class="panel-kicker">Callback Policy</span>
-                <h3>回调配置</h3>
+          <h3>回调配置</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -602,7 +548,6 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
-import { useRouter } from 'vue-router'
 import logger from '@/utils/logger'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue'
@@ -619,8 +564,6 @@ import {
 } from '@/api/config'
 
 let saveStatusTimer: number | undefined
-const router = useRouter()
-
 const activeTab = ref('brand')
 const loading = ref(false)
 const dataSource = ref<SysConfigInfo[]>([])
@@ -630,10 +573,6 @@ const saveStatus = ref<'saving' | 'saved' | 'error' | ''>('')
 
 const windowWidth = ref(window.innerWidth)
 const modalWidth = computed(() => windowWidth.value < 768 ? '95%' : '600px')
-
-function goTo(path: string) {
-  router.push(path)
-}
 
 function handleResize() {
   windowWidth.value = window.innerWidth
@@ -932,7 +871,7 @@ onUnmounted(() => {
 .intro-side {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   min-width: min(420px, 100%);
 }
 
@@ -982,10 +921,10 @@ onUnmounted(() => {
 }
 
 .mini-stat {
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(0, 9, 24, 0.04);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: rgba(0, 9, 24, 0.05);
+  border: 1px solid rgba(0, 9, 24, 0.08);
 }
 
 .mini-stat span {
@@ -1000,7 +939,7 @@ onUnmounted(() => {
   display: block;
   color: var(--text-primary);
   font-family: var(--font-heading);
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -1014,28 +953,34 @@ onUnmounted(() => {
 
 .completion-strip {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .completion-head h3 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   color: var(--text-primary);
+}
+
+.completion-head p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
 .completion-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .completion-item {
   display: grid;
-  gap: 6px;
-  padding: 14px 16px;
+  gap: 4px;
+  padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.68);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: rgba(248, 244, 237, 0.76);
+  border: 1px solid rgba(0, 9, 24, 0.08);
 }
 
 .completion-item span {
@@ -1046,7 +991,7 @@ onUnmounted(() => {
 .completion-item strong {
   color: var(--text-primary);
   font-family: var(--font-heading);
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1.1;
 }
 
@@ -1077,15 +1022,15 @@ onUnmounted(() => {
 }
 
 .config-card {
-  padding: 22px;
+  padding: 18px;
 }
 
 .card-heading {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .card-heading h3,
@@ -1093,14 +1038,14 @@ onUnmounted(() => {
 .advanced-header h3 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .field-hint {
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--text-tertiary);
   font-size: 12px;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .hint-example {

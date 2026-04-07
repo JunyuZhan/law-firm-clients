@@ -17,61 +17,37 @@
         <div class="hero-section">
           <div class="hero-content section-shell">
             <section class="hero-panel fade-in">
-              <div class="hero-copy">
-                <div class="hero-kicker-row">
-                  <div class="hero-kicker">
-                    {{ lawFirmName }}
-                  </div>
-                  <span class="hero-badge">Client Matter Portal</span>
+              <div class="hero-copy hero-surface">
+                <div class="hero-kicker">
+                  {{ lawFirmName }}
                 </div>
                 <div class="hero-headline-group">
-                  <div
-                    v-if="heroValueItems.length"
-                    class="hero-value-line"
-                  >
-                    <span
-                      v-for="item in heroValueItems"
-                      :key="item"
-                    >
-                      {{ item }}
-                    </span>
-                  </div>
                   <a-typography-title
                     :level="1"
                     class="main-title"
                   >
                     客户项目入口
                   </a-typography-title>
+                  <p
+                    v-if="heroValueItems.length"
+                    class="hero-value-line"
+                  >
+                    {{ heroValueItems.join(' · ') }}
+                  </p>
                 </div>
                 <a-typography-paragraph class="main-subtitle">
-                  粘贴律所发送的完整访问链接后，即可直接进入项目详情、文件与通知入口。
+                  粘贴律所发送的完整访问链接，直接进入项目详情、文件和通知。
                 </a-typography-paragraph>
+
                 <div class="hero-actions">
                   <a-button type="primary" size="large" class="hero-primary-action" @click="focusAccessInput">
-                    粘贴并进入项目
+                    输入访问链接
                   </a-button>
-                  <a-button size="large" @click="router.push('/help')">
-                    访问帮助中心
+                  <a-button type="link" class="hero-secondary-action" @click="router.push('/help')">
+                    遇到问题？查看帮助
                   </a-button>
                 </div>
 
-                <div class="hero-evidence-strip">
-                  <div class="evidence-item">
-                    <span>进入方式</span>
-                    <strong>完整链接直达</strong>
-                  </div>
-                  <div class="evidence-item">
-                    <span>访问凭证</span>
-                    <strong>系统自动识别 token</strong>
-                  </div>
-                  <div class="evidence-item">
-                    <span>进入后</span>
-                    <strong>查看项目、文件与通知</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div class="hero-aside">
                 <a-card
                   class="access-card"
                   bordered
@@ -79,33 +55,13 @@
                   <template #title>
                     <div class="access-card-head">
                       <div>
-                        <span class="eyebrow">Client Access</span>
                         <h3>输入完整访问链接</h3>
+                        <p class="access-card-caption">系统会自动识别项目编号与访问 token。</p>
                       </div>
-                      <span class="access-card-status">安全识别</span>
                     </div>
                   </template>
 
                   <div class="access-card-body">
-                    <p class="access-description">
-                      系统会自动提取项目编号与访问令牌，并带您进入对应项目。
-                    </p>
-
-                    <div class="access-flow">
-                      <div class="flow-step">
-                        <strong>1</strong>
-                        <span>复制律所发送的完整访问链接</span>
-                      </div>
-                      <div class="flow-step">
-                        <strong>2</strong>
-                        <span>粘贴后自动识别项目编号与 token</span>
-                      </div>
-                      <div class="flow-step">
-                        <strong>3</strong>
-                        <span>直接进入项目详情、文件与通知入口</span>
-                      </div>
-                    </div>
-
                     <div class="input-wrapper access-input-panel">
                       <span class="input-label">完整访问链接</span>
                       <a-input-search
@@ -138,28 +94,23 @@
                       </div>
                     </div>
 
+                    <div class="hero-evidence-strip">
+                      <p class="evidence-summary">
+                        律所发送完整链接，系统自动识别项目编号与 token，进入后可查看项目、文件与通知。
+                      </p>
+                    </div>
+
                     <ul class="access-hints">
                       <li>请直接粘贴律所发送的完整访问链接。</li>
                       <li>如链接失效，请联系承办律师重新发送。</li>
-                      <li>管理员请从右上角进入后台工作台。</li>
                     </ul>
                   </div>
                 </a-card>
 
                 <div class="assurance-panel">
-                  <div class="assurance-copy">
-                    <span class="assurance-kicker">Need Help</span>
-                    <h3>链接失效或页面无法进入？</h3>
-                    <p>请先确认链接完整，再查看帮助中心；如仍无法访问，请联系承办律师重新发送。</p>
-                  </div>
-                  <div class="assurance-actions">
-                    <a-button block @click="router.push('/help')">
-                      查看访问说明
-                    </a-button>
-                    <a-button type="primary" block @click="focusAccessInput">
-                      回到输入区
-                    </a-button>
-                  </div>
+                  <p class="assurance-copy">
+                    打不开页面或链接失效？请先检查链接是否完整；如仍无法访问，请联系承办律师重新发送，或前往帮助中心查看说明。
+                  </p>
                 </div>
               </div>
             </section>
@@ -170,14 +121,13 @@
             >
               <div class="section-header">
                 <div>
-                  <span class="eyebrow">Core Capabilities</span>
                   <a-typography-title :level="2">
-                    在一个入口里完成访问、查看与协作
+                    进入后可以做什么
                   </a-typography-title>
+                  <a-typography-text type="secondary">
+                    项目、文件、通知和帮助入口会围绕当前访问项目展开。
+                  </a-typography-text>
                 </div>
-                <a-typography-text type="secondary">
-                  先完成安全进入，再逐步展开项目进度、文件快照与通知信息。
-                </a-typography-text>
               </div>
               <div class="feature-grid">
                 <article
@@ -185,9 +135,6 @@
                   :key="feature.title"
                   class="feature-card"
                 >
-                  <div class="feature-icon-box">
-                    <component :is="feature.icon" />
-                  </div>
                   <h3>{{ feature.title }}</h3>
                   <p>{{ feature.description }}</p>
                 </article>
@@ -263,15 +210,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import {
-  LinkOutlined,
-  FileTextOutlined,
-  FolderOutlined,
-  SafetyOutlined,
-  TeamOutlined,
-  ClockCircleOutlined,
-  LockOutlined,
-} from '@ant-design/icons-vue'
+import { LinkOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
@@ -309,34 +248,20 @@ const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmN
 
 const features = [
   {
-    icon: FileTextOutlined,
     title: '项目详情',
-    description: '进入后先查看项目概况、承办律师与当前处理状态。',
+    description: '查看当前项目概况、承办律师和处理进度。',
   },
   {
-    icon: FolderOutlined,
     title: '文件中心',
-    description: '统一查看、预览和下载当前项目材料，不再分散在多个入口。',
+    description: '统一预览和下载当前项目材料。',
   },
   {
-    icon: ClockCircleOutlined,
     title: '最新通知',
-    description: '同步查看最近动态、提醒与关键状态更新。',
+    description: '查看最近提醒、动态和状态更新。',
   },
   {
-    icon: LockOutlined,
-    title: '受控访问',
-    description: '通过项目链接与访问令牌识别身份，减少误入和重复验证。',
-  },
-  {
-    icon: TeamOutlined,
     title: '帮助支持',
-    description: '遇到访问异常时，可先查看说明，再联系承办律师处理。',
-  },
-  {
-    icon: SafetyOutlined,
-    title: '隐私保护',
-    description: '访问与文件分发遵循授权范围，尽量避免信息外泄。',
+    description: '访问异常时先看说明，再联系承办律师。',
   },
 ]
 
@@ -510,28 +435,28 @@ onUnmounted(() => {
 
 .hero-content {
   display: grid;
-  gap: 28px;
+  gap: 24px;
 }
 
 .hero-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
-  gap: 28px;
-  align-items: start;
+  grid-template-columns: minmax(0, 760px);
+  justify-content: start;
 }
 
 .hero-copy {
   display: grid;
-  gap: 18px;
+  gap: 16px;
   align-content: start;
-  padding: 12px 0 0;
+  padding: 8px 0 0;
 }
 
-.hero-kicker-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+.hero-surface {
+  padding: 30px 30px 26px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.56);
+  border: 1px solid rgba(0, 9, 24, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .hero-kicker {
@@ -542,49 +467,16 @@ onUnmounted(() => {
   font-weight: 700;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(0, 33, 64, 0.06);
-  border: 1px solid rgba(0, 33, 64, 0.08);
-  color: var(--lex-primary-soft);
-  font-size: 12px;
-  font-weight: 600;
-}
-
 .hero-headline-group {
   display: grid;
-  gap: 16px;
-}
-
-.hero-value-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   gap: 10px;
 }
 
-.hero-value-line span {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  color: var(--lex-accent-strong);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.hero-value-line span:not(:last-child)::after {
-  content: '';
-  width: 18px;
-  height: 1px;
-  margin-left: 10px;
-  background: rgba(179, 138, 61, 0.35);
+.hero-value-line {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.7;
 }
 
 .main-title {
@@ -599,67 +491,52 @@ onUnmounted(() => {
 
 .main-subtitle {
   margin: 0 !important;
-  max-width: 42ch;
+  max-width: 40ch;
   font-family: var(--font-sans);
-  font-size: 18px;
+  font-size: 17px;
   color: var(--text-secondary);
-  line-height: 1.85;
+  line-height: 1.8;
 }
 
 .hero-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
 }
 
 .hero-primary-action {
-  min-width: 150px;
+  min-width: 180px;
+}
+
+.hero-secondary-action {
+  padding-inline: 0;
+  height: auto;
 }
 
 .hero-evidence-strip {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  display: block;
 }
 
-.evidence-item {
-  display: grid;
-  gap: 4px;
+.evidence-summary {
+  margin: 0;
   padding: 14px 16px;
   border-radius: 8px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(252, 251, 248, 0.88) 100%);
-  border: 1px solid rgba(0, 9, 24, 0.06);
-}
-
-.evidence-item span {
-  color: var(--text-tertiary);
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.evidence-item strong {
-  color: var(--lex-primary);
-  font-size: 15px;
-  line-height: 1.55;
-}
-
-.hero-aside {
-  display: grid;
-  gap: 18px;
+  background: rgba(248, 244, 237, 0.72);
+  border: 1px solid rgba(0, 9, 24, 0.05);
+  color: var(--text-secondary);
+  line-height: 1.8;
 }
 
 .access-card {
-  height: 100%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 248, 244, 0.94) 100%);
+  margin-top: 2px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 248, 244, 0.96) 100%);
   border: 1px solid rgba(0, 9, 24, 0.06);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.05);
 }
 
 .access-card-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
+  display: grid;
+  gap: 6px;
 }
 
 .access-card-head h3 {
@@ -669,63 +546,15 @@ onUnmounted(() => {
   font-family: var(--font-heading);
 }
 
-.access-card-status {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(179, 138, 61, 0.1);
-  border: 1px solid rgba(179, 138, 61, 0.14);
-  color: var(--accent-color-deep);
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
+.access-card-caption {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
 }
 
 .access-card-body {
   display: grid;
-  gap: 16px;
-}
-
-.access-description {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.75;
-}
-
-.access-flow {
-  display: grid;
-  gap: 10px;
-}
-
-.flow-step {
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr);
-  gap: 12px;
-  align-items: center;
-  padding: 12px 14px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(0, 9, 24, 0.05);
-}
-
-.flow-step strong {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(0, 33, 64, 0.08);
-  color: var(--lex-primary-soft);
-  font-size: 13px;
-}
-
-.flow-step span {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  font-size: 13px;
+  gap: 14px;
 }
 
 .input-wrapper {
@@ -789,7 +618,8 @@ onUnmounted(() => {
 
 .features-section {
   display: grid;
-  gap: 20px;
+  gap: 14px;
+  max-width: 760px;
 }
 
 .section-header {
@@ -805,86 +635,41 @@ onUnmounted(() => {
 
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .feature-card {
   display: grid;
-  gap: 16px;
-  min-height: 220px;
-  padding: 22px;
+  gap: 6px;
+  padding: 16px;
   border-radius: 8px;
-  background: rgba(252, 251, 248, 0.78);
+  background: rgba(252, 251, 248, 0.7);
   border: 1px solid rgba(0, 9, 24, 0.05);
-  box-shadow: var(--shadow-xs);
-}
-
-.feature-icon-box {
-  width: 44px;
-  height: 44px;
-  background: rgba(0, 33, 64, 0.06);
-  border: 1px solid rgba(0, 33, 64, 0.06);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: var(--lex-primary-soft);
 }
 
 .feature-card h3 {
   margin: 0;
   color: var(--lex-primary);
-  font-size: 18px;
+  font-size: 17px;
 }
 
 .feature-card p {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.75;
+  font-size: 14px;
 }
 
 .assurance-panel {
-  display: grid;
-  gap: 18px;
-  padding: 24px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(0, 9, 24, 0.98) 0%, rgba(0, 33, 64, 0.96) 100%);
-  color: rgba(255, 255, 255, 0.88);
-  box-shadow: var(--shadow-md);
+  padding-top: 2px;
 }
 
 .assurance-copy {
-  display: grid;
-  gap: 10px;
-}
-
-.assurance-kicker {
-  color: rgba(179, 138, 61, 0.94);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.assurance-copy h3 {
   margin: 0;
-  color: #fff;
-  font-size: 24px;
-  line-height: 1.25;
-}
-
-.assurance-copy p {
-  margin: 0;
-  line-height: 1.8;
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.assurance-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.75;
 }
 
 .footer {
@@ -980,10 +765,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 1100px) {
-  .hero-panel {
-    grid-template-columns: 1fr;
-  }
-
   .hero-copy {
     padding-top: 0;
   }
@@ -1002,6 +783,10 @@ onUnmounted(() => {
     padding: 18px 0 40px;
   }
 
+  .hero-surface {
+    padding: 20px 16px;
+  }
+
   .main-title {
     font-size: 34px !important;
     max-width: none;
@@ -1012,24 +797,11 @@ onUnmounted(() => {
   }
 
   .hero-value-line {
-    gap: 8px;
+    font-size: 13px;
   }
 
-  .hero-value-line span {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-  }
-
-  .hero-value-line span:not(:last-child)::after {
-    width: 12px;
-    margin-left: 8px;
-  }
-
-  .hero-panel,
   .feature-grid,
-  .hero-evidence-strip,
-  .footer-grid,
-  .assurance-actions {
+  .footer-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1048,14 +820,12 @@ onUnmounted(() => {
     min-width: 108px;
   }
 
-  .hero-primary-action,
-  .hero-actions :deep(.ant-btn) {
+  .hero-primary-action {
     width: 100%;
   }
 
-  .access-input-panel,
-  .assurance-panel {
-    padding: 16px;
+  .access-input-panel {
+    padding: 14px;
   }
 
   .footer {

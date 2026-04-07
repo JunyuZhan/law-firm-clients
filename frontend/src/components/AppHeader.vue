@@ -38,7 +38,6 @@
               >
             </div>
             <div class="logo-text">
-              <span class="brand-kicker">Secure Portal</span>
               <h1>{{ lawFirmName }}</h1>
               <p>{{ title || portalSystemLabel }}</p>
             </div>
@@ -217,16 +216,6 @@ const detailSubtitle = computed(() => '安全访问、进度追踪与受控文�
   min-width: 0;
 }
 
-.brand-kicker {
-  display: inline-block;
-  margin-bottom: 4px;
-  color: var(--lex-accent-strong);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
 .logo-text h1 {
   margin: 0;
   font-size: 18px;
@@ -316,7 +305,6 @@ const detailSubtitle = computed(() => '安全访问、进度追踪与受控文�
     font-size: 16px;
   }
 
-  .brand-kicker,
   .logo-text p {
     display: none;
   }

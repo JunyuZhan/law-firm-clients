@@ -2,9 +2,6 @@
   <div class="letter-verification-container">
     <section class="page-intro">
       <div>
-        <div class="eyebrow">
-          Verification Ledger
-        </div>
         <h2 class="editorial-title intro-title">
           函件验证记录
         </h2>
@@ -54,67 +51,9 @@
       </article>
     </section>
 
-    <section class="spotlight-grid dashboard-spotlight-grid">
-      <article class="spotlight-card dashboard-spotlight-card">
-        <span class="panel-kicker">Risk Desk</span>
-        <h3>验证风险与处理顺序</h3>
-        <p>先识别有效、过期和撤销记录的分布，再决定是查看详情、追踪访问还是执行撤销动作。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">已过期占比</span>
-        <strong>{{ expiredRatio }}</strong>
-        <p>帮助快速判断历史函件是否在累积风险。</p>
-      </article>
-      <article class="spotlight-card spotlight-card--metric dashboard-spotlight-card dashboard-spotlight-card--metric">
-        <span class="spotlight-label dashboard-spotlight-label">活跃记录</span>
-        <strong>{{ activeRecordCount }}</strong>
-        <p>仍可能继续被第三方核验的函件数量。</p>
-      </article>
-    </section>
-
-    <section class="guide-grid dashboard-guide-grid">
-      <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <span class="panel-kicker">Verification Logic</span>
-            <h3>状态判定规则</h3>
-          </div>
-        </div>
-        <div class="rule-grid">
-          <div class="rule-item">
-            <span>有效</span>
-            <strong>状态为 ACTIVE 且仍在有效期内。</strong>
-          </div>
-          <div class="rule-item">
-            <span>已过期</span>
-            <strong>状态为 ACTIVE，但有效期已截止。</strong>
-          </div>
-          <div class="rule-item">
-            <span>已撤销</span>
-            <strong>由后台主动失效，外部不应继续核验。</strong>
-          </div>
-        </div>
-      </article>
-
-      <article class="guide-card dashboard-guide-card">
-        <div class="guide-card__head dashboard-guide-head">
-          <div>
-            <span class="panel-kicker">Operations</span>
-            <h3>处理建议</h3>
-          </div>
-        </div>
-        <ul class="guide-list">
-          <li>先用关键词定位异常记录，再查看详情中的时间线和最后验证 IP。</li>
-          <li>撤销只对仍有效的函件开放，避免误操作历史记录。</li>
-          <li>如果需要运营视角统计，再展开上方统计区即可。</li>
-        </ul>
-      </article>
-    </section>
-
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
         <div>
-          <span class="panel-kicker">Search Ledger</span>
           <h3>验证检索</h3>
         </div>
         <p>按状态与关键词快速定位异常函件，再进入详情与撤销操作。</p>
@@ -168,7 +107,6 @@
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
         <div>
-          <span class="panel-kicker">Verification Ledger</span>
           <h3>核验记录台账</h3>
         </div>
         <p>把状态、有效期、核验次数和最后访问时间集中在一张表里，便于快速判断风险。</p>
@@ -256,9 +194,6 @@
     >
       <template #title>
         <div class="drawer-title-block">
-          <div class="drawer-kicker">
-            Verification Detail
-          </div>
           <div class="drawer-title">
             函件验证详情
           </div>
@@ -365,11 +300,6 @@ const statistics = reactive({
   expired: 0,
   revoked: 0,
 })
-const expiredRatio = computed(() => {
-  if (!statistics.total) return '0%'
-  return `${Math.round((statistics.expired / statistics.total) * 100)}%`
-})
-const activeRecordCount = computed(() => dataSource.value.filter(record => record.status === 'ACTIVE' && !isExpired(record.validUntil)).length)
 const revocableCount = computed(() => dataSource.value.filter(record => record.status === 'ACTIVE' && !isExpired(record.validUntil)).length)
 
 const searchForm = ref({
