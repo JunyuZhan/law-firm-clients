@@ -112,9 +112,7 @@
           </div>
 
           <div class="header-title-block">
-            <div class="header-title-row">
-              <span class="page-title">{{ currentPageTitle }}</span>
-            </div>
+            <span class="page-title">{{ currentPageTitle }}</span>
           </div>
 
           <div class="header-side header-side-right">
@@ -853,7 +851,7 @@ async function handleLogout() {
 
 .header-content {
   display: grid;
-  grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 12px;
   min-height: 76px;
@@ -896,28 +894,27 @@ async function handleLogout() {
   min-width: 0;
   display: flex;
   justify-content: center;
-}
-
-.header-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  text-align: center;
+  overflow: hidden;
 }
 
 .page-title {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 24px;
   font-weight: 700;
   color: var(--lex-primary);
   line-height: 1.3;
   font-family: var(--font-heading);
+  text-align: center;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .header-btn {
@@ -981,12 +978,6 @@ async function handleLogout() {
   z-index: 1000;
 }
 
-@media (max-width: 1024px) {
-  .header-title-row {
-    gap: 10px;
-  }
-}
-
 @media (max-width: 768px) {
   .main-layout {
     margin-left: 0 !important;
@@ -1020,7 +1011,7 @@ async function handleLogout() {
   }
 
   .header-content {
-    grid-template-columns: 44px minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     min-height: 64px;
     padding: 12px 0 8px;
     align-items: center;

@@ -7,8 +7,31 @@
     <div class="header-content section-shell">
       <div class="header-left">
         <slot name="left">
+          <div
+            v-if="variant === 'portal' && !title"
+            class="portal-left-group"
+          >
+            <div class="logo-section">
+              <div class="logo-icon">
+                <img
+                  :src="logoUrl"
+                  alt="Logo"
+                  class="logo-image"
+                >
+              </div>
+              <div class="logo-text">
+                <h1>{{ lawFirmName }}</h1>
+                <p class="logo-system-label">{{ portalSystemLabel }}</p>
+                <p
+                  v-if="appConfigStore.appSlogan"
+                  class="logo-slogan"
+                >{{ appConfigStore.appSlogan }}</p>
+              </div>
+            </div>
+          </div>
+
           <a-button
-            v-if="showBack"
+            v-else-if="showBack"
             type="default"
             class="header-btn back-btn"
             @click="$emit('back')"
@@ -22,33 +45,27 @@
             >{{ backText }}</span>
           </a-button>
         </slot>
+
+        <a-button
+          v-if="variant === 'portal' && !title && showBack"
+          type="default"
+          class="header-btn back-btn"
+          @click="$emit('back')"
+        >
+          <template #icon>
+            <ArrowLeftOutlined />
+          </template>
+          <span
+            v-if="showBackText"
+            class="back-btn-text"
+          >{{ backText }}</span>
+        </a-button>
       </div>
 
       <div class="header-center">
         <slot name="center">
           <div
-            v-if="variant === 'portal' && !title"
-            class="logo-section"
-          >
-            <div class="logo-icon">
-              <img
-                :src="logoUrl"
-                alt="Logo"
-                class="logo-image"
-              >
-            </div>
-            <div class="logo-text">
-              <h1>{{ lawFirmName }}</h1>
-              <p class="logo-system-label">{{ portalSystemLabel }}</p>
-              <p
-                v-if="appConfigStore.appSlogan"
-                class="logo-slogan"
-              >{{ appConfigStore.appSlogan }}</p>
-            </div>
-          </div>
-
-          <div
-            v-else-if="title"
+            v-if="title"
             class="title-section"
           >
             <div
@@ -201,6 +218,16 @@ const detailSubtitle = computed(() => '安全访问、进度追踪与受控文�
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.app-header.portal .header-center {
+  justify-content: flex-start;
+}
+
+.portal-left-group {
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .logo-section {
