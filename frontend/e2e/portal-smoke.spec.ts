@@ -6,23 +6,24 @@ test.describe('Portal smoke', () => {
     await mockPublicConfig(page)
   })
 
-  test('renders the portal entry with brand copy', async ({ page }) => {
+  test('renders the portal entry with slogan and centered hero copy', async ({ page }) => {
     await page.goto('/portal')
 
-    await expect(page.locator('.main-title')).toContainText('专业事项')
-    await expect(page.locator('.main-title')).toContainText('客户入口')
-    await expect(page.getByText('项目访问入口')).toBeVisible()
-    await expect(page.getByText('单链接访问')).toBeVisible()
-    await expect(page.getByText('安全令牌验证')).toBeVisible()
+    await expect(page.locator('.logo-text h1')).toContainText('汉科律师事务所')
+    await expect(page.locator('.logo-slogan')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.locator('.main-title')).toContainText('客户项目入口')
+    await expect(page.locator('.hero-slogan')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.getByRole('button', { name: '进入项目' })).toBeVisible()
   })
 
   test('stays readable on a narrow viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/portal')
 
-    await expect(page.locator('.main-title')).toContainText('专业事项')
-    await expect(page.locator('.main-title')).toContainText('客户入口')
-    await expect(page.getByText('项目访问入口')).toBeVisible()
+    await expect(page.locator('.logo-text h1')).toContainText('汉科律师事务所')
+    await expect(page.locator('.logo-slogan')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.locator('.main-title')).toContainText('客户项目入口')
+    await expect(page.locator('.hero-slogan')).toContainText('专业事项，一个清晰的客户入口')
     await expect(page.getByRole('button', { name: '进入项目' })).toBeVisible()
   })
 })

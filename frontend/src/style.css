@@ -461,11 +461,11 @@ th.ant-table-cell-fix-left {
   background: transparent;
 }
 
-.matter-list-container .content,
-.file-list-container .content,
-.notifications-container .content,
-.profile-container .content,
-.help-center-container .content {
+.matter-list-container > .content,
+.file-list-container > .content,
+.notifications-container > .content,
+.profile-container > .content,
+.help-center-container > .content {
   width: min(var(--page-content-max-width), calc(100vw - 2 * var(--shell-gutter)));
   margin: 0 auto;
   padding: 24px 0 var(--page-content-bottom-space);

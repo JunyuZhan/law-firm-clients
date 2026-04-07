@@ -25,7 +25,7 @@
           <div class="brand-copy">
             <p class="brand-kicker">管理员登录</p>
             <h1 class="editorial-title brand-title">
-              {{ appConfigStore.lawFirmName }}
+              {{ appConfigStore.displayName }}
             </h1>
           </div>
         </div>
@@ -124,7 +124,7 @@
             {{ appConfigStore.copyright }}
           </p>
           <p v-else>
-            © {{ currentYear }} {{ appConfigStore.lawFirmName }}
+            © {{ currentYear }} {{ appConfigStore.displayName }}
           </p>
           <p
             v-if="appConfigStore.icpLicense"
@@ -262,15 +262,17 @@ onMounted(() => {
 
 .login-shell {
   min-height: calc(100vh - 48px);
-  width: min(520px, 100%);
+  width: min(640px, 100%);
   margin: 0 auto;
-  display: block;
+  display: grid;
+  place-items: center;
 }
 
 .login-panel {
+  width: min(520px, 100%);
   padding: 32px;
   border-radius: 8px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
   background: rgba(255, 255, 255, 0.98);
 }
@@ -445,9 +447,12 @@ onMounted(() => {
 
   .login-shell {
     min-height: calc(100vh - 32px);
+    width: 100%;
+    place-items: start center;
   }
 
   .login-panel {
+    width: 100%;
     padding: 20px;
   }
 

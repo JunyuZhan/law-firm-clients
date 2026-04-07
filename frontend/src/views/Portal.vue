@@ -29,6 +29,12 @@
                     客户项目入口
                   </a-typography-title>
                   <p
+                    v-if="appSlogan"
+                    class="hero-slogan"
+                  >
+                    {{ appSlogan }}
+                  </p>
+                  <p
                     v-if="heroValueItems.length"
                     class="hero-value-line"
                   >
@@ -241,7 +247,7 @@ const heroValueItems = computed(() => {
     .slice(0, 4)
 })
 const icpLicense = computed(() => appConfigStore.icpLicense)
-const lawFirmName = computed(() => appConfigStore.lawFirmName)
+const lawFirmName = computed(() => appConfigStore.displayName)
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
 const isMobile = computed(() => windowWidth.value <= 768)
 const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmName.value)
@@ -436,12 +442,14 @@ onUnmounted(() => {
 .hero-content {
   display: grid;
   gap: 24px;
+  justify-items: center;
 }
 
 .hero-panel {
+  width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 760px);
-  justify-content: start;
+  grid-template-columns: minmax(0, 840px);
+  justify-content: center;
 }
 
 .hero-copy {
@@ -470,6 +478,15 @@ onUnmounted(() => {
 .hero-headline-group {
   display: grid;
   gap: 10px;
+}
+
+.hero-slogan {
+  margin: 0;
+  max-width: 32ch;
+  font-family: var(--font-heading);
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.35;
+  color: var(--lex-accent-strong);
 }
 
 .hero-value-line {
@@ -617,9 +634,10 @@ onUnmounted(() => {
 }
 
 .features-section {
+  width: 100%;
   display: grid;
   gap: 14px;
-  max-width: 760px;
+  max-width: 840px;
 }
 
 .section-header {

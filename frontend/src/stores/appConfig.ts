@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { getPortalConfig, getBrandConfig } from '@/api/config'
 import {
   APP_NAME,
@@ -29,7 +29,8 @@ export const useAppConfigStore = defineStore('appConfig', () => {
   const logoUrl = ref(LOGO_URL)
   const icpLicense = ref(ICP_LICENSE)
   const copyright = ref('')
-  
+  const displayName = computed(() => appName.value || lawFirmName.value || appShortName.value || APP_NAME)
+
   // 加载状态
   const loaded = ref(false)
   const loading = ref(false)
@@ -84,6 +85,7 @@ export const useAppConfigStore = defineStore('appConfig', () => {
     appShortNameEn,
     appSlogan,
     lawFirmName,
+    displayName,
     lawFirmWebsite,
     logoUrl,
     icpLicense,

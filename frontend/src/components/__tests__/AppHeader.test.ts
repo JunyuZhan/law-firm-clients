@@ -133,9 +133,12 @@ describe('AppHeader', () => {
     const pinia = createPinia()
     setActivePinia(pinia)
     const appConfigStore = useAppConfigStore()
+    appConfigStore.appName = '北京某某律师事务所'
     appConfigStore.lawFirmName = '北京某某律师事务所'
     appConfigStore.logoUrl = '/logo.png'
-    
+    appConfigStore.appShortName = '某某客户服务'
+    appConfigStore.appSlogan = '专业事项，一个清晰的客户入口'
+
     const wrapper = mount(AppHeader, {
       props: defaultProps,
       global: {
@@ -152,7 +155,8 @@ describe('AppHeader', () => {
 
     expect(wrapper.find('.logo-section').exists()).toBe(true)
     expect(wrapper.find('.logo-text h1').text().trim()).toBe('北京某某律师事务所')
-    expect(wrapper.find('.logo-text p').text().trim()).toBe(appConfigStore.appShortName || '客户服务系统')
+    expect(wrapper.find('.logo-system-label').text().trim()).toBe('某某客户服务')
+    expect(wrapper.find('.logo-slogan').text().trim()).toBe('专业事项，一个清晰的客户入口')
   })
 
   it('does not render logo section for detail variant', () => {

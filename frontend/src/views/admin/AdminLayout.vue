@@ -98,67 +98,70 @@
 
       <a-layout-header class="header">
         <div class="header-content">
-          <a-button
-            type="text"
-            class="collapse-btn"
-            @click="collapsed = !collapsed"
-          >
-            <template #icon>
-              <MenuUnfoldOutlined v-if="collapsed" />
-              <MenuFoldOutlined v-else />
-            </template>
-          </a-button>
+          <div class="header-side header-side-left">
+            <a-button
+              type="text"
+              class="collapse-btn"
+              @click="collapsed = !collapsed"
+            >
+              <template #icon>
+                <MenuUnfoldOutlined v-if="collapsed" />
+                <MenuFoldOutlined v-else />
+              </template>
+            </a-button>
+          </div>
 
           <div class="header-title-block">
             <div class="header-title-row">
               <span class="page-title">{{ currentPageTitle }}</span>
-              <span class="header-status-pill">{{ headerStatusLabel }}</span>
             </div>
           </div>
 
-          <a-space
-            class="header-actions"
-            size="middle"
-          >
-            <a-badge :count="0">
-              <a-button
-                type="text"
-                class="header-btn"
-              >
-                <template #icon>
-                  <BellOutlined />
+          <div class="header-side header-side-right">
+            <a-space
+              class="header-actions"
+              size="middle"
+            >
+              <a-badge :count="0">
+                <a-button
+                  type="text"
+                  class="header-btn"
+                >
+                  <template #icon>
+                    <BellOutlined />
+                  </template>
+                </a-button>
+              </a-badge>
+              <a-dropdown>
+                <a-button
+                  type="text"
+                  class="header-btn"
+                >
+                  <template #icon>
+                    <UserOutlined />
+                  </template>
+                  <span class="header-btn-text">{{ authStore.getCurrentUserInfo()?.realName || authStore.getCurrentUserInfo()?.username || '管理员' }}</span>
+                </a-button>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item @click="router.push('/admin/profile')">
+                      <template #icon>
+                        <UserOutlined />
+                      </template>
+                      个人中心
+                    </a-menu-item>
+                    <a-menu-divider />
+                    <a-menu-item @click="handleLogout">
+                      <template #icon>
+                        <LogoutOutlined />
+                      </template>
+                      退出登录
+                    </a-menu-item>
+                  </a-menu>
                 </template>
-              </a-button>
-            </a-badge>
-            <a-dropdown>
-              <a-button
-                type="text"
-                class="header-btn"
-              >
-                <template #icon>
-                  <UserOutlined />
-                </template>
-                <span class="header-btn-text">{{ authStore.getCurrentUserInfo()?.realName || authStore.getCurrentUserInfo()?.username || '管理员' }}</span>
-              </a-button>
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item @click="router.push('/admin/profile')">
-                    <template #icon>
-                      <UserOutlined />
-                    </template>
-                    个人中心
-                  </a-menu-item>
-                  <a-menu-divider />
-                  <a-menu-item @click="handleLogout">
-                    <template #icon>
-                      <LogoutOutlined />
-                    </template>
-                    退出登录
-                  </a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-          </a-space>
+              </a-dropdown>
+            </a-space>
+          </div>
         </div>
       </a-layout-header>
       <a-layout-content
@@ -699,7 +702,7 @@ async function handleLogout() {
 }
 
 .logo {
-  min-height: 92px;
+  min-height: 78px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -711,8 +714,8 @@ async function handleLogout() {
 .logo-content {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 20px 18px 18px;
+  gap: 12px;
+  padding: 16px 16px 14px;
   width: 100%;
 }
 
@@ -760,21 +763,21 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  padding: 18px 16px;
 }
 
 .admin-menu {
   flex: 1;
   border-right: none;
-  padding: 18px 10px 12px;
+  padding: 12px 8px 10px;
   background: transparent !important;
 }
 
 .admin-menu :deep(.ant-menu-item) {
-  margin: 6px 4px;
+  margin: 4px 2px;
   border-radius: 6px;
-  height: 44px;
-  line-height: 44px;
+  height: 42px;
+  line-height: 42px;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.78) !important;
   font-weight: 500;
@@ -849,13 +852,28 @@ async function handleLogout() {
 }
 
 .header-content {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(72px, 1fr) auto minmax(72px, 1fr);
   align-items: center;
   gap: 12px;
-  min-height: 84px;
+  min-height: 76px;
   width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
   margin: 0 auto;
-  padding: 18px 0 12px;
+  padding: 14px 0 10px;
+}
+
+.header-side {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.header-side-left {
+  justify-content: flex-start;
+}
+
+.header-side-right {
+  justify-content: flex-end;
 }
 
 .collapse-btn {
@@ -875,14 +893,18 @@ async function handleLogout() {
 }
 
 .header-title-block {
-  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .header-title-row {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
+  text-align: center;
 }
 
 .page-title {
@@ -893,9 +915,9 @@ async function handleLogout() {
   font-family: var(--font-heading);
 }
 
-
 .header-actions {
-  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .header-btn {
@@ -929,22 +951,22 @@ async function handleLogout() {
 }
 
 .content {
-  padding: 4px 0 28px;
-  min-height: calc(100vh - 120px);
+  padding: 0 0 24px;
+  min-height: calc(100vh - 112px);
 }
 
 .content-shell {
   width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
   margin: 0 auto;
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 124px);
 }
 
 .content-wrapper {
   background: rgba(252, 251, 248, 0.84);
   border: 1px solid rgba(0, 9, 24, 0.06);
   border-radius: 8px;
-  padding: 24px;
-  min-height: calc(100vh - 140px);
+  padding: 20px;
+  min-height: calc(100vh - 124px);
   box-shadow: var(--shadow-sm);
 }
 
@@ -998,9 +1020,10 @@ async function handleLogout() {
   }
 
   .header-content {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     min-height: 64px;
-    padding: 16px 0 10px;
-    align-items: flex-start;
+    padding: 12px 0 8px;
+    align-items: center;
   }
 
   .header-caption,
@@ -1013,7 +1036,7 @@ async function handleLogout() {
   }
 
   .content-wrapper {
-    padding: 18px;
+    padding: 16px;
     min-height: calc(100vh - 104px);
   }
 
