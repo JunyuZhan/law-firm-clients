@@ -716,10 +716,10 @@ async function handleLogout() {
 }
 
 .logo-brand-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 6px;
-  padding: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -736,8 +736,8 @@ async function handleLogout() {
 }
 
 .logo-image-collapsed {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   display: block;
 }
@@ -922,14 +922,17 @@ async function handleLogout() {
 
 .header-btn {
   color: var(--text-secondary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
   background: rgba(252, 251, 248, 0.86) !important;
   border: 1px solid var(--border-color-light);
   border-radius: 999px;
   cursor: pointer;
-  min-height: 40px;
 }
 
 .header-btn:hover {
@@ -938,12 +941,25 @@ async function handleLogout() {
 }
 
 .header-actions :deep(.ant-badge) {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  line-height: 1;
 }
 
 .header-actions :deep(.ant-badge .ant-badge-count) {
   box-shadow: none;
+}
+
+.header-actions :deep(.ant-badge .ant-badge-dot),
+.header-actions :deep(.ant-badge .ant-badge-count) {
+  transform: translate(2px, -2px);
+}
+
+.header-actions :deep(.ant-btn > .anticon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .header-btn-text {
