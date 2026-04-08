@@ -47,6 +47,7 @@ function matchesPatterns(url: string | undefined, patterns: string[]): boolean {
 // 扩展 AxiosRequestConfig，添加 params 类型支持
 export interface RequestConfig extends AxiosRequestConfig {
   params?: Record<string, unknown>
+  suppressErrorMessage?: boolean
 }
 
 // 创建axios实例
@@ -127,6 +128,7 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     const status = error.response?.status
+    const suppressErrorMessage = Boolean(error.config?.suppressErrorMessage)
 
     // 处理401未授权错误（Token无效或过期）
     if (status === 401) {
@@ -135,7 +137,9 @@ axiosInstance.interceptors.response.use(
       const isLoginPage = window.location.pathname === '/admin/login'
       if (!isLoginPage) {
         authStore.clearAuth()
-        message.error('登录已过期，请重新登录')
+        if (!suppressErrorMessage) {
+          message.error('登录已过期，请重新登录')
+        }
         // 如果是管理后台页面，跳转到登录页
         if (window.location.pathname.startsWith('/admin')) {
           router.push('/admin/login')
@@ -155,7 +159,9 @@ axiosInstance.interceptors.response.use(
         const isLoginPage = window.location.pathname === '/admin/login'
         if (!isLoginPage) {
           authStore.clearAuth()
-          message.error(errorMsg || '安全令牌已失效，请重新登录')
+          if (!suppressErrorMessage) {
+            message.error(errorMsg || '安全令牌已失效，请重新登录')
+          }
           if (window.location.pathname.startsWith('/admin')) {
             router.push('/admin/login')
           }
@@ -163,25 +169,33 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error)
       }
       
-      message.error('权限不足，无法执行此操作')
+      if (!suppressErrorMessage) {
+        message.error('权限不足，无法执行此操作')
+      }
       return Promise.reject(error)
     }
 
     // 处理500服务器内部错误（不暴露后端详情）
     if (status && status >= 500) {
-      message.error('服务器繁忙，请稍后重试')
+      if (!suppressErrorMessage) {
+        message.error('服务器繁忙，请稍后重试')
+      }
       return Promise.reject(error)
     }
 
     // 处理429请求过多
     if (status === 429) {
-      message.warning('操作过于频繁，请稍后再试')
+      if (!suppressErrorMessage) {
+        message.warning('操作过于频繁，请稍后再试')
+      }
       return Promise.reject(error)
     }
 
     // 其他错误：使用通用提示，不暴露后端内部信息
     const errorMessage = error.response?.data?.message || error.message || '网络错误'
-    message.error(errorMessage)
+    if (!suppressErrorMessage) {
+      message.error(errorMessage)
+    }
     return Promise.reject(error)
   }
 )

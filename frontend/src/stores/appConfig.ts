@@ -45,8 +45,8 @@ export const useAppConfigStore = defineStore('appConfig', () => {
     try {
       // 并行获取门户配置和品牌配置
       const [portalRes, brandRes] = await Promise.all([
-        getPortalConfig().catch(() => null),
-        getBrandConfig().catch(() => null),
+        getPortalConfig({ suppressErrorMessage: true }).catch(() => null),
+        getBrandConfig({ suppressErrorMessage: true }).catch(() => null),
       ])
       
       // 应用门户配置

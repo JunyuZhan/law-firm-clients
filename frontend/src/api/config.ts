@@ -1,5 +1,5 @@
 import request from './request'
-import type { ApiResponse } from './request'
+import type { ApiResponse, RequestConfig } from './request'
 
 // 系统配置接口
 export interface SysConfigInfo {
@@ -63,9 +63,9 @@ export function deleteConfig(id: number): Promise<ApiResponse<void>> {
  * @param keys 配置键列表，多个用逗号分隔（可选）
  * @returns 配置键值对
  */
-export function getPublicConfig(keys?: string): Promise<ApiResponse<Record<string, string>>> {
+export function getPublicConfig(keys?: string, config?: RequestConfig): Promise<ApiResponse<Record<string, string>>> {
   const params = keys ? { keys } : {}
-  return request.get('/api/public/config', { params })
+  return request.get('/api/public/config', { ...config, params })
 }
 
 /**
@@ -92,8 +92,8 @@ export interface PortalConfig {
  * 获取门户页面配置（无需认证）
  * @returns 门户配置
  */
-export function getPortalConfig(): Promise<ApiResponse<PortalConfig>> {
-  return request.get('/api/public/config/portal')
+export function getPortalConfig(config?: RequestConfig): Promise<ApiResponse<PortalConfig>> {
+  return request.get('/api/public/config/portal', config)
 }
 
 /**
@@ -110,8 +110,8 @@ export interface BrandConfig {
  * 获取系统品牌配置（无需认证）
  * @returns 品牌配置
  */
-export function getBrandConfig(): Promise<ApiResponse<BrandConfig>> {
-  return request.get('/api/public/config/brand')
+export function getBrandConfig(config?: RequestConfig): Promise<ApiResponse<BrandConfig>> {
+  return request.get('/api/public/config/brand', config)
 }
 
 export interface SystemRuntimeInfo {

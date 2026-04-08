@@ -14,35 +14,172 @@
         class="content"
         tabindex="-1"
       >
-        <div class="hero-section">
-          <div class="hero-content section-shell fade-in">
-            <section class="hero-panel">
-              <div class="hero-copy hero-surface">
-                <div class="hero-headline-group">
-                  <p
-                    v-if="heroValueItems.length"
-                    class="hero-value-line"
-                  >
-                    {{ heroValueItems.join(' · ') }}
-                  </p>
-                  <a-typography-title
-                    :level="1"
-                    class="main-title"
-                  >
-                    输入完整访问链接
-                  </a-typography-title>
-                </div>
-                <a-typography-paragraph class="main-subtitle">
-                  直接粘贴律所发送的完整访问链接，系统会自动识别项目编号与访问 token。
-                </a-typography-paragraph>
+        <section class="hero-section section-shell fade-in">
+          <div class="hero-grid">
+            <div class="hero-main hero-surface">
+              <p class="hero-eyebrow">
+                {{ lawFirmName }}
+              </p>
+              <p
+                v-if="heroValueItems.length"
+                class="hero-value-line"
+              >
+                {{ heroValueItems.join(' · ') }}
+              </p>
+              <a-typography-title
+                :level="1"
+                class="main-title"
+              >
+                {{ heroTitle }}
+              </a-typography-title>
+              <a-typography-paragraph class="main-subtitle">
+                {{ heroSubtitle }}
+              </a-typography-paragraph>
+
+              <div class="hero-actions">
+                <a-button
+                  type="primary"
+                  size="large"
+                  @click="router.push('/help')"
+                >
+                  查看帮助说明
+                </a-button>
+                <a-button
+                  size="large"
+                  @click="router.push('/verify/letter')"
+                >
+                  函件真伪验证
+                </a-button>
+                <a
+                  v-if="lawFirmWebsite"
+                  :href="lawFirmWebsite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="hero-link"
+                >
+                  访问律所官网
+                </a>
+              </div>
+
+              <div class="hero-metrics">
+                <article
+                  v-for="item in heroMetrics"
+                  :key="item.label"
+                  class="metric-card"
+                >
+                  <span class="metric-label">{{ item.label }}</span>
+                  <strong>{{ item.value }}</strong>
+                  <p>{{ item.description }}</p>
+                </article>
+              </div>
+            </div>
+
+            <aside class="hero-side hero-surface hero-surface--soft">
+              <div class="hero-side-label">
+                Access Guide
+              </div>
+              <strong>{{ accessGuideTitle }}</strong>
+              <ol class="hero-steps">
+                <li>收到承办律师发送的专属访问链接后，直接打开即可查看项目信息。</li>
+                <li>如链接失效、过期或无法打开，请联系承办律师重新发送。</li>
+                <li>只有在无法直接打开链接时，才使用下方的辅助入口继续访问。</li>
+              </ol>
+            </aside>
+          </div>
+        </section>
+
+        <section class="section-shell info-section">
+          <div class="section-head">
+            <div>
+              <div class="eyebrow">
+                Service Overview
+              </div>
+              <h2>客户访问应当直接、可信、清晰</h2>
+            </div>
+            <p>门户页负责说明访问方式、展示服务入口，并提供异常情况下的自助帮助。</p>
+          </div>
+
+          <div class="journey-card">
+            <div class="journey-copy">
+              <span class="panel-kicker">Client Journey</span>
+              <h3>从收到链接到进入项目，流程应当尽量少一步</h3>
+              <p>客户不需要理解 token，也不需要先到门户页再手动粘贴链接。首页更适合承担品牌展示、路径说明和帮助承接。</p>
+            </div>
+            <ol class="journey-steps">
+              <li>律师发送专属访问链接</li>
+              <li>客户直接打开链接进入项目</li>
+              <li>若链接异常，再使用帮助或辅助入口</li>
+            </ol>
+          </div>
+
+          <div class="feature-grid">
+            <article
+              v-for="item in featureCards"
+              :key="item.title"
+              class="feature-card"
+            >
+              <span class="feature-label">{{ item.label }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-shell support-section">
+          <div class="support-grid">
+            <article class="support-card support-card--primary">
+              <span class="panel-kicker">How it works</span>
+              <h3>标准访问方式</h3>
+              <p>系统默认以“律师推送专属链接，客户直接打开”为主流程，不要求客户手动输入 token 或重复粘贴链接。</p>
+              <ul class="support-list">
+                <li>直接点击消息中的访问链接</li>
+                <li>进入项目详情页查看进展与材料</li>
+                <li>如遇异常，先看帮助中心，再联系承办律师</li>
+              </ul>
+            </article>
+
+            <article class="support-card">
+              <span class="panel-kicker">Support</span>
+              <h3>需要人工协助时</h3>
+              <p>如仍无法访问，请优先联系承办律师；如需公开联系方式，可通过官网进一步查询。</p>
+              <div class="support-actions">
+                <a-button @click="router.push('/help')">进入帮助中心</a-button>
+                <a
+                  v-if="lawFirmWebsite"
+                  :href="lawFirmWebsite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="support-link"
+                >
+                  前往 {{ lawFirmName }} 官网
+                </a>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section-shell fallback-section">
+          <a-collapse ghost>
+            <a-collapse-panel
+              key="manual-access"
+              header="无法直接打开律师发送的链接？可使用辅助入口继续访问"
+            >
+              <div class="fallback-panel">
+                <p class="fallback-copy">
+                  请粘贴律师发送的完整访问链接，系统会自动识别项目编号与访问 token，并跳转到对应页面。
+                </p>
 
                 <div class="input-wrapper access-input-panel">
-                  <span class="input-label">完整访问链接</span>
+                  <label
+                    for="portal-access-url"
+                    class="input-label"
+                  >完整访问链接</label>
                   <a-input-search
+                    id="portal-access-url"
                     v-model:value="matterUrl"
                     class="matter-search"
                     placeholder="请输入完整的项目访问链接，例如：https://example.com/matter/123?token=xxx"
-                    enter-button="进入项目"
+                    enter-button="继续访问"
                     size="large"
                     :loading="loading"
                     @search="handleAccess"
@@ -67,19 +204,10 @@
                     </a-button>
                   </div>
                 </div>
-
-                <div class="portal-help-row">
-                  <p class="portal-help-copy">
-                    链接失效或打不开页面时，请联系承办律师重新发送。
-                  </p>
-                  <a-button type="link" class="hero-secondary-action" @click="router.push('/help')">
-                    查看帮助说明
-                  </a-button>
-                </div>
               </div>
-            </section>
-          </div>
-        </div>
+            </a-collapse-panel>
+          </a-collapse>
+        </section>
       </a-layout-content>
 
       <a-layout-footer class="footer">
@@ -97,12 +225,12 @@
               </a>
               <span v-else>{{ lawFirmName }}</span>
             </p>
-            <p>如有疑问，请优先联系承办律师或事务所工作人员。</p>
+            <p>如有疑问，请优先联系承办律师或查看帮助中心中的访问说明。</p>
           </div>
 
           <div class="footer-bottom">
             <p class="footer-copy">
-              © 2026 {{ lawFirmName }}
+              {{ footerCopyright }}
             </p>
             <p
               v-if="icpLicense"
@@ -164,10 +292,49 @@ const heroValueItems = computed(() => {
     .slice(0, 4)
 })
 const icpLicense = computed(() => appConfigStore.icpLicense)
-const lawFirmName = computed(() => appConfigStore.displayName)
+const lawFirmName = computed(() => appConfigStore.displayName || '律师事务所')
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
+const footerCopyright = computed(() => appConfigStore.copyright || `© ${new Date().getFullYear()} ${lawFirmName.value}`)
 const isMobile = computed(() => windowWidth.value <= 768)
 const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmName.value)
+const heroTitle = computed(() => '客户服务与项目访问入口')
+const heroSubtitle = computed(() => '客户通常通过承办律师发送的专属访问链接直接进入项目页面。门户首页主要用于展示服务说明、帮助入口与异常情况下的辅助访问方式。')
+const accessGuideTitle = computed(() => appSlogan.value || '安全访问、进度同步、材料查看')
+const heroMetrics = computed(() => [
+  {
+    label: '主流程',
+    value: '直接打开链接',
+    description: '收到律师发送的访问链接后，无需重复粘贴或输入 token。',
+  },
+  {
+    label: '帮助入口',
+    value: '帮助说明 / 验证',
+    description: '遇到访问异常时，先查看帮助中心或进行函件真伪验证。',
+  },
+  {
+    label: '辅助方式',
+    value: '粘贴完整链接',
+    description: '仅在无法直接打开链接时，使用辅助入口继续访问。',
+  },
+])
+
+const featureCards = computed(() => [
+  {
+    label: 'Secure Access',
+    title: '安全访问项目动态',
+    description: '通过专属访问链接进入项目详情页，在受控范围内查看当前进展、关键节点与相关说明。',
+  },
+  {
+    label: 'File Delivery',
+    title: '集中查看项目材料',
+    description: '文件与通知围绕项目统一呈现，减少在聊天记录、邮件与多个页面之间来回切换。',
+  },
+  {
+    label: 'Support Guidance',
+    title: '先自助排查，再联系律师',
+    description: '门户页与帮助中心负责说明标准访问方式，以及遇到失效链接时的处理路径。',
+  },
+])
 
 function parseMatterUrl(url: string): { matterId: string; token: string } | null {
   try {
@@ -329,50 +496,100 @@ onUnmounted(() => {
 
 .content {
   flex: 1;
-  padding: 0;
+  display: grid;
+  gap: 20px;
+  padding: 0 0 24px;
 }
 
 .hero-section {
-  position: relative;
-  padding: 24px 0 48px;
+  padding-top: 24px;
 }
 
-.hero-content {
-  display: block;
-}
-
-.hero-panel {
-  width: 100%;
-  max-width: 760px;
-}
-
-.hero-copy {
+.hero-grid,
+.support-grid {
   display: grid;
-  gap: 18px;
-  align-content: start;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  gap: 16px;
 }
 
-.hero-surface {
-  padding: 28px;
+.hero-surface,
+.feature-card,
+.support-card,
+.journey-card,
+.fallback-section :deep(.ant-collapse-item) {
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(0, 9, 24, 0.06);
+  background: rgba(255, 255, 255, 0.86);
   box-shadow: var(--shadow-sm);
 }
 
-.hero-headline-group {
+.journey-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  gap: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(248, 244, 237, 0.76), rgba(255, 255, 255, 0.92));
+}
+
+.journey-copy {
   display: grid;
   gap: 10px;
 }
 
-.hero-value-line {
+.journey-copy h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.journey-copy p,
+.journey-steps {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+.journey-steps {
+  padding-left: 18px;
+}
+
+.journey-steps li + li {
+  margin-top: 8px;
+}
+
+.hero-surface {
+  padding: 28px;
+}
+
+.hero-surface--soft,
+.support-card--primary {
+  background: rgba(248, 244, 237, 0.78);
+}
+
+.hero-main {
+  display: grid;
+  gap: 18px;
+}
+
+.hero-eyebrow,
+.hero-value-line,
+.eyebrow,
+.panel-kicker,
+.hero-side-label,
+.feature-label,
+.metric-label {
   margin: 0;
   color: var(--lex-accent-strong);
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.6;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.hero-eyebrow {
+  color: var(--text-tertiary);
 }
 
 .main-title {
@@ -380,23 +597,149 @@ onUnmounted(() => {
   color: var(--lex-primary) !important;
   font-family: var(--font-heading);
   font-weight: 600 !important;
-  font-size: clamp(32px, 4.4vw, 48px) !important;
+  font-size: clamp(32px, 4.8vw, 52px) !important;
   line-height: 1.12 !important;
-  letter-spacing: 0.01em;
 }
 
-.main-subtitle {
-  margin: 0 !important;
-  max-width: 46ch;
-  font-family: var(--font-sans);
-  font-size: 16px;
+.main-subtitle,
+.section-head p,
+.feature-card p,
+.support-card p,
+.fallback-copy,
+.footer-meta p,
+.hero-steps,
+.support-list {
+  margin: 0;
   color: var(--text-secondary);
   line-height: 1.75;
 }
 
-.hero-secondary-action {
-  padding-inline: 0;
-  height: auto;
+.hero-actions,
+.support-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-card {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(248, 244, 237, 0.72);
+  border: 1px solid rgba(0, 9, 24, 0.05);
+}
+
+.metric-card strong {
+  display: block;
+  margin: 6px 0 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.metric-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.hero-link,
+.support-link,
+.law-firm-link {
+  color: var(--lex-primary-soft);
+  transition: color 0.2s ease;
+}
+
+.hero-link:hover,
+.support-link:hover,
+.law-firm-link:hover {
+  color: var(--accent-color-deep);
+}
+
+.hero-side {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.hero-side strong,
+.feature-card h3,
+.support-card h3,
+.section-head h2 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.hero-side strong {
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.hero-steps,
+.support-list {
+  padding-left: 18px;
+}
+
+.info-section,
+.support-section,
+.fallback-section {
+  display: grid;
+  gap: 16px;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+}
+
+.section-head h2 {
+  margin-top: 6px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.section-head p {
+  max-width: 420px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.feature-card,
+.support-card {
+  padding: 20px;
+}
+
+.feature-card h3,
+.support-card h3 {
+  margin: 8px 0 10px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.fallback-section :deep(.ant-collapse-header) {
+  font-weight: 600;
+  color: var(--lex-primary);
+}
+
+.fallback-section :deep(.ant-collapse-content-box) {
+  padding-top: 0 !important;
+}
+
+.fallback-panel {
+  display: grid;
+  gap: 16px;
 }
 
 .input-wrapper {
@@ -450,29 +793,6 @@ onUnmounted(() => {
   z-index: 10;
 }
 
-.access-hints {
-  margin: 0;
-  padding-left: 18px;
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-.portal-help-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding-top: 4px;
-}
-
-.portal-help-copy {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.75;
-}
-
 .footer {
   background: rgba(249, 247, 242, 0.66);
   color: var(--text-secondary);
@@ -490,21 +810,6 @@ onUnmounted(() => {
 .footer-meta {
   display: grid;
   gap: 4px;
-}
-
-.footer-meta p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.law-firm-link {
-  color: var(--lex-primary-soft);
-  transition: color 0.3s;
-}
-
-.law-firm-link:hover {
-  color: var(--accent-color-deep);
 }
 
 .footer-bottom {
@@ -543,26 +848,40 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .hero-section {
-    padding: 16px 0 32px;
+  .content {
+    gap: 16px;
+    padding-bottom: calc(24px + var(--mobile-nav-height));
   }
 
-  .hero-surface {
-    padding: 20px 16px;
+  .hero-section {
+    padding-top: 16px;
+  }
+
+  .hero-grid,
+  .support-grid,
+  .feature-grid,
+  .hero-metrics,
+  .journey-card,
+  .footer-content {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .hero-surface,
+  .feature-card,
+  .support-card,
+  .journey-card,
+  .access-input-panel {
+    padding: 16px;
+  }
+
+  .section-head {
+    display: grid;
+    align-items: start;
   }
 
   .main-title {
     font-size: 30px !important;
-    max-width: none;
-  }
-
-  .main-subtitle {
-    font-size: 15px;
-  }
-
-  .portal-help-row,
-  .footer-content {
-    display: grid;
   }
 
   .paste-tip {
@@ -572,14 +891,6 @@ onUnmounted(() => {
 
   .matter-search :deep(.ant-btn) {
     min-width: 108px;
-  }
-
-  .access-input-panel {
-    padding: 14px;
-  }
-
-  .footer {
-    padding-bottom: calc(28px + var(--mobile-nav-height));
   }
 }
 </style>
