@@ -124,7 +124,7 @@
             {{ appConfigStore.copyright }}
           </p>
           <p v-else>
-            © {{ currentYear }} {{ appConfigStore.displayName }}
+            © {{ currentYear }} {{ organizationName }}
           </p>
           <p
             v-if="appConfigStore.icpLicense"
@@ -145,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAppConfigStore } from '@/stores/appConfig'
@@ -159,6 +159,7 @@ const authStore = useAuthStore()
 const appConfigStore = useAppConfigStore()
 
 const currentYear = new Date().getFullYear()
+const organizationName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName)
 
 const form = ref({
   username: '',
