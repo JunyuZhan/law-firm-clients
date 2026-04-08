@@ -6,13 +6,13 @@ test.describe('Portal smoke', () => {
     await mockPublicConfig(page)
   })
 
-  test('renders the portal entry with slogan and centered hero copy', async ({ page }) => {
+  test('renders the portal as a focused entry gateway', async ({ page }) => {
     await page.goto('/portal')
 
     await expect(page.locator('.logo-text h1')).toContainText('汉科客户服务系统')
-    await expect(page.locator('.logo-slogan')).toContainText('专业事项，一个清晰的客户入口')
-    await expect(page.locator('.main-title')).toContainText('客户项目入口')
-    await expect(page.locator('.hero-slogan')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.locator('.main-title')).toContainText('输入完整访问链接')
+    await expect(page.locator('.hero-value-line')).toContainText('专业事项')
+    await expect(page.locator('.portal-help-copy')).toContainText('链接失效或打不开页面时')
     await expect(page.getByRole('button', { name: '进入项目' })).toBeVisible()
   })
 
@@ -21,9 +21,8 @@ test.describe('Portal smoke', () => {
     await page.goto('/portal')
 
     await expect(page.locator('.logo-text h1')).toContainText('汉科客户服务系统')
-    await expect(page.locator('.logo-slogan')).toContainText('专业事项，一个清晰的客户入口')
-    await expect(page.locator('.main-title')).toContainText('客户项目入口')
-    await expect(page.locator('.hero-slogan')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.locator('.main-title')).toContainText('输入完整访问链接')
+    await expect(page.locator('.portal-help-copy')).toContainText('链接失效或打不开页面时')
     await expect(page.getByRole('button', { name: '进入项目' })).toBeVisible()
   })
 })

@@ -15,135 +15,67 @@
         tabindex="-1"
       >
         <div class="hero-section">
-          <div class="hero-content section-shell">
-            <section class="hero-panel fade-in">
+          <div class="hero-content section-shell fade-in">
+            <section class="hero-panel">
               <div class="hero-copy hero-surface">
-                <div class="hero-kicker">
-                  {{ lawFirmName }}
-                </div>
                 <div class="hero-headline-group">
-                  <a-typography-title
-                    :level="1"
-                    class="main-title"
-                  >
-                    客户项目入口
-                  </a-typography-title>
-                  <p
-                    v-if="appSlogan"
-                    class="hero-slogan"
-                  >
-                    {{ appSlogan }}
-                  </p>
                   <p
                     v-if="heroValueItems.length"
                     class="hero-value-line"
                   >
                     {{ heroValueItems.join(' · ') }}
                   </p>
+                  <a-typography-title
+                    :level="1"
+                    class="main-title"
+                  >
+                    输入完整访问链接
+                  </a-typography-title>
                 </div>
                 <a-typography-paragraph class="main-subtitle">
-                  粘贴律所发送的完整访问链接，直接进入项目详情、文件和通知。
+                  直接粘贴律所发送的完整访问链接，系统会自动识别项目编号与访问 token。
                 </a-typography-paragraph>
 
-                <div class="hero-actions">
-                  <a-button type="primary" size="large" class="hero-primary-action" @click="focusAccessInput">
-                    输入访问链接
-                  </a-button>
-                  <a-button type="link" class="hero-secondary-action" @click="router.push('/help')">
-                    遇到问题？查看帮助
-                  </a-button>
-                </div>
-
-                <a-card
-                  class="access-card"
-                  bordered
-                >
-                  <template #title>
-                    <div class="access-card-head">
-                      <div>
-                        <h3>输入完整访问链接</h3>
-                        <p class="access-card-caption">系统会自动识别项目编号与访问 token。</p>
-                      </div>
-                    </div>
-                  </template>
-
-                  <div class="access-card-body">
-                    <div class="input-wrapper access-input-panel">
-                      <span class="input-label">完整访问链接</span>
-                      <a-input-search
-                        v-model:value="matterUrl"
-                        class="matter-search"
-                        placeholder="请输入完整的项目访问链接，例如：https://example.com/matter/123?token=xxx"
-                        enter-button="进入项目"
-                        size="large"
-                        :loading="loading"
-                        @search="handleAccess"
-                        @input="checkClipboardAndUpdateButton"
-                      >
-                        <template #prefix>
-                          <LinkOutlined class="search-prefix" />
-                        </template>
-                      </a-input-search>
-                      <div
-                        v-if="showPasteButton"
-                        class="paste-tip"
-                      >
-                        <a-button
-                          type="link"
-                          size="small"
-                          :disabled="!canPaste"
-                          @mousedown.prevent
-                          @click="handlePaste"
-                        >
-                          {{ pasteButtonText }}
-                        </a-button>
-                      </div>
-                    </div>
-
-                    <div class="hero-evidence-strip">
-                      <p class="evidence-summary">
-                        律所发送完整链接，系统自动识别项目编号与 token，进入后可查看项目、文件与通知。
-                      </p>
-                    </div>
-
-                    <ul class="access-hints">
-                      <li>请直接粘贴律所发送的完整访问链接。</li>
-                      <li>如链接失效，请联系承办律师重新发送。</li>
-                    </ul>
+                <div class="input-wrapper access-input-panel">
+                  <span class="input-label">完整访问链接</span>
+                  <a-input-search
+                    v-model:value="matterUrl"
+                    class="matter-search"
+                    placeholder="请输入完整的项目访问链接，例如：https://example.com/matter/123?token=xxx"
+                    enter-button="进入项目"
+                    size="large"
+                    :loading="loading"
+                    @search="handleAccess"
+                    @input="checkClipboardAndUpdateButton"
+                  >
+                    <template #prefix>
+                      <LinkOutlined class="search-prefix" />
+                    </template>
+                  </a-input-search>
+                  <div
+                    v-if="showPasteButton"
+                    class="paste-tip"
+                  >
+                    <a-button
+                      type="link"
+                      size="small"
+                      :disabled="!canPaste"
+                      @mousedown.prevent
+                      @click="handlePaste"
+                    >
+                      {{ pasteButtonText }}
+                    </a-button>
                   </div>
-                </a-card>
+                </div>
 
-                <div class="assurance-panel">
-                  <p class="assurance-copy">
-                    打不开页面或链接失效？请先检查链接是否完整；如仍无法访问，请联系承办律师重新发送，或前往帮助中心查看说明。
+                <div class="portal-help-row">
+                  <p class="portal-help-copy">
+                    链接失效或打不开页面时，请联系承办律师重新发送。
                   </p>
+                  <a-button type="link" class="hero-secondary-action" @click="router.push('/help')">
+                    查看帮助说明
+                  </a-button>
                 </div>
-              </div>
-            </section>
-
-            <section
-              class="features-section fade-in"
-              style="animation-delay: 0.12s"
-            >
-              <div class="section-header">
-                <div>
-                  <a-typography-title :level="2">
-                    进入后可以做什么
-                  </a-typography-title>
-                  <a-typography-text type="secondary">
-                    项目、文件、通知和帮助入口会围绕当前访问项目展开。
-                  </a-typography-text>
-                </div>
-              </div>
-              <div class="feature-grid">
-                <article
-                  v-for="feature in features"
-                  :key="feature.title"
-                  class="feature-card"
-                >
-                  <h3>{{ feature.title }}</h3>
-                  <p>{{ feature.description }}</p>
-                </article>
               </div>
             </section>
           </div>
@@ -152,36 +84,21 @@
 
       <a-layout-footer class="footer">
         <div class="footer-content section-shell">
-          <div class="footer-grid">
-            <section class="footer-section">
-              <span class="footer-kicker">机构</span>
-              <h4>关于我们</h4>
-              <p>
-                <a
-                  v-if="lawFirmWebsite"
-                  :href="lawFirmWebsite"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="law-firm-link"
-                >
-                  {{ lawFirmName }} 官网
-                </a>
-                <span v-else>{{ lawFirmName }}</span>
-              </p>
-            </section>
-            <section class="footer-section">
-              <span class="footer-kicker">支持</span>
-              <h4>联系路径</h4>
-              <p>如有疑问，请优先联系承办律师或事务所工作人员。</p>
-            </section>
-            <section class="footer-section">
-              <span class="footer-kicker">合规</span>
-              <h4>访问安全</h4>
-              <p>访问链接、令牌校验与验证能力共同保障文件与项目信息安全。</p>
-            </section>
+          <div class="footer-meta">
+            <p>
+              <a
+                v-if="lawFirmWebsite"
+                :href="lawFirmWebsite"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="law-firm-link"
+              >
+                {{ lawFirmName }}
+              </a>
+              <span v-else>{{ lawFirmName }}</span>
+            </p>
+            <p>如有疑问，请优先联系承办律师或事务所工作人员。</p>
           </div>
-
-          <a-divider class="footer-divider" />
 
           <div class="footer-bottom">
             <p class="footer-copy">
@@ -251,25 +168,6 @@ const lawFirmName = computed(() => appConfigStore.displayName)
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
 const isMobile = computed(() => windowWidth.value <= 768)
 const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmName.value)
-
-const features = [
-  {
-    title: '项目详情',
-    description: '查看当前项目概况、承办律师和处理进度。',
-  },
-  {
-    title: '文件中心',
-    description: '统一预览和下载当前项目材料。',
-  },
-  {
-    title: '最新通知',
-    description: '查看最近提醒、动态和状态更新。',
-  },
-  {
-    title: '帮助支持',
-    description: '访问异常时先看说明，再联系承办律师。',
-  },
-]
 
 function parseMatterUrl(url: string): { matterId: string; token: string } | null {
   try {
@@ -436,43 +334,30 @@ onUnmounted(() => {
 
 .hero-section {
   position: relative;
-  padding: 36px 0 64px;
+  padding: 24px 0 48px;
 }
 
 .hero-content {
-  display: grid;
-  gap: 24px;
-  justify-items: center;
+  display: block;
 }
 
 .hero-panel {
   width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 840px);
-  justify-content: center;
+  max-width: 760px;
 }
 
 .hero-copy {
   display: grid;
-  gap: 16px;
+  gap: 18px;
   align-content: start;
-  padding: 8px 0 0;
 }
 
 .hero-surface {
-  padding: 30px 30px 26px;
+  padding: 28px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.56);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(0, 9, 24, 0.06);
   box-shadow: var(--shadow-sm);
-}
-
-.hero-kicker {
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-weight: 700;
 }
 
 .hero-headline-group {
@@ -480,20 +365,14 @@ onUnmounted(() => {
   gap: 10px;
 }
 
-.hero-slogan {
-  margin: 0;
-  max-width: 32ch;
-  font-family: var(--font-heading);
-  font-size: clamp(20px, 2.6vw, 28px);
-  line-height: 1.35;
-  color: var(--lex-accent-strong);
-}
-
 .hero-value-line {
   margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.7;
+  color: var(--lex-accent-strong);
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .main-title {
@@ -501,77 +380,23 @@ onUnmounted(() => {
   color: var(--lex-primary) !important;
   font-family: var(--font-heading);
   font-weight: 600 !important;
-  font-size: clamp(36px, 5.2vw, 58px) !important;
-  line-height: 1.08 !important;
+  font-size: clamp(32px, 4.4vw, 48px) !important;
+  line-height: 1.12 !important;
   letter-spacing: 0.01em;
 }
 
 .main-subtitle {
   margin: 0 !important;
-  max-width: 40ch;
+  max-width: 46ch;
   font-family: var(--font-sans);
-  font-size: 17px;
+  font-size: 16px;
   color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.hero-actions {
-  display: grid;
-  gap: 10px;
-  justify-items: start;
-}
-
-.hero-primary-action {
-  min-width: 180px;
+  line-height: 1.75;
 }
 
 .hero-secondary-action {
   padding-inline: 0;
   height: auto;
-}
-
-.hero-evidence-strip {
-  display: block;
-}
-
-.evidence-summary {
-  margin: 0;
-  padding: 14px 16px;
-  border-radius: 8px;
-  background: rgba(248, 244, 237, 0.72);
-  border: 1px solid rgba(0, 9, 24, 0.05);
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.access-card {
-  margin-top: 2px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 248, 244, 0.96) 100%);
-  border: 1px solid rgba(0, 9, 24, 0.06);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.05);
-}
-
-.access-card-head {
-  display: grid;
-  gap: 6px;
-}
-
-.access-card-head h3 {
-  margin: 0;
-  font-size: 24px;
-  color: var(--lex-primary);
-  font-family: var(--font-heading);
-}
-
-.access-card-caption {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.access-card-body {
-  display: grid;
-  gap: 14px;
 }
 
 .input-wrapper {
@@ -633,57 +458,15 @@ onUnmounted(() => {
   line-height: 1.8;
 }
 
-.features-section {
-  width: 100%;
-  display: grid;
-  gap: 14px;
-  max-width: 840px;
-}
-
-.section-header {
+.portal-help-row {
   display: flex;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
+  padding-top: 4px;
 }
 
-.section-header :deep(.ant-typography) {
-  margin-bottom: 0;
-}
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.feature-card {
-  display: grid;
-  gap: 6px;
-  padding: 16px;
-  border-radius: 8px;
-  background: rgba(252, 251, 248, 0.7);
-  border: 1px solid rgba(0, 9, 24, 0.05);
-}
-
-.feature-card h3 {
-  margin: 0;
-  color: var(--lex-primary);
-  font-size: 17px;
-}
-
-.feature-card p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.75;
-  font-size: 14px;
-}
-
-.assurance-panel {
-  padding-top: 2px;
-}
-
-.assurance-copy {
+.portal-help-copy {
   margin: 0;
   color: var(--text-secondary);
   font-size: 13px;
@@ -693,49 +476,26 @@ onUnmounted(() => {
 .footer {
   background: rgba(249, 247, 242, 0.66);
   color: var(--text-secondary);
-  padding: 32px 0 40px;
+  padding: 20px 0 28px;
   border-top: 1px solid rgba(0, 9, 24, 0.05);
 }
 
 .footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.footer-meta {
   display: grid;
-  gap: 18px;
+  gap: 4px;
 }
 
-.footer-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-}
-
-.footer-section {
-  display: grid;
-  gap: 6px;
-}
-
-.footer-kicker {
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.footer-section h4 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--lex-primary);
-}
-
-.footer-section p {
+.footer-meta p {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.7;
-}
-
-.footer-divider {
-  margin: 16px 0 !important;
 }
 
 .law-firm-link {
@@ -782,23 +542,9 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 1100px) {
-  .hero-copy {
-    padding-top: 0;
-  }
-
-  .feature-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .section-header {
-    display: grid;
-  }
-}
-
 @media (max-width: 768px) {
   .hero-section {
-    padding: 18px 0 40px;
+    padding: 16px 0 32px;
   }
 
   .hero-surface {
@@ -806,7 +552,7 @@ onUnmounted(() => {
   }
 
   .main-title {
-    font-size: 34px !important;
+    font-size: 30px !important;
     max-width: none;
   }
 
@@ -814,18 +560,8 @@ onUnmounted(() => {
     font-size: 15px;
   }
 
-  .hero-value-line {
-    font-size: 13px;
-  }
-
-  .feature-grid,
-  .footer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-actions,
-  .section-header,
-  .access-card-head {
+  .portal-help-row,
+  .footer-content {
     display: grid;
   }
 
@@ -838,20 +574,12 @@ onUnmounted(() => {
     min-width: 108px;
   }
 
-  .hero-primary-action {
-    width: 100%;
-  }
-
   .access-input-panel {
     padding: 14px;
   }
 
   .footer {
-    padding-bottom: calc(40px + var(--mobile-nav-height));
-  }
-
-  .footer-section {
-    text-align: center;
+    padding-bottom: calc(28px + var(--mobile-nav-height));
   }
 }
 </style>

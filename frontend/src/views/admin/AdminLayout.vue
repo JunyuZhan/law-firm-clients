@@ -98,7 +98,7 @@
 
       <a-layout-header class="header">
         <div class="header-content">
-          <div class="header-side header-side-left">
+          <div class="header-left-cluster">
             <a-button
               type="text"
               class="collapse-btn"
@@ -109,10 +109,9 @@
                 <MenuFoldOutlined v-else />
               </template>
             </a-button>
-          </div>
-
-          <div class="header-title-block">
-            <span class="page-title">{{ currentPageTitle }}</span>
+            <div class="header-title-block">
+              <span class="page-title">{{ currentPageTitle }}</span>
+            </div>
           </div>
 
           <div class="header-side header-side-right">
@@ -623,8 +622,7 @@ async function handleLogout() {
 }
 
 .update-banner {
-  width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
-  margin: 20px auto 0;
+  margin: calc(var(--header-height) + 16px) 24px 0;
   padding: 14px 18px;
   border-radius: 8px;
   border: 1px solid rgba(179, 138, 61, 0.2);
@@ -841,23 +839,26 @@ async function handleLogout() {
 }
 
 .header {
-  background: transparent !important;
+  background: rgba(243, 239, 232, 0.94) !important;
+  backdrop-filter: blur(var(--backdrop-blur));
   padding: 0;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: var(--sidebar-width);
+  right: 0;
   z-index: 99;
-  border-bottom: 0;
+  border-bottom: 1px solid rgba(0, 9, 24, 0.06);
+  transition: left 0.24s ease;
 }
 
 .header-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 76px;
-  width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
-  margin: 0 auto;
-  padding: 14px 0 10px;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--header-height);
+  width: 100%;
+  padding: 0 24px;
 }
 
 .header-side {
@@ -866,8 +867,11 @@ async function handleLogout() {
   min-width: 0;
 }
 
-.header-side-left {
-  justify-content: flex-start;
+.header-left-cluster {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
 }
 
 .header-side-right {
@@ -893,7 +897,7 @@ async function handleLogout() {
 .header-title-block {
   min-width: 0;
   display: flex;
-  justify-content: center;
+  align-items: center;
   overflow: hidden;
 }
 
@@ -908,7 +912,6 @@ async function handleLogout() {
   color: var(--lex-primary);
   line-height: 1.3;
   font-family: var(--font-heading);
-  text-align: center;
 }
 
 .header-actions {
@@ -948,14 +951,14 @@ async function handleLogout() {
 }
 
 .content {
-  padding: 0 0 24px;
-  min-height: calc(100vh - 112px);
+  padding: calc(var(--header-height) + 16px) 24px 24px;
+  min-height: 100vh;
 }
 
 .content-shell {
-  width: min(var(--shell-max-width), calc(100vw - var(--sidebar-width) - 2 * var(--shell-gutter)));
-  margin: 0 auto;
-  min-height: calc(100vh - 124px);
+  width: 100%;
+  margin: 0;
+  min-height: calc(100vh - var(--header-height) - 40px);
 }
 
 .content-wrapper {
@@ -963,7 +966,7 @@ async function handleLogout() {
   border: 1px solid rgba(0, 9, 24, 0.06);
   border-radius: 8px;
   padding: 20px;
-  min-height: calc(100vh - 124px);
+  min-height: calc(100vh - var(--header-height) - 40px);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1001,23 +1004,15 @@ async function handleLogout() {
   }
 
   .header {
-    padding-top: 0;
-  }
-
-  .update-banner,
-  .header-content,
-  .content-shell {
-    width: min(var(--shell-max-width), calc(100vw - 2 * var(--shell-gutter)));
+    left: 0;
   }
 
   .header-content {
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     min-height: 64px;
-    padding: 12px 0 8px;
+    padding: 0 16px;
     align-items: center;
   }
 
-  .header-caption,
   .header-btn-text {
     display: none;
   }
@@ -1026,13 +1021,17 @@ async function handleLogout() {
     font-size: 20px;
   }
 
+  .content {
+    padding: calc(var(--header-height) + 12px) 16px 16px;
+  }
+
   .content-wrapper {
     padding: 16px;
-    min-height: calc(100vh - 104px);
+    min-height: calc(100vh - var(--header-height) - 28px);
   }
 
   .update-banner {
-    margin-top: 12px;
+    margin: calc(var(--header-height) + 12px) 16px 0;
     padding: 12px 14px;
     border-radius: 8px;
   }
