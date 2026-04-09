@@ -2,11 +2,8 @@
   <div class="initial-setup-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          首次初始化
-        </h2>
         <p class="intro-text">
-          用于新客户首次交付后的基础配置初始化，先完成品牌名称、门户展示文案和页脚信息，再进入系统配置补充高级参数。
+          品牌与门户文案；完成后可在系统配置中补充高级项。
         </p>
       </div>
       <div class="intro-actions">
@@ -137,13 +134,19 @@
               <span v-else>未设置</span>
             </div>
             <div>
-              <div class="preview-name">{{ form.appName || defaultValues.appName }}</div>
-              <div class="preview-subname">{{ form.appShortNameEn || defaultValues.appShortNameEn }}</div>
+              <div class="preview-name">
+                {{ form.appName || defaultValues.appName }}
+              </div>
+              <div class="preview-subname">
+                {{ form.appShortNameEn || defaultValues.appShortNameEn }}
+              </div>
             </div>
           </div>
 
           <div class="preview-copy">
-            <div class="preview-kicker">{{ form.lawFirmName || defaultValues.lawFirmName }}</div>
+            <div class="preview-kicker">
+              {{ form.lawFirmName || defaultValues.lawFirmName }}
+            </div>
             <strong>{{ form.appSlogan || defaultValues.appSlogan }}</strong>
             <p>用于门户首页、帮助页、登录页和后台导航中的统一品牌表达。</p>
           </div>
@@ -313,8 +316,8 @@ onMounted(() => {
   gap: 4px;
   padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.8);
-  border: 1px solid rgba(179, 138, 61, 0.18);
+  background: var(--lex-bg-muted);
+  border: 1px solid color-mix(in srgb, var(--lex-accent) 22%, var(--lex-outline));
 }
 
 .status-label {
@@ -453,8 +456,8 @@ onMounted(() => {
   margin-top: 14px;
   padding: 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.74);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .plain-list {

@@ -29,83 +29,83 @@ onMounted(() => {
 const themeConfig = computed(() => ({
   algorithm: theme.defaultAlgorithm,
   token: {
-    colorPrimary: '#002140',
-    colorSuccess: '#3f6f4d',
-    colorWarning: '#a26c17',
-    colorError: '#b44537',
-    colorInfo: '#123154',
-    colorBgBase: '#f3f0e8',
-    colorTextBase: '#16120d',
-    colorBorder: 'rgba(0, 9, 24, 0.14)',
-    colorSplit: 'rgba(0, 9, 24, 0.08)',
-    borderRadius: 6,
+    colorPrimary: '#1e40af',
+    colorSuccess: '#15803d',
+    colorWarning: '#ca8a04',
+    colorError: '#dc2626',
+    colorInfo: '#3b82f6',
+    colorBgBase: '#f8fafc',
+    colorTextBase: '#0f172a',
+    colorBorder: '#e2e8f0',
+    colorSplit: '#f1f5f9',
+    borderRadius: 8,
     wireframe: false,
     motionDurationSlow: '0.24s',
     motionDurationMid: '0.2s',
-    fontFamily: '"Inter", "PingFang SC", "Microsoft YaHei", sans-serif',
-    fontFamilyCode: '"SF Mono", "Consolas", monospace',
-    boxShadow: '0 12px 32px rgba(0, 9, 24, 0.06)',
-    boxShadowSecondary: '0 18px 48px rgba(0, 9, 24, 0.08)',
-    controlOutline: 'rgba(179, 138, 61, 0.18)',
+    fontFamily: '"Fira Sans", "PingFang SC", "Microsoft YaHei", sans-serif',
+    fontFamilyCode: '"Fira Code", "SFMono-Regular", "Consolas", monospace',
+    boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.06)',
+    boxShadowSecondary: '0 8px 24px rgba(15, 23, 42, 0.08)',
+    controlOutline: 'rgba(30, 64, 175, 0.15)',
   },
   components: {
     Layout: {
       bodyBg: 'transparent',
       headerBg: 'transparent',
-      siderBg: '#000918',
-      triggerBg: '#000918',
+      siderBg: '#0f172a',
+      triggerBg: '#0f172a',
     },
     Button: {
-      borderRadius: 4,
-      controlHeight: 42,
+      borderRadius: 6,
+      controlHeight: 40,
       fontWeight: 600,
       primaryShadow: 'none',
     },
     Card: {
-      borderRadiusLG: 8,
+      borderRadiusLG: 10,
       headerBg: 'transparent',
-      boxShadow: '0 12px 32px rgba(0, 9, 24, 0.06)',
+      boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.06)',
     },
     Input: {
-      borderRadius: 4,
-      controlHeight: 46,
-      hoverBorderColor: '#b38a3d',
-      activeBorderColor: '#b38a3d',
+      borderRadius: 6,
+      controlHeight: 40,
+      hoverBorderColor: '#1e40af',
+      activeBorderColor: '#1e40af',
     },
     Select: {
-      borderRadius: 4,
-      controlHeight: 46,
+      borderRadius: 6,
+      controlHeight: 40,
     },
     Table: {
-      borderColor: 'rgba(0, 9, 24, 0.08)',
-      headerBg: 'rgba(0, 9, 24, 0.04)',
-      headerColor: '#000918',
-      rowHoverBg: 'rgba(179, 138, 61, 0.08)',
+      borderColor: '#f1f5f9',
+      headerBg: '#f8fafc',
+      headerColor: '#1e3a8a',
+      rowHoverBg: 'rgba(30, 64, 175, 0.06)',
     },
     Menu: {
       borderRadius: 8,
       itemBorderRadius: 6,
-      itemHeight: 48,
+      itemHeight: 44,
       itemMarginInline: 8,
-      itemMarginBlock: 6,
+      itemMarginBlock: 4,
       darkItemBg: 'transparent',
       darkSubMenuItemBg: 'transparent',
       darkItemHoverBg: 'rgba(255, 255, 255, 0.06)',
-      darkItemSelectedBg: 'rgba(179, 138, 61, 0.14)',
+      darkItemSelectedBg: 'rgba(59, 130, 246, 0.18)',
     },
     Drawer: {
-      colorBgElevated: 'rgba(252, 251, 248, 0.98)',
+      colorBgElevated: '#ffffff',
     },
     Modal: {
-      borderRadiusLG: 8,
+      borderRadiusLG: 12,
     },
     Tag: {
       borderRadiusSM: 999,
     },
     Tabs: {
-      itemColor: '#7a7367',
-      itemSelectedColor: '#000918',
-      inkBarColor: '#b38a3d',
+      itemColor: '#64748b',
+      itemSelectedColor: '#1e3a8a',
+      inkBarColor: '#1e40af',
     },
   },
 }) as ConfigProviderProps['theme'])
@@ -124,10 +124,10 @@ const themeConfig = computed(() => ({
   top: -48px;
   z-index: 2000;
   padding: 10px 14px;
-  border-radius: 6px;
-  background: rgba(252, 251, 248, 0.96);
-  color: var(--lex-primary);
-  border: 1px solid var(--border-color-light);
+  border-radius: 8px;
+  background: var(--lex-surface-strong);
+  color: var(--lex-primary-soft);
+  border: 1px solid var(--border-color);
   text-decoration: none;
   box-shadow: var(--shadow-sm);
 }
@@ -149,7 +149,7 @@ const themeConfig = computed(() => ({
   right: -40px;
   width: 380px;
   height: 380px;
-  background: radial-gradient(circle, rgba(0, 33, 64, 0.16) 0%, rgba(0, 33, 64, 0) 72%);
+  background: radial-gradient(circle, rgba(30, 64, 175, 0.14) 0%, rgba(30, 64, 175, 0) 72%);
 }
 
 .app-frame__glow--accent {
@@ -157,6 +157,6 @@ const themeConfig = computed(() => ({
   bottom: 8vh;
   width: 340px;
   height: 340px;
-  background: radial-gradient(circle, rgba(179, 138, 61, 0.18) 0%, rgba(179, 138, 61, 0) 72%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0) 72%);
 }
 </style>

@@ -2,11 +2,8 @@
   <div class="notification-template-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          通知模板管理
-        </h2>
         <p class="intro-text">
-          集中维护短信、微信、邮件模板，统一模板结构、变量定义和服务商映射。
+          短信 / 微信 / 邮件模板与服务商映射。
         </p>
       </div>
       <a-space>
@@ -40,10 +37,8 @@
             </a-tag>
           </div>
           <ul class="guide-list">
-            <li><strong>模板内容</strong> 就是客户最终收到的消息结构，发送前会自动替换变量。</li>
-            <li><strong>短信模板</strong> 需与阿里云/腾讯云平台的模板代码和变量命名保持一致。</li>
-            <li><strong>微信模板</strong> 使用 JSON 结构，需符合微信模板消息字段格式。</li>
-            <li><strong>邮件模板</strong> 支持 HTML，可直接组合品牌化邮件内容。</li>
+            <li>发送前替换变量；短信/微信需与平台侧模板一致。</li>
+            <li>邮件支持 HTML。</li>
           </ul>
           <div class="token-cloud">
             <code>${matterName}</code>
@@ -59,31 +54,24 @@
       <div class="stats-card">
         <span class="stats-label">模板总数</span>
         <strong>{{ templateStats.total }}</strong>
-        <p>当前模板库中的全部模板。</p>
       </div>
       <div class="stats-card success">
         <span class="stats-label">启用中</span>
         <strong>{{ templateStats.enabled }}</strong>
-        <p>会参与实际消息发送的模板。</p>
       </div>
       <div class="stats-card info">
         <span class="stats-label">短信 / 微信 / 邮件</span>
         <strong>{{ templateStats.sms }}/{{ templateStats.wechat }}/{{ templateStats.email }}</strong>
-        <p>按渠道拆分的模板库存量。</p>
       </div>
       <div class="stats-card danger">
         <span class="stats-label">服务商映射</span>
         <strong>{{ templateStats.providers }}</strong>
-        <p>已配置服务商的模板数量。</p>
       </div>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
-        <div>
-          <h3>筛选模板库</h3>
-        </div>
-        <p>按渠道、服务商和启用状态定位模板，降低误改风险。</p>
+        <h3>筛选</h3>
       </div>
 
       <a-form
@@ -161,15 +149,12 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <div>
-          <h3>模板库清单</h3>
-        </div>
-        <p>表格保留治理动作，内容预览做截断展示，避免长文本打乱阅读节奏。</p>
+        <h3>模板列表</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>当前模板 {{ dataSource.length }} 条</span>
-        <span>启用模板 {{ templateStats.enabled }} 条</span>
+        <span>共 {{ dataSource.length }} 条</span>
+        <span v-if="templateStats.enabled">启用 {{ templateStats.enabled }} 条</span>
       </div>
 
       <a-table
@@ -179,6 +164,7 @@
         :pagination="pagination"
         :scroll="{ x: 1080 }"
         row-key="id"
+        size="small"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">

@@ -11,46 +11,20 @@
     >
       <section class="page-intro section-shell">
         <div>
-          <div class="eyebrow">
-            Updates
-          </div>
-          <h1 class="intro-title">
-            项目提醒与动态
-          </h1>
           <p class="intro-text">
-            通知页只负责一件事：按时间顺序展示最近提醒。未读状态、正文和时间放在同一视线区域，避免原本的信息断层。
+            按时间查看提醒；未读条目带标记。
           </p>
         </div>
         <div class="stats-grid">
           <article class="stats-card">
-            <span class="stats-label">通知总数</span>
+            <span class="stats-label">全部</span>
             <strong>{{ notifications.length }}</strong>
-            <p>最近消息</p>
           </article>
           <article class="stats-card">
             <span class="stats-label">未读</span>
             <strong>{{ unreadCount }}</strong>
-            <p>待处理提醒</p>
           </article>
         </div>
-      </section>
-
-      <section class="notification-spotlight section-shell">
-        <article class="spotlight-card">
-          <span class="panel-kicker">Inbox View</span>
-          <h2>项目提醒与动态</h2>
-          <p>通知页只负责时间顺序、未读状态与正文摘要，不把复杂筛选和额外业务设定强行塞进来。</p>
-        </article>
-        <article class="spotlight-card spotlight-card--metric">
-          <span class="spotlight-label">最近 7 天</span>
-          <strong>{{ recentCount }}</strong>
-          <p>统计最近进入通知流的消息数量。</p>
-        </article>
-        <article class="spotlight-card spotlight-card--metric">
-          <span class="spotlight-label">已读率</span>
-          <strong>{{ readRate }}</strong>
-          <p>帮助快速判断是否存在积压提醒。</p>
-        </article>
       </section>
 
       <section class="table-panel section-shell">
@@ -142,16 +116,6 @@ const loading = ref(false)
 const notifications = ref<NotificationItem[]>([])
 
 const unreadCount = computed(() => notifications.value.filter(item => !item.read).length)
-const recentCount = computed(() => notifications.value.filter(item => {
-  const time = new Date(item.createdAt).getTime()
-  if (Number.isNaN(time)) return false
-  return Date.now() - time <= 7 * 24 * 60 * 60 * 1000
-}).length)
-const readRate = computed(() => {
-  if (notifications.value.length === 0) return '0%'
-  const read = notifications.value.length - unreadCount.value
-  return `${Math.round((read / notifications.value.length) * 100)}%`
-})
 
 function formatTime(dateStr?: string): string {
   if (!dateStr) return '-'
@@ -167,13 +131,12 @@ function formatTime(dateStr?: string): string {
 }
 
 onMounted(() => {
-  const visitorName = portalVisitorStore.displayName || '当前访客'
   notifications.value = portalVisitorStore.profile.lastMatterId
     ? [
         {
           id: 'matter-entry',
-          title: '最近访问项目已同步',
-          content: `${visitorName} 可继续从文件中心或项目详情查看最近访问项目的最新材料与动态。`,
+          title: '已同步最近访问的项目',
+          content: '可从「文件中心」或项目详情继续查看材料。',
           createdAt: new Date().toISOString(),
           read: false,
         },
@@ -186,57 +149,6 @@ onMounted(() => {
 .content {
   display: grid;
   gap: 20px;
-}
-
-.notification-spotlight {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.spotlight-card {
-  display: grid;
-  gap: 8px;
-  padding: 20px;
-  border-radius: 8px;
-  background: rgba(252, 251, 248, 0.78);
-  border: 1px solid rgba(0, 9, 24, 0.05);
-  box-shadow: var(--shadow-xs);
-}
-
-.spotlight-card h2,
-.spotlight-card p {
-  margin: 0;
-}
-
-.spotlight-card h2 {
-  font-size: 24px;
-  color: var(--lex-primary);
-  font-family: var(--font-heading);
-}
-
-.spotlight-card p {
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-.spotlight-card--metric {
-  align-content: end;
-}
-
-.spotlight-label,
-.panel-kicker {
-  color: var(--lex-accent-strong);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.spotlight-card--metric strong {
-  font-size: 32px;
-  line-height: 1;
-  color: var(--lex-primary);
 }
 
 .notification-list :deep(.ant-list-items) {
@@ -267,9 +179,9 @@ onMounted(() => {
   min-height: 22px;
   padding: 0 8px;
   border-radius: 999px;
-  background: rgba(179, 138, 61, 0.12);
-  border: 1px solid rgba(179, 138, 61, 0.16);
-  color: var(--accent-color-deep);
+  background: rgba(30, 64, 175, 0.1);
+  border: 1px solid rgba(30, 64, 175, 0.2);
+  color: var(--lex-primary-soft);
   font-size: 11px;
   font-weight: 600;
 }
@@ -291,7 +203,7 @@ onMounted(() => {
 }
 
 .notification-item:hover {
-  background: rgba(252, 251, 248, 0.9);
+  background: var(--lex-bg-muted);
 }
 
 .skeleton-list {
@@ -302,14 +214,13 @@ onMounted(() => {
 .skeleton-item {
   padding: 16px;
   border-radius: 8px;
-  background: rgba(252, 251, 248, 0.82);
+  background: var(--lex-bg-muted);
   border: 1px solid var(--border-color-light);
 }
 
 @media (max-width: 768px) {
-  .notification-spotlight,
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 </style>

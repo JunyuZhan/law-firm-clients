@@ -2,11 +2,8 @@
   <div class="system-info-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          系统信息
-        </h2>
         <p class="intro-text">
-          集中查看版本、依赖健康状态、运维边界和交付文档入口，便于上线前核查、升级前巡检和客户交付留痕。
+          版本与健康状态；可按需刷新。
         </p>
       </div>
       <div class="intro-actions">
@@ -26,22 +23,18 @@
       <div class="stats-card">
         <span class="stats-label">产品版本</span>
         <strong>{{ runtimeInfo.productVersion || '-' }}</strong>
-        <p>当前交付版本号。</p>
       </div>
       <div class="stats-card success">
         <span class="stats-label">依赖总状态</span>
         <strong>{{ formatDependencyStatus(dependencyStatus.overallStatus) }}</strong>
-        <p>数据库、Redis、邮件和存储的综合状态。</p>
       </div>
       <div class="stats-card info">
         <span class="stats-label">推荐部署</span>
         <strong>{{ runtimeInfo.recommendedMode || 'Docker Compose' }}</strong>
-        <p>用于客户交付和升级时的推荐方式。</p>
       </div>
       <div class="stats-card danger">
         <span class="stats-label">构建时间</span>
         <strong>{{ runtimeInfo.buildTime || '-' }}</strong>
-        <p>当前版本对应的构建时间。</p>
       </div>
     </section>
 
@@ -174,8 +167,12 @@
         >
           <div class="doc-head">
             <div>
-              <div class="doc-title">{{ doc.title }}</div>
-              <div class="doc-desc">{{ doc.description }}</div>
+              <div class="doc-title">
+                {{ doc.title }}
+              </div>
+              <div class="doc-desc">
+                {{ doc.description }}
+              </div>
             </div>
             <a-button
               type="link"
@@ -184,7 +181,9 @@
               复制路径
             </a-button>
           </div>
-          <div class="doc-path">{{ doc.path }}</div>
+          <div class="doc-path">
+            {{ doc.path }}
+          </div>
         </article>
       </div>
     </section>
@@ -428,8 +427,8 @@ onMounted(() => {
   gap: 6px;
   padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.68);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .doc-summary-item span {

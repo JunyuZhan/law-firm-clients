@@ -42,13 +42,13 @@
                   size="large"
                   @click="router.push('/help')"
                 >
-                  查看帮助说明
+                  帮助中心
                 </a-button>
                 <a-button
                   size="large"
                   @click="router.push('/verify/letter')"
                 >
-                  函件真伪验证
+                  函件验证
                 </a-button>
                 <a
                   v-if="lawFirmWebsite"
@@ -57,104 +57,19 @@
                   rel="noopener noreferrer"
                   class="hero-link"
                 >
-                  访问律所官网
+                  律所官网
                 </a>
-              </div>
-
-              <div class="hero-metrics">
-                <article
-                  v-for="item in heroMetrics"
-                  :key="item.label"
-                  class="metric-card"
-                >
-                  <span class="metric-label">{{ item.label }}</span>
-                  <strong>{{ item.value }}</strong>
-                  <p>{{ item.description }}</p>
-                </article>
               </div>
             </div>
 
             <aside class="hero-side hero-surface hero-surface--soft">
-              <div class="hero-side-label">
-                Access Guide
-              </div>
-              <strong>{{ accessGuideTitle }}</strong>
+              <strong class="hero-side-title">访问说明</strong>
               <ol class="hero-steps">
-                <li>收到承办律师发送的专属访问链接后，直接打开即可查看项目信息。</li>
-                <li>如链接失效、过期或无法打开，请联系承办律师重新发送。</li>
-                <li>只有在无法直接打开链接时，才使用下方的辅助入口继续访问。</li>
+                <li>用律师发来的链接直接进入项目。</li>
+                <li>链接失效时，请让律师重发，或打开「帮助中心」。</li>
+                <li>仍无法打开时，在下方粘贴完整链接。</li>
               </ol>
             </aside>
-          </div>
-        </section>
-
-        <section class="section-shell info-section">
-          <div class="section-head">
-            <div>
-              <div class="eyebrow">
-                Service Overview
-              </div>
-              <h2>客户访问应当直接、可信、清晰</h2>
-            </div>
-            <p>门户页负责说明访问方式、展示服务入口，并提供异常情况下的自助帮助。</p>
-          </div>
-
-          <div class="journey-card">
-            <div class="journey-copy">
-              <span class="panel-kicker">Client Journey</span>
-              <h3>从收到链接到进入项目，流程应当尽量少一步</h3>
-              <p>客户不需要理解 token，也不需要先到门户页再手动粘贴链接。首页更适合承担品牌展示、路径说明和帮助承接。</p>
-            </div>
-            <ol class="journey-steps">
-              <li>律师发送专属访问链接</li>
-              <li>客户直接打开链接进入项目</li>
-              <li>若链接异常，再使用帮助或辅助入口</li>
-            </ol>
-          </div>
-
-          <div class="feature-grid">
-            <article
-              v-for="item in featureCards"
-              :key="item.title"
-              class="feature-card"
-            >
-              <span class="feature-label">{{ item.label }}</span>
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.description }}</p>
-            </article>
-          </div>
-        </section>
-
-        <section class="section-shell support-section">
-          <div class="support-grid">
-            <article class="support-card support-card--primary">
-              <span class="panel-kicker">How it works</span>
-              <h3>标准访问方式</h3>
-              <p>系统默认以“律师推送专属链接，客户直接打开”为主流程，不要求客户手动输入 token 或重复粘贴链接。</p>
-              <ul class="support-list">
-                <li>直接点击消息中的访问链接</li>
-                <li>进入项目详情页查看进展与材料</li>
-                <li>如遇异常，先看帮助中心，再联系承办律师</li>
-              </ul>
-            </article>
-
-            <article class="support-card">
-              <span class="panel-kicker">Support</span>
-              <h3>需要人工协助时</h3>
-              <p>如仍无法访问，请优先联系承办律师；如需公开联系方式，可通过官网进一步查询。</p>
-              <div class="support-actions">
-                <a-button @click="router.push('/help')">进入帮助中心</a-button>
-                <a
-                  v-if="lawFirmWebsite"
-                  :href="lawFirmWebsite"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="support-link"
-                >
-                  前往 {{ lawFirmName }} 官网
-                </a>
-              </div>
-            </article>
           </div>
         </section>
 
@@ -162,11 +77,11 @@
           <a-collapse ghost>
             <a-collapse-panel
               key="manual-access"
-              header="无法直接打开律师发送的链接？可使用辅助入口继续访问"
+              header="链接打不开？粘贴完整访问链接"
             >
               <div class="fallback-panel">
                 <p class="fallback-copy">
-                  请粘贴律师发送的完整访问链接，系统会自动识别项目编号与访问 token，并跳转到对应页面。
+                  粘贴律师提供的完整链接（含项目编号与 token），点击「继续访问」即可跳转。
                 </p>
 
                 <div class="input-wrapper access-input-panel">
@@ -225,7 +140,7 @@
               </a>
               <span v-else>{{ lawFirmName }}</span>
             </p>
-            <p>如有疑问，请优先联系承办律师或查看帮助中心中的访问说明。</p>
+            <p>请通过承办律师获取访问链接；其他问题见帮助中心。</p>
           </div>
 
           <div class="footer-bottom">
@@ -287,7 +202,7 @@ const heroValueItems = computed(() => {
   if (!appSlogan.value) return []
   return appSlogan.value
     .split(/[·、,，|｜/]/)
-    .map(item => item.trim())
+    .map((item: string) => item.trim())
     .filter(Boolean)
     .slice(0, 4)
 })
@@ -297,44 +212,11 @@ const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
 const footerCopyright = computed(() => appConfigStore.copyright || `© ${new Date().getFullYear()} ${lawFirmName.value}`)
 const isMobile = computed(() => windowWidth.value <= 768)
 const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmName.value)
-const heroTitle = computed(() => '客户服务与项目访问入口')
-const heroSubtitle = computed(() => '客户通常通过承办律师发送的专属访问链接直接进入项目页面。门户首页主要用于展示服务说明、帮助入口与异常情况下的辅助访问方式。')
-const accessGuideTitle = computed(() => appSlogan.value || '安全访问、进度同步、材料查看')
-const heroMetrics = computed(() => [
-  {
-    label: '主流程',
-    value: '直接打开链接',
-    description: '收到律师发送的访问链接后，无需重复粘贴或输入 token。',
-  },
-  {
-    label: '帮助入口',
-    value: '帮助说明 / 验证',
-    description: '遇到访问异常时，先查看帮助中心或进行函件真伪验证。',
-  },
-  {
-    label: '辅助方式',
-    value: '粘贴完整链接',
-    description: '仅在无法直接打开链接时，使用辅助入口继续访问。',
-  },
-])
-
-const featureCards = computed(() => [
-  {
-    label: 'Secure Access',
-    title: '安全访问项目动态',
-    description: '通过专属访问链接进入项目详情页，在受控范围内查看当前进展、关键节点与相关说明。',
-  },
-  {
-    label: 'File Delivery',
-    title: '集中查看项目材料',
-    description: '文件与通知围绕项目统一呈现，减少在聊天记录、邮件与多个页面之间来回切换。',
-  },
-  {
-    label: 'Support Guidance',
-    title: '先自助排查，再联系律师',
-    description: '门户页与帮助中心负责说明标准访问方式，以及遇到失效链接时的处理路径。',
-  },
-])
+const heroTitle = computed(() => appConfigStore.appShortName || '客户门户')
+const heroSubtitle = computed(
+  () =>
+    appSlogan.value || '通过律师发送的链接进入项目；可在此验证函件或查看帮助。',
+)
 
 function parseMatterUrl(url: string): { matterId: string; token: string } | null {
   try {
@@ -505,66 +387,26 @@ onUnmounted(() => {
   padding-top: 24px;
 }
 
-.hero-grid,
-.support-grid {
+.hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
   gap: 16px;
 }
 
 .hero-surface,
-.feature-card,
-.support-card,
-.journey-card,
 .fallback-section :deep(.ant-collapse-item) {
-  border-radius: 8px;
-  border: 1px solid rgba(0, 9, 24, 0.06);
-  background: rgba(255, 255, 255, 0.86);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--lex-surface-strong);
   box-shadow: var(--shadow-sm);
-}
-
-.journey-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
-  gap: 20px;
-  padding: 20px;
-  background: linear-gradient(135deg, rgba(248, 244, 237, 0.76), rgba(255, 255, 255, 0.92));
-}
-
-.journey-copy {
-  display: grid;
-  gap: 10px;
-}
-
-.journey-copy h3 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 22px;
-  line-height: 1.35;
-}
-
-.journey-copy p,
-.journey-steps {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.75;
-}
-
-.journey-steps {
-  padding-left: 18px;
-}
-
-.journey-steps li + li {
-  margin-top: 8px;
 }
 
 .hero-surface {
   padding: 28px;
 }
 
-.hero-surface--soft,
-.support-card--primary {
-  background: rgba(248, 244, 237, 0.78);
+.hero-surface--soft {
+  background: var(--lex-bg);
 }
 
 .hero-main {
@@ -573,23 +415,20 @@ onUnmounted(() => {
 }
 
 .hero-eyebrow,
-.hero-value-line,
-.eyebrow,
-.panel-kicker,
-.hero-side-label,
-.feature-label,
-.metric-label {
+.hero-value-line {
   margin: 0;
-  color: var(--lex-accent-strong);
   font-size: 12px;
   line-height: 1.6;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
+  letter-spacing: 0.06em;
+  font-weight: 600;
 }
 
 .hero-eyebrow {
   color: var(--text-tertiary);
+}
+
+.hero-value-line {
+  color: var(--lex-primary-soft);
 }
 
 .main-title {
@@ -602,51 +441,19 @@ onUnmounted(() => {
 }
 
 .main-subtitle,
-.section-head p,
-.feature-card p,
-.support-card p,
 .fallback-copy,
 .footer-meta p,
-.hero-steps,
-.support-list {
+.hero-steps {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.75;
+  line-height: 1.65;
 }
 
-.hero-actions,
-.support-actions {
+.hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-}
-
-.hero-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.metric-card {
-  padding: 14px 16px;
-  border-radius: 8px;
-  background: rgba(248, 244, 237, 0.72);
-  border: 1px solid rgba(0, 9, 24, 0.05);
-}
-
-.metric-card strong {
-  display: block;
-  margin: 6px 0 8px;
-  color: var(--text-primary);
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-.metric-card p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
 }
 
 .hero-link,
@@ -657,9 +464,8 @@ onUnmounted(() => {
 }
 
 .hero-link:hover,
-.support-link:hover,
 .law-firm-link:hover {
-  color: var(--accent-color-deep);
+  color: var(--lex-primary);
 }
 
 .hero-side {
@@ -668,64 +474,20 @@ onUnmounted(() => {
   gap: 10px;
 }
 
-.hero-side strong,
-.feature-card h3,
-.support-card h3,
-.section-head h2 {
+.hero-side-title {
   margin: 0;
+  font-size: 17px;
+  line-height: 1.4;
   color: var(--text-primary);
 }
 
-.hero-side strong {
-  font-size: 20px;
-  line-height: 1.4;
-}
-
-.hero-steps,
-.support-list {
+.hero-steps {
   padding-left: 18px;
 }
 
-.info-section,
-.support-section,
 .fallback-section {
   display: grid;
   gap: 16px;
-}
-
-.section-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 16px;
-}
-
-.section-head h2 {
-  margin-top: 6px;
-  font-size: 24px;
-  line-height: 1.3;
-}
-
-.section-head p {
-  max-width: 420px;
-}
-
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.feature-card,
-.support-card {
-  padding: 20px;
-}
-
-.feature-card h3,
-.support-card h3 {
-  margin: 8px 0 10px;
-  font-size: 18px;
-  line-height: 1.4;
 }
 
 .fallback-section :deep(.ant-collapse-header) {
@@ -750,9 +512,9 @@ onUnmounted(() => {
   display: grid;
   gap: 10px;
   padding: 16px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  border-radius: var(--radius-md);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--border-color-light);
 }
 
 .input-label {
@@ -794,10 +556,10 @@ onUnmounted(() => {
 }
 
 .footer {
-  background: rgba(249, 247, 242, 0.66);
+  background: var(--lex-surface);
   color: var(--text-secondary);
   padding: 20px 0 28px;
-  border-top: 1px solid rgba(0, 9, 24, 0.05);
+  border-top: 1px solid var(--border-color-light);
 }
 
 .footer-content {
@@ -858,26 +620,14 @@ onUnmounted(() => {
   }
 
   .hero-grid,
-  .support-grid,
-  .feature-grid,
-  .hero-metrics,
-  .journey-card,
   .footer-content {
     grid-template-columns: 1fr;
     display: grid;
   }
 
   .hero-surface,
-  .feature-card,
-  .support-card,
-  .journey-card,
   .access-input-panel {
     padding: 16px;
-  }
-
-  .section-head {
-    display: grid;
-    align-items: start;
   }
 
   .main-title {

@@ -2,11 +2,8 @@
   <div class="letter-verification-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          函件验证记录
-        </h2>
         <p class="intro-text">
-          统一查看律师函验证状态、访问次数与过期情况，便于后台快速判断函件是否仍可被第三方核验。
+          查询函件验证记录与状态；可展开统计。
         </p>
       </div>
       <a-space>
@@ -32,31 +29,24 @@
       <article class="stats-card">
         <span class="stats-label">总记录数</span>
         <strong>{{ statistics.total }}</strong>
-        <p>当前全部可检索的函件验证记录。</p>
       </article>
       <article class="stats-card success">
         <span class="stats-label">有效</span>
         <strong>{{ statistics.active }}</strong>
-        <p>仍可被第三方继续核验。</p>
       </article>
       <article class="stats-card warning">
         <span class="stats-label">已过期</span>
         <strong>{{ statistics.expired }}</strong>
-        <p>超过有效期，建议重新核查状态。</p>
       </article>
       <article class="stats-card danger">
         <span class="stats-label">已撤销</span>
         <strong>{{ statistics.revoked }}</strong>
-        <p>已被主动撤销，不应继续使用。</p>
       </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
-        <div>
-          <h3>验证检索</h3>
-        </div>
-        <p>按状态与关键词快速定位异常函件，再进入详情与撤销操作。</p>
+        <h3>筛选</h3>
       </div>
 
       <a-form
@@ -106,15 +96,12 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <div>
-          <h3>核验记录台账</h3>
-        </div>
-        <p>把状态、有效期、核验次数和最后访问时间集中在一张表里，便于快速判断风险。</p>
+        <h3>记录列表</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>当前记录 {{ dataSource.length }} 条</span>
-        <span>可撤销记录 {{ revocableCount }} 条</span>
+        <span>共 {{ dataSource.length }} 条</span>
+        <span v-if="revocableCount">可撤销 {{ revocableCount }} 条</span>
       </div>
 
       <a-table
@@ -124,6 +111,7 @@
         :pagination="pagination"
         :scroll="{ x: 1120 }"
         row-key="id"
+        size="small"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
@@ -441,8 +429,8 @@ onMounted(() => {
 .guide-card,
 .detail-hero,
 .detail-panel {
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  background: var(--lex-surface);
+  border: 1px solid var(--lex-outline);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
 }
@@ -472,8 +460,8 @@ onMounted(() => {
   gap: 6px;
   padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(0, 9, 24, 0.03);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .rule-item span {
@@ -506,7 +494,7 @@ onMounted(() => {
 }
 
 .expired {
-  color: #b42318;
+  color: var(--error-color);
   font-weight: 600;
 }
 
@@ -518,8 +506,8 @@ onMounted(() => {
   height: 32px;
   padding: 0 12px;
   border-radius: 999px;
-  background: rgba(82, 196, 26, 0.14);
-  color: #226d17;
+  background: color-mix(in srgb, var(--success-color) 16%, transparent);
+  color: var(--success-color);
   font-weight: 700;
 }
 
@@ -581,8 +569,8 @@ onMounted(() => {
   gap: 6px;
   padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(0, 9, 24, 0.03);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .detail-item span {

@@ -26,7 +26,7 @@
               {{ matterDetail.clientName || '项目详情' }}
             </h2>
             <p class="hero-text">
-              查看项目标识、访问状态、有效期与原始项目数据，确认客户侧访问权限是否处于预期状态。
+              标识、状态、有效期与访问信息。
             </p>
           </div>
 
@@ -396,7 +396,7 @@ onMounted(() => {
 }
 
 .expired {
-  color: #cf1322;
+  color: var(--error-color);
 }
 
 @media (max-width: 768px) {

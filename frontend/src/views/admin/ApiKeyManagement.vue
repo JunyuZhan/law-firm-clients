@@ -2,11 +2,8 @@
   <div class="api-key-management-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          API 密钥管理
-        </h2>
         <p class="intro-text">
-          管理律所系统与客户服务系统之间的接口密钥，同时确认回调配置路径和对接说明。
+          创建与轮换密钥；下方为对接地址与回调说明。
         </p>
       </div>
       <a-space>
@@ -154,10 +151,7 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <div>
-          <h3>密钥治理台账</h3>
-        </div>
-        <p>核心操作只保留启停、编辑和删除，创建成功后的 Secret 独立弹窗展示，降低误暴露风险。</p>
+        <h3>密钥列表</h3>
       </div>
 
       <a-table
@@ -167,6 +161,7 @@
         :pagination="pagination"
         :scroll="{ x: 'max-content' }"
         row-key="id"
+        size="small"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
@@ -631,7 +626,7 @@ onUnmounted(() => {
 }
 
 .guide-card :deep(.ant-descriptions-bordered .ant-descriptions-item-label) {
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--lex-surface);
 }
 
 .guide-list {
@@ -668,7 +663,7 @@ onUnmounted(() => {
 }
 
 .expired {
-  color: #cf1322;
+  color: var(--error-color);
 }
 
 .modal-title-note {

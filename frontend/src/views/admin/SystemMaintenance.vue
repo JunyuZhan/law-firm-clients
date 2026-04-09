@@ -2,11 +2,8 @@
   <div class="system-maintenance">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          系统维护
-        </h2>
         <p class="intro-text">
-          把系统状态、版本升级、数据备份与审计日志集中到一个运维工作台，减少切页和重复判断。
+          状态、升级、备份与日志；按需刷新。
         </p>
       </div>
       <a-button
@@ -25,22 +22,18 @@
       <article class="ops-metric">
         <span>数据库连接</span>
         <strong>{{ status.database?.connected ? '正常' : '待检查' }}</strong>
-        <p>数据库连通性和基础数据面状态。</p>
       </article>
       <article class="ops-metric">
         <span>文件存储</span>
         <strong>{{ status.storage?.available ? '可用' : '待检查' }}</strong>
-        <p>对象存储或本地存储路径的可用性。</p>
       </article>
       <article class="ops-metric">
         <span>备份文件</span>
         <strong>{{ backups.length }}</strong>
-        <p>当前可下载或恢复的备份数量。</p>
       </article>
       <article class="ops-metric">
         <span>版本状态</span>
         <strong>{{ gitInfo.hasUpdate ? '可升级' : gitInfo.currentVersion ? '最新' : '未检查' }}</strong>
-        <p>仓库版本检查结果与升级建议。</p>
       </article>
     </section>
 
@@ -378,8 +371,8 @@
           type="primary"
           :loading="backupLoading"
           @click="createBackup"
-      >
-        <DownloadOutlined /> 创建备份
+        >
+          <DownloadOutlined /> 创建备份
         </a-button>
       </template>
 
@@ -416,6 +409,7 @@
         :loading="backupListLoading"
         :pagination="false"
         row-key="filename"
+        size="small"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'action'">
@@ -474,46 +468,46 @@
               style="margin-bottom: 0"
               class="log-filter-form"
             >
-            <a-form-item label="开始时间">
-              <a-date-picker
-                v-model:value="loginLogFilter.startTime"
-                show-time
-                format="YYYY-MM-DD HH:mm:ss"
-                placeholder="选择开始时间"
-                style="width: 200px"
-                class="log-date-picker"
-              />
-            </a-form-item>
-            <a-form-item label="结束时间">
-              <a-date-picker
-                v-model:value="loginLogFilter.endTime"
-                show-time
-                format="YYYY-MM-DD HH:mm:ss"
-                placeholder="选择结束时间"
-                style="width: 200px"
-                class="log-date-picker"
-              />
-            </a-form-item>
-            <a-form-item>
-              <a-space class="log-action-buttons">
-                <a-button
-                  type="primary"
-                  @click="loadLoginLogs"
-                >
-                  查询
-                </a-button>
-                <a-button @click="resetLoginLogFilter">
-                  重置
-                </a-button>
-                <a-button
-                  :loading="exportLoading"
-                  @click="exportLoginLogs"
-                >
-                  <DownloadOutlined /> <span class="btn-text">导出 CSV</span>
-                </a-button>
-              </a-space>
-            </a-form-item>
-          </a-form>
+              <a-form-item label="开始时间">
+                <a-date-picker
+                  v-model:value="loginLogFilter.startTime"
+                  show-time
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="选择开始时间"
+                  style="width: 200px"
+                  class="log-date-picker"
+                />
+              </a-form-item>
+              <a-form-item label="结束时间">
+                <a-date-picker
+                  v-model:value="loginLogFilter.endTime"
+                  show-time
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="选择结束时间"
+                  style="width: 200px"
+                  class="log-date-picker"
+                />
+              </a-form-item>
+              <a-form-item>
+                <a-space class="log-action-buttons">
+                  <a-button
+                    type="primary"
+                    @click="loadLoginLogs"
+                  >
+                    查询
+                  </a-button>
+                  <a-button @click="resetLoginLogFilter">
+                    重置
+                  </a-button>
+                  <a-button
+                    :loading="exportLoading"
+                    @click="exportLoginLogs"
+                  >
+                    <DownloadOutlined /> <span class="btn-text">导出 CSV</span>
+                  </a-button>
+                </a-space>
+              </a-form-item>
+            </a-form>
           </div>
 
           <a-table
@@ -522,6 +516,7 @@
             :loading="loginLogLoading"
             :pagination="loginLogPagination"
             :scroll="{ x: 'max-content' }"
+            size="small"
             @change="handleLoginLogTableChange"
           >
             <template #bodyCell="{ column, record }">
@@ -549,55 +544,55 @@
               style="margin-bottom: 0"
               class="log-filter-form"
             >
-            <a-form-item label="项目ID">
-              <a-input
-                v-model:value="downloadLogFilter.matterId"
-                placeholder="输入项目ID"
-                style="width: 150px"
-                allow-clear
-                class="log-input"
-              />
-            </a-form-item>
-            <a-form-item label="开始时间">
-              <a-date-picker
-                v-model:value="downloadLogFilter.startTime"
-                show-time
-                format="YYYY-MM-DD HH:mm:ss"
-                placeholder="选择开始时间"
-                style="width: 200px"
-                class="log-date-picker"
-              />
-            </a-form-item>
-            <a-form-item label="结束时间">
-              <a-date-picker
-                v-model:value="downloadLogFilter.endTime"
-                show-time
-                format="YYYY-MM-DD HH:mm:ss"
-                placeholder="选择结束时间"
-                style="width: 200px"
-                class="log-date-picker"
-              />
-            </a-form-item>
-            <a-form-item>
-              <a-space class="log-action-buttons">
-                <a-button
-                  type="primary"
-                  @click="loadDownloadLogs"
-                >
-                  查询
-                </a-button>
-                <a-button @click="resetDownloadLogFilter">
-                  重置
-                </a-button>
-                <a-button
-                  :loading="exportLoading"
-                  @click="exportDownloadLogs"
-                >
-                  <DownloadOutlined /> <span class="btn-text">导出 CSV</span>
-                </a-button>
-              </a-space>
-            </a-form-item>
-          </a-form>
+              <a-form-item label="项目ID">
+                <a-input
+                  v-model:value="downloadLogFilter.matterId"
+                  placeholder="输入项目ID"
+                  style="width: 150px"
+                  allow-clear
+                  class="log-input"
+                />
+              </a-form-item>
+              <a-form-item label="开始时间">
+                <a-date-picker
+                  v-model:value="downloadLogFilter.startTime"
+                  show-time
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="选择开始时间"
+                  style="width: 200px"
+                  class="log-date-picker"
+                />
+              </a-form-item>
+              <a-form-item label="结束时间">
+                <a-date-picker
+                  v-model:value="downloadLogFilter.endTime"
+                  show-time
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="选择结束时间"
+                  style="width: 200px"
+                  class="log-date-picker"
+                />
+              </a-form-item>
+              <a-form-item>
+                <a-space class="log-action-buttons">
+                  <a-button
+                    type="primary"
+                    @click="loadDownloadLogs"
+                  >
+                    查询
+                  </a-button>
+                  <a-button @click="resetDownloadLogFilter">
+                    重置
+                  </a-button>
+                  <a-button
+                    :loading="exportLoading"
+                    @click="exportDownloadLogs"
+                  >
+                    <DownloadOutlined /> <span class="btn-text">导出 CSV</span>
+                  </a-button>
+                </a-space>
+              </a-form-item>
+            </a-form>
           </div>
 
           <a-table
@@ -606,6 +601,7 @@
             :loading="downloadLogLoading"
             :pagination="downloadLogPagination"
             :scroll="{ x: 'max-content' }"
+            size="small"
             @change="handleDownloadLogTableChange"
           >
             <template #bodyCell="{ column, record }">
@@ -681,7 +677,6 @@ import { message, Modal } from 'ant-design-vue'
 import type { TablePaginationConfig } from 'ant-design-vue'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
-import { useRouter } from 'vue-router'
 import {
   ReloadOutlined,
   DownloadOutlined,
@@ -695,7 +690,6 @@ import { useAuthStore } from '@/stores/auth'
 
 // 获取token的统一方法
 const authStore = useAuthStore()
-const router = useRouter()
 const getAuthToken = () => authStore.getToken()
 
 /** 带超时的 fetch 封装 */
@@ -788,10 +782,6 @@ interface DownloadLog {
 
 function getErrorMessage(error: unknown, fallback: string): string {
   return error instanceof Error && error.message ? error.message : fallback
-}
-
-function goTo(path: string) {
-  router.push(path)
 }
 
 // 状态数据
@@ -1303,8 +1293,8 @@ onMounted(() => {
 
 .guide-card,
 .ops-metric {
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  background: var(--lex-surface);
+  border: 1px solid var(--lex-outline);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
 }
@@ -1405,7 +1395,7 @@ onMounted(() => {
 }
 
 .stat-label {
-  color: #666;
+  color: var(--text-tertiary);
 }
 
 .stat-value {
@@ -1446,7 +1436,7 @@ onMounted(() => {
 }
 
 .version-label {
-  color: #666;
+  color: var(--text-tertiary);
   font-size: 14px;
 }
 
@@ -1455,7 +1445,7 @@ onMounted(() => {
 }
 
 .version-arrow {
-  color: #999;
+  color: var(--lex-muted-soft);
   margin: 0 4px;
 }
 
@@ -1480,7 +1470,7 @@ onMounted(() => {
 }
 
 .system-maintenance :deep(.ant-table-thead > tr > th) {
-  background: rgba(235, 229, 220, 0.55);
+  background: var(--lex-bg);
   font-weight: 700;
 }
 
@@ -1520,7 +1510,7 @@ onMounted(() => {
   margin-left: 24px;
   margin-top: 4px;
   font-size: 12px;
-  color: #666;
+  color: var(--text-tertiary);
   line-height: 1.5;
 }
 
@@ -1535,8 +1525,8 @@ onMounted(() => {
   padding: 0 12px;
   margin-bottom: 12px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
   color: var(--text-secondary);
   font-size: 13px;
 }
@@ -1553,8 +1543,8 @@ onMounted(() => {
   gap: 4px;
   padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.76);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .backup-summary-item span {
@@ -1580,8 +1570,8 @@ onMounted(() => {
   gap: 4px;
   padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.76);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .upgrade-summary-item span {
@@ -1603,7 +1593,7 @@ onMounted(() => {
 }
 
 .upgrade-status-text {
-  color: #1890ff;
+  color: var(--lex-primary-soft);
 }
 
 .modal-actions {
@@ -1809,8 +1799,8 @@ onMounted(() => {
   margin-bottom: 14px;
   padding: 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.76);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .log-filter-form {

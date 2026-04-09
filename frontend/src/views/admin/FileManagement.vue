@@ -2,11 +2,8 @@
   <div class="file-management">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          文件管理
-        </h2>
         <p class="intro-text">
-          查看文件存量、状态与存储占用，集中处理详情、删除、批量删除和过期清理。
+          按条件筛选；支持批量删除与过期清理。
         </p>
       </div>
       <a-space
@@ -36,31 +33,24 @@
       <article class="stats-card">
         <span class="stats-label">总文件数</span>
         <strong>{{ statistics.totalCount }}</strong>
-        <p>含活跃与已删除文件</p>
       </article>
       <article class="stats-card success">
         <span class="stats-label">活跃文件</span>
         <strong>{{ statistics.activeCount }}</strong>
-        <p>当前仍可查看或下载</p>
       </article>
       <article class="stats-card danger">
         <span class="stats-label">已删除</span>
         <strong>{{ statistics.deletedCount }}</strong>
-        <p>适合进入物理清理流程</p>
       </article>
       <article class="stats-card info">
         <span class="stats-label">存储空间</span>
         <strong>{{ statistics.activeSizeFormatted }}</strong>
-        <p>活跃文件占用空间</p>
       </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
-        <div>
-          <h3>筛选条件</h3>
-        </div>
-        <p>按项目、状态、类别和关键字快速定位文件。</p>
+        <h3>筛选</h3>
       </div>
 
       <a-form
@@ -139,15 +129,12 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <div>
-          <h3>文件数据表</h3>
-        </div>
-        <p>保留高频字段，详情放入弹窗，避免表格过宽。</p>
+        <h3>文件列表</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>当前结果 {{ files.length }} 条</span>
-        <span>已选择 {{ selectedRowKeys.length }} 条待处理文件</span>
+        <span>共 {{ files.length }} 条</span>
+        <span v-if="selectedRowKeys.length">已选 {{ selectedRowKeys.length }} 条</span>
       </div>
 
       <a-table
@@ -158,6 +145,7 @@
         :row-selection="rowSelection"
         :scroll="{ x: 920 }"
         row-key="id"
+        size="small"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">

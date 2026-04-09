@@ -2,11 +2,8 @@
   <div class="matter-list-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          项目列表
-        </h2>
         <p class="intro-text">
-          查看客户项目状态、访问有效期与访问链接。先看整体分布，再进入筛选和具体操作。
+          查看状态、有效期与访问链接；支持筛选与刷新。
         </p>
       </div>
       <a-button @click="loadData">
@@ -21,31 +18,24 @@
       <article class="stats-card">
         <span class="stats-label">总项目数</span>
         <strong>{{ summaryStats.total }}</strong>
-        <p>当前返回结果中的全部项目</p>
       </article>
       <article class="stats-card success">
         <span class="stats-label">有效访问</span>
         <strong>{{ summaryStats.active }}</strong>
-        <p>客户仍可通过链接直接进入</p>
       </article>
       <article class="stats-card warning">
         <span class="stats-label">已过期</span>
         <strong>{{ summaryStats.expired }}</strong>
-        <p>建议优先检查是否需要续期</p>
       </article>
       <article class="stats-card danger">
         <span class="stats-label">已撤销</span>
         <strong>{{ summaryStats.revoked }}</strong>
-        <p>访问已被主动停用</p>
       </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head">
-        <div>
-          <h3>筛选项目</h3>
-        </div>
-        <p>按客户、状态和时间范围快速定位项目。</p>
+        <h3>筛选</h3>
       </div>
 
       <a-form
@@ -106,15 +96,11 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table">
-        <div>
-          <h3>项目数据表</h3>
-        </div>
-        <p>表格保留核心字段，长链接用可读方式展示。</p>
+        <h3>项目列表</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>显示 {{ dataSource.length }} 个项目</span>
-        <span>状态按有效、过期、撤销分组识别</span>
+        <span>共 {{ dataSource.length }} 条</span>
       </div>
 
       <a-table
@@ -124,6 +110,7 @@
         :pagination="pagination"
         :scroll="{ x: 1080 }"
         row-key="id"
+        size="small"
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
@@ -334,9 +321,9 @@ onMounted(() => {
 }
 
 .panel-head h3 {
-  margin: 4px 0 0;
-  font-size: 18px;
-  color: var(--text-primary);
+  margin: 0;
+  font-size: 17px;
+  color: var(--lex-primary);
 }
 
 .panel-head p {

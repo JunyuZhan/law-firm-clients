@@ -10,10 +10,12 @@ test.describe('Portal smoke', () => {
     await page.goto('/portal')
 
     await expect(page.locator('.logo-text h1')).toContainText('汉科客户服务系统')
-    await expect(page.locator('.main-title')).toContainText('输入完整访问链接')
+    await expect(page.locator('.main-title')).toContainText('汉科客户服务')
     await expect(page.locator('.hero-value-line')).toContainText('专业事项')
-    await expect(page.locator('.portal-help-copy')).toContainText('链接失效或打不开页面时')
-    await expect(page.getByRole('button', { name: '进入项目' })).toBeVisible()
+    await expect(page.locator('.footer-meta')).toContainText('请通过承办律师获取访问链接')
+    await expect(page.getByRole('button', { name: '帮助中心' })).toBeVisible()
+    await page.getByText('链接打不开？粘贴完整访问链接').click()
+    await expect(page.getByRole('button', { name: '继续访问' })).toBeVisible()
   })
 
   test('stays readable on a narrow viewport', async ({ page }) => {
@@ -21,8 +23,10 @@ test.describe('Portal smoke', () => {
     await page.goto('/portal')
 
     await expect(page.locator('.logo-text h1')).toContainText('汉科客户服务系统')
-    await expect(page.locator('.main-title')).toContainText('输入完整访问链接')
-    await expect(page.locator('.portal-help-copy')).toContainText('链接失效或打不开页面时')
-    await expect(page.getByRole('button', { name: '进入项目' })).toBeVisible()
+    await expect(page.locator('.main-title')).toContainText('汉科客户服务')
+    await expect(page.locator('.footer-meta')).toContainText('请通过承办律师获取访问链接')
+    await expect(page.getByRole('button', { name: '帮助中心' })).toBeVisible()
+    await page.getByText('链接打不开？粘贴完整访问链接').click()
+    await expect(page.getByRole('button', { name: '继续访问' })).toBeVisible()
   })
 })

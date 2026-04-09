@@ -11,51 +11,23 @@
     >
       <section class="page-intro section-shell">
         <div>
-          <div class="eyebrow">
-            Matter Access
-          </div>
-          <h1 class="intro-title">
-            项目访问与状态总览
-          </h1>
           <p class="intro-text">
-            这里集中展示您当前可访问的项目。状态、有效期和进入路径都在同一层级里，不需要反复跳转确认。
+            点击项目进入详情；「有效」即可访问。
           </p>
         </div>
         <div class="stats-grid">
           <article class="stats-card">
-            <span class="stats-label">项目数量</span>
+            <span class="stats-label">全部</span>
             <strong>{{ matters.length }}</strong>
-            <p>当前可访问项目</p>
           </article>
           <article class="stats-card">
-            <span class="stats-label">活跃项目</span>
+            <span class="stats-label">有效</span>
             <strong>{{ activeCount }}</strong>
-            <p>状态为有效</p>
           </article>
         </div>
-      </section>
-
-      <section class="matter-summary section-shell">
-        <article class="summary-card">
-          <span class="summary-label">最近状态</span>
-          <strong>{{ activeCount > 0 ? '可继续处理' : '待开通访问' }}</strong>
-          <p>根据当前有效项目数量自动判断。</p>
-        </article>
-        <article class="summary-card">
-          <span class="summary-label">进入方式</span>
-          <strong>点击项目进入详情</strong>
-          <p>访问 token 会随项目入口一同带入。</p>
-        </article>
       </section>
 
       <section class="table-panel section-shell">
-        <div class="list-head">
-          <div>
-            <span class="panel-kicker">Matter List</span>
-            <h2>项目入口</h2>
-          </div>
-          <p>把状态、有效期和进入动作收在同一张列表里，减少来回确认。</p>
-        </div>
         <a-spin :spinning="loading">
           <div
             v-if="loading"
@@ -103,7 +75,6 @@
                   <template #description>
                     <div class="matter-meta">
                       <span>有效期至 {{ formatDate(item.expiresAt) }}</span>
-                      <span>点击进入项目详情</span>
                     </div>
                   </template>
                 </a-list-item-meta>
@@ -176,60 +147,6 @@ function goToMatter(item: MatterItem) {
   gap: 20px;
 }
 
-.matter-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.summary-card {
-  display: grid;
-  gap: 6px;
-  padding: 18px 20px;
-  border-radius: 8px;
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: var(--shadow-xs);
-}
-
-.summary-label {
-  color: var(--text-tertiary);
-  font-size: 12px;
-}
-
-.summary-card strong {
-  color: var(--text-primary);
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-.summary-card p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.list-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.list-head h2 {
-  margin: 6px 0 0;
-  color: var(--text-primary);
-  font-size: 22px;
-}
-
-.list-head p {
-  margin: 0;
-  max-width: 320px;
-  color: var(--text-secondary);
-  line-height: 1.75;
-}
-
 .matter-title-row {
   display: flex;
   align-items: center;
@@ -260,7 +177,7 @@ function goToMatter(item: MatterItem) {
 }
 
 .matter-item:hover {
-  background: #fafafa;
+  background: var(--lex-bg-muted);
 }
 
 .skeleton-list {
@@ -271,7 +188,7 @@ function goToMatter(item: MatterItem) {
 .skeleton-item {
   padding: 16px;
   border-radius: 8px;
-  background: #fafafa;
+  background: var(--lex-outline-soft);
   border: 1px solid var(--border-color-light);
 }
 
@@ -280,11 +197,8 @@ function goToMatter(item: MatterItem) {
     gap: 16px;
   }
 
-  .stats-grid,
-  .matter-summary,
-  .list-head {
-    grid-template-columns: 1fr;
-    display: grid;
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 </style>

@@ -624,9 +624,9 @@ async function handleLogout() {
 .update-banner {
   margin: calc(var(--header-height) + 16px) 24px 0;
   padding: 14px 18px;
-  border-radius: 8px;
-  border: 1px solid rgba(179, 138, 61, 0.2);
-  background: rgba(251, 246, 232, 0.92);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(30, 64, 175, 0.18);
+  background: rgba(239, 246, 255, 0.95);
   box-shadow: var(--shadow-xs);
 }
 
@@ -663,8 +663,8 @@ async function handleLogout() {
 }
 
 .update-banner :deep(.ant-btn:hover) {
-  border-color: var(--border-color-light);
-  background: rgba(252, 251, 248, 1);
+  border-color: var(--border-color);
+  background: var(--lex-surface-strong);
 }
 
 .update-banner :deep(.ant-btn-primary) {
@@ -672,8 +672,7 @@ async function handleLogout() {
 }
 
 .sider {
-  background:
-    linear-gradient(180deg, rgba(0, 9, 24, 0.98) 0%, rgba(0, 19, 37, 0.98) 100%) !important;
+  background: linear-gradient(180deg, var(--lex-surface-dark) 0%, var(--lex-surface-dark-muted) 100%) !important;
   position: fixed;
   left: 0;
   top: 0;
@@ -684,7 +683,7 @@ async function handleLogout() {
   overflow-x: hidden;
   z-index: 100;
   transition: width 0.24s ease;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sider.ant-layout-sider-collapsed {
@@ -718,13 +717,13 @@ async function handleLogout() {
 .logo-brand-mark {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(179, 138, 61, 0.16));
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(245, 158, 11, 0.12));
+  border: 1px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
 }
 
@@ -784,10 +783,10 @@ async function handleLogout() {
 }
 
 .admin-menu :deep(.ant-menu-item-selected) {
-  background: linear-gradient(135deg, rgba(179, 138, 61, 0.18), rgba(179, 138, 61, 0.1)) !important;
+  background: rgba(59, 130, 246, 0.22) !important;
   border: 0;
   color: #fff !important;
-  box-shadow: inset 0 0 0 1px rgba(179, 138, 61, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(147, 197, 253, 0.35);
 }
 
 .admin-menu :deep(.ant-menu-item-selected::after) {
@@ -839,7 +838,7 @@ async function handleLogout() {
 }
 
 .header {
-  background: rgba(243, 239, 232, 0.94) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   backdrop-filter: blur(var(--backdrop-blur));
   padding: 0;
   position: fixed;
@@ -847,7 +846,7 @@ async function handleLogout() {
   left: var(--sidebar-width);
   right: 0;
   z-index: 99;
-  border-bottom: 1px solid rgba(0, 9, 24, 0.06);
+  border-bottom: 1px solid var(--border-color);
   transition: left 0.24s ease;
 }
 
@@ -879,19 +878,19 @@ async function handleLogout() {
 }
 
 .collapse-btn {
-  color: var(--lex-primary);
+  color: var(--lex-primary-soft);
   font-size: 16px;
   cursor: pointer;
   width: 42px;
   height: 42px;
   border-radius: 999px;
-  background: rgba(252, 251, 248, 0.86) !important;
-  border: 1px solid var(--border-color-light);
+  background: var(--lex-bg-muted) !important;
+  border: 1px solid var(--border-color);
 }
 
 .collapse-btn:hover {
-  color: var(--accent-color-deep);
-  background: rgba(252, 251, 248, 1) !important;
+  color: var(--lex-primary);
+  background: var(--lex-surface-strong) !important;
 }
 
 .header-title-block {
@@ -929,15 +928,15 @@ async function handleLogout() {
   min-width: 40px;
   height: 40px;
   padding: 0 12px;
-  background: rgba(252, 251, 248, 0.86) !important;
-  border: 1px solid var(--border-color-light);
+  background: var(--lex-bg-muted) !important;
+  border: 1px solid var(--border-color);
   border-radius: 999px;
   cursor: pointer;
 }
 
 .header-btn:hover {
-  color: var(--accent-color-deep);
-  background: rgba(252, 251, 248, 1) !important;
+  color: var(--lex-primary-soft);
+  background: var(--lex-surface-strong) !important;
 }
 
 .header-actions :deep(.ant-badge) {
@@ -978,10 +977,10 @@ async function handleLogout() {
 }
 
 .content-wrapper {
-  background: rgba(252, 251, 248, 0.84);
-  border: 1px solid rgba(0, 9, 24, 0.06);
-  border-radius: 8px;
-  padding: 20px;
+  background: var(--lex-surface-strong);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
   min-height: calc(100vh - var(--header-height) - 40px);
   box-shadow: var(--shadow-sm);
 }

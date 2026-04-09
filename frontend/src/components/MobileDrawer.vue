@@ -180,7 +180,7 @@ function handleClose() {
   border-radius: 6px;
   padding: 6px;
   border: 1px solid var(--border-color);
-  background: #ffffff;
+  background: var(--lex-surface-strong);
 }
 
 .drawer-logo {
@@ -214,8 +214,8 @@ function handleClose() {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  border-radius: 6px;
-  background: #fafafa;
+  border-radius: var(--radius-md);
+  background: var(--lex-bg-muted);
   border: 1px solid var(--border-color-light);
 }
 
@@ -246,7 +246,7 @@ function handleClose() {
 .drawer-menu {
   border: 1px solid var(--border-color-light);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--lex-surface-strong);
 }
 
 .drawer-menu :deep(.ant-menu-item) {
@@ -258,7 +258,7 @@ function handleClose() {
 }
 
 .drawer-menu :deep(.ant-menu-item-selected) {
-  background: #e6f4ff;
-  color: var(--primary-color);
+  background: rgba(30, 64, 175, 0.08);
+  color: var(--lex-primary-soft);
 }
 </style>

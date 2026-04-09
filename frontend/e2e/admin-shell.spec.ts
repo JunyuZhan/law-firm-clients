@@ -14,7 +14,7 @@ test.describe('Admin shell smoke', () => {
 
     await expect(page).toHaveURL(/\/admin\/matters$/)
     await expect(page.getByText('项目列表').first()).toBeVisible()
-    await expect(page.getByText('项目数据表')).toBeVisible()
+    await expect(page.getByRole('columnheader', { name: '客户名称' })).toBeVisible()
     await expect(page.locator('.header .page-title')).toHaveText('项目列表')
     await expect(page.getByText('测试管理员')).toBeVisible()
   })
@@ -25,6 +25,6 @@ test.describe('Admin shell smoke', () => {
 
     await expect(page).toHaveURL(/\/admin\/matters$/)
     await expect(page.getByText('项目列表').first()).toBeVisible()
-    await expect(page.getByText('项目数据表')).toBeVisible()
+    await expect(page.getByRole('columnheader', { name: '客户名称' })).toBeVisible()
   })
 })

@@ -1,43 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
 
+/**
+ * Design tokens — Law Firm Clients (Stripe-inspired structure + project brand colors).
+ * Semantic names --lex-* are kept for compatibility across views; values follow REDESIGN-SPEC / MASTER.md.
+ */
 :root {
-  --lex-bg: #f3f0e8;
-  --lex-bg-muted: #ebe6db;
-  --lex-surface: rgba(249, 247, 242, 0.94);
-  --lex-surface-strong: #fcfbf8;
-  --lex-surface-inset: rgba(221, 214, 198, 0.34);
-  --lex-surface-dark: #000918;
-  --lex-surface-dark-muted: #001325;
-  --lex-surface-dark-soft: rgba(0, 19, 37, 0.88);
-  --lex-primary: #000918;
-  --lex-primary-soft: #002140;
-  --lex-accent: #b38a3d;
-  --lex-accent-soft: rgba(179, 138, 61, 0.14);
-  --lex-accent-strong: #8f6921;
-  --lex-muted: #6d6559;
-  --lex-muted-soft: #91897d;
-  --lex-text: #16120d;
-  --lex-text-secondary: #514a3f;
-  --lex-text-tertiary: #7a7367;
-  --lex-outline: rgba(0, 9, 24, 0.14);
-  --lex-outline-soft: rgba(0, 9, 24, 0.08);
-  --lex-panel-shadow: 0 18px 42px rgba(0, 9, 24, 0.06);
-  --lex-float-shadow: 0 12px 32px rgba(0, 9, 24, 0.08);
-  --lex-glow: radial-gradient(circle at top, rgba(179, 138, 61, 0.16), transparent 54%);
-  --lex-hero-gradient: linear-gradient(135deg, #000918 0%, #002140 100%);
+  --lex-bg: #f8fafc;
+  --lex-bg-muted: #f1f5f9;
+  --lex-surface: rgba(255, 255, 255, 0.92);
+  --lex-surface-strong: #ffffff;
+  --lex-surface-inset: #e2e8f0;
+  --lex-surface-dark: #0f172a;
+  --lex-surface-dark-muted: #1e293b;
+  --lex-surface-dark-soft: rgba(15, 23, 42, 0.94);
+  --lex-primary: #1e3a8a;
+  --lex-primary-soft: #1e40af;
+  --lex-accent: #f59e0b;
+  --lex-accent-soft: rgba(245, 158, 11, 0.14);
+  --lex-accent-strong: #d97706;
+  --lex-muted: #64748b;
+  --lex-muted-soft: #94a3b8;
+  --lex-text: #0f172a;
+  --lex-text-secondary: #475569;
+  --lex-text-tertiary: #94a3b8;
+  --lex-outline: #e2e8f0;
+  --lex-outline-soft: #f1f5f9;
+  --lex-panel-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.06);
+  --lex-float-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --lex-glow: radial-gradient(circle at top, rgba(30, 64, 175, 0.12), transparent 55%);
+  --lex-hero-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 
   --primary-color: var(--lex-primary-soft);
-  --primary-color-light: #1d3d63;
-  --primary-color-lighter: rgba(0, 33, 64, 0.14);
+  --primary-color-light: #3b82f6;
+  --primary-color-lighter: rgba(30, 64, 175, 0.12);
   --primary-color-dark: var(--lex-primary);
 
   --accent-color: var(--lex-accent);
   --accent-color-light: var(--lex-accent-soft);
-  --accent-color-lighter: rgba(179, 138, 61, 0.08);
+  --accent-color-lighter: rgba(245, 158, 11, 0.1);
   --accent-color-deep: var(--lex-accent-strong);
 
-  --cta-color: var(--lex-primary-soft);
-  --cta-color-hover: #123154;
+  --cta-color: var(--lex-accent);
+  --cta-color-hover: #d97706;
 
   --bg-primary: var(--lex-bg);
   --bg-secondary: var(--lex-bg-muted);
@@ -54,19 +58,19 @@
   --border-color: var(--lex-outline);
   --border-color-light: var(--lex-outline-soft);
 
-  --success-color: #3f6f4d;
-  --warning-color: #a26c17;
-  --error-color: #b44537;
+  --success-color: #15803d;
+  --warning-color: #ca8a04;
+  --error-color: #dc2626;
   --info-color: var(--lex-primary-soft);
 
-  --shadow-xs: 0 2px 10px rgba(0, 9, 24, 0.03);
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow-sm: var(--lex-panel-shadow);
-  --shadow-md: 0 18px 48px rgba(0, 9, 24, 0.08);
-  --shadow-lg: 0 28px 80px rgba(0, 9, 24, 0.12);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.1);
 
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
   --radius-xl: 12px;
 
   --spacing-xs: 4px;
@@ -76,9 +80,9 @@
   --spacing-xl: 32px;
   --spacing-2xl: 40px;
 
-  --font-heading: 'Manrope', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-body: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'SFMono-Regular', 'Consolas', monospace;
+  --font-heading: 'Fira Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-body: 'Fira Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Fira Code', 'SFMono-Regular', Consolas, monospace;
 
   --shell-max-width: 1280px;
   --shell-gutter: 24px;
@@ -99,18 +103,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-primary);
   background:
-    radial-gradient(circle at top left, rgba(179, 138, 61, 0.12), transparent 28%),
-    linear-gradient(180deg, #f7f4ec 0%, #f3f0e8 42%, #ece6db 100%);
+    radial-gradient(circle at 12% 0%, rgba(30, 64, 175, 0.08), transparent 42%),
+    radial-gradient(circle at 88% 8%, rgba(245, 158, 11, 0.06), transparent 38%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 55%, #e2e8f0 100%);
 }
 
 ::selection {
-  background: rgba(179, 138, 61, 0.22);
-  color: var(--lex-primary);
+  background: rgba(30, 64, 175, 0.18);
+  color: var(--lex-text);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+  scrollbar-color: rgba(15, 23, 42, 0.2) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -119,7 +124,7 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.18);
+  background: rgba(15, 23, 42, 0.2);
   border-radius: 999px;
 }
 
@@ -149,8 +154,8 @@ h6,
 .page-title {
   font-family: var(--font-heading);
   font-weight: 600;
-  letter-spacing: 0;
-  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  color: var(--lex-primary);
 }
 
 .section-shell {
@@ -163,8 +168,8 @@ h6,
 .surface-card,
 .pro-card,
 .glass-panel {
-  background: var(--lex-surface);
-  border: 1px solid var(--lex-outline-soft);
+  background: var(--lex-surface-strong);
+  border: 1px solid var(--lex-outline);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
@@ -173,11 +178,11 @@ h6,
   background: var(--lex-hero-gradient);
   border: 1px solid transparent;
   color: #fff;
-  box-shadow: none;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .pro-button-primary:hover {
-  background: linear-gradient(135deg, #001325 0%, #123154 100%);
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
 }
 
 .eyebrow {
@@ -188,10 +193,10 @@ h6,
   border-radius: 0;
   background: transparent;
   border: 0;
-  color: var(--lex-accent-strong);
+  color: var(--lex-primary-soft);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
@@ -204,7 +209,7 @@ h6,
   width: 28px;
   height: 1px;
   background: currentColor;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .fade-in {

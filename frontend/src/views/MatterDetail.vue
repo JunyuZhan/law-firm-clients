@@ -22,14 +22,11 @@
           >
             <section class="hero-panel glass-panel">
               <div class="hero-copy">
-                <div class="eyebrow">
-                  Matter Overview
-                </div>
                 <h1 class="hero-title">
                   {{ matterData.matterName || `项目 ${matterId}` }}
                 </h1>
                 <p class="hero-subtitle">
-                  {{ matterDetail.clientName }} 的项目访问页。当前状态、阶段、关键期限和文件协作都在同一视图内呈现。
+                  {{ matterDetail.clientName }} · 进度、材料与节点见下方各区块。
                 </p>
 
                 <div class="hero-meta">
@@ -70,7 +67,7 @@
                 </div>
 
                 <div class="hero-action-card">
-                  <span class="hero-progress-label">当前建议</span>
+                  <span class="hero-progress-label">建议</span>
                   <strong>{{ heroActionTitle }}</strong>
                   <p>{{ heroActionDescription }}</p>
                   <a-button
@@ -83,29 +80,6 @@
                   </a-button>
                 </div>
               </div>
-            </section>
-
-            <section class="stats-grid overview-grid">
-              <article class="stats-card">
-                <span class="stats-label">访问状态</span>
-                <strong>{{ displayStatus }}</strong>
-                <p>链接权限状态</p>
-              </article>
-              <article class="stats-card">
-                <span class="stats-label">整体进度</span>
-                <strong>{{ normalizedProgress }}%</strong>
-                <p>{{ currentStageLabel }}</p>
-              </article>
-              <article class="stats-card">
-                <span class="stats-label">待办任务</span>
-                <strong>{{ pendingTaskCount }}</strong>
-                <p>{{ completedTasksLabel }}</p>
-              </article>
-              <article class="stats-card">
-                <span class="stats-label">文件数量</span>
-                <strong>{{ fileList.length }}</strong>
-                <p>当前项目文件</p>
-              </article>
             </section>
 
             <section class="detail-grid">
@@ -688,7 +662,6 @@ import {
   type FileInfo,
   FILE_SOURCE_PUSHED
 } from '@/api/file'
-import { LAW_FIRM_NAME } from '@/config/app'
 import { formatDate as formatDateTime } from '@/utils/date'
 import { getMatterStatusColor, getTaskStatusColor as getTaskStatusColorUtil } from '@/utils/status'
 import dayjs from 'dayjs'
@@ -704,7 +677,6 @@ const portalVisitorStore = usePortalVisitorStore()
 const loading = ref(false)
 const fileLoading = ref(false)
 const matterDetail = ref<ClientMatterDetail | null>(null)
-const lawFirmName = LAW_FIRM_NAME
 const fileList = ref<FileInfo[]>([])
 const showUploadModal = ref(false)
 
@@ -728,10 +700,7 @@ const matterId = computed(() => route.params.id as string)
 const token = computed(() => route.query.token as string)
 const matterData = computed<MatterData>(() => matterDetail.value?.matterData || {})
 
-const welcomeText = computed(() => {
-  if (!matterDetail.value?.clientName) return ''
-  return `尊敬的${matterDetail.value.clientName}：欢迎使用${lawFirmName}客户服务系统。`
-})
+const welcomeText = computed(() => matterDetail.value?.clientName || '')
 
 const lawyerList = computed(() => {
   const data = matterData.value
@@ -765,9 +734,9 @@ const heroActionTitle = computed(() => {
   return '继续查看最新进展'
 })
 const heroActionDescription = computed(() => {
-  if (pendingTaskCount.value > 0) return `当前仍有 ${pendingTaskCount.value} 项待办，建议先核对截止时间并补充所需资料。`
-  if (fileList.value.length === 0) return '当前项目暂未显示文件，可先上传补充材料或等待律所推送。'
-  return '项目状态、文件快照和最近动态已经同步，可继续留意后续更新。'
+  if (pendingTaskCount.value > 0) return `待办 ${pendingTaskCount.value} 项，请按截止日补充材料。`
+  if (fileList.value.length === 0) return '暂无文件时可上传补充材料，或等待律所上传。'
+  return '进展与材料见下方。'
 })
 const recentActivityList = computed(() => {
   const activities: Array<{ key: string; title: string; description: string; meta: string }> = []
@@ -775,9 +744,9 @@ const recentActivityList = computed(() => {
   if (displayLastUpdate.value) {
     activities.push({
       key: 'last-update',
-      title: '项目状态已同步',
-      description: `当前阶段为 ${currentStageLabel.value}，整体进度 ${normalizedProgress.value}%。`,
-      meta: `更新于 ${formatDate(displayLastUpdate.value)}`,
+      title: '进度已更新',
+      description: `${currentStageLabel.value} · ${normalizedProgress.value}%`,
+      meta: formatDate(displayLastUpdate.value),
     })
   }
 
@@ -1198,8 +1167,8 @@ onUnmounted(() => {
   gap: 10px;
   padding: 20px;
   border-radius: 8px;
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: var(--lex-surface);
+  border: 1px solid var(--lex-outline);
 }
 
 .hero-action-card {
@@ -1207,7 +1176,7 @@ onUnmounted(() => {
   gap: 10px;
   padding: 20px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(0, 9, 24, 0.98) 0%, rgba(0, 33, 64, 0.96) 100%);
+  background: linear-gradient(135deg, var(--lex-surface-dark) 0%, var(--lex-surface-dark-muted) 100%);
   color: rgba(255, 255, 255, 0.82);
   box-shadow: var(--shadow-sm);
 }
@@ -1243,10 +1212,6 @@ onUnmounted(() => {
 .hero-progress-foot {
   color: var(--text-secondary);
   font-size: 13px;
-}
-
-.overview-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .detail-grid {
@@ -1342,7 +1307,8 @@ onUnmounted(() => {
   gap: 12px;
   padding: 16px;
   border-radius: 8px;
-  background: rgba(0, 9, 24, 0.03);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .activity-dot {
@@ -1351,7 +1317,7 @@ onUnmounted(() => {
   margin-top: 6px;
   border-radius: 999px;
   background: var(--accent-color);
-  box-shadow: 0 0 0 6px rgba(179, 138, 61, 0.08);
+  box-shadow: 0 0 0 6px var(--lex-accent-soft);
 }
 
 .activity-copy {
@@ -1388,8 +1354,8 @@ onUnmounted(() => {
   gap: 6px;
   padding: 16px;
   border-radius: 8px;
-  background: rgba(0, 9, 24, 0.04);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .fee-item span,
@@ -1453,7 +1419,6 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
   }
 
-  .overview-grid,
   .hero-meta {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1468,7 +1433,6 @@ onUnmounted(() => {
     padding: 22px;
   }
 
-  .overview-grid,
   .hero-meta {
     grid-template-columns: 1fr;
   }

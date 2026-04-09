@@ -20,40 +20,24 @@
             </template>
           </a-avatar>
           <div class="profile-info">
-            <div class="eyebrow">
-              Client Identity
-            </div>
-            <h1>{{ clientName || '当前访客' }}</h1>
-            <p>{{ clientIdText }}</p>
+            <h1 class="profile-name">
+              {{ clientName || '访客' }}
+            </h1>
+            <p class="profile-id">
+              {{ clientIdText }}
+            </p>
           </div>
           <div class="profile-badge">
-            <span>当前状态</span>
-            <strong>{{ clientName ? '已同步访客信息' : '访客模式' }}</strong>
+            <span>状态</span>
+            <strong>{{ clientName ? '已识别' : '未登录' }}</strong>
           </div>
         </div>
-      </section>
-
-      <section class="profile-summary section-shell">
-        <article class="summary-card">
-          <span class="summary-label">最近访问</span>
-          <strong>{{ portalVisitorStore.profile.lastMatterId || '-' }}</strong>
-          <p>最近同步的项目编号。</p>
-        </article>
-        <article class="summary-card">
-          <span class="summary-label">材料入口</span>
-          <strong>{{ portalVisitorStore.profile.lastMatterToken ? '已具备' : '待进入项目' }}</strong>
-          <p>是否已具备最近项目的访问上下文。</p>
-        </article>
       </section>
 
       <section class="table-panel section-shell">
-        <div class="action-panel-head">
-          <div>
-            <span class="panel-kicker">Quick Access</span>
-            <h2>常用入口</h2>
-          </div>
-          <p>从这里继续进入文件、通知与帮助，不需要重新寻找主入口。</p>
-        </div>
+        <h2 class="panel-title">
+          快捷入口
+        </h2>
         <a-list>
           <a-list-item @click="router.push('/files')">
             <template #actions>
@@ -64,7 +48,7 @@
                 文件中心
               </template>
               <template #description>
-                查看最近访问项目的材料并进行预览或下载
+                预览、下载项目文件
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -77,7 +61,7 @@
                 消息通知
               </template>
               <template #description>
-                查看最近提醒、动态和系统通知
+                系统提醒与动态
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -90,7 +74,7 @@
                 帮助中心
               </template>
               <template #description>
-                查看常见问题、使用说明和协助入口
+                常见问题与访问说明
               </template>
             </a-list-item-meta>
           </a-list-item>
@@ -129,9 +113,9 @@ const clientIdText = computed(() => {
 
 .profile-hero {
   padding: 20px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color-light);
-  background: var(--lex-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--lex-surface-strong);
   box-shadow: var(--shadow-sm);
 }
 
@@ -144,9 +128,9 @@ const clientIdText = computed(() => {
 }
 
 .profile-avatar {
-  background: rgba(0, 33, 64, 0.08);
-  color: var(--primary-color);
-  border: 1px solid rgba(0, 33, 64, 0.12);
+  background: rgba(30, 64, 175, 0.08);
+  color: var(--lex-primary-soft);
+  border: 1px solid rgba(30, 64, 175, 0.15);
   flex-shrink: 0;
 }
 
@@ -154,26 +138,27 @@ const clientIdText = computed(() => {
   min-width: 0;
 }
 
-.profile-info h1 {
-  margin: 8px 0 4px;
-  color: var(--text-primary);
+.profile-name {
+  margin: 0 0 4px;
+  color: var(--lex-primary);
   font-size: 22px;
   line-height: 1.3;
   word-break: break-word;
 }
 
-.profile-info p {
+.profile-id {
   margin: 0;
   color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .profile-badge {
   display: grid;
   gap: 4px;
   padding: 12px 14px;
-  border-radius: 8px;
-  background: rgba(248, 244, 237, 0.72);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: var(--radius-md);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--border-color-light);
 }
 
 .profile-badge span {
@@ -187,58 +172,10 @@ const clientIdText = computed(() => {
   line-height: 1.6;
 }
 
-.profile-summary {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.summary-card {
-  display: grid;
-  gap: 6px;
-  padding: 18px 20px;
-  border-radius: 8px;
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow: var(--shadow-xs);
-}
-
-.summary-label {
-  color: var(--text-tertiary);
-  font-size: 12px;
-}
-
-.summary-card strong {
-  color: var(--text-primary);
-  font-size: 22px;
-  line-height: 1.2;
-}
-
-.summary-card p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-.action-panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 12px;
-}
-
-.action-panel-head h2 {
-  margin: 6px 0 0;
-  color: var(--text-primary);
-  font-size: 22px;
-}
-
-.action-panel-head p {
-  margin: 0;
-  max-width: 320px;
-  color: var(--text-secondary);
-  line-height: 1.75;
+.panel-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  color: var(--lex-primary);
 }
 
 :deep(.ant-list-item) {
@@ -246,7 +183,7 @@ const clientIdText = computed(() => {
 }
 
 :deep(.ant-list-item:hover) {
-  background: #fafafa;
+  background: var(--lex-bg-muted);
 }
 
 @media (max-width: 768px) {
@@ -254,9 +191,7 @@ const clientIdText = computed(() => {
     padding: 16px;
   }
 
-  .profile-header,
-  .profile-summary,
-  .action-panel-head {
+  .profile-header {
     grid-template-columns: 1fr;
     display: grid;
     align-items: flex-start;

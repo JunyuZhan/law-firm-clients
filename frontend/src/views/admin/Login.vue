@@ -23,7 +23,9 @@
             </svg>
           </div>
           <div class="brand-copy">
-            <p class="brand-kicker">管理员登录</p>
+            <p class="brand-kicker">
+              管理员登录
+            </p>
             <h1 class="editorial-title brand-title">
               {{ appConfigStore.displayName }}
             </h1>
@@ -33,10 +35,9 @@
         <a-divider class="brand-divider" />
 
         <div class="form-header">
-          <h2 class="editorial-title">
-            欢迎回来
-          </h2>
-          <p>请使用您的管理员账户继续操作。</p>
+          <p class="form-header-hint">
+            使用管理员账号登录。
+          </p>
         </div>
 
         <a-form
@@ -257,8 +258,8 @@ onMounted(() => {
   min-height: 100vh;
   padding: 24px;
   background:
-    radial-gradient(circle at top left, rgba(179, 138, 61, 0.08), transparent 28%),
-    linear-gradient(180deg, #f8f4ed 0%, #f3efe8 100%);
+    radial-gradient(circle at top left, rgba(245, 158, 11, 0.08), transparent 28%),
+    linear-gradient(180deg, var(--lex-bg) 0%, var(--lex-bg-muted) 100%);
 }
 
 .login-shell {
@@ -342,18 +343,11 @@ onMounted(() => {
   margin-bottom: 18px;
 }
 
-.form-header h2 {
-  margin: 6px 0 4px;
-  font-size: 30px;
-  line-height: 1.12;
-  color: var(--lex-primary);
-  letter-spacing: 0.01em;
-}
-
-.form-header p {
+.form-header-hint {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.7;
+  font-size: 15px;
 }
 
 .login-form :deep(.ant-form-item) {
@@ -374,8 +368,8 @@ onMounted(() => {
 .login-input :deep(.ant-input-affix-wrapper-focused),
 .login-input :deep(.ant-input:hover),
 .login-input :deep(.ant-input:focus) {
-  border-color: rgba(179, 138, 61, 0.4);
-  box-shadow: 0 0 0 3px rgba(179, 138, 61, 0.08);
+  border-color: var(--lex-accent-strong);
+  box-shadow: 0 0 0 3px var(--lex-accent-soft);
 }
 
 .input-icon {
@@ -399,15 +393,15 @@ onMounted(() => {
   min-width: 128px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--lex-surface-strong);
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .captcha-image:hover {
-  border-color: rgba(179, 138, 61, 0.32);
-  box-shadow: 0 0 0 3px rgba(179, 138, 61, 0.06);
+  border-color: color-mix(in srgb, var(--lex-accent) 40%, var(--lex-outline));
+  box-shadow: 0 0 0 3px var(--accent-color-lighter);
 }
 
 .captcha-image img {

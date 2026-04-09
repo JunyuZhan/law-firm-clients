@@ -21,11 +21,15 @@
               </div>
               <div class="logo-text">
                 <h1>{{ lawFirmName }}</h1>
-                <p class="logo-system-label">{{ portalSystemLabel }}</p>
+                <p class="logo-system-label">
+                  {{ portalSystemLabel }}
+                </p>
                 <p
                   v-if="appConfigStore.appSlogan"
                   class="logo-slogan"
-                >{{ appConfigStore.appSlogan }}</p>
+                >
+                  {{ appConfigStore.appSlogan }}
+                </p>
               </div>
             </div>
           </div>
@@ -161,7 +165,7 @@ const logoUrl = computed(() => appConfigStore.logoUrl)
 const lawFirmName = computed(() => appConfigStore.displayName || '律师事务所')
 const portalSystemLabel = computed(() => appConfigStore.appShortName || '客户服务系统')
 const portalSubtitle = computed(() => appConfigStore.appSlogan || '客户服务系统')
-const detailSubtitle = computed(() => '安全访问、进度追踪与受控文件分发')
+const detailSubtitle = computed(() => '项目进展与文件')
 </script>
 
 <style scoped>
@@ -176,9 +180,9 @@ const detailSubtitle = computed(() => '安全访问、进度追踪与受控文�
 .header-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(249, 247, 242, 0.72);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(var(--backdrop-blur));
-  border-bottom: 1px solid rgba(0, 9, 24, 0.06);
+  border-bottom: 1px solid var(--border-color);
   pointer-events: none;
 }
 
@@ -317,14 +321,14 @@ const detailSubtitle = computed(() => '安全访问、进度追踪与受控文�
   min-height: 40px;
   padding-inline: 12px;
   border-radius: 999px;
-  border: 1px solid var(--border-color-light);
-  background: rgba(252, 251, 248, 0.8) !important;
-  color: var(--lex-primary) !important;
+  border: 1px solid var(--border-color);
+  background: var(--lex-bg-muted) !important;
+  color: var(--lex-primary-soft) !important;
 }
 
 .header-btn:hover {
-  background: rgba(252, 251, 248, 1) !important;
-  color: var(--accent-color-deep) !important;
+  background: var(--lex-surface-strong) !important;
+  color: var(--lex-primary) !important;
   transform: translateY(-1px);
 }
 

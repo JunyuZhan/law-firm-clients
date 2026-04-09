@@ -2,11 +2,8 @@
   <div class="admin-profile">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          个人中心
-        </h2>
         <p class="intro-text">
-          集中查看管理员资料，并在统一的安全面板中完成密码更新与会话退出。
+          资料与安全设置。
         </p>
       </div>
       <a-space>
@@ -29,22 +26,18 @@
       <div class="stats-card">
         <span class="stats-label">账户身份</span>
         <strong>{{ userInfo.realName || userInfo.username || '管理员' }}</strong>
-        <p>当前登录管理员的展示名称。</p>
       </div>
       <div class="stats-card success">
         <span class="stats-label">用户名</span>
         <strong>{{ userInfo.username || '-' }}</strong>
-        <p>用于后台登录与审计日志识别。</p>
       </div>
       <div class="stats-card info">
-        <span class="stats-label">邮箱状态</span>
-        <strong>{{ userInfo.email ? '已绑定' : '未绑定' }}</strong>
-        <p>{{ userInfo.email || '建议补充邮箱用于通知和审计' }}</p>
+        <span class="stats-label">邮箱</span>
+        <strong>{{ userInfo.email ? userInfo.email : '未绑定' }}</strong>
       </div>
       <div class="stats-card danger">
-        <span class="stats-label">密码策略</span>
-        <strong>定期轮换</strong>
-        <p>避免重复使用旧密码，降低账户风险。</p>
+        <span class="stats-label">密码</span>
+        <strong>定期更换</strong>
       </div>
     </section>
 
@@ -61,7 +54,7 @@
           </a-avatar>
           <div class="identity-copy">
             <h3>{{ userInfo.realName || userInfo.username || '管理员' }}</h3>
-            <p>账号用于管理项目、通知、文件和系统配置。</p>
+            <p>后台账号。</p>
           </div>
         </div>
 
@@ -255,8 +248,8 @@ const handleLogout = () => {
 
 .guide-card,
 .profile-card {
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  background: var(--lex-surface);
+  border: 1px solid var(--lex-outline);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
 }
@@ -293,8 +286,8 @@ const handleLogout = () => {
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  background: rgba(179, 138, 61, 0.12);
-  border: 1px solid rgba(179, 138, 61, 0.14);
+  background: var(--lex-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--lex-accent) 28%, var(--lex-outline));
   color: var(--accent-color-deep);
   font-size: 12px;
 }

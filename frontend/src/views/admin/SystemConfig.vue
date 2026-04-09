@@ -2,11 +2,8 @@
   <div class="system-config-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          系统配置
-        </h2>
         <p class="intro-text">
-          统一管理品牌、门户和系统级参数。常用配置放在可视化卡片中，所有底层配置项保留在高级配置页签。
+          品牌、门户与系统参数；高级项在对应页签。
         </p>
       </div>
 
@@ -28,26 +25,22 @@
 
     <section class="completion-strip config-card">
       <div class="completion-head">
-        <div>
-          <h3>配置完整度</h3>
-          <p>先补齐品牌和门户字段，再进入系统级参数。</p>
-        </div>
+        <h3>配置完整度</h3>
       </div>
       <div class="completion-grid">
         <div class="completion-item">
           <span>品牌配置</span>
           <strong>{{ brandCompletionRate }}</strong>
-          <p>{{ brandCompletion }}/4 项已完成</p>
+          <p>{{ brandCompletion }}/4</p>
         </div>
         <div class="completion-item">
           <span>门户配置</span>
           <strong>{{ portalCompletionRate }}</strong>
-          <p>{{ portalCompletion }}/5 项已完成</p>
+          <p>{{ portalCompletion }}/5</p>
         </div>
         <div class="completion-item">
           <span>系统配置项</span>
           <strong>{{ dataSource.length }}</strong>
-          <p>高级配置列表中的当前条目数</p>
         </div>
       </div>
     </section>
@@ -65,7 +58,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-          <h3>系统名称</h3>
+                <h3>系统名称</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -105,7 +98,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-          <h3>Logo 设置</h3>
+                <h3>Logo 设置</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -148,7 +141,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-          <h3>律所信息</h3>
+                <h3>律所信息</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -178,7 +171,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-          <h3>页面内容</h3>
+                <h3>页面内容</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -225,7 +218,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-          <h3>系统地址</h3>
+                <h3>系统地址</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -247,7 +240,7 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-          <h3>回调配置</h3>
+                <h3>回调配置</h3>
               </div>
             </div>
             <a-form layout="vertical">
@@ -882,8 +875,8 @@ onUnmounted(() => {
 .entry-card {
   padding: 20px 22px;
   border-radius: 8px;
-  background: linear-gradient(135deg, rgba(0, 9, 24, 0.04), rgba(179, 138, 61, 0.12)), rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.05), var(--lex-accent-soft)), var(--lex-surface);
+  border: 1px solid var(--lex-outline);
 }
 
 .entry-head {
@@ -945,8 +938,8 @@ onUnmounted(() => {
 
 .config-card,
 .advanced-panel {
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  background: var(--lex-surface);
+  border: 1px solid var(--lex-outline);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
 }
@@ -979,8 +972,8 @@ onUnmounted(() => {
   gap: 4px;
   padding: 12px 14px;
   border-radius: 8px;
-  background: rgba(248, 244, 237, 0.76);
-  border: 1px solid rgba(0, 9, 24, 0.08);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .completion-item span {
@@ -1134,21 +1127,21 @@ onUnmounted(() => {
 }
 
 .save-status.saving {
-  background: #e6f7ff;
-  color: #1890ff;
-  border: 1px solid #91d5ff;
+  background: color-mix(in srgb, var(--lex-primary-soft) 12%, transparent);
+  color: var(--lex-primary-soft);
+  border: 1px solid color-mix(in srgb, var(--lex-primary-soft) 32%, var(--lex-outline));
 }
 
 .save-status.saved {
-  background: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
+  background: color-mix(in srgb, var(--success-color) 10%, transparent);
+  color: var(--success-color);
+  border: 1px solid color-mix(in srgb, var(--success-color) 28%, var(--lex-outline));
 }
 
 .save-status.error {
-  background: #fff2f0;
-  color: #ff4d4f;
-  border: 1px solid #ffccc7;
+  background: color-mix(in srgb, var(--error-color) 8%, transparent);
+  color: var(--error-color);
+  border: 1px solid color-mix(in srgb, var(--error-color) 24%, var(--lex-outline));
 }
 
 @media (max-width: 992px) {

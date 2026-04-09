@@ -82,10 +82,10 @@ function handleClick(item: NavItem) {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0;
   padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid rgba(0, 9, 24, 0.08);
-  background: rgba(252, 251, 248, 0.94);
+  border-top: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(18px);
-  box-shadow: 0 -10px 30px rgba(0, 9, 24, 0.08);
+  box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.06);
   z-index: 1000;
 }
 
@@ -102,8 +102,8 @@ function handleClick(item: NavItem) {
 }
 
 .nav-item.active {
-  color: var(--primary-color);
-  background: rgba(0, 33, 64, 0.06);
+  color: var(--lex-primary-soft);
+  background: rgba(30, 64, 175, 0.08);
 }
 
 .nav-icon {

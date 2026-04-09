@@ -2,11 +2,8 @@
   <div class="notification-settings-container">
     <section class="page-intro">
       <div>
-        <h2 class="editorial-title intro-title">
-          通知配置
-        </h2>
         <p class="intro-text">
-          在同一页面管理邮件、短信、微信三个渠道的启用状态与发送参数，保存后立即生效。
+          邮件 / 短信 / 微信渠道与参数；保存后生效。
         </p>
       </div>
       <a-button @click="loadData">
@@ -28,15 +25,11 @@
           </a-tag>
         </div>
         <p>
-          系统优先读取数据库中的通知配置；当数据库缺少对应键时，才会回退到
-          <code>application.yml</code>
-          默认值。建议先启用渠道，再补充凭证和模板映射。
+          配置存数据库；缺键时回退 <code>application.yml</code>。
+          <router-link to="/admin/notification-templates">
+            管理通知模板
+          </router-link>
         </p>
-        <router-link to="/admin/notification-templates">
-          <a-button>
-            前往通知模板管理
-          </a-button>
-        </router-link>
       </article>
     </section>
 
@@ -44,32 +37,25 @@
       <div class="stats-card">
         <span class="stats-label">启用渠道</span>
         <strong>{{ enabledChannelCount }}/3</strong>
-        <p>当前已启用的通知渠道数量。</p>
       </div>
       <div class="stats-card success">
         <span class="stats-label">邮件</span>
         <strong>{{ emailForm.enabled ? 'ON' : 'OFF' }}</strong>
-        <p>{{ emailForm.smtpHost ? 'SMTP 已配置' : 'SMTP 待配置' }}</p>
       </div>
       <div class="stats-card info">
         <span class="stats-label">短信</span>
         <strong>{{ smsForm.enabled ? 'ON' : 'OFF' }}</strong>
-        <p>{{ smsForm.provider === 'tencent' ? '腾讯云通道' : '阿里云通道' }}</p>
       </div>
       <div class="stats-card danger">
         <span class="stats-label">微信</span>
         <strong>{{ wechatForm.enabled ? 'ON' : 'OFF' }}</strong>
-        <p>{{ wechatForm.templateId ? '模板已配置' : '模板待配置' }}</p>
       </div>
     </section>
 
     <a-spin :spinning="loading">
       <section class="section-shell-card">
         <div class="section-head dashboard-section-head">
-          <div>
-            <h3>通知通道工作台</h3>
-          </div>
-          <p>每个通道都保持相同的阅读顺序：状态判断、关键凭证、模板接入、保存落地。</p>
+          <h3>通知通道</h3>
         </div>
       </section>
 
@@ -656,7 +642,7 @@ onMounted(() => {
 }
 
 .overview-card--wide {
-  background: linear-gradient(180deg, rgba(252, 251, 248, 0.92), rgba(252, 251, 248, 0.82));
+  background: linear-gradient(180deg, var(--lex-surface-strong), var(--lex-surface));
 }
 
 .channel-kicker {
@@ -671,8 +657,8 @@ onMounted(() => {
 .section-shell-card,
 .channel-card {
   padding: 22px;
-  background: rgba(252, 251, 248, 0.82);
-  border: 1px solid rgba(0, 9, 24, 0.05);
+  background: var(--lex-surface);
+  border: 1px solid var(--lex-outline);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
 }
@@ -687,15 +673,15 @@ onMounted(() => {
 }
 
 .channel-card--email {
-  background: linear-gradient(180deg, rgba(0, 33, 64, 0.08), rgba(252, 251, 248, 0.82) 28%), rgba(252, 251, 248, 0.82);
+  background: linear-gradient(180deg, rgba(30, 64, 175, 0.08), var(--lex-surface) 28%), var(--lex-surface);
 }
 
 .channel-card--sms {
-  background: linear-gradient(180deg, rgba(179, 138, 61, 0.1), rgba(252, 251, 248, 0.82) 28%), rgba(252, 251, 248, 0.82);
+  background: linear-gradient(180deg, var(--accent-color-lighter), var(--lex-surface) 28%), var(--lex-surface);
 }
 
 .channel-card--wechat {
-  background: linear-gradient(180deg, rgba(63, 111, 77, 0.1), rgba(252, 251, 248, 0.82) 28%), rgba(252, 251, 248, 0.82);
+  background: linear-gradient(180deg, rgba(21, 128, 61, 0.1), var(--lex-surface) 28%), var(--lex-surface);
 }
 
 .channel-switch {
@@ -720,8 +706,8 @@ onMounted(() => {
 .channel-meta-item {
   padding: 14px 16px;
   border-radius: 8px;
-  background: rgba(0, 9, 24, 0.03);
-  border: 1px solid rgba(0, 9, 24, 0.06);
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--lex-outline);
 }
 
 .channel-meta-item span {
