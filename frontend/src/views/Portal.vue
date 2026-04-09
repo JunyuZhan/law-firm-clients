@@ -20,21 +20,18 @@
               <p class="hero-eyebrow">
                 {{ lawFirmName }}
               </p>
-              <p
-                v-if="heroValueItems.length"
-                class="hero-value-line"
-              >
-                {{ heroValueItems.join(' · ') }}
-              </p>
               <a-typography-title
                 :level="1"
                 class="main-title"
               >
-                {{ heroTitle }}
+                {{ portalSystemLabel }}
               </a-typography-title>
               <a-typography-paragraph class="main-subtitle">
-                {{ heroSubtitle }}
+                {{ portalDescription }}
               </a-typography-paragraph>
+              <p class="hero-note">
+                {{ portalAccessNote }}
+              </p>
 
               <div class="hero-actions">
                 <a-button
@@ -42,13 +39,7 @@
                   size="large"
                   @click="router.push('/help')"
                 >
-                  帮助中心
-                </a-button>
-                <a-button
-                  size="large"
-                  @click="router.push('/verify/letter')"
-                >
-                  函件验证
+                  了解系统
                 </a-button>
                 <a
                   v-if="lawFirmWebsite"
@@ -57,71 +48,60 @@
                   rel="noopener noreferrer"
                   class="hero-link"
                 >
-                  律所官网
+                  访问律所官网
                 </a>
               </div>
             </div>
 
             <aside class="hero-side hero-surface hero-surface--soft">
-              <strong class="hero-side-title">访问说明</strong>
-              <ol class="hero-steps">
-                <li>用律师发来的链接直接进入项目。</li>
-                <li>链接失效时，请让律师重发，或打开「帮助中心」。</li>
-                <li>仍无法打开时，在下方粘贴完整链接。</li>
-              </ol>
+              <strong class="hero-side-title">系统说明</strong>
+              <ul class="hero-points">
+                <li>本系统用于律所客户服务与项目协作展示。</li>
+                <li>项目页面需通过律师发送的专属链接访问。</li>
+                <li>未授权访问者无法查看具体项目与文件内容。</li>
+              </ul>
             </aside>
           </div>
         </section>
 
-        <section class="section-shell fallback-section">
-          <a-collapse ghost>
-            <a-collapse-panel
-              key="manual-access"
-              header="链接打不开？粘贴完整访问链接"
-            >
-              <div class="fallback-panel">
-                <p class="fallback-copy">
-                  粘贴律师提供的完整链接（含项目编号与 token），点击「继续访问」即可跳转。
-                </p>
+        <section class="section-shell intro-section">
+          <div class="intro-grid">
+            <article class="intro-card">
+              <h2 class="intro-title">关于客户服务系统</h2>
+              <p class="intro-copy">
+                这是律所面向客户提供的数字化服务系统，用于承载项目协作、文件往来、进度沟通等服务场景。
+              </p>
+            </article>
+            <article class="intro-card">
+              <h2 class="intro-title">访问方式</h2>
+              <p class="intro-copy">
+                如需进入具体项目页面，请使用承办律师发送的专属访问链接。门户页仅作律所与系统说明，不展示具体项目数据。
+              </p>
+            </article>
+          </div>
+        </section>
 
-                <div class="input-wrapper access-input-panel">
-                  <label
-                    for="portal-access-url"
-                    class="input-label"
-                  >完整访问链接</label>
-                  <a-input-search
-                    id="portal-access-url"
-                    v-model:value="matterUrl"
-                    class="matter-search"
-                    placeholder="请输入完整的项目访问链接，例如：https://example.com/matter/123?token=xxx"
-                    enter-button="继续访问"
-                    size="large"
-                    :loading="loading"
-                    @search="handleAccess"
-                    @input="checkClipboardAndUpdateButton"
-                  >
-                    <template #prefix>
-                      <LinkOutlined class="search-prefix" />
-                    </template>
-                  </a-input-search>
-                  <div
-                    v-if="showPasteButton"
-                    class="paste-tip"
-                  >
-                    <a-button
-                      type="link"
-                      size="small"
-                      :disabled="!canPaste"
-                      @mousedown.prevent
-                      @click="handlePaste"
-                    >
-                      {{ pasteButtonText }}
-                    </a-button>
-                  </div>
-                </div>
-              </div>
-            </a-collapse-panel>
-          </a-collapse>
+        <section class="section-shell feature-section">
+          <div class="feature-head">
+            <div>
+              <p class="feature-kicker">系统能力</p>
+              <h2 class="feature-heading">客户服务系统提供的核心支持</h2>
+            </div>
+            <p class="feature-summary">
+              以下内容用于说明系统承载的服务能力，不代表门户页直接开放全部功能入口。
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article
+              v-for="feature in featureCards"
+              :key="feature.title"
+              class="feature-card"
+            >
+              <h3 class="feature-title">{{ feature.title }}</h3>
+              <p class="feature-copy">{{ feature.description }}</p>
+            </article>
+          </div>
         </section>
       </a-layout-content>
 
@@ -140,7 +120,7 @@
               </a>
               <span v-else>{{ lawFirmName }}</span>
             </p>
-            <p>请通过承办律师获取访问链接；其他问题见帮助中心。</p>
+            <p>本页面用于展示律所客户服务系统，具体项目内容需通过专属链接访问。</p>
           </div>
 
           <div class="footer-bottom">
@@ -175,149 +155,51 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { LinkOutlined } from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileDrawer from '@/components/MobileDrawer.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
 import { useAppConfigStore } from '@/stores/appConfig'
 import { usePortalVisitorStore } from '@/stores/portalVisitor'
-import logger from '@/utils/logger'
 
 const router = useRouter()
-const route = useRoute()
 const portalVisitorStore = usePortalVisitorStore()
-const matterUrl = ref('')
-const loading = ref(false)
 const mobileDrawerOpen = ref(false)
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
-const showPasteButton = ref(false)
-const canPaste = ref(false)
-const pasteButtonText = ref('粘贴')
 
 const appConfigStore = useAppConfigStore()
-const appSlogan = computed(() => appConfigStore.appSlogan)
-const heroValueItems = computed(() => {
-  if (!appSlogan.value) return []
-  return appSlogan.value
-    .split(/[·、,，|｜/]/)
-    .map((item: string) => item.trim())
-    .filter(Boolean)
-    .slice(0, 4)
-})
 const icpLicense = computed(() => appConfigStore.icpLicense)
 const lawFirmName = computed(() => appConfigStore.displayName || '律师事务所')
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
 const footerCopyright = computed(() => appConfigStore.copyright || `© ${new Date().getFullYear()} ${lawFirmName.value}`)
 const isMobile = computed(() => windowWidth.value <= 768)
 const drawerUserName = computed(() => portalVisitorStore.displayName || lawFirmName.value)
-const heroTitle = computed(() => appConfigStore.appShortName || '客户门户')
-const heroSubtitle = computed(
-  () =>
-    appSlogan.value || '通过律师发送的链接进入项目；可在此验证函件或查看帮助。',
+const portalSystemLabel = computed(() => appConfigStore.appShortName || '客户服务系统')
+const portalDescription = computed(
+  () => appConfigStore.appSlogan || '面向客户提供项目协作、资料交付与服务沟通的数字化服务系统。',
+)
+const portalAccessNote = computed(
+  () => '具体项目内容需通过律师发送的专属链接访问；门户页主要用于展示律所品牌与客户服务系统定位。',
 )
 
-function parseMatterUrl(url: string): { matterId: string; token: string } | null {
-  try {
-    if (!url || typeof url !== 'string') return null
-
-    const urlObj = new URL(url)
-    if (!['http:', 'https:'].includes(urlObj.protocol)) return null
-
-    const pathParts = urlObj.pathname.split('/')
-    const matterId = pathParts[pathParts.length - 1]
-    const token = urlObj.searchParams.get('token') || ''
-
-    if (!matterId || !/^[\w-]+$/.test(matterId)) return null
-    if (!token || !/^[\w.-]+$/.test(token)) return null
-
-    return { matterId, token }
-  } catch {
-    return null
-  }
-}
-
-async function checkClipboardAndUpdateButton() {
-  if (matterUrl.value.trim()) {
-    canPaste.value = false
-    pasteButtonText.value = '请复制链接后再粘贴'
-    showPasteButton.value = false
-    return
-  }
-
-  if (!window.isSecureContext || !navigator.clipboard) {
-    canPaste.value = false
-    pasteButtonText.value = '当前环境不支持剪贴板'
-    return
-  }
-
-  try {
-    const text = await navigator.clipboard.readText()
-    if (text && text.trim()) {
-      canPaste.value = true
-      pasteButtonText.value = '粘贴链接'
-      showPasteButton.value = true
-    } else {
-      canPaste.value = false
-      showPasteButton.value = false
-    }
-  } catch (error) {
-    logger.debug('剪贴板读取失败:', error)
-    canPaste.value = false
-    showPasteButton.value = false
-  }
-}
-
-async function handlePaste() {
-  if (!canPaste.value) return
-
-  try {
-    const text = await navigator.clipboard.readText()
-    if (text && text.trim()) {
-      matterUrl.value = text.trim()
-      message.success('已粘贴链接')
-      showPasteButton.value = false
-    } else {
-      message.warning('剪贴板中没有内容')
-    }
-  } catch {
-    message.error('无法读取剪贴板内容，请手动粘贴')
-  }
-}
-
-function focusAccessInput() {
-  const input = document.querySelector('.matter-search input') as HTMLInputElement | null
-  input?.focus()
-  input?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}
-
-async function handleAccess() {
-  if (!matterUrl.value) {
-    message.warning('请输入项目访问链接')
-    focusAccessInput()
-    return
-  }
-
-  const parsed = parseMatterUrl(matterUrl.value)
-  if (!parsed) {
-    message.error('链接格式不正确，请检查链接是否包含项目 ID 和 token')
-    return
-  }
-
-  loading.value = true
-  try {
-    await router.push({
-      name: 'MatterDetail',
-      params: { id: parsed.matterId },
-      query: { token: parsed.token },
-    })
-  } catch {
-    message.error('访问失败，请检查链接是否正确')
-  } finally {
-    loading.value = false
-  }
-}
+const featureCards = [
+  {
+    title: '项目协作',
+    description: '围绕具体法律服务事项承载客户与律师之间的协作流程与项目信息展示。',
+  },
+  {
+    title: '文件往来',
+    description: '支持围绕项目进行文件收发、整理与受控查看，提升资料交付效率。',
+  },
+  {
+    title: '进度沟通',
+    description: '用于承载项目进展说明与服务过程中的关键节点沟通，帮助客户理解事项推进情况。',
+  },
+  {
+    title: '受控访问',
+    description: '具体项目页面通过专属链接进行访问控制，确保不同客户仅查看与自身相关的内容。',
+  },
+]
 
 function goToAdmin() {
   router.push({ name: 'AdminLogin' }).catch(() => {
@@ -345,17 +227,6 @@ function updateWindowWidth() {
 onMounted(() => {
   updateWindowWidth()
   window.addEventListener('resize', updateWindowWidth)
-  const urlParam = route.query.url as string
-  if (urlParam) {
-    const parsed = parseMatterUrl(urlParam)
-    if (parsed) {
-      router.push({
-        name: 'MatterDetail',
-        params: { id: parsed.matterId },
-        query: { token: parsed.token },
-      })
-    }
-  }
 })
 
 onUnmounted(() => {
@@ -379,22 +250,22 @@ onUnmounted(() => {
 .content {
   flex: 1;
   display: grid;
-  gap: 20px;
-  padding: 0 0 24px;
+  gap: 24px;
+  padding: 0 0 32px;
 }
 
 .hero-section {
-  padding-top: 24px;
+  padding-top: 28px;
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.9fr);
   gap: 16px;
 }
 
 .hero-surface,
-.fallback-section :deep(.ant-collapse-item) {
+.intro-card {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: var(--lex-surface-strong);
@@ -402,62 +273,70 @@ onUnmounted(() => {
 }
 
 .hero-surface {
-  padding: 28px;
+  padding: 32px;
 }
 
 .hero-surface--soft {
-  background: var(--lex-bg);
+  background: color-mix(in srgb, var(--lex-bg) 82%, white);
 }
 
-.hero-main {
+.hero-main,
+.hero-side,
+.intro-card {
   display: grid;
-  gap: 18px;
-}
-
-.hero-eyebrow,
-.hero-value-line {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.6;
-  letter-spacing: 0.06em;
-  font-weight: 600;
+  gap: 16px;
 }
 
 .hero-eyebrow {
-  color: var(--text-tertiary);
-}
-
-.hero-value-line {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0.1em;
+  font-weight: 700;
   color: var(--lex-primary-soft);
+  text-transform: uppercase;
 }
 
 .main-title {
   margin: 0 !important;
+  max-width: 10ch;
   color: var(--lex-primary) !important;
   font-family: var(--font-heading);
   font-weight: 600 !important;
-  font-size: clamp(32px, 4.8vw, 52px) !important;
-  line-height: 1.12 !important;
+  font-size: clamp(40px, 6vw, 68px) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.03em;
 }
 
 .main-subtitle,
-.fallback-copy,
+.hero-note,
 .footer-meta p,
-.hero-steps {
+.hero-points,
+.intro-copy {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.65;
+  line-height: 1.72;
+}
+
+.hero-note {
+  padding-left: 14px;
+  border-left: 3px solid color-mix(in srgb, var(--lex-accent) 40%, transparent);
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
 }
 
+.hero-actions :deep(.ant-btn) {
+  min-height: 44px;
+  padding-inline: 18px;
+  border-radius: 999px;
+}
+
 .hero-link,
-.support-link,
 .law-firm-link {
   color: var(--lex-primary-soft);
   transition: color 0.2s ease;
@@ -469,90 +348,86 @@ onUnmounted(() => {
 }
 
 .hero-side {
-  display: grid;
   align-content: start;
-  gap: 10px;
 }
 
-.hero-side-title {
+.hero-side-title,
+.intro-title {
   margin: 0;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.4;
   color: var(--text-primary);
 }
 
-.hero-steps {
+.hero-points {
   padding-left: 18px;
 }
 
-.fallback-section {
+.intro-section,
+.feature-section {
   display: grid;
+}
+
+.intro-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
-.fallback-section :deep(.ant-collapse-header) {
-  font-weight: 600;
+.intro-card,
+.feature-card {
+  padding: 24px;
+}
+
+.feature-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.feature-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--lex-primary-soft);
+  text-transform: uppercase;
+}
+
+.feature-heading,
+.feature-title {
+  margin: 0;
   color: var(--lex-primary);
 }
 
-.fallback-section :deep(.ant-collapse-content-box) {
-  padding-top: 0 !important;
+.feature-heading {
+  font-size: 28px;
+  line-height: 1.25;
 }
 
-.fallback-panel {
+.feature-summary,
+.feature-copy {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.feature-grid {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 }
 
-.input-wrapper {
-  position: relative;
-}
-
-.access-input-panel {
+.feature-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--lex-surface-strong);
+  box-shadow: var(--shadow-sm);
   display: grid;
   gap: 10px;
-  padding: 16px;
-  border-radius: var(--radius-md);
-  background: var(--lex-bg-muted);
-  border: 1px solid var(--border-color-light);
-}
-
-.input-label {
-  color: var(--lex-primary);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.matter-search :deep(.ant-input-group-addon) {
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-}
-
-.matter-search :deep(.ant-input-affix-wrapper),
-.matter-search :deep(.ant-input),
-.matter-search :deep(.ant-btn) {
-  height: 50px;
-}
-
-.matter-search :deep(.ant-btn) {
-  border-radius: 0 4px 4px 0 !important;
-  min-width: 124px;
-}
-
-.matter-search :deep(.ant-input-affix-wrapper) {
-  border-radius: 4px 0 0 4px !important;
-}
-
-.search-prefix {
-  color: var(--lex-accent-strong);
-}
-
-.paste-tip {
-  position: absolute;
-  right: 126px;
-  top: calc(100% + 6px);
-  z-index: 10;
 }
 
 .footer {
@@ -620,27 +495,32 @@ onUnmounted(() => {
   }
 
   .hero-grid,
+  .intro-grid,
+  .feature-grid,
   .footer-content {
     grid-template-columns: 1fr;
     display: grid;
   }
 
+  .feature-head {
+    align-items: start;
+    margin-bottom: 12px;
+  }
+
   .hero-surface,
-  .access-input-panel {
-    padding: 16px;
+  .intro-card,
+  .feature-card {
+    padding: 18px;
+  }
+
+  .feature-heading {
+    font-size: 24px;
   }
 
   .main-title {
-    font-size: 30px !important;
-  }
-
-  .paste-tip {
-    right: 0;
-    top: calc(100% + 4px);
-  }
-
-  .matter-search :deep(.ant-btn) {
-    min-width: 108px;
+    max-width: none;
+    font-size: 34px !important;
+    line-height: 1.08 !important;
   }
 }
 </style>

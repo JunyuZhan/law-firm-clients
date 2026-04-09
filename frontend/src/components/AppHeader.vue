@@ -24,12 +24,6 @@
                 <p class="logo-system-label">
                   {{ portalSystemLabel }}
                 </p>
-                <p
-                  v-if="appConfigStore.appSlogan"
-                  class="logo-slogan"
-                >
-                  {{ appConfigStore.appSlogan }}
-                </p>
               </div>
             </div>
           </div>
@@ -164,7 +158,7 @@ const appConfigStore = useAppConfigStore()
 const logoUrl = computed(() => appConfigStore.logoUrl)
 const lawFirmName = computed(() => appConfigStore.displayName || '律师事务所')
 const portalSystemLabel = computed(() => appConfigStore.appShortName || '客户服务系统')
-const portalSubtitle = computed(() => appConfigStore.appSlogan || '客户服务系统')
+const portalSubtitle = computed(() => '客户服务系统')
 const detailSubtitle = computed(() => '项目进展与文件')
 </script>
 
@@ -272,8 +266,7 @@ const detailSubtitle = computed(() => '项目进展与文件')
   text-overflow: ellipsis;
 }
 
-.logo-system-label,
-.logo-slogan {
+.logo-system-label {
   margin: 4px 0 0;
   font-size: 12px;
   line-height: 1.6;
@@ -281,10 +274,6 @@ const detailSubtitle = computed(() => '项目进展与文件')
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.logo-slogan {
-  color: var(--lex-accent-strong);
 }
 
 .title-section {
@@ -358,11 +347,6 @@ const detailSubtitle = computed(() => '项目进展与文件')
 
   .logo-system-label {
     display: none;
-  }
-
-  .logo-slogan {
-    display: block;
-    font-size: 11px;
   }
 
   .title-section {

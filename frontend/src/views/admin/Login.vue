@@ -23,12 +23,15 @@
             </svg>
           </div>
           <div class="brand-copy">
-            <p class="brand-kicker">
-              管理员登录
-            </p>
             <h1 class="editorial-title brand-title">
-              {{ appConfigStore.displayName }}
+              {{ systemName }}
             </h1>
+            <p
+              v-if="organizationName"
+              class="brand-meta"
+            >
+              {{ organizationName }}
+            </p>
           </div>
         </div>
 
@@ -36,7 +39,7 @@
 
         <div class="form-header">
           <p class="form-header-hint">
-            使用管理员账号登录。
+            管理后台登录
           </p>
         </div>
 
@@ -161,6 +164,7 @@ const appConfigStore = useAppConfigStore()
 
 const currentYear = new Date().getFullYear()
 const organizationName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName)
+const systemName = computed(() => appConfigStore.appShortName || '客户服务系统')
 
 const form = ref({
   username: '',
@@ -310,22 +314,20 @@ onMounted(() => {
 
 .brand-copy {
   display: grid;
-  gap: 2px;
-}
-
-.brand-kicker {
-  margin: 0;
-  color: var(--text-tertiary);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  font-weight: 700;
+  gap: 4px;
 }
 
 .brand-title {
   margin: 0;
   font-size: clamp(20px, 3vw, 26px);
   color: var(--lex-primary);
+}
+
+.brand-meta {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .login-panel {
