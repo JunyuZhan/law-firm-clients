@@ -13,15 +13,20 @@
 - 业务管理员负责系统配置、通知模板、API Key、文件管理和日常后台操作。
 - 运维管理员负责程序升级、镜像替换、容器重启、数据库迁移、异常回滚和部署目录维护。
 
-## 2. 推荐目录规范
+## 2. 目录规范（与当前生产 myu 一致）
 
-- 源码目录：`/root/src/law-firm-clients`
-- 部署目录：`/opt/law-firm-clients`
+**一体化部署（当前服务器用法）：** 将整个 Git 仓库放在 **`/root/law-firm-clients`**，与仓库同级的 **`docker/`** 内放 `docker-compose.yml`、`.env` 及持久化卷配置；项目根目录的 **`./deploy.sh`** 负责备份、拉代码、构建与重启。
 
-要求：
+```bash
+cd /root/law-firm-clients
+git pull origin main   # 或目标分支/标签
+./deploy.sh --upgrade  # 或 ./deploy.sh --quick（见 deploy.sh --help）
+```
 
-- `/root/src` 只放源码、构建脚本和版本标签信息
-- `/opt/law-firm-clients` 只放部署清单、环境变量、持久化目录和运维台账
+说明：
+
+- **`/root/law-firm`** 若仅有零散目录且无完整 Git 仓库，**不要**当作本系统的部署根目录；请以 **`/root/law-firm-clients`** 为准。
+- **分离式布局（可选）：** 若将来拆成「只读源码 + 独立运行目录」，可采用源码目录 `/root/src/law-firm-clients`、运行目录 `/opt/law-firm-clients`，由运维自行同步 Compose 与 `.env`；与一体化二选一即可，勿混用两套路径。
 
 ## 3. 推荐部署方式
 
@@ -36,28 +41,24 @@
 
 ## 4. 首次部署流程
 
-### 4.1 准备源码
+### 4.1 准备源码（一体化示例）
 
 ```bash
-cd /root/src
-git clone <your-repository-url> law-firm-clients
+cd /root
+git clone git@github.com:JunyuZhan/law-firm-clients.git law-firm-clients
 cd law-firm-clients
-git checkout <release-tag>
+git checkout <release-tag>   # 或保持 main
 ```
 
-### 4.2 准备部署目录
+### 4.2 准备运行配置
 
-```bash
-mkdir -p /opt/law-firm-clients
-```
+在 **`law-firm-clients/docker/`** 下准备：
 
-需要准备：
-
-- Compose 文件
-- `.env` 文件
-- 持久化目录
-- 反向代理配置
-- 版本元数据：`APP_VERSION`、`APP_COMMIT_SHA`、`APP_BUILD_TIME`
+- `docker-compose.yml`（仓库已带）
+- `.env`（首次执行 `./deploy.sh --init` 可生成模板并补齐）
+- 持久化目录（由 Compose volumes 定义）
+- 反向代理（若前置 Nginx/网关，在宿主机或独立容器中配置）
+- 版本元数据：`APP_VERSION`、`APP_COMMIT_SHA`、`APP_BUILD_TIME`（按团队规范写入 `.env` 或镜像标签）
 
 ### 4.3 初始化数据库
 
@@ -69,9 +70,20 @@ mkdir -p /opt/law-firm-clients
 
 ### 4.4 启动服务
 
+推荐使用仓库根目录脚本（会自动进入 `docker/`、检查依赖与配置）：
+
 ```bash
-docker compose pull
-docker compose up -d
+cd /root/law-firm-clients
+chmod +x deploy.sh
+./deploy.sh --init    # 首次：生成配置并启动
+# 日常仅启动：./deploy.sh
+```
+
+若手动操作 Compose，须在 **`docker/`** 目录执行：
+
+```bash
+cd /root/law-firm-clients/docker
+docker compose up -d --build
 ```
 
 ### 4.5 首次部署后必须验证
@@ -94,14 +106,12 @@ docker compose up -d
 - 系统配置备份
 - 当前版本号、镜像标签、提交号留痕
 
-### 5.2 升级执行
+### 5.2 升级执行（一体化目录）
 
-1. 在源码目录拉取目标版本代码
-2. 确认目标镜像标签，例如 `v1.0.1`
-3. 在部署目录更新 Compose 中的镜像标签与版本元数据
-4. 执行 `docker compose pull`
-5. 执行 `docker compose up -d`
-6. 执行部署后冒烟测试
+1. `cd /root/law-firm-clients`
+2. 执行 **`./deploy.sh --upgrade`**（内含备份、`git pull`、重建镜像、`docker compose up -d`），或先 `git pull` 再 **`./deploy.sh --quick`**
+3. 若使用固定镜像标签发布，先在 `docker/docker-compose.yml` 或 `.env` 中更新标签后再执行上述脚本
+4. 执行部署后冒烟测试
 
 建议：
 

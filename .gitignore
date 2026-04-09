@@ -43,3 +43,12 @@ docker-compose.override.yml
 .env.local
 .env.*.local
 .gitnexus
+
+# Local agent / design tool caches (do not commit)
+.agents/
+.codeartsdoer/
+.stitch-downloads/
+
+# Playwright artifacts
+frontend/playwright-report/
+frontend/test-results/
