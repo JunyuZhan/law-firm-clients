@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.NotificationHistoryDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.MatterService;
 import com.clientservice.application.service.NotificationRecordService;
 import com.clientservice.application.service.NotificationService;
@@ -39,6 +40,9 @@ class NotificationControllerTest {
     private MatterService matterService;
 
     @Mock
+    private AdminAuthorizationService adminAuthorizationService;
+
+    @Mock
     private NotificationService notificationService;
 
     @Mock
@@ -49,6 +53,7 @@ class NotificationControllerTest {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(new NotificationController(
+                adminAuthorizationService,
                 matterService,
                 notificationService,
                 notificationRecordService
@@ -91,6 +96,7 @@ class NotificationControllerTest {
 
             verify(matterService, times(1)).getMatterById(matterId);
             verify(notificationService, times(1)).sendNotificationAsync(mockMatter);
+            verify(adminAuthorizationService, times(1)).requireSuperAdmin();
         }
 
         @Test
@@ -126,6 +132,7 @@ class NotificationControllerTest {
 
             verify(matterService, times(1)).getMatterById(matterId);
             verify(notificationService, never()).sendNotificationAsync(any());
+            verify(adminAuthorizationService, times(1)).requireSuperAdmin();
         }
     }
 
@@ -155,6 +162,7 @@ class NotificationControllerTest {
                     .andExpect(jsonPath("$.data.length()").value(2));
 
             verify(notificationRecordService, times(1)).getNotificationHistory(isNull(), isNull(), isNull(), isNull(), isNull(), isNull(), isNull());
+            verify(adminAuthorizationService, times(1)).requireSuperAdmin();
         }
 
         @Test
@@ -190,6 +198,7 @@ class NotificationControllerTest {
                     .andExpect(jsonPath("$.data.length()").value(1));
 
             verify(notificationRecordService, times(1)).getNotificationHistory(eq(matterId), eq(clientId), eq(notificationType), eq(status), eq(startTime), eq(endTime), eq(limit));
+            verify(adminAuthorizationService, times(1)).requireSuperAdmin();
         }
 
         @Test
@@ -232,6 +241,7 @@ class NotificationControllerTest {
                     .andExpect(jsonPath("$.data.total").value(100));
 
             verify(notificationRecordService, times(1)).getNotificationStatistics(isNull(), isNull(), isNull(), isNull());
+            verify(adminAuthorizationService, times(1)).requireSuperAdmin();
         }
     }
 

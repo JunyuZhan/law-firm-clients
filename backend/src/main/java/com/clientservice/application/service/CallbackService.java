@@ -25,10 +25,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HexFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * 回调服务 - 将访问日志和下载日志回调给管理系统
@@ -72,6 +77,10 @@ public class CallbackService {
 
     /** 律所系统 API 前缀 */
     private static final String LAW_FIRM_API_PREFIX = "/api";
+    private static final String CALLBACK_NONCE_HEADER = "X-Callback-Nonce";
+    private static final String CALLBACK_TIMESTAMP_HEADER = "X-Callback-Timestamp";
+    private static final String CALLBACK_SIGNATURE_HEADER = "X-Callback-Signature";
+    private static final String HMAC_ALGORITHM = "HmacSHA256";
 
     /**
      * 检查回调是否启用（优先从系统配置读取）
@@ -375,6 +384,13 @@ public class CallbackService {
         if (callbackApiKey != null && !callbackApiKey.isEmpty()) {
             headers.set("X-Callback-Key", callbackApiKey);
             headers.set("Authorization", "Bearer " + callbackApiKey);
+            String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+            String nonce = UUID.randomUUID().toString().replace("-", "");
+            headers.set(CALLBACK_TIMESTAMP_HEADER, timestamp);
+            headers.set(CALLBACK_NONCE_HEADER, nonce);
+            headers.set(
+                    CALLBACK_SIGNATURE_HEADER,
+                    signCallback(callbackApiKey, "POST", normalizeCallbackPath(url), timestamp, nonce));
         }
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
@@ -385,6 +401,37 @@ public class CallbackService {
             log.debug("回调请求成功: url={}", url);
         } else {
             throw new RuntimeException("回调请求返回非成功状态: " + response.getStatusCode());
+        }
+    }
+
+    private String normalizeCallbackPath(final String url) {
+        try {
+            String path = new URI(url).getPath();
+            if (path == null || path.isBlank()) {
+                return "/";
+            }
+            if (path.startsWith("/api/open/client/")) {
+                return path.substring(4);
+            }
+            return path;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("回调地址无法解析路径: " + e.getMessage(), e);
+        }
+    }
+
+    private String signCallback(
+            final String secret,
+            final String method,
+            final String path,
+            final String timestamp,
+            final String nonce) {
+        try {
+            String payload = method + "\n" + path + "\n" + timestamp + "\n" + nonce;
+            Mac mac = Mac.getInstance(HMAC_ALGORITHM);
+            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM));
+            return HexFormat.of().formatHex(mac.doFinal(payload.getBytes(StandardCharsets.UTF_8)));
+        } catch (Exception e) {
+            throw new IllegalStateException("生成回调签名失败", e);
         }
     }
 

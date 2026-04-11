@@ -81,73 +81,73 @@ const routes: RouteRecordRaw[] = [
         path: 'setup',
         name: 'InitialSetup',
         component: () => import('@/views/admin/InitialSetup.vue'),
-        meta: { title: '首次初始化' },
+        meta: { title: '首次初始化', adminOnly: true },
       },
       {
         path: 'system-info',
         name: 'SystemInfo',
         component: () => import('@/views/admin/SystemInfo.vue'),
-        meta: { title: '系统信息' },
+        meta: { title: '系统信息', adminOnly: true },
       },
       {
         path: 'notifications',
         name: 'NotificationHistory',
         component: () => import('@/views/admin/NotificationHistory.vue'),
-        meta: { title: '通知记录' },
+        meta: { title: '通知记录', adminOnly: true },
       },
       {
         path: 'matters',
         name: 'MatterList',
         component: () => import('@/views/admin/MatterList.vue'),
-        meta: { title: '项目列表' },
+        meta: { title: '项目列表', adminOnly: true },
       },
       {
         path: 'matters/:id',
         name: 'AdminMatterDetail',
         component: () => import('@/views/admin/MatterDetail.vue'),
-        meta: { title: '项目详情' },
+        meta: { title: '项目详情', adminOnly: true },
       },
       {
         path: 'api-keys',
         name: 'ApiKeyManagement',
         component: () => import('@/views/admin/ApiKeyManagement.vue'),
-        meta: { title: 'API密钥管理' },
+        meta: { title: 'API密钥管理', adminOnly: true },
       },
       {
         path: 'config',
         name: 'SystemConfig',
         component: () => import('@/views/admin/SystemConfig.vue'),
-        meta: { title: '系统配置' },
+        meta: { title: '系统配置', adminOnly: true },
       },
       {
         path: 'notification-templates',
         name: 'NotificationTemplateManagement',
         component: () => import('@/views/admin/NotificationTemplateManagement.vue'),
-        meta: { title: '通知模板管理' },
+        meta: { title: '通知模板管理', adminOnly: true },
       },
       {
         path: 'notification-settings',
         name: 'NotificationSettings',
         component: () => import('@/views/admin/NotificationSettings.vue'),
-        meta: { title: '通知配置' },
+        meta: { title: '通知配置', adminOnly: true },
       },
       {
         path: 'files',
         name: 'FileManagement',
         component: () => import('@/views/admin/FileManagement.vue'),
-        meta: { title: '文件管理' },
+        meta: { title: '文件管理', adminOnly: true },
       },
       {
         path: 'maintenance',
         name: 'SystemMaintenance',
         component: () => import('@/views/admin/SystemMaintenance.vue'),
-        meta: { title: '系统维护' },
+        meta: { title: '系统维护', adminOnly: true },
       },
       {
         path: 'letter-verifications',
         name: 'LetterVerificationList',
         component: () => import('@/views/admin/LetterVerificationList.vue'),
-        meta: { title: '函件验证' },
+        meta: { title: '函件验证', adminOnly: true },
       },
       {
         path: 'profile',
@@ -157,7 +157,7 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: '',
-        redirect: '/admin/matters',
+        redirect: '/admin/notifications',
       },
     ],
   },
@@ -169,7 +169,7 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   // 调试信息：验证路由匹配
   if (to.path.startsWith('/portal/matter/')) {
     logger.debug('[Router] 匹配到项目详情路由:', {
@@ -224,10 +224,20 @@ router.beforeEach((to, _from, next) => {
       return
     }
   }
+
+  if (to.matched.some((record) => record.meta.adminOnly) && authStore.isAuthenticated && !authStore.getCurrentUserInfo()) {
+    await authStore.fetchCurrentUser()
+  }
+
+  if (to.matched.some((record) => record.meta.adminOnly) && !authStore.getCurrentUserInfo()?.superAdmin) {
+    message.warning('该功能仅超级管理员可访问')
+    next('/admin/notifications')
+    return
+  }
   
   // 如果已登录，访问登录页时跳转到管理后台首页
   if (to.path === '/admin/login' && authStore.isAuthenticated) {
-    next('/admin/matters')
+    next(authStore.getCurrentUserInfo()?.superAdmin ? '/admin/matters' : '/admin/notifications')
     return
   }
   

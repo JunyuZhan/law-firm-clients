@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.SysConfigDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.SysConfigService;
 import com.clientservice.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,7 @@ import java.util.Map;
 public class SysConfigController {
 
     private final SysConfigService sysConfigService;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     /**
      * 获取配置列表
@@ -49,6 +51,7 @@ public class SysConfigController {
             @Parameter(description = "配置键") @RequestParam(required = false) final String configKey,
             @Parameter(description = "配置类型") @RequestParam(required = false) final String configType,
             @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取配置列表
         List<SysConfigDTO> list = sysConfigService.getConfigList(configKey, configType, limit);
@@ -68,6 +71,7 @@ public class SysConfigController {
     @GetMapping("/{id}")
     public Result<SysConfigDTO> getConfigById(
             @Parameter(description = "配置ID", required = true) @PathVariable final Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取配置
         SysConfigDTO configDTO = sysConfigService.getConfigById(id);
@@ -87,6 +91,7 @@ public class SysConfigController {
     @PostMapping
     public Result<SysConfigDTO> saveConfig(
             @RequestBody final Map<String, Object> request) {
+        adminAuthorizationService.requireSuperAdmin();
 
         String configKey = (String) request.get("configKey");
         String configValue = (String) request.get("configValue");
@@ -117,6 +122,7 @@ public class SysConfigController {
     public Result<SysConfigDTO> updateConfig(
             @Parameter(description = "配置ID", required = true) @PathVariable final Long id,
             @RequestBody final Map<String, Object> request) {
+        adminAuthorizationService.requireSuperAdmin();
 
         String configValue = (String) request.get("configValue");
         String configType = (String) request.get("configType");
@@ -140,6 +146,7 @@ public class SysConfigController {
     @DeleteMapping("/{id}")
     public Result<Void> deleteConfig(
             @Parameter(description = "配置ID", required = true) @PathVariable final Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 删除配置
         sysConfigService.deleteConfig(id);

@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.ApiKeyDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.ApiKeyService;
 import com.clientservice.infrastructure.config.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +50,9 @@ class ApiKeyControllerTest {
     @Mock
     private ApiKeyService apiKeyService;
 
+    @Mock
+    private AdminAuthorizationService adminAuthorizationService;
+
     @InjectMocks
     private ApiKeyController apiKeyController;
 
@@ -78,6 +82,7 @@ class ApiKeyControllerTest {
             List<ApiKeyDTO> apiKeys = Arrays.asList(apiKey1, apiKey2);
 
             when(apiKeyService.getApiKeyList(anyBoolean(), anyString(), anyInt())).thenReturn(apiKeys);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(get("/api/admin/api-keys")
@@ -104,6 +109,7 @@ class ApiKeyControllerTest {
             // Given
             ApiKeyDTO apiKey = ApiKeyDTO.builder().id(1L).keyName("Test Key").build();
             when(apiKeyService.getApiKeyById(1L)).thenReturn(apiKey);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(get("/api/admin/api-keys/1"))
@@ -134,6 +140,7 @@ class ApiKeyControllerTest {
                     .build();
 
             when(apiKeyService.createApiKey(anyString(), anyString(), any(LocalDateTime.class))).thenReturn(apiKey);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(post("/api/admin/api-keys")
@@ -182,6 +189,7 @@ class ApiKeyControllerTest {
                     .build();
 
             when(apiKeyService.updateApiKey(anyLong(), anyString(), any(), anyBoolean(), any())).thenReturn(apiKey);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(put("/api/admin/api-keys/1")
@@ -204,6 +212,7 @@ class ApiKeyControllerTest {
         void deleteApiKey_ShouldReturnSuccess() throws Exception {
             // Given
             doNothing().when(apiKeyService).deleteApiKey(1L);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(delete("/api/admin/api-keys/1"))

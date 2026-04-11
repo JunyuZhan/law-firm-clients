@@ -3,6 +3,7 @@ package com.clientservice.interfaces.rest;
 import com.clientservice.application.dto.ApiKeyCreateRequest;
 import com.clientservice.application.dto.ApiKeyDTO;
 import com.clientservice.application.dto.ApiKeyUpdateRequest;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.ApiKeyService;
 import com.clientservice.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,7 @@ import java.util.List;
 public class ApiKeyController {
 
     private final ApiKeyService apiKeyService;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     /**
      * 获取API密钥列表
@@ -51,6 +53,7 @@ public class ApiKeyController {
             @Parameter(description = "是否启用") @RequestParam(required = false) final Boolean enabled,
             @Parameter(description = "律所名称") @RequestParam(required = false) final String lawFirmName,
             @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取API密钥列表
         List<ApiKeyDTO> list = apiKeyService.getApiKeyList(enabled, lawFirmName, limit);
@@ -70,6 +73,7 @@ public class ApiKeyController {
     @GetMapping("/{id}")
     public Result<ApiKeyDTO> getApiKeyById(
             @Parameter(description = "API密钥ID", required = true) @PathVariable final Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取API密钥
         ApiKeyDTO apiKeyDTO = apiKeyService.getApiKeyById(id);
@@ -89,6 +93,7 @@ public class ApiKeyController {
     @PostMapping
     public Result<ApiKeyDTO> createApiKey(
             @Valid @RequestBody final ApiKeyCreateRequest request) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 创建API密钥（lawFirmName 为可选字段）
         ApiKeyDTO apiKeyDTO = apiKeyService.createApiKey(
@@ -114,6 +119,7 @@ public class ApiKeyController {
     public Result<ApiKeyDTO> updateApiKey(
             @Parameter(description = "API密钥ID", required = true) @PathVariable final Long id,
             @Valid @RequestBody final ApiKeyUpdateRequest request) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 更新API密钥
         ApiKeyDTO apiKeyDTO = apiKeyService.updateApiKey(
@@ -139,6 +145,7 @@ public class ApiKeyController {
     @DeleteMapping("/{id}")
     public Result<Void> deleteApiKey(
             @Parameter(description = "API密钥ID", required = true) @PathVariable final Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 删除API密钥
         apiKeyService.deleteApiKey(id);

@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -125,12 +127,13 @@ class CallbackServiceTest {
             when(sysConfigService.getBooleanConfig(eq("callback.enabled"), anyBoolean())).thenReturn(true);
             when(sysConfigService.getConfigValue(eq("callback.law-firm-url"), anyString()))
                     .thenReturn("");
+            when(matterMapper.selectById("CS1706860800000123456")).thenReturn(testMatter);
 
             // When
             callbackService.callbackAccessLog(accessLog);
 
             // Then
-            verify(matterMapper, never()).selectById(anyString());
+            verify(matterMapper, times(1)).selectById("CS1706860800000123456");
             verify(restTemplate, never()).exchange(anyString(), any(), any(), eq(String.class));
         }
 
@@ -144,8 +147,6 @@ class CallbackServiceTest {
                     .build();
 
             when(sysConfigService.getBooleanConfig(eq("callback.enabled"), anyBoolean())).thenReturn(true);
-            when(sysConfigService.getConfigValue(eq("callback.law-firm-url"), anyString()))
-                    .thenReturn("http://example.com");
             when(matterMapper.selectById("CS1706860800000123456")).thenReturn(null);
 
             // When
@@ -230,6 +231,41 @@ class CallbackServiceTest {
                     any(),
                     any(),
                     eq(String.class));
+        }
+
+        @Test
+        @DisplayName("回调访问日志应携带签名与防重放请求头")
+        void callbackAccessLog_ShouldIncludeSignatureHeaders() {
+            AccessLog accessLog = AccessLog.builder()
+                    .matterId("CS1706860800000123456")
+                    .clientId(2001L)
+                    .accessTime(LocalDateTime.now())
+                    .build();
+
+            when(sysConfigService.getBooleanConfig(eq("callback.enabled"), anyBoolean())).thenReturn(true);
+            when(sysConfigService.getConfigValue(eq("callback.law-firm-url"), anyString()))
+                    .thenReturn("http://example.com");
+            when(sysConfigService.getConfigValue(eq("callback.api-key"), isNull()))
+                    .thenReturn("test-secret");
+            when(matterMapper.selectById("CS1706860800000123456")).thenReturn(testMatter);
+            when(restTemplate.exchange(anyString(), any(), any(), eq(String.class)))
+                    .thenReturn(new ResponseEntity<>("OK", HttpStatus.OK));
+
+            callbackService.callbackAccessLog(accessLog);
+
+            @SuppressWarnings("rawtypes")
+            ArgumentCaptor<HttpEntity> entityCaptor = ArgumentCaptor.forClass(HttpEntity.class);
+            verify(restTemplate).exchange(
+                    eq("http://example.com/api/open/client/access-log"),
+                    eq(org.springframework.http.HttpMethod.POST),
+                    entityCaptor.capture(),
+                    eq(String.class));
+
+            HttpEntity<?> entity = entityCaptor.getValue();
+            assertNotNull(entity.getHeaders().getFirst("X-Callback-Key"));
+            assertNotNull(entity.getHeaders().getFirst("X-Callback-Timestamp"));
+            assertNotNull(entity.getHeaders().getFirst("X-Callback-Nonce"));
+            assertNotNull(entity.getHeaders().getFirst("X-Callback-Signature"));
         }
     }
 

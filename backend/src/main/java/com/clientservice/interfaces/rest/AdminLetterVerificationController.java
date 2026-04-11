@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.service.LetterVerificationService;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.common.result.Result;
 import com.clientservice.domain.entity.LetterVerification;
 import io.micrometer.core.annotation.Timed;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminLetterVerificationController {
 
+    private final AdminAuthorizationService adminAuthorizationService;
     private final LetterVerificationService letterVerificationService;
 
     /**
@@ -46,6 +48,7 @@ public class AdminLetterVerificationController {
             @Parameter(description = "每页大小") @RequestParam(defaultValue = "20") int pageSize,
             @Parameter(description = "状态") @RequestParam(required = false) String status,
             @Parameter(description = "关键词") @RequestParam(required = false) String keyword) {
+        adminAuthorizationService.requireSuperAdmin();
 
         log.info("查询验证记录: page={}, pageSize={}, status={}, keyword={}", page, pageSize, status, keyword);
 
@@ -65,6 +68,7 @@ public class AdminLetterVerificationController {
     @GetMapping("/{id}")
     public Result<LetterVerification> getVerificationDetail(
             @Parameter(description = "验证记录ID", required = true) @PathVariable Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         log.info("获取验证详情: id={}", id);
 
@@ -84,6 +88,7 @@ public class AdminLetterVerificationController {
     @DeleteMapping("/{id}")
     public Result<Void> revokeVerification(
             @Parameter(description = "验证记录ID", required = true) @PathVariable Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         log.info("撤销验证: id={}", id);
 
@@ -101,6 +106,7 @@ public class AdminLetterVerificationController {
     @Timed(value = "api.admin.letter.verification.statistics", description = "获取验证统计接口耗时")
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getVerificationStatistics() {
+        adminAuthorizationService.requireSuperAdmin();
 
         log.info("获取验证统计");
 

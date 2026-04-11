@@ -29,4 +29,7 @@ public class UserInfo {
 
     /** 最后登录时间 */
     private LocalDateTime lastLoginAt;
+
+    /** 是否为超级管理员 */
+    private Boolean superAdmin;
 }

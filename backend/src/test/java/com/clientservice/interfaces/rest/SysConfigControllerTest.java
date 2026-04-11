@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.SysConfigDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.SysConfigService;
 import com.clientservice.infrastructure.config.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,6 +41,9 @@ class SysConfigControllerTest {
     @Mock
     private SysConfigService sysConfigService;
 
+    @Mock
+    private AdminAuthorizationService adminAuthorizationService;
+
     @InjectMocks
     private SysConfigController sysConfigController;
 
@@ -75,6 +79,7 @@ class SysConfigControllerTest {
             List<SysConfigDTO> configList = Arrays.asList(config1, config2);
 
             when(sysConfigService.getConfigList(any(), any(), any())).thenReturn(configList);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(get("/api/admin/config")
@@ -104,6 +109,7 @@ class SysConfigControllerTest {
                     .build();
 
             when(sysConfigService.getConfigById(1L)).thenReturn(config);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(get("/api/admin/config/1"))
@@ -136,6 +142,7 @@ class SysConfigControllerTest {
                     .build();
 
             when(sysConfigService.saveConfig(anyString(), anyString(), anyString(), anyString())).thenReturn(config);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(post("/api/admin/config")
@@ -185,6 +192,7 @@ class SysConfigControllerTest {
                     .build();
 
             when(sysConfigService.updateConfig(eq(1L), anyString(), anyString(), anyString())).thenReturn(config);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(put("/api/admin/config/1")
@@ -207,6 +215,7 @@ class SysConfigControllerTest {
         void deleteConfig_ShouldReturnSuccess() throws Exception {
             // Given
             doNothing().when(sysConfigService).deleteConfig(1L);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(delete("/api/admin/config/1"))

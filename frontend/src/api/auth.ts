@@ -18,6 +18,7 @@ export interface UserInfo {
   realName?: string
   email?: string
   lastLoginAt?: string
+  superAdmin?: boolean
 }
 
 export interface LoginResponse {

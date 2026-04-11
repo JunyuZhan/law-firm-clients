@@ -3,6 +3,7 @@ package com.clientservice.interfaces.rest;
 import com.clientservice.application.dto.NotificationTemplateCreateRequest;
 import com.clientservice.application.dto.NotificationTemplateDTO;
 import com.clientservice.application.dto.NotificationTemplateUpdateRequest;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.NotificationTemplateService;
 import com.clientservice.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,7 @@ import java.util.List;
 public class NotificationTemplateController {
 
     private final NotificationTemplateService templateService;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     /**
      * 获取模板列表
@@ -53,6 +55,7 @@ public class NotificationTemplateController {
             @Parameter(description = "提供商") @RequestParam(required = false) final String provider,
             @Parameter(description = "是否启用") @RequestParam(required = false) final Boolean enabled,
             @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取模板列表
         List<NotificationTemplateDTO> list = templateService.getTemplateList(templateType, provider, enabled, limit);
@@ -72,6 +75,7 @@ public class NotificationTemplateController {
     @GetMapping("/{id}")
     public Result<NotificationTemplateDTO> getTemplateById(
             @Parameter(description = "模板ID", required = true) @PathVariable final Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取模板
         NotificationTemplateDTO templateDTO = templateService.getTemplateById(id);
@@ -91,6 +95,7 @@ public class NotificationTemplateController {
     @PostMapping
     public Result<NotificationTemplateDTO> createTemplate(
             @Valid @RequestBody final NotificationTemplateCreateRequest request) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 创建模板
         NotificationTemplateDTO templateDTO = templateService.createTemplate(
@@ -121,6 +126,7 @@ public class NotificationTemplateController {
     public Result<NotificationTemplateDTO> updateTemplate(
             @Parameter(description = "模板ID", required = true) @PathVariable final Long id,
             @Valid @RequestBody final NotificationTemplateUpdateRequest request) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 更新模板
         NotificationTemplateDTO templateDTO = templateService.updateTemplate(
@@ -146,6 +152,7 @@ public class NotificationTemplateController {
     @DeleteMapping("/{id}")
     public Result<Void> deleteTemplate(
             @Parameter(description = "模板ID", required = true) @PathVariable final Long id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 删除模板
         templateService.deleteTemplate(id);

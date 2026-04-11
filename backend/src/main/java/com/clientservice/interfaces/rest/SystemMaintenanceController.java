@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.common.result.Result;
+import com.clientservice.application.service.AdminAuthorizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class SystemMaintenanceController {
 
     private final JdbcTemplate jdbcTemplate;
     private final RestTemplate restTemplate;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     @Value("${file.storage.path:/data/client-service/files}")
     private String fileStoragePath;
@@ -61,6 +63,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "获取系统状态", description = "获取数据库、存储等系统状态信息")
     @GetMapping("/status")
     public Result<Map<String, Object>> getSystemStatus() {
+        adminAuthorizationService.requireSuperAdmin();
         Map<String, Object> status = new LinkedHashMap<>();
 
         // 数据库状态
@@ -138,6 +141,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "创建数据库备份", description = "导出数据库为SQL文件并下载")
     @PostMapping("/backup/database")
     public Result<Map<String, Object>> createDatabaseBackup() {
+        adminAuthorizationService.requireSuperAdmin();
         try {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String backupDir = backupDirectory;
@@ -187,6 +191,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "获取备份列表", description = "获取已创建的备份文件列表")
     @GetMapping("/backup/list")
     public Result<List<Map<String, Object>>> listBackups() {
+        adminAuthorizationService.requireSuperAdmin();
         try {
             String backupDir = backupDirectory;
             Path backupPath = Paths.get(backupDir);
@@ -235,6 +240,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "下载备份文件", description = "下载指定的备份文件")
     @GetMapping("/backup/download/{filename}")
     public ResponseEntity<byte[]> downloadBackup(@PathVariable String filename) throws IOException {
+        adminAuthorizationService.requireSuperAdmin();
         // 安全检查：防止路径遍历攻击
         if (filename == null || filename.isBlank()) {
             throw new IllegalArgumentException("文件名不能为空");
@@ -275,6 +281,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "删除备份文件", description = "删除指定的备份文件")
     @DeleteMapping("/backup/{filename}")
     public Result<Void> deleteBackup(@PathVariable String filename) {
+        adminAuthorizationService.requireSuperAdmin();
         try {
             // 安全检查：防止路径遍历攻击
             if (filename == null || filename.isBlank()) {
@@ -421,6 +428,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "获取版本信息", description = "获取当前版本和远程最新版本信息")
     @GetMapping("/git/info")
     public Result<Map<String, Object>> getGitInfo() {
+        adminAuthorizationService.requireSuperAdmin();
         Map<String, Object> result = new LinkedHashMap<>();
         
         // 当前版本
@@ -484,6 +492,7 @@ public class SystemMaintenanceController {
     public Result<Map<String, Object>> getUpgradeGuide(
             @RequestParam(defaultValue = "false") boolean noCache,
             @RequestParam(defaultValue = "false") boolean skipRestart) {
+        adminAuthorizationService.requireSuperAdmin();
         
         Map<String, Object> result = new LinkedHashMap<>();
         
@@ -529,6 +538,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "获取服务状态", description = "检查后端服务是否正常运行")
     @GetMapping("/upgrade/status")
     public Result<Map<String, Object>> getUpgradeStatus() {
+        adminAuthorizationService.requireSuperAdmin();
         Map<String, Object> result = new LinkedHashMap<>();
         
         // 检查后端服务是否正常
@@ -548,6 +558,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "检查新版本", description = "检查是否有新版本可用")
     @GetMapping("/version/check")
     public Result<Map<String, Object>> checkVersion() {
+        adminAuthorizationService.requireSuperAdmin();
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("currentVersion", currentVersion);
         result.put("hasUpdate", false);
@@ -585,6 +596,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "获取当前版本", description = "获取当前系统版本信息")
     @GetMapping("/version")
     public Result<Map<String, Object>> getVersion() {
+        adminAuthorizationService.requireSuperAdmin();
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("version", currentVersion);
         result.put("name", "客户服务系统");
@@ -598,6 +610,7 @@ public class SystemMaintenanceController {
     @Operation(summary = "忽略版本更新", description = "忽略指定版本的更新提示")
     @PostMapping("/version/ignore")
     public Result<Void> ignoreVersion(@RequestParam String version) {
+        adminAuthorizationService.requireSuperAdmin();
         try {
             // 将忽略的版本保存到数据库配置中
             String configKey = "system.ignored-version";

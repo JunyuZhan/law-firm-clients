@@ -1,5 +1,6 @@
 package com.clientservice.interfaces.rest;
 
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.AdminLoginLogService;
 import com.clientservice.common.result.Result;
 import com.clientservice.domain.entity.AdminLoginLog;
@@ -37,6 +38,7 @@ import java.util.List;
 @Tag(name = "日志管理", description = "登录日志和下载日志的查询、导出功能")
 public class LogManagementController {
 
+    private final AdminAuthorizationService adminAuthorizationService;
     private final AdminLoginLogService adminLoginLogService;
     private final AdminLoginLogMapper adminLoginLogMapper;
     private final DownloadLogMapper downloadLogMapper;
@@ -52,6 +54,7 @@ public class LogManagementController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize) {
+        adminAuthorizationService.requireSuperAdmin();
         // 分页参数安全校验
         pageNum = Math.max(1, pageNum);
         pageSize = Math.max(1, Math.min(100, pageSize));
@@ -69,6 +72,7 @@ public class LogManagementController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
             HttpServletResponse response) throws IOException {
+        adminAuthorizationService.requireSuperAdmin();
         
         // 查询所有符合条件的日志（不分页）
         LambdaQueryWrapper<AdminLoginLog> wrapper = new LambdaQueryWrapper<>();
@@ -127,6 +131,7 @@ public class LogManagementController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize) {
+        adminAuthorizationService.requireSuperAdmin();
         // 分页参数安全校验
         pageNum = Math.max(1, pageNum);
         pageSize = Math.max(1, Math.min(100, pageSize));
@@ -165,6 +170,7 @@ public class LogManagementController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime startTime,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime endTime,
             HttpServletResponse response) throws IOException {
+        adminAuthorizationService.requireSuperAdmin();
         
         // 查询所有符合条件的日志（不分页）
         LambdaQueryWrapper<DownloadLog> wrapper = new LambdaQueryWrapper<>();

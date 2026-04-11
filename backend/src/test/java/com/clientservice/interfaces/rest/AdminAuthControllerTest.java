@@ -2,6 +2,7 @@ package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.ChangePasswordRequest;
 import com.clientservice.application.dto.LoginRequest;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.AdminUserService;
 import com.clientservice.application.service.CaptchaService;
 import com.clientservice.application.service.CsrfTokenService;
@@ -28,6 +29,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -45,6 +48,9 @@ class AdminAuthControllerTest {
 
     @Mock
     private AdminUserService adminUserService;
+
+    @Mock
+    private AdminAuthorizationService adminAuthorizationService;
 
     @Mock
     private CaptchaService captchaService;
@@ -143,6 +149,7 @@ class AdminAuthControllerTest {
             when(adminUserService.login(anyString(), anyString(), anyString(), any())).thenReturn("jwt-token");
             when(adminUserService.getUserByUsername("admin")).thenReturn(user);
             when(csrfTokenService.generateToken(anyString())).thenReturn("csrf-token");
+            when(adminAuthorizationService.isSuperAdmin(user)).thenReturn(true);
 
             // When & Then
             mockMvc.perform(post("/api/admin/auth/login")
@@ -152,6 +159,7 @@ class AdminAuthControllerTest {
                     .andExpect(jsonPath("$.code").value("200"))
                     .andExpect(jsonPath("$.data.token").value("jwt-token"))
                     .andExpect(jsonPath("$.data.user.username").value("admin"))
+                    .andExpect(jsonPath("$.data.user.superAdmin").value(true))
                     .andExpect(jsonPath("$.data.csrfToken").value("csrf-token"));
             
             verify(requestRateLimitService).checkRateLimit(anyString(), anyString());
@@ -197,12 +205,14 @@ class AdminAuthControllerTest {
 
             jwtAuthenticationFilterMockedStatic.when(JwtAuthenticationFilter::getCurrentUser).thenReturn(user);
             when(csrfTokenService.generateToken(anyString())).thenReturn("csrf-token");
+            when(adminAuthorizationService.isSuperAdmin(user)).thenReturn(true);
 
             // When & Then
             mockMvc.perform(get("/api/admin/auth/me"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value("200"))
                     .andExpect(jsonPath("$.data.user.username").value("admin"))
+                    .andExpect(jsonPath("$.data.user.superAdmin").value(true))
                     .andExpect(jsonPath("$.data.csrfToken").value("csrf-token"));
         }
 
@@ -300,6 +310,7 @@ class AdminAuthControllerTest {
             AdminUser user = new AdminUser();
             user.setUsername("admin");
             jwtAuthenticationFilterMockedStatic.when(JwtAuthenticationFilter::getCurrentUser).thenReturn(user);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(post("/api/admin/auth/unlock/2"))
@@ -307,6 +318,23 @@ class AdminAuthControllerTest {
                     .andExpect(jsonPath("$.code").value("200"));
 
             verify(adminUserService).unlockAccount(2L);
+        }
+
+        @Test
+        @DisplayName("非超级管理员解锁账户应返回403")
+        void unlockAccount_ShouldReturnForbidden_WhenNotSuperAdmin() throws Exception {
+            AdminUser user = new AdminUser();
+            user.setUsername("operator");
+            jwtAuthenticationFilterMockedStatic.when(JwtAuthenticationFilter::getCurrentUser).thenReturn(user);
+            doThrow(new com.clientservice.common.exception.BusinessException("403", "仅超级管理员可执行该操作"))
+                    .when(adminAuthorizationService).requireSuperAdmin();
+
+            mockMvc.perform(post("/api/admin/auth/unlock/2"))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.code").value("403"))
+                    .andExpect(jsonPath("$.message").value("仅超级管理员可执行该操作"));
+
+            verify(adminUserService, never()).unlockAccount(any());
         }
     }
 }

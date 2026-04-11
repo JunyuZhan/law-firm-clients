@@ -2,6 +2,7 @@ package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.MatterListDTO;
 import com.clientservice.application.dto.MatterDetailDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.MatterService;
 import com.clientservice.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MatterManagementController {
 
     private final MatterService matterService;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     /**
      * 撤销项目访问
@@ -43,6 +45,7 @@ public class MatterManagementController {
     @PostMapping("/revoke")
     public Result<Void> revokeMatter(
             @Parameter(description = "项目ID", required = true) @RequestParam final String matterId) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 撤销项目访问
         matterService.revokeMatter(matterId);
@@ -76,6 +79,7 @@ public class MatterManagementController {
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) 
                 final LocalDateTime endTime,
             @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取项目列表
         List<MatterListDTO> list = matterService.getMatterList(clientId, status, startTime, endTime, limit);
@@ -95,6 +99,7 @@ public class MatterManagementController {
     @GetMapping("/detail/{id}")
     public Result<MatterDetailDTO> getMatterDetail(
             @Parameter(description = "项目ID", required = true) @PathVariable final String id) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取项目详情
         MatterDetailDTO detail = matterService.getMatterDetail(id);

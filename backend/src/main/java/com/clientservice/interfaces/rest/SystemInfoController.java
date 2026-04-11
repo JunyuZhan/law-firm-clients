@@ -1,5 +1,6 @@
 package com.clientservice.interfaces.rest;
 
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,6 +41,7 @@ import java.util.Map;
 @Tag(name = "系统信息", description = "运行时信息、依赖健康状态等系统信息接口")
 public class SystemInfoController {
 
+    private final AdminAuthorizationService adminAuthorizationService;
     private final ObjectProvider<BuildProperties> buildPropertiesProvider;
     private final ObjectProvider<HealthEndpoint> healthEndpointProvider;
 
@@ -64,6 +66,7 @@ public class SystemInfoController {
     @Operation(summary = "获取系统运行时信息", description = "返回版本、构建和部署模式等交付元信息")
     @GetMapping("/runtime-info")
     public Result<Map<String, Object>> getRuntimeInfo() {
+        adminAuthorizationService.requireSuperAdmin();
         BuildProperties buildProperties = buildPropertiesProvider.getIfAvailable();
         String backendVersion = buildProperties != null ? buildProperties.getVersion() : productVersion;
         String resolvedBuildTime = StringUtils.hasText(buildTime) && !"unknown".equalsIgnoreCase(buildTime)
@@ -86,6 +89,7 @@ public class SystemInfoController {
     @Operation(summary = "获取关键依赖状态", description = "基于 Actuator HealthEndpoint 汇总关键依赖和本地存储状态")
     @GetMapping("/dependency-status")
     public Result<Map<String, Object>> getDependencyStatus() {
+        adminAuthorizationService.requireSuperAdmin();
         HealthEndpoint healthEndpoint = healthEndpointProvider.getIfAvailable();
 
         List<Map<String, Object>> items = new ArrayList<>();

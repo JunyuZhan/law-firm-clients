@@ -1,5 +1,6 @@
 package com.clientservice.interfaces.rest;
 
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.common.result.Result;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +35,9 @@ class SystemMaintenanceControllerTest {
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private AdminAuthorizationService adminAuthorizationService;
+
     @InjectMocks
     private SystemMaintenanceController systemMaintenanceController;
 
@@ -54,6 +58,7 @@ class SystemMaintenanceControllerTest {
         @DisplayName("获取系统状态应该成功")
         void getSystemStatus_ShouldSuccess() {
             // Given
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
             when(jdbcTemplate.queryForObject(eq("SELECT 1"), eq(Integer.class))).thenReturn(1);
             when(jdbcTemplate.queryForObject(startsWith("SELECT COUNT(*)"), eq(Long.class))).thenReturn(10L);
             when(jdbcTemplate.queryForObject(eq("SELECT pg_database_size(?)"), eq(Long.class), anyString())).thenReturn(1024L * 1024L * 10L);
@@ -76,6 +81,7 @@ class SystemMaintenanceControllerTest {
         @DisplayName("数据库连接失败应该返回错误状态")
         void getSystemStatus_WithDbFailure_ShouldReturnError() {
             // Given
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
             when(jdbcTemplate.queryForObject(eq("SELECT 1"), eq(Integer.class))).thenThrow(new RuntimeException("Connection failed"));
 
             // When
@@ -98,6 +104,7 @@ class SystemMaintenanceControllerTest {
         @DisplayName("创建数据库备份应该成功")
         void createDatabaseBackup_ShouldSuccess() {
             // Given
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
             when(jdbcTemplate.queryForList(anyString())).thenReturn(java.util.Collections.emptyList());
 
             // When
@@ -119,6 +126,7 @@ class SystemMaintenanceControllerTest {
         @DisplayName("获取Git信息应该成功")
         void getGitInfo_ShouldSuccess() {
             // Given
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
             Map<String, Object> releaseInfo = new HashMap<>();
             releaseInfo.put("tag_name", "v1.1.0");
             releaseInfo.put("body", "Release notes");
@@ -142,6 +150,7 @@ class SystemMaintenanceControllerTest {
         @DisplayName("版本检查应该返回是否有更新")
         void checkVersion_ShouldReturnUpdateStatus() {
             // Given
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
             Map<String, Object> releaseInfo = new HashMap<>();
             releaseInfo.put("tag_name", "v1.1.0");
             
@@ -161,6 +170,7 @@ class SystemMaintenanceControllerTest {
         @DisplayName("忽略版本应该成功")
         void ignoreVersion_ShouldSuccess() {
             // Given
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
             String version = "1.1.0";
             // Mock ignoreVersion calls
              when(jdbcTemplate.queryForObject(contains("COUNT(*)"), eq(Long.class), anyString())).thenReturn(0L);

@@ -80,7 +80,7 @@ class MatterControllerTest {
             MatterReceiveResponse response = createMatterReceiveResponse();
 
             when(apiKeyService.validateApiKey(anyString())).thenReturn(mockApiKey);
-            when(matterService.receiveMatterData(any(MatterReceiveRequest.class), any(HttpServletRequest.class))).thenReturn(response);
+            when(matterService.receiveMatterData(any(MatterReceiveRequest.class), any(HttpServletRequest.class), any(ApiKey.class))).thenReturn(response);
 
             // When & Then
             mockMvc.perform(post("/api/matter/receive")
@@ -94,7 +94,7 @@ class MatterControllerTest {
                     .andExpect(jsonPath("$.data.accessUrl").value(response.getAccessUrl()));
 
             verify(apiKeyService, times(1)).validateApiKey("Bearer test-api-key");
-            verify(matterService, times(1)).receiveMatterData(any(MatterReceiveRequest.class), any(HttpServletRequest.class));
+            verify(matterService, times(1)).receiveMatterData(any(MatterReceiveRequest.class), any(HttpServletRequest.class), any(ApiKey.class));
         }
 
         @Test
@@ -113,7 +113,7 @@ class MatterControllerTest {
                     .andExpect(status().isInternalServerError()); // 500
 
             verify(apiKeyService, never()).validateApiKey(anyString());
-            verify(matterService, never()).receiveMatterData(any(), any());
+            verify(matterService, never()).receiveMatterData(any(), any(), any());
         }
 
         @Test
@@ -134,7 +134,7 @@ class MatterControllerTest {
                     .andExpect(jsonPath("$.code").value("401"));
 
             verify(apiKeyService, times(1)).validateApiKey("Bearer invalid-key");
-            verify(matterService, never()).receiveMatterData(any(), any());
+            verify(matterService, never()).receiveMatterData(any(), any(), any());
         }
 
         @Test
@@ -154,7 +154,7 @@ class MatterControllerTest {
 
             // 参数验证失败时，Controller方法不会执行，所以这些服务不会被调用
             verify(apiKeyService, never()).validateApiKey(anyString());
-            verify(matterService, never()).receiveMatterData(any(), any());
+            verify(matterService, never()).receiveMatterData(any(), any(), any());
         }
     }
 

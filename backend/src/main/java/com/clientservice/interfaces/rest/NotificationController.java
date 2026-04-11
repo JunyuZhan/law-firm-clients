@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.NotificationHistoryDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.MatterService;
 import com.clientservice.application.service.NotificationRecordService;
 import com.clientservice.application.service.NotificationService;
@@ -31,6 +32,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationController {
 
+    private final AdminAuthorizationService adminAuthorizationService;
     private final MatterService matterService;
     private final NotificationService notificationService;
     private final NotificationRecordService notificationRecordService;
@@ -47,6 +49,7 @@ public class NotificationController {
     @PostMapping("/send")
     public Result<Void> sendNotification(
             @Parameter(description = "项目ID", required = true) @RequestParam final String matterId) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取项目
         ClientMatter matter = matterService.getMatterById(matterId);
@@ -85,6 +88,7 @@ public class NotificationController {
             @Parameter(description = "结束时间") @RequestParam(required = false) 
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endTime,
             @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取通知历史
         List<NotificationHistoryDTO> history = notificationRecordService.getNotificationHistory(
@@ -113,6 +117,7 @@ public class NotificationController {
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime startTime,
             @Parameter(description = "结束时间") @RequestParam(required = false) 
                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final LocalDateTime endTime) {
+        adminAuthorizationService.requireSuperAdmin();
 
         // 获取统计信息
         com.clientservice.application.dto.NotificationStatisticsDTO statistics = 

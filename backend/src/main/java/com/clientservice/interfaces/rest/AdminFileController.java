@@ -1,6 +1,7 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.ClientFileDTO;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.FileService;
 import com.clientservice.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class AdminFileController {
 
     private final FileService fileService;
+    private final AdminAuthorizationService adminAuthorizationService;
 
     /**
      * 获取文件列表（支持分页和筛选）
@@ -38,6 +40,7 @@ public class AdminFileController {
             @Parameter(description = "关键字") @RequestParam(required = false) String keyword,
             @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "20") int pageSize) {
+        adminAuthorizationService.requireSuperAdmin();
         // 分页参数安全校验
         page = Math.max(1, page);
         pageSize = Math.max(1, Math.min(100, pageSize));
@@ -53,6 +56,7 @@ public class AdminFileController {
     @Operation(summary = "获取文件统计", description = "获取文件存储统计信息")
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics() {
+        adminAuthorizationService.requireSuperAdmin();
         Map<String, Object> stats = fileService.getFileStatistics();
         return Result.success(stats);
     }
@@ -64,6 +68,7 @@ public class AdminFileController {
     @GetMapping("/{fileId}")
     public Result<ClientFileDTO> getFile(
             @Parameter(description = "文件ID", required = true) @PathVariable String fileId) {
+        adminAuthorizationService.requireSuperAdmin();
         ClientFileDTO file = fileService.getFileById(fileId);
         return Result.success(file);
     }
@@ -75,6 +80,7 @@ public class AdminFileController {
     @DeleteMapping("/{fileId}")
     public Result<Void> deleteFile(
             @Parameter(description = "文件ID", required = true) @PathVariable String fileId) {
+        adminAuthorizationService.requireSuperAdmin();
         fileService.deleteFile(fileId);
         log.info("管理员删除文件: fileId={}", fileId);
         return Result.success();
@@ -87,6 +93,7 @@ public class AdminFileController {
     @DeleteMapping("/batch")
     public Result<Map<String, Object>> batchDeleteFiles(
             @Parameter(description = "文件ID列表", required = true) @RequestBody List<String> fileIds) {
+        adminAuthorizationService.requireSuperAdmin();
         if (fileIds == null || fileIds.isEmpty()) {
             return Result.badRequest("文件ID列表不能为空");
         }
@@ -122,6 +129,7 @@ public class AdminFileController {
     public Result<Map<String, Object>> cleanupFiles(
             @Parameter(description = "清理天数（删除N天前标记为删除的文件）") 
             @RequestParam(defaultValue = "30") int days) {
+        adminAuthorizationService.requireSuperAdmin();
         int cleanedCount = fileService.cleanupDeletedFiles(days);
         
         Map<String, Object> result = new HashMap<>();

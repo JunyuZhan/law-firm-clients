@@ -53,7 +53,7 @@
     </a-layout-sider>
     <a-layout class="main-layout">
       <div
-        v-if="updateInfo.hasUpdate && !updateInfo.dismissed"
+        v-if="isSuperAdmin && updateInfo.hasUpdate && !updateInfo.dismissed"
         class="update-banner"
       >
         <div class="update-content">
@@ -209,6 +209,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const appConfigStore = useAppConfigStore()
+const isSuperAdmin = computed(() => !!authStore.getCurrentUserInfo()?.superAdmin)
 
 const appShortName = computed(() => appConfigStore.appShortName)
 const logoUrl = computed(() => appConfigStore.logoUrl)
@@ -392,7 +393,9 @@ onMounted(() => {
     })
   }
 
-  checkForUpdates()
+  if (isSuperAdmin.value) {
+    checkForUpdates()
+  }
 
   if (authStore.isAuthenticated) {
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
@@ -500,74 +503,89 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
-const menuItems: MenuProps['items'] = [
+const rawMenuItems = [
   {
     key: '/admin/matters',
     icon: () => h(AppstoreOutlined),
     label: '项目列表',
     title: '项目列表',
+    superAdminOnly: true,
   },
   {
     key: '/admin/files',
     icon: () => h(FolderOutlined),
     label: '文件管理',
     title: '文件管理',
+    superAdminOnly: true,
   },
   {
     key: '/admin/setup',
     icon: () => h(CompassOutlined),
     label: '首次初始化',
     title: '首次初始化',
+    superAdminOnly: true,
   },
   {
     key: '/admin/system-info',
     icon: () => h(InfoCircleOutlined),
     label: '系统信息',
     title: '系统信息',
+    superAdminOnly: true,
   },
   {
     key: '/admin/letter-verifications',
     icon: () => h(SafetyCertificateOutlined),
     label: '函件验证',
     title: '函件验证',
+    superAdminOnly: true,
   },
   {
     key: '/admin/notifications',
     icon: () => h(BellOutlined),
     label: '通知记录',
     title: '通知记录',
+    superAdminOnly: true,
   },
   {
     key: '/admin/notification-templates',
     icon: () => h(FileSyncOutlined),
     label: '通知模板',
     title: '通知模板',
+    superAdminOnly: true,
   },
   {
     key: '/admin/notification-settings',
     icon: () => h(SettingFilled),
     label: '通知配置',
     title: '通知配置',
+    superAdminOnly: true,
   },
   {
     key: '/admin/api-keys',
     icon: () => h(ApiOutlined),
     label: 'API密钥管理',
     title: 'API密钥管理',
+    superAdminOnly: true,
   },
   {
     key: '/admin/config',
     icon: () => h(SettingFilled),
     label: '系统配置',
     title: '系统配置',
+    superAdminOnly: true,
   },
   {
     key: '/admin/maintenance',
     icon: () => h(ToolOutlined),
     label: '系统维护',
     title: '系统维护',
+    superAdminOnly: true,
   },
 ]
+
+const menuItems = computed<MenuProps['items']>(() => rawMenuItems.filter((item) => {
+  return !item.superAdminOnly || isSuperAdmin.value
+}))
 
 const stopWatch = watch(
   () => route.path,

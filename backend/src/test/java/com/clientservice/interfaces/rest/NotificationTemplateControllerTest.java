@@ -3,6 +3,7 @@ package com.clientservice.interfaces.rest;
 import com.clientservice.application.dto.NotificationTemplateCreateRequest;
 import com.clientservice.application.dto.NotificationTemplateDTO;
 import com.clientservice.application.dto.NotificationTemplateUpdateRequest;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.NotificationTemplateService;
 import com.clientservice.infrastructure.config.GlobalExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +42,9 @@ class NotificationTemplateControllerTest {
     @Mock
     private NotificationTemplateService templateService;
 
+    @Mock
+    private AdminAuthorizationService adminAuthorizationService;
+
     @InjectMocks
     private NotificationTemplateController templateController;
 
@@ -74,6 +78,7 @@ class NotificationTemplateControllerTest {
             List<NotificationTemplateDTO> templateList = Arrays.asList(template1, template2);
 
             when(templateService.getTemplateList(any(), any(), any(), any())).thenReturn(templateList);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(get("/api/admin/notification-templates")
@@ -102,6 +107,7 @@ class NotificationTemplateControllerTest {
                     .build();
 
             when(templateService.getTemplateById(1L)).thenReturn(template);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(get("/api/admin/notification-templates/1"))
@@ -138,6 +144,7 @@ class NotificationTemplateControllerTest {
                     anyString(), anyString(), anyString(), anyString(), 
                     any(), anyString(), any(), anyBoolean(), any()))
                     .thenReturn(template);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(post("/api/admin/notification-templates")
@@ -190,6 +197,7 @@ class NotificationTemplateControllerTest {
             when(templateService.updateTemplate(
                     eq(1L), anyString(), anyString(), any(), anyBoolean(), any()))
                     .thenReturn(template);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(put("/api/admin/notification-templates/1")
@@ -213,6 +221,7 @@ class NotificationTemplateControllerTest {
         void deleteTemplate_ShouldReturnSuccess() throws Exception {
             // Given
             doNothing().when(templateService).deleteTemplate(1L);
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
 
             // When & Then
             mockMvc.perform(delete("/api/admin/notification-templates/1"))

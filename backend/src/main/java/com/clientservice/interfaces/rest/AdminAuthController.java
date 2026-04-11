@@ -5,6 +5,7 @@ import com.clientservice.application.dto.ChangePasswordRequest;
 import com.clientservice.application.dto.LoginRequest;
 import com.clientservice.application.dto.LoginResponse;
 import com.clientservice.application.dto.UserInfo;
+import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.application.service.AdminUserService;
 import com.clientservice.application.service.CaptchaService;
 import com.clientservice.application.service.RequestRateLimitService;
@@ -43,6 +44,7 @@ import java.util.UUID;
 public class AdminAuthController {
 
     private final AdminUserService adminUserService;
+    private final AdminAuthorizationService adminAuthorizationService;
     private final CaptchaService captchaService;
     private final RequestRateLimitService requestRateLimitService;
     private final com.clientservice.application.service.TokenBlacklistService tokenBlacklistService;
@@ -113,6 +115,7 @@ public class AdminAuthController {
                 .realName(user.getRealName())
                 .email(user.getEmail())
                 .lastLoginAt(user.getLastLoginAt())
+                .superAdmin(adminAuthorizationService.isSuperAdmin(user))
                 .build();
 
         // 4. 生成 CSRF Token（使用用户ID作为会话ID）
@@ -147,6 +150,7 @@ public class AdminAuthController {
                 .realName(user.getRealName())
                 .email(user.getEmail())
                 .lastLoginAt(user.getLastLoginAt())
+                .superAdmin(adminAuthorizationService.isSuperAdmin(user))
                 .build();
 
         // 生成或刷新 CSRF Token
@@ -230,6 +234,7 @@ public class AdminAuthController {
         if (currentUser == null) {
             return Result.unauthorized("未登录");
         }
+        adminAuthorizationService.requireSuperAdmin();
 
         adminUserService.unlockAccount(userId);
 

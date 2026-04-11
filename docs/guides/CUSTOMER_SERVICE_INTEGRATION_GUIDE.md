@@ -258,7 +258,14 @@ HTTP状态码应为非2xx，响应体格式：
 **请求头**：
 ```
 Content-Type: application/json
+X-Callback-Key: {回调密钥}
+Authorization: Bearer {回调密钥}
 ```
+
+说明：
+- 律所系统当前会对 `/open/client/**` 执行回调密钥校验
+- 推荐显式传 `X-Callback-Key`
+- 为兼容现有实现，也可同时携带 `Authorization: Bearer {回调密钥}`
 
 **请求体**：
 ```json
@@ -1944,7 +1951,14 @@ ExternalIntegration integration =
 #### POST /open/client/files
 接收客户上传的文件。
 
-**权限**：无需认证（客户服务系统调用）
+**权限**：需要回调密钥认证（客户服务系统调用）
+
+**请求头**：
+```http
+X-Callback-Key: {回调密钥}
+Authorization: Bearer {回调密钥}
+Content-Type: application/json
+```
 
 **请求体**：
 ```json
@@ -1967,7 +1981,13 @@ ExternalIntegration integration =
 #### POST /open/client/files/deleted
 文件删除回调。
 
-**权限**：无需认证（客户服务系统调用）
+**权限**：需要回调密钥认证（客户服务系统调用）
+
+**请求头**：
+```http
+X-Callback-Key: {回调密钥}
+Authorization: Bearer {回调密钥}
+```
 
 **查询参数**：
 - `externalFileId`（必填）：外部文件ID
@@ -2201,6 +2221,11 @@ ExternalIntegration integration =
 **A**: 调用律所系统的回调接口：
 ```
 POST {律所系统API地址}/api/open/client/files/deleted?externalFileId=xxx
+```
+并在请求头中携带：
+```
+X-Callback-Key: {回调密钥}
+Authorization: Bearer {回调密钥}
 ```
 
 ### Q9: 响应格式必须使用扁平格式吗？
