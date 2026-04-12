@@ -522,10 +522,10 @@
 
 ### 2026-02-15
 - [x] **并发竞争条件修复**：`MatterService.receiveMatterData` 方法添加并发插入保护
-  - 数据库 `client_matter` 表添加 `law_firm_matter_id` 唯一约束（SQL 迁移脚本 `04-add-unique-constraint-matter.sql`）
+  - 数据库 `client_matter` 表唯一约束已回收到基线脚本 `scripts/init-db/01-schema.sql`
   - 代码中捕获 `DataIntegrityViolationException` 并转为更新操作
 - [x] **文件上传幂等性**：防止重复文件上传
-  - 数据库 `client_file` 表添加 `file_hash` 字段和索引（SQL 迁移脚本 `05-add-file-hash-column.sql`）
+  - 数据库 `client_file.file_hash` 字段和索引已回收到基线脚本 `scripts/init-db/01-schema.sql`
   - `FileService` 上传前计算 SHA-256 哈希，若存在相同文件则直接返回已有记录
   - 更新单元测试 `FileServiceTest` 覆盖新逻辑
 - [x] **API Key 验证速率限制**：防止暴力枚举

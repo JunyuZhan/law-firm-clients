@@ -32,7 +32,7 @@
 
 ### 任务 1.1：创建函件验证数据表
 
-**文件**: `scripts/init-db/06-letter-verification.sql`
+**文件**: `scripts/init-db/01-schema.sql`
 
 ```sql
 CREATE TABLE IF NOT EXISTS public.letter_verification (
