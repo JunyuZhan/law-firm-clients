@@ -486,6 +486,41 @@ build_images() {
     log_success "镜像构建完成"
 }
 
+# 执行安全的增量数据库迁移
+run_safe_db_migrations() {
+    cd "$DOCKER_DIR"
+
+    if ! docker compose ps postgres 2>/dev/null | grep -q "Up\|running"; then
+        log_warn "PostgreSQL 容器未运行，跳过增量数据库迁移"
+        return 0
+    fi
+
+    log_info "执行安全的增量数据库迁移..."
+
+    local scripts=(
+        "../scripts/init-db/05-add-file-hash-column.sql"
+        "../scripts/init-db/06-letter-verification.sql"
+        "../scripts/init-db/07-source-ownership-hardening.sql"
+    )
+
+    local script
+    for script in "${scripts[@]}"; do
+        if [ ! -f "$script" ]; then
+            log_warn "迁移脚本不存在，跳过: $script"
+            continue
+        fi
+
+        log_info "应用迁移: $(basename "$script")"
+        docker compose exec -T postgres psql \
+            -U "${POSTGRES_USER:-postgres}" \
+            -d client_service \
+            -v ON_ERROR_STOP=1 \
+            < "$script"
+    done
+
+    log_success "增量数据库迁移完成"
+}
+
 # 启动服务
 start_services() {
     log_info "启动服务..."
@@ -512,6 +547,8 @@ start_services() {
     else
         docker compose up -d
     fi
+
+    run_safe_db_migrations
     
     log_success "服务启动完成"
 }
@@ -612,6 +649,7 @@ upgrade_system() {
     # 4. 重启服务
     log_info "步骤 4/4: 重启服务..."
     docker compose up -d
+    run_safe_db_migrations
     
     # 等待服务就绪
     wait_for_services
@@ -761,6 +799,7 @@ main() {
             cd "$DOCKER_DIR"
             docker compose build --no-cache
             docker compose up -d
+            run_safe_db_migrations
             wait_for_services
             show_status
             ;;
