@@ -1,9 +1,10 @@
 <template>
   <div class="login-page">
     <div class="login-shell">
-      <section class="login-frame">
-        <aside class="brand-panel">
-          <div class="brand-header">
+      <section class="login-panel">
+        <aside class="panel-intro">
+          <p class="panel-kicker">Admin Console</p>
+          <div class="brand-head">
             <div class="logo">
               <img
                 v-if="appConfigStore.logoUrl"
@@ -24,8 +25,8 @@
                 <path d="M12 12L4 7.5" />
               </svg>
             </div>
+
             <div class="brand-copy">
-              <p class="brand-kicker">Admin Console</p>
               <h1 class="brand-title">
                 {{ systemName }}
               </h1>
@@ -38,34 +39,32 @@
             </div>
           </div>
 
-          <div class="brand-body">
-            <p class="brand-lead">
-              用统一后台管理项目进展、文件资料、通知分发与门户配置。
-            </p>
+          <p class="panel-lead">
+            统一管理项目、通知、文件资料与门户展示配置。
+          </p>
 
-            <div class="brand-points">
-              <article class="brand-point">
-                <span>项目与访问</span>
-                <p>集中维护项目状态、有效期与客户访问链接。</p>
-              </article>
-              <article class="brand-point">
-                <span>资料与通知</span>
-                <p>管理文件、通知记录与协作过程中的关键触达。</p>
-              </article>
-              <article class="brand-point">
-                <span>品牌与门户</span>
-                <p>系统名称、Logo、律所名称等展示信息均可从后台配置获取。</p>
-              </article>
-            </div>
+          <div class="intro-grid">
+            <article class="intro-card">
+              <span>项目管理</span>
+              <p>维护项目状态、有效期和客户访问范围。</p>
+            </article>
+            <article class="intro-card">
+              <span>通知协作</span>
+              <p>集中处理通知发送记录和协作过程追踪。</p>
+            </article>
+            <article class="intro-card">
+              <span>品牌配置</span>
+              <p>系统名称、Logo 与门户文案优先读取后台配置。</p>
+            </article>
           </div>
         </aside>
 
-        <section class="login-panel">
+        <section class="panel-form">
           <div class="form-header">
-            <p class="form-header-kicker">管理后台</p>
+            <p class="panel-kicker">管理后台</p>
             <h2 class="form-title">登录系统</h2>
             <p class="form-header-hint">
-              使用管理员账号进入后台工作台。
+              使用管理员账号进入工作台。
             </p>
           </div>
 
@@ -151,7 +150,7 @@
 
           <div class="form-footer">
             <p class="config-note">
-              品牌展示信息来源：后台系统配置；未配置时回退到环境变量默认值。
+              品牌展示优先读取后台配置，未配置时回退到默认值。
             </p>
             <p v-if="appConfigStore.copyright">
               {{ appConfigStore.copyright }}
@@ -179,14 +178,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useAppConfigStore } from '@/stores/appConfig'
-import { getCaptcha } from '@/api/auth'
 import { message } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
-import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
+import { LockOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { getCaptcha } from '@/api/auth'
+import { useAppConfigStore } from '@/stores/appConfig'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -294,43 +293,54 @@ onMounted(() => {
   min-height: 100vh;
   padding: 24px;
   background:
-    radial-gradient(circle at top left, rgba(30, 64, 175, 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.09), transparent 22%),
+    radial-gradient(circle at top left, rgba(30, 64, 175, 0.1), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 24%),
     linear-gradient(180deg, var(--lex-bg) 0%, var(--lex-bg-muted) 100%);
 }
 
 .login-shell {
-  min-height: calc(100vh - 48px);
   width: min(1100px, 100%);
+  min-height: calc(100vh - 48px);
   margin: 0 auto;
   display: grid;
   place-items: center;
 }
 
-.login-frame {
+.login-panel {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(320px, 1.05fr) minmax(360px, 0.92fr);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 440px);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color-light);
   background: var(--lex-surface-strong);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
 }
 
-.brand-panel {
+.panel-intro,
+.panel-form {
+  padding: 32px;
+}
+
+.panel-intro {
   display: grid;
-  align-content: space-between;
-  gap: 28px;
-  min-height: 640px;
-  padding: 36px 32px;
-  background:
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
-    linear-gradient(180deg, #0f172a 0%, #172554 100%);
-  color: rgba(248, 250, 252, 0.92);
+  align-content: start;
+  gap: 20px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94) 0%, rgba(241, 245, 249, 0.98) 100%);
+  border-right: 1px solid var(--border-color-light);
 }
 
-.brand-header {
+.panel-kicker,
+.intro-card span {
+  margin: 0;
+  color: var(--lex-accent-strong);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.brand-head {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -342,11 +352,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
   flex-shrink: 0;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color-light);
+  background: var(--lex-surface-strong);
 }
 
 .logo img {
@@ -356,9 +366,9 @@ onMounted(() => {
 }
 
 .logo svg {
-  width: 32px;
-  height: 32px;
-  color: rgba(255, 255, 255, 0.92);
+  width: 30px;
+  height: 30px;
+  color: var(--lex-primary-soft);
 }
 
 .brand-copy {
@@ -366,101 +376,64 @@ onMounted(() => {
   gap: 4px;
 }
 
-.brand-kicker,
-.form-header-kicker {
+.brand-title,
+.form-title {
   margin: 0;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.brand-kicker {
-  color: rgba(245, 158, 11, 0.88);
+  color: var(--lex-primary);
+  font-family: var(--font-heading);
 }
 
 .brand-title {
-  margin: 0;
   font-size: clamp(24px, 3vw, 30px);
-  color: #f8fafc;
+}
+
+.brand-meta,
+.panel-lead,
+.form-header-hint,
+.intro-card p,
+.form-footer {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
 .brand-meta {
-  margin: 0;
-  color: rgba(226, 232, 240, 0.76);
   font-size: 13px;
-  line-height: 1.6;
 }
 
-.login-panel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 36px 32px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+.panel-lead {
+  max-width: 34rem;
+  font-size: 18px;
 }
 
-.brand-body {
-  display: grid;
-  gap: 24px;
-}
-
-.brand-lead {
-  max-width: 30ch;
-  margin: 0;
-  font-size: 26px;
-  line-height: 1.35;
-  color: #f8fafc;
-}
-
-.brand-points {
+.intro-grid {
   display: grid;
   gap: 12px;
 }
 
-.brand-point {
+.intro-card {
+  display: grid;
+  gap: 8px;
   padding: 16px 18px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--radius-lg);
+  background: var(--lex-surface-strong);
+  box-shadow: var(--shadow-xs);
 }
 
-.brand-point span {
-  display: inline-block;
-  margin-bottom: 8px;
-  color: rgba(245, 158, 11, 0.9);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.brand-point p {
-  margin: 0;
-  color: rgba(226, 232, 240, 0.82);
-  font-size: 13px;
-  line-height: 1.7;
+.panel-form {
+  display: grid;
+  align-content: center;
 }
 
 .form-header {
   margin-bottom: 22px;
 }
 
-.form-header-kicker {
-  color: var(--lex-accent-strong);
-}
-
 .form-title {
-  margin: 6px 0 10px;
-  color: var(--lex-primary);
+  margin-top: 8px;
   font-size: 28px;
-  line-height: 1.15;
-}
-
-.form-header-hint {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  font-size: 15px;
+  line-height: 1.1;
 }
 
 .login-form :deep(.ant-form-item) {
@@ -477,7 +450,6 @@ onMounted(() => {
 }
 
 .login-input :deep(.ant-input-affix-wrapper:hover),
-.login-input :deep(.ant-input-affix-wrapper:focus),
 .login-input :deep(.ant-input-affix-wrapper-focused),
 .login-input :deep(.ant-input:hover),
 .login-input :deep(.ant-input:focus) {
@@ -491,15 +463,18 @@ onMounted(() => {
 
 .captcha-label {
   display: inline-block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: var(--text-secondary);
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13px;
 }
 
 .captcha-row {
   display: flex;
   gap: 12px;
+}
+
+.captcha-input {
+  flex: 1;
 }
 
 .captcha-image {
@@ -520,15 +495,23 @@ onMounted(() => {
 .captcha-image img {
   display: block;
   width: 100%;
-  height: 100%;
+  height: 46px;
   object-fit: cover;
 }
 
-.login-form :deep(.ant-btn-primary) {
+.captcha-image span {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 46px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.login-button {
   min-height: 48px;
   border-radius: var(--radius-sm);
   font-weight: 600;
-  letter-spacing: 0.02em;
   box-shadow: var(--shadow-sm);
 }
 
@@ -538,14 +521,13 @@ onMounted(() => {
 }
 
 .form-footer {
-  margin-top: 22px;
-  color: var(--text-tertiary);
+  display: grid;
+  gap: 4px;
+  margin-top: 18px;
   font-size: 12px;
-  line-height: 1.8;
 }
 
 .config-note {
-  margin-bottom: 4px;
   color: var(--text-secondary);
 }
 
@@ -553,18 +535,14 @@ onMounted(() => {
   color: inherit;
 }
 
-@media (max-width: 1024px) {
-  .login-frame {
+@media (max-width: 960px) {
+  .login-panel {
     grid-template-columns: 1fr;
   }
 
-  .brand-panel {
-    min-height: auto;
-    padding: 28px 24px;
-  }
-
-  .login-panel {
-    padding: 28px 24px;
+  .panel-intro {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-color-light);
   }
 }
 
@@ -575,22 +553,15 @@ onMounted(() => {
 
   .login-shell {
     min-height: calc(100vh - 32px);
-    width: 100%;
-    place-items: center;
   }
 
-  .logo {
-    width: 40px;
-    height: 40px;
-  }
-
-  .brand-panel,
-  .login-panel {
+  .panel-intro,
+  .panel-form {
     padding: 20px;
   }
 
-  .brand-lead {
-    font-size: 22px;
+  .panel-lead {
+    font-size: 16px;
   }
 
   .form-title {
@@ -602,7 +573,7 @@ onMounted(() => {
   }
 
   .captcha-image {
-    min-height: 52px;
+    min-width: 0;
   }
 }
 </style>

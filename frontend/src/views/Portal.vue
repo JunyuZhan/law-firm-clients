@@ -8,123 +8,62 @@
       tabindex="-1"
     >
       <section class="portal-hero section-shell fade-in">
-        <div class="hero-copy">
-          <p
-            v-if="cardEyebrow"
-            class="hero-eyebrow"
-          >
-            {{ cardEyebrow }}
-          </p>
-          <h1 class="hero-title">
-            面向客户的专属案件协作门户
-          </h1>
-          <p class="hero-lead">
-            {{ heroLead }}
-          </p>
+        <p
+          v-if="cardEyebrow"
+          class="portal-eyebrow"
+        >
+          {{ cardEyebrow }}
+        </p>
 
-          <div class="hero-signals">
-            <span class="signal-pill">
-              非公开访问
-            </span>
-            <span class="signal-pill">
-              专属 Token 验证
-            </span>
-            <span class="signal-pill">
-              文件与进度同步
-            </span>
+        <div class="hero-head">
+          <div>
+            <h1 class="portal-title">
+              {{ heroTitle }}
+            </h1>
+            <p class="portal-slogan">
+              {{ heroLead }}
+            </p>
+          </div>
+
+          <div class="access-badge">
+            <span class="access-badge__label">Access</span>
+            <strong>Private Link Only</strong>
+            <p>客户通过律师发送的专属链接进入对应项目。</p>
           </div>
         </div>
 
-        <aside class="hero-aside">
-          <div class="hero-note-card">
-            <span class="note-label">访问方式</span>
-            <p class="note-title">
-              请通过律师发送的专属链接进入项目页面
+        <div class="portal-grid">
+          <article class="info-card">
+            <span class="info-card__label">系统说明</span>
+            <p>
+              这是一个面向客户的协作系统，用于查看项目进展、接收通知以及获取与项目相关的资料。
             </p>
-            <p
-              v-if="accessNoticeDisplay"
-              class="note-copy"
-            >
+          </article>
+
+          <article class="info-card">
+            <span class="info-card__label">访问方式</span>
+            <p v-if="accessNoticeDisplay">
               {{ accessNoticeDisplay }}
             </p>
-            <p
-              v-else
-              class="note-copy"
-            >
-              门户首页用于说明系统能力与访问方式，不提供公开登录入口。客户收到专属链接后，可直接查看对应项目。
+            <p v-else>
+              门户首页不提供公开登录。客户收到带有 Token 的专属链接后，可直接访问对应项目页面。
             </p>
-          </div>
-        </aside>
-      </section>
+          </article>
 
-      <section class="capability-grid">
-        <article class="capability-card section-shell">
-          <FileTextOutlined class="capability-icon" />
-          <h2>项目进展查看</h2>
-          <p>围绕单个项目查看状态、节点、更新时间与关键说明，减少重复沟通。</p>
-        </article>
-
-        <article class="capability-card section-shell">
-          <FolderOpenOutlined class="capability-icon" />
-          <h2>文件集中交付</h2>
-          <p>在统一空间内查看、上传和下载项目资料，保留清晰的交付轨迹。</p>
-        </article>
-
-        <article class="capability-card section-shell">
-          <NotificationOutlined class="capability-icon" />
-          <h2>通知及时同步</h2>
-          <p>重要更新通过门户、短信、邮件或微信同步触达，减少信息遗漏。</p>
-        </article>
-      </section>
-
-      <section class="portal-band section-shell">
-        <div class="band-copy">
-          <p class="band-label">Private Access</p>
-          <h2>这是一个受控访问的客户协作界面，而不是公开业务页面。</h2>
+          <article class="info-card info-card--steps">
+            <span class="info-card__label">访问流程</span>
+            <ol class="access-steps">
+              <li>律师发送项目专属链接</li>
+              <li>系统校验链接中的 Token</li>
+              <li>客户直接进入对应项目页面</li>
+            </ol>
+          </article>
         </div>
-        <div class="band-points">
-          <div class="band-point">
-            <span>01</span>
-            <p>客户收到律师发送的项目专属链接</p>
-          </div>
-          <div class="band-point">
-            <span>02</span>
-            <p>系统通过链接中的 Token 校验访问权限</p>
-          </div>
-          <div class="band-point">
-            <span>03</span>
-            <p>客户直接进入对应项目，而非先登录门户首页</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="actions-grid">
-        <router-link
-          to="/help"
-          class="action-card section-shell"
-        >
-          <div class="action-head">
-            <QuestionCircleOutlined class="action-icon" />
-            <span>帮助中心</span>
-          </div>
-          <p>查看访问说明、常见问题与异常处理方式。</p>
-        </router-link>
-
-        <router-link
-          to="/verify/letter"
-          class="action-card section-shell"
-        >
-          <div class="action-head">
-            <SafetyCertificateOutlined class="action-icon" />
-            <span>函件验真</span>
-          </div>
-          <p>核验函件信息与签发结果，获得即时反馈。</p>
-        </router-link>
       </section>
 
       <footer
-        v-if="footerText || staffEntryLabel"
-        class="portal-footer"
+        v-if="footerText || staffEntryLabel || lawFirmName"
+        class="portal-footer section-shell"
       >
         <p
           v-if="lawFirmName"
@@ -156,13 +95,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  FileTextOutlined,
-  FolderOpenOutlined,
-  NotificationOutlined,
-  QuestionCircleOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import { useAppConfigStore } from '@/stores/appConfig'
 import { APP_SLOGAN } from '@/config/app'
@@ -175,11 +107,10 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName?.trim() || appConf
 const cardEyebrow = computed(() => {
   const custom = appConfigStore.portalEyebrowEn?.trim()
   if (custom) return custom
-  return appConfigStore.appShortNameEn?.trim() || 'Private Client Access'
+  return appConfigStore.appShortNameEn?.trim() || 'Private Client Portal'
 })
 
 const accessNoticeDisplay = computed(() => appConfigStore.portalAccessNotice?.trim() || '')
-
 const staffEntryLabel = computed(() => appConfigStore.staffEntryLabel?.trim() || '')
 
 const footerText = computed(() => {
@@ -189,345 +120,149 @@ const footerText = computed(() => {
   return icp || copy || ''
 })
 
+const heroTitle = computed(() => lawFirmName.value || appConfigStore.displayName?.trim() || '客户协作门户')
+
 const heroLead = computed(() => {
-  if (slogan.value) {
-    return `${slogan.value}。客户通常通过律师发送的专属链接直接进入对应项目，在同一界面完成进度查看、资料获取与通知接收。`
-  }
-  return '客户通常通过律师发送的专属链接直接进入对应项目，在同一界面完成进度查看、资料获取与通知接收。'
+  if (slogan.value) return slogan.value
+  return '客户通过专属链接访问具体项目，查看进展、资料与通知。'
 })
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Lato:wght@400;500;700&display=swap');
-
 .portal-page {
-  position: relative;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(30, 58, 138, 0.12), transparent 32%),
-    radial-gradient(circle at 85% 18%, rgba(180, 83, 9, 0.12), transparent 24%),
-    linear-gradient(180deg, #f8fafc 0%, #f3f6fb 46%, #eef2f8 100%);
-}
-
-.portal-page::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.32)),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0,
-      transparent 72px,
-      rgba(15, 23, 42, 0.02) 72px,
-      rgba(15, 23, 42, 0.02) 73px
-    );
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.42), transparent 85%);
+  background: transparent;
 }
 
 .content {
-  position: relative;
-  z-index: 1;
   display: grid;
-  gap: 24px;
-  padding-bottom: 36px;
+  gap: 16px;
+  padding-bottom: 32px;
 }
 
 .portal-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 0.9fr);
   gap: 24px;
-  padding: 32px;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.92)),
-    var(--lex-surface-strong);
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 28px;
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  box-shadow: var(--shadow-sm);
 }
 
-.hero-copy {
-  min-width: 0;
-}
-
-.hero-eyebrow,
-.band-label,
-.note-label {
-  margin: 0 0 14px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--lex-accent-strong);
-}
-
-.hero-title {
-  max-width: 12ch;
+.portal-eyebrow,
+.info-card__label,
+.access-badge__label {
   margin: 0;
-  color: #0f172a;
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: clamp(40px, 5vw, 68px);
-  font-weight: 600;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-}
-
-.hero-lead,
-.note-copy,
-.capability-card p,
-.band-point p,
-.action-card p,
-.footer-meta {
-  font-family: 'Lato', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-}
-
-.hero-lead {
-  max-width: 62ch;
-  margin: 24px 0 0;
-  font-size: 16px;
-  line-height: 1.9;
-  color: var(--text-secondary);
-}
-
-.hero-signals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 28px;
-}
-
-.signal-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid rgba(30, 58, 138, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: #1e3a8a;
-  font-size: 13px;
-  font-weight: 600;
-  backdrop-filter: blur(10px);
-}
-
-.hero-aside {
-  display: flex;
-  align-items: stretch;
-}
-
-.hero-note-card {
-  position: relative;
-  width: 100%;
-  padding: 24px;
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.88)),
-    var(--lex-surface-dark);
-  color: rgba(248, 250, 252, 0.92);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.24);
-  overflow: hidden;
-}
-
-.hero-note-card::after {
-  content: '';
-  position: absolute;
-  inset: auto -36px -36px auto;
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.32), transparent 68%);
-}
-
-.note-title {
-  position: relative;
-  z-index: 1;
-  margin: 0 0 14px;
-  color: #f8fafc;
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 30px;
-  line-height: 1.08;
-}
-
-.note-copy {
-  position: relative;
-  z-index: 1;
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.9;
-  color: rgba(226, 232, 240, 0.88);
-}
-
-.capability-grid,
-.actions-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.capability-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.capability-card {
-  padding: 24px;
-  background: rgba(255, 255, 255, 0.84);
-  backdrop-filter: blur(16px);
-  transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    border-color 220ms ease;
-}
-
-.capability-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(30, 58, 138, 0.2);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
-}
-
-.capability-icon,
-.action-icon {
-  color: var(--lex-primary-soft);
-  font-size: 20px;
-}
-
-.capability-card h2,
-.band-copy h2,
-.action-head span,
-.footer-brand {
-  font-family: 'EB Garamond', Georgia, serif;
-}
-
-.capability-card h2 {
-  margin: 18px 0 10px;
-  color: var(--lex-primary);
-  font-size: 27px;
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-.capability-card p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.85;
-}
-
-.portal-band {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.2fr);
-  gap: 22px;
-  padding: 26px 28px;
-  background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.76)),
-    var(--lex-surface-strong);
-}
-
-.band-copy h2 {
-  max-width: 18ch;
-  margin: 0;
-  color: #0f172a;
-  font-size: clamp(28px, 3.2vw, 42px);
-  line-height: 1.05;
-  font-weight: 600;
-}
-
-.band-points {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.band-point {
-  padding: 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.band-point span {
-  display: inline-flex;
-  margin-bottom: 12px;
   color: var(--lex-accent-strong);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.band-point p {
+.hero-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(240px, 320px);
+  gap: 20px;
+  align-items: start;
+}
+
+.portal-title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.08;
+  color: var(--lex-primary);
+  font-family: var(--font-heading);
+}
+
+.portal-slogan {
+  max-width: 44rem;
+  margin: 14px 0 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.access-badge {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(30, 64, 175, 0.12);
+  background: var(--lex-bg);
+}
+
+.access-badge strong {
+  color: var(--text-primary);
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.access-badge p,
+.info-card p,
+.footer-meta,
+.portal-staff-line {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 13px;
   line-height: 1.75;
 }
 
-.actions-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.portal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.action-card {
-  display: block;
-  padding: 22px 24px;
-  color: inherit;
-  text-decoration: none;
-  background: rgba(255, 255, 255, 0.86);
-  transition:
-    transform 220ms ease,
-    box-shadow 220ms ease,
-    border-color 220ms ease;
-}
-
-.action-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(180, 83, 9, 0.2);
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
-}
-
-.action-head {
-  display: flex;
-  align-items: center;
+.info-card {
+  display: grid;
   gap: 12px;
-  margin-bottom: 12px;
+  min-height: 100%;
+  padding: 18px;
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--radius-md);
+  background: var(--lex-surface-strong);
 }
 
-.action-head span {
-  color: var(--lex-primary);
-  font-size: 28px;
-  line-height: 1;
+.info-card--steps {
+  background: linear-gradient(180deg, var(--lex-surface-strong) 0%, var(--lex-bg) 100%);
 }
 
-.action-card p {
+.access-steps {
   margin: 0;
+  padding-left: 18px;
   color: var(--text-secondary);
-  font-size: 14px;
-  line-height: 1.8;
+  line-height: 1.9;
 }
 
 .portal-footer {
   display: grid;
   gap: 6px;
-  justify-items: center;
-  padding: 12px 0 4px;
+  padding-top: 6px;
 }
 
-.footer-brand {
-  color: var(--lex-primary);
-  font-size: 19px;
-}
-
-.footer-meta,
-.portal-staff-line {
-  margin: 0;
-  color: var(--text-tertiary);
-  font-size: 12px;
-  line-height: 1.7;
+.portal-footer p {
   text-align: center;
 }
 
+.footer-brand {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.footer-meta {
+  font-size: 12px;
+}
+
+.portal-staff-line {
+  font-size: 12px;
+}
+
 .portal-staff-link {
-  color: inherit;
+  color: var(--text-tertiary);
   text-decoration: none;
-  transition: color 180ms ease;
 }
 
 .portal-staff-link:hover {
@@ -535,70 +270,20 @@ const heroLead = computed(() => {
   text-decoration: underline;
 }
 
-@media (max-width: 1024px) {
-  .portal-hero,
-  .portal-band,
-  .capability-grid,
-  .actions-grid {
+@media (max-width: 960px) {
+  .hero-head,
+  .portal-grid {
     grid-template-columns: 1fr;
-  }
-
-  .band-points {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-title {
-    max-width: none;
   }
 }
 
 @media (max-width: 768px) {
-  .content {
-    gap: 18px;
-  }
-
-  .portal-hero,
-  .portal-band,
-  .capability-card,
-  .action-card {
+  .portal-hero {
     padding: 20px;
   }
 
-  .hero-title {
-    font-size: 40px;
-    line-height: 1.02;
-  }
-
-  .hero-lead {
+  .portal-slogan {
     font-size: 15px;
-    line-height: 1.8;
-  }
-
-  .note-title {
-    font-size: 26px;
-  }
-
-  .capability-card h2,
-  .action-head span {
-    font-size: 24px;
-  }
-
-  .signal-pill {
-    min-height: 34px;
-    font-size: 12px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .capability-card,
-  .action-card,
-  .portal-staff-link {
-    transition: none;
-  }
-
-  .capability-card:hover,
-  .action-card:hover {
-    transform: none;
   }
 }
 </style>
