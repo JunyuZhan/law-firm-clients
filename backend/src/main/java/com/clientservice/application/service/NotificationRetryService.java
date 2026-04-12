@@ -26,6 +26,7 @@ public class NotificationRetryService {
     private final EmailNotificationService emailNotificationService;
     private final SmsNotificationService smsNotificationService;
     private final WechatNotificationService wechatNotificationService;
+    private final CallbackService callbackService;
 
     /** 默认最大重试次数 */
     @Value("${client-service.notification.retry.max-retries:3}")
@@ -86,6 +87,7 @@ public class NotificationRetryService {
                         record.setSentAt(LocalDateTime.now());
                         record.setNextRetryAt(null);
                         record.setErrorMessage(null);
+                        callbackService.callbackNotificationSuccess(record);
                         successCount++;
                         log.info("通知重试成功: id={}, type={}, recipient={}, retryCount={}", 
                                 record.getId(), record.getNotificationType(), record.getRecipient(), record.getRetryCount());
@@ -96,6 +98,7 @@ public class NotificationRetryService {
                             record.setStatus(NotificationRecord.STATUS_FAILED);
                             record.setNextRetryAt(null);
                             record.setErrorMessage("已达到最大重试次数: " + maxRetries);
+                            callbackService.callbackNotificationFailure(record);
                             log.warn("通知重试失败且达到最大重试次数: id={}, type={}, recipient={}, retryCount={}", 
                                     record.getId(), record.getNotificationType(), record.getRecipient(), record.getRetryCount());
                         } else {

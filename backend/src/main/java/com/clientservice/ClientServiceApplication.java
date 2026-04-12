@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * 客户服务系统启动类
  *
- * @author client-service
+ * @author junyuzhan
  * @since 2026-02-02
  */
 @SpringBootApplication

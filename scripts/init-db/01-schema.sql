@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS public.client_matter (
     law_firm_matter_id BIGINT NOT NULL,            -- 律所系统项目ID
     client_id BIGINT NOT NULL,                      -- 客户ID
     client_name VARCHAR(200),                       -- 客户名称
+    source_api_key_id BIGINT,                       -- 来源 API Key ID
     matter_data JSONB NOT NULL,                     -- 项目数据（完整JSON）
     scopes VARCHAR(500),                             -- 数据范围（逗号分隔）
     valid_days INTEGER DEFAULT 30,                  -- 有效期（天）
@@ -28,7 +29,10 @@ CREATE TABLE IF NOT EXISTS public.client_matter (
 );
 
 CREATE INDEX IF NOT EXISTS idx_client_matter_law_firm_id ON public.client_matter(law_firm_matter_id);
-ALTER TABLE public.client_matter ADD CONSTRAINT uk_client_matter_law_firm_id UNIQUE (law_firm_matter_id);
+CREATE INDEX IF NOT EXISTS idx_client_matter_source_api_key_id ON public.client_matter(source_api_key_id);
+ALTER TABLE public.client_matter DROP CONSTRAINT IF EXISTS uk_client_matter_law_firm_id;
+ALTER TABLE public.client_matter ADD CONSTRAINT uk_client_matter_source_law_firm_id
+    UNIQUE (source_api_key_id, law_firm_matter_id);
 
 CREATE INDEX IF NOT EXISTS idx_client_matter_client_id ON public.client_matter(client_id);
 CREATE INDEX IF NOT EXISTS idx_client_matter_access_token ON public.client_matter(access_token);
@@ -38,6 +42,7 @@ CREATE INDEX IF NOT EXISTS idx_client_matter_expires_at ON public.client_matter(
 COMMENT ON TABLE public.client_matter IS '项目数据表 - 存储从律所管理系统推送的项目数据';
 COMMENT ON COLUMN public.client_matter.id IS '主键，外部系统ID，由客户服务系统生成';
 COMMENT ON COLUMN public.client_matter.law_firm_matter_id IS '律所系统项目ID，用于关联';
+COMMENT ON COLUMN public.client_matter.source_api_key_id IS '来源 API Key ID，用于多来源隔离';
 COMMENT ON COLUMN public.client_matter.access_token IS '访问令牌，用于生成客户访问链接';
 COMMENT ON COLUMN public.client_matter.matter_data IS '项目数据，JSON格式，包含完整的项目信息';
 

@@ -23,6 +23,20 @@ public interface LetterVerificationMapper extends BaseMapper<LetterVerification>
     LetterVerification selectByApplicationNo(@Param("applicationNo") String applicationNo);
 
     /**
+     * 根据来源 API Key 与函件申请编号查询
+     */
+    @Select("""
+            SELECT * FROM letter_verification
+            WHERE application_no = #{applicationNo}
+              AND source_api_key_id = #{sourceApiKeyId}
+              AND deleted = false
+            LIMIT 1
+            """)
+    LetterVerification selectByApplicationNoAndSource(
+            @Param("applicationNo") String applicationNo,
+            @Param("sourceApiKeyId") Long sourceApiKeyId);
+
+    /**
      * 根据律所系统函件ID查询
      *
      * @param letterId 律所系统函件ID
@@ -30,6 +44,20 @@ public interface LetterVerificationMapper extends BaseMapper<LetterVerification>
      */
     @Select("SELECT * FROM letter_verification WHERE letter_id = #{letterId} AND deleted = false")
     LetterVerification selectByLetterId(@Param("letterId") Long letterId);
+
+    /**
+     * 根据来源 API Key 与律所系统函件ID查询
+     */
+    @Select("""
+            SELECT * FROM letter_verification
+            WHERE letter_id = #{letterId}
+              AND source_api_key_id = #{sourceApiKeyId}
+              AND deleted = false
+            LIMIT 1
+            """)
+    LetterVerification selectByLetterIdAndSource(
+            @Param("letterId") Long letterId,
+            @Param("sourceApiKeyId") Long sourceApiKeyId);
 
     /**
      * 根据验证码查询
@@ -56,4 +84,18 @@ public interface LetterVerificationMapper extends BaseMapper<LetterVerification>
      */
     @Update("UPDATE letter_verification SET status = 'REVOKED', updated_at = CURRENT_TIMESTAMP WHERE letter_id = #{letterId} AND deleted = false")
     void revokeByLetterId(@Param("letterId") Long letterId);
+
+    /**
+     * 按来源撤销验证
+     */
+    @Update("""
+            UPDATE letter_verification
+            SET status = 'REVOKED', updated_at = CURRENT_TIMESTAMP
+            WHERE letter_id = #{letterId}
+              AND source_api_key_id = #{sourceApiKeyId}
+              AND deleted = false
+            """)
+    void revokeByLetterIdAndSource(
+            @Param("letterId") Long letterId,
+            @Param("sourceApiKeyId") Long sourceApiKeyId);
 }

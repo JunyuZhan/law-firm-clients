@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          创建与轮换密钥；下方为对接地址与回调说明。
+          创建与轮换密钥；下方为管理系统对接地址与回调校验说明。
         </p>
       </div>
       <a-space>
@@ -65,9 +65,9 @@
           <a-descriptions-item label="使用说明">
             <ol class="guide-list">
               <li>在下方创建 API 密钥</li>
-              <li>将 API 地址和 API 密钥提供给律所系统管理员</li>
-              <li>在律所系统的外部系统集成中完成配置</li>
-              <li>建议同时保留 API Secret，供律所系统回调校验自动复用</li>
+              <li>将 API 地址、API 密钥和 API Secret 提供给管理系统管理员</li>
+              <li>在管理系统的“外部系统集成”中完成客户服务系统配置</li>
+              <li>客户服务系统回调管理系统时，优先使用 API Secret 参与校验</li>
             </ol>
           </a-descriptions-item>
         </a-descriptions>

@@ -170,7 +170,7 @@ class MatterControllerTest {
             ClientMatter matter = createClientMatter(matterId);
 
             when(apiKeyService.validateApiKey(anyString())).thenReturn(mockApiKey);
-            when(matterService.getMatterById(matterId)).thenReturn(matter);
+            when(matterService.getMatterByIdForSource(matterId, mockApiKey.getId())).thenReturn(matter);
 
             // When & Then
             mockMvc.perform(get("/api/matter/{id}", matterId)
@@ -182,7 +182,7 @@ class MatterControllerTest {
                     .andExpect(jsonPath("$.data.clientName").value(matter.getClientName()));
 
             verify(apiKeyService, times(1)).validateApiKey("Bearer test-api-key");
-            verify(matterService, times(1)).getMatterById(matterId);
+            verify(matterService, times(1)).getMatterByIdForSource(matterId, mockApiKey.getId());
         }
 
         @Test
@@ -191,7 +191,7 @@ class MatterControllerTest {
             // Given
             String matterId = "non-existent";
             when(apiKeyService.validateApiKey(anyString())).thenReturn(mockApiKey);
-            when(matterService.getMatterById(matterId)).thenThrow(
+            when(matterService.getMatterByIdForSource(matterId, mockApiKey.getId())).thenThrow(
                     new BusinessException("404", "项目不存在"));
 
             // When & Then
@@ -202,7 +202,7 @@ class MatterControllerTest {
                     .andExpect(jsonPath("$.code").value("404"));
 
             verify(apiKeyService, times(1)).validateApiKey("Bearer test-api-key");
-            verify(matterService, times(1)).getMatterById(matterId);
+            verify(matterService, times(1)).getMatterByIdForSource(matterId, mockApiKey.getId());
         }
 
         @Test
@@ -218,7 +218,25 @@ class MatterControllerTest {
                     .andExpect(status().isInternalServerError()); // 500
 
             verify(apiKeyService, never()).validateApiKey(anyString());
-            verify(matterService, never()).getMatterById(anyString());
+            verify(matterService, never()).getMatterByIdForSource(anyString(), anyLong());
+        }
+
+        @Test
+        @DisplayName("访问不属于当前来源的项目应该返回403")
+        void getMatterById_WithMismatchedSource_ShouldReturn403() throws Exception {
+            String matterId = "CS1234567890123456789";
+            when(apiKeyService.validateApiKey(anyString())).thenReturn(mockApiKey);
+            when(matterService.getMatterByIdForSource(matterId, mockApiKey.getId())).thenThrow(
+                    new BusinessException("403", "无权访问该项目"));
+
+            mockMvc.perform(get("/api/matter/{id}", matterId)
+                            .header("Authorization", "Bearer test-api-key"))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(jsonPath("$.code").value("403"));
+
+            verify(apiKeyService, times(1)).validateApiKey("Bearer test-api-key");
+            verify(matterService, times(1)).getMatterByIdForSource(matterId, mockApiKey.getId());
         }
     }
 

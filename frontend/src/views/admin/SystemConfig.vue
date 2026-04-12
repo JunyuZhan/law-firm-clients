@@ -252,7 +252,7 @@
                   @change="saveSystemConfig('callback.enabled', systemConfig.callbackEnabled ? 'true' : 'false')"
                 />
                 <div class="field-hint">
-                  当客户访问项目或下载文件时，通知律所系统记录日志。
+                  当客户访问项目或下载文件时，回调管理系统记录访问日志。
                 </div>
               </a-form-item>
               <a-form-item
@@ -265,7 +265,7 @@
                   @blur="saveSystemConfig('callback.law-firm-url', systemConfig.callbackUrl)"
                 />
                 <div class="field-hint">
-                  新主链路下通常无需手工填写。律所管理系统推送项目时会自动把自己的回调地址绑定到该项目；这里只作为历史项目或特殊覆盖场景兜底。
+                  新主链路下通常无需手工填写。管理系统推送项目时会自动把自己的回调地址绑定到该项目；这里只作为历史项目或特殊覆盖场景兜底。
                 </div>
               </a-form-item>
               <a-form-item
@@ -274,11 +274,11 @@
               >
                 <a-input-password
                   v-model:value="systemConfig.callbackApiKey"
-                  placeholder="与律所系统约定的密钥"
+                  placeholder="与管理系统约定的回调校验密钥"
                   @blur="saveSystemConfig('callback.api-key', systemConfig.callbackApiKey)"
                 />
                 <div class="field-hint">
-                  新主链路下通常优先复用当前项目来源 API key 的 Secret；这里只作为旧链路或手工覆盖兜底。
+                  新主链路下通常优先复用当前项目来源 API key 的 Secret 作为回调校验；这里只作为旧链路或手工覆盖兜底。固定公网 IP 场景如需额外白名单控制，请在网关或反向代理侧配置。
                 </div>
               </a-form-item>
               <a-form-item

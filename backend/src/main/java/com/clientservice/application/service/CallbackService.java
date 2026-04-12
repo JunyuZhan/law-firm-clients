@@ -1,28 +1,20 @@
 package com.clientservice.application.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.clientservice.common.util.UrlGenerator;
-import com.clientservice.domain.entity.ApiKey;
 import com.clientservice.domain.entity.AccessLog;
+import com.clientservice.domain.entity.ApiKey;
+import com.clientservice.domain.entity.CallbackTask;
 import com.clientservice.domain.entity.ClientFile;
 import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.domain.entity.DownloadLog;
 import com.clientservice.domain.entity.NotificationRecord;
 import com.clientservice.infrastructure.persistence.mapper.ApiKeyMapper;
+import com.clientservice.infrastructure.persistence.mapper.CallbackTaskMapper;
 import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import java.net.InetAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -34,9 +26,22 @@ import java.util.Map;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.client.RestTemplate;
 
 /**
- * 回调服务 - 将访问日志和下载日志回调给管理系统
+ * 回调服务 - 将访问日志、下载日志、文件上传与通知结果可靠回调给管理系统。
  */
 @Slf4j
 @Service
@@ -45,87 +50,64 @@ public class CallbackService {
 
     private static final String CALLBACK_URL_KEY = "_lawFirmCallbackUrl";
     private static final String SOURCE_API_KEY_ID_KEY = "_sourceApiKeyId";
-
-    private final ClientMatterMapper matterMapper;
-    private final ApiKeyMapper apiKeyMapper;
-    private final RestTemplate restTemplate;
-    private final SysConfigService sysConfigService;
-    private final UrlGenerator urlGenerator;
-    private final ObjectMapper objectMapper;
-
-    /** 管理系统回调地址（配置文件中的默认值） */
-    @Value("${client-service.callback.law-firm-url:}")
-    private String defaultLawFirmCallbackUrl;
-
-    /** 是否启用回调（配置文件中的默认值） */
-    @Value("${client-service.callback.enabled:true}")
-    private boolean defaultCallbackEnabled;
-
-    /** 回调 API Key（用于律所系统验证回调请求的合法性） */
-    @Value("${client-service.callback.api-key:}")
-    private String defaultCallbackApiKey;
-
-    /** 是否允许回调到内网地址（默认 true，企业内网部署场景需要允许） */
-    @Value("${client-service.callback.allow-internal:true}")
-    private boolean defaultAllowInternalCallback;
-
-    /** 回调最大重试次数 */
     private static final int MAX_RETRY_ATTEMPTS = 3;
-
-    /** 重试间隔（毫秒） */
     private static final long RETRY_DELAY_MS = 1000;
-
-    /** 律所系统 API 前缀 */
+    private static final int MAX_ERROR_LENGTH = 1000;
     private static final String LAW_FIRM_API_PREFIX = "/api";
     private static final String CALLBACK_NONCE_HEADER = "X-Callback-Nonce";
     private static final String CALLBACK_TIMESTAMP_HEADER = "X-Callback-Timestamp";
     private static final String CALLBACK_SIGNATURE_HEADER = "X-Callback-Signature";
     private static final String HMAC_ALGORITHM = "HmacSHA256";
 
-    /**
-     * 检查回调是否启用（优先从系统配置读取）
-     *
-     * @return 是否启用
-     */
+    private final ClientMatterMapper matterMapper;
+    private final ApiKeyMapper apiKeyMapper;
+    private final CallbackTaskMapper callbackTaskMapper;
+    private final RestTemplate restTemplate;
+    private final SysConfigService sysConfigService;
+    private final UrlGenerator urlGenerator;
+    private final ObjectMapper objectMapper;
+    private final TaskExecutor taskExecutor;
+
+    @Value("${client-service.callback.law-firm-url:}")
+    private String defaultLawFirmCallbackUrl;
+
+    @Value("${client-service.callback.enabled:true}")
+    private boolean defaultCallbackEnabled;
+
+    @Value("${client-service.callback.api-key:}")
+    private String defaultCallbackApiKey;
+
+    @Value("${client-service.callback.allow-internal:true}")
+    private boolean defaultAllowInternalCallback;
+
+    @Value("${client-service.callback.outbox.max-retries:12}")
+    private int defaultOutboxMaxRetries;
+
+    @Value("${client-service.callback.outbox.retry-delay-minutes:5}")
+    private int outboxRetryDelayMinutes;
+
+    @Value("${client-service.callback.outbox.batch-size:100}")
+    private int outboxBatchSize;
+
+    @Value("${client-service.callback.outbox.stale-sending-minutes:10}")
+    private int staleSendingMinutes;
+
     private boolean isCallbackEnabled() {
         return sysConfigService.getBooleanConfig("callback.enabled", defaultCallbackEnabled);
     }
 
-    /**
-     * 获取管理系统回调地址（优先从系统配置读取）
-     *
-     * @return 回调地址
-     */
     private String getLawFirmCallbackUrl() {
         return sysConfigService.getConfigValue("callback.law-firm-url", defaultLawFirmCallbackUrl);
     }
 
-    /**
-     * 获取回调 API Key（优先从系统配置读取）
-     * 用于律所系统验证回调请求的合法性
-     *
-     * @return API Key，如果未配置则返回空字符串
-     */
     private String getCallbackApiKey() {
         return sysConfigService.getConfigValue("callback.api-key", defaultCallbackApiKey);
     }
 
-    /**
-     * 检查是否允许回调到内网地址（优先从系统配置读取）
-     * 企业内网部署场景通常需要允许内网回调
-     *
-     * @return 是否允许内网回调
-     */
     private boolean isAllowInternalCallback() {
         return sysConfigService.getBooleanConfig("callback.allow-internal", defaultAllowInternalCallback);
     }
 
-    /**
-     * 异步回调访问日志给管理系统
-     *
-     * @param accessLog 访问日志
-     */
-    @Async
     public void callbackAccessLog(final AccessLog accessLog) {
         if (!isCallbackEnabled()) {
             log.debug("回调未启用，跳过访问日志回调");
@@ -133,7 +115,6 @@ public class CallbackService {
         }
 
         try {
-            // 获取项目信息
             ClientMatter matter = matterMapper.selectById(accessLog.getMatterId());
             if (matter == null) {
                 log.warn("项目不存在，跳过访问日志回调: matterId={}", accessLog.getMatterId());
@@ -145,37 +126,28 @@ public class CallbackService {
                 return;
             }
 
-            // 构建回调数据
             Map<String, Object> callbackData = new HashMap<>();
-            callbackData.put("matterId", matter.getLawFirmMatterId()); // 律所系统的项目ID
+            callbackData.put("matterId", matter.getLawFirmMatterId());
             callbackData.put("clientId", accessLog.getClientId());
-            // LocalDateTime 序列化为 ISO 格式字符串（Spring Boot 的 RestTemplate 会自动处理）
-            callbackData.put("accessTime", accessLog.getAccessTime() != null 
+            callbackData.put("accessTime", accessLog.getAccessTime() != null
                     ? accessLog.getAccessTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     : null);
             callbackData.put("ipAddress", accessLog.getIpAddress());
             callbackData.put("userAgent", accessLog.getUserAgent());
-            callbackData.put("eventType", "ACCESS"); // 事件类型：访问
+            callbackData.put("eventType", "ACCESS");
 
-            // 发送回调请求
-            String fullCallbackUrl = buildLawFirmCallbackUrl(callbackUrl, "/open/client/access-log");
-            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
-
-            log.debug("访问日志回调成功: matterId={}, clientId={}", 
+            enqueueCallbackTask(
+                    accessLog.getMatterId(),
+                    CallbackTask.TYPE_ACCESS_LOG,
+                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/access-log"),
+                    callbackData);
+            log.debug("访问日志回调已入队: matterId={}, clientId={}",
                     accessLog.getMatterId(), accessLog.getClientId());
-
         } catch (Exception e) {
-            log.error("访问日志回调失败: matterId={}", accessLog.getMatterId(), e);
-            // 回调失败不影响主流程，只记录日志
+            log.error("访问日志回调入队失败: matterId={}", accessLog.getMatterId(), e);
         }
     }
 
-    /**
-     * 异步回调下载日志给管理系统
-     *
-     * @param downloadLog 下载日志
-     */
-    @Async
     public void callbackDownloadLog(final DownloadLog downloadLog) {
         if (!isCallbackEnabled()) {
             log.debug("回调未启用，跳过下载日志回调");
@@ -183,7 +155,6 @@ public class CallbackService {
         }
 
         try {
-            // 获取项目信息
             ClientMatter matter = matterMapper.selectById(downloadLog.getMatterId());
             if (matter == null) {
                 log.warn("项目不存在，跳过下载日志回调: matterId={}", downloadLog.getMatterId());
@@ -195,42 +166,31 @@ public class CallbackService {
                 return;
             }
 
-            // 构建回调数据
             Map<String, Object> callbackData = new HashMap<>();
-            callbackData.put("matterId", matter.getLawFirmMatterId()); // 律所系统的项目ID
+            callbackData.put("matterId", matter.getLawFirmMatterId());
             callbackData.put("clientId", downloadLog.getClientId());
             callbackData.put("fileId", downloadLog.getFileId());
             callbackData.put("fileName", downloadLog.getFileName());
-            // LocalDateTime 序列化为 ISO 格式字符串（Spring Boot 的 RestTemplate 会自动处理）
-            callbackData.put("downloadTime", downloadLog.getDownloadTime() != null 
+            callbackData.put("downloadTime", downloadLog.getDownloadTime() != null
                     ? downloadLog.getDownloadTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     : null);
             callbackData.put("ipAddress", downloadLog.getIpAddress());
             callbackData.put("userAgent", downloadLog.getUserAgent());
-            callbackData.put("eventType", "DOWNLOAD"); // 事件类型：下载
+            callbackData.put("eventType", "DOWNLOAD");
 
-            // 发送回调请求
-            String fullCallbackUrl = buildLawFirmCallbackUrl(callbackUrl, "/open/client/download-log");
-            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
-
-            log.debug("下载日志回调成功: matterId={}, fileId={}", 
+            enqueueCallbackTask(
+                    downloadLog.getMatterId(),
+                    CallbackTask.TYPE_DOWNLOAD_LOG,
+                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/download-log"),
+                    callbackData);
+            log.debug("下载日志回调已入队: matterId={}, fileId={}",
                     downloadLog.getMatterId(), downloadLog.getFileId());
-
         } catch (Exception e) {
-            log.error("下载日志回调失败: matterId={}, fileId={}", 
+            log.error("下载日志回调入队失败: matterId={}, fileId={}",
                     downloadLog.getMatterId(), downloadLog.getFileId(), e);
-            // 回调失败不影响主流程，只记录日志
         }
     }
 
-    /**
-     * 异步回调文件上传通知给管理系统
-     *
-     * @param file 文件实体
-     * @param matter 项目实体
-     * @param token 访问令牌（用于生成文件下载URL）
-     */
-    @Async
     public void callbackUploadFile(final ClientFile file, final ClientMatter matter, final String token) {
         if (!isCallbackEnabled()) {
             log.debug("回调未启用，跳过文件上传回调");
@@ -243,13 +203,11 @@ public class CallbackService {
                 log.debug("未配置回调地址，跳过文件上传回调");
                 return;
             }
-            // 生成文件下载URL
-            String fileDownloadUrl = urlGenerator.generateFileDownloadUrl(
-                    file.getId(), file.getMatterId(), token);
 
-            // 构建回调数据
+            String fileDownloadUrl = urlGenerator.generateFileDownloadUrl(file.getId(), file.getMatterId(), token);
+
             Map<String, Object> callbackData = new HashMap<>();
-            callbackData.put("matterId", matter.getLawFirmMatterId()); // 律所系统的项目ID
+            callbackData.put("matterId", matter.getLawFirmMatterId());
             callbackData.put("clientId", file.getClientId() != null ? file.getClientId() : matter.getClientId());
             callbackData.put("clientName", matter.getClientName());
             callbackData.put("fileName", file.getFileName());
@@ -257,37 +215,288 @@ public class CallbackService {
             callbackData.put("fileType", file.getFileType());
             callbackData.put("fileCategory", file.getFileCategory());
             callbackData.put("description", file.getDescription());
-            callbackData.put("externalFileId", file.getId()); // 客户服务系统中的文件ID
-            callbackData.put("externalFileUrl", fileDownloadUrl); // 文件下载URL
-            callbackData.put("uploadedBy", matter.getClientName()); // 上传人姓名（使用客户姓名）
-            callbackData.put("uploadedAt", file.getUploadedAt() != null 
+            callbackData.put("externalFileId", file.getId());
+            callbackData.put("externalFileUrl", fileDownloadUrl);
+            callbackData.put("uploadedBy", matter.getClientName());
+            callbackData.put("uploadedAt", file.getUploadedAt() != null
                     ? file.getUploadedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
                     : LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
-            // 发送回调请求
-            String fullCallbackUrl = buildLawFirmCallbackUrl(callbackUrl, "/open/client/files");
-            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
-
-            log.debug("文件上传回调成功: fileId={}, matterId={}", 
-                    file.getId(), file.getMatterId());
-
+            enqueueCallbackTask(
+                    file.getMatterId(),
+                    CallbackTask.TYPE_FILE_UPLOAD,
+                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/files"),
+                    callbackData);
+            log.debug("文件上传回调已入队: fileId={}, matterId={}", file.getId(), file.getMatterId());
         } catch (Exception e) {
-            log.error("文件上传回调失败: fileId={}, matterId={}", 
-                    file.getId(), file.getMatterId(), e);
-            // 回调失败不影响主流程，只记录日志
+            log.error("文件上传回调入队失败: fileId={}, matterId={}", file.getId(), file.getMatterId(), e);
         }
     }
 
+    public void callbackNotificationSuccess(final NotificationRecord record) {
+        if (!isCallbackEnabled()) {
+            log.debug("回调未启用，跳过通知成功回调");
+            return;
+        }
+
+        ClientMatter matter = record.getMatterId() != null ? matterMapper.selectById(record.getMatterId()) : null;
+        String callbackUrl = resolveLawFirmCallbackUrl(matter);
+        if (callbackUrl == null || callbackUrl.isEmpty()) {
+            log.debug("未配置回调地址，跳过通知成功回调");
+            return;
+        }
+
+        try {
+            Map<String, Object> callbackData = new HashMap<>();
+            callbackData.put("matterId", record.getLawFirmMatterId() != null ? record.getLawFirmMatterId() : "");
+            callbackData.put("clientId", record.getClientId() != null ? record.getClientId() : 0L);
+            callbackData.put("clientName", record.getClientName() != null ? record.getClientName() : "");
+            callbackData.put("notificationType", record.getNotificationType());
+            callbackData.put("recipient", record.getRecipient() != null ? record.getRecipient() : "");
+            callbackData.put("status", record.getStatus());
+            callbackData.put("sentAt", record.getSentAt() != null
+                    ? record.getSentAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    : null);
+            callbackData.put("eventType", "NOTIFICATION_SUCCESS");
+
+            enqueueCallbackTask(
+                    record.getMatterId(),
+                    CallbackTask.TYPE_NOTIFICATION_SUCCESS,
+                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/notification-success"),
+                    callbackData);
+            log.info("通知成功回调已入队: matterId={}, notificationType={}",
+                    record.getMatterId(), record.getNotificationType());
+        } catch (Exception e) {
+            log.error("通知成功回调入队失败: matterId={}", record.getMatterId(), e);
+        }
+    }
+
+    public void callbackNotificationFailure(final NotificationRecord record) {
+        if (!isCallbackEnabled()) {
+            log.debug("回调未启用，跳过通知失败回调");
+            return;
+        }
+
+        ClientMatter matter = record.getMatterId() != null ? matterMapper.selectById(record.getMatterId()) : null;
+        String callbackUrl = resolveLawFirmCallbackUrl(matter);
+        if (callbackUrl == null || callbackUrl.isEmpty()) {
+            log.debug("未配置回调地址，跳过通知失败回调");
+            return;
+        }
+
+        try {
+            Map<String, Object> callbackData = new HashMap<>();
+            callbackData.put("matterId", record.getLawFirmMatterId() != null ? record.getLawFirmMatterId() : "");
+            callbackData.put("clientId", record.getClientId() != null ? record.getClientId() : 0L);
+            callbackData.put("clientName", record.getClientName() != null ? record.getClientName() : "");
+            callbackData.put("notificationType", record.getNotificationType());
+            callbackData.put("recipient", record.getRecipient() != null ? record.getRecipient() : "");
+            callbackData.put("status", record.getStatus());
+            callbackData.put("errorCode", record.getErrorCode() != null ? record.getErrorCode() : "");
+            callbackData.put("errorMessage", record.getErrorMessage() != null ? record.getErrorMessage() : "");
+            callbackData.put("sentAt", record.getSentAt() != null
+                    ? record.getSentAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    : null);
+            callbackData.put("eventType", "NOTIFICATION_FAILURE");
+
+            enqueueCallbackTask(
+                    record.getMatterId(),
+                    CallbackTask.TYPE_NOTIFICATION_FAILURE,
+                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/notification-failure"),
+                    callbackData);
+            log.info("通知失败回调已入队: matterId={}, notificationType={}, errorCode={}",
+                    record.getMatterId(), record.getNotificationType(), record.getErrorCode());
+        } catch (Exception e) {
+            log.error("通知失败回调入队失败: matterId={}", record.getMatterId(), e);
+        }
+    }
+
+    public void retryPendingCallbacks() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime reclaimBefore = now.minusMinutes(staleSendingMinutes);
+
+        QueryWrapper<CallbackTask> queryWrapper = new QueryWrapper<>();
+        queryWrapper.and(wrapper -> wrapper
+                        .eq("status", CallbackTask.STATUS_PENDING)
+                        .and(inner -> inner.isNull("next_retry_at").or().le("next_retry_at", now)))
+                .or(wrapper -> wrapper
+                        .eq("status", CallbackTask.STATUS_SENDING)
+                        .le("updated_at", reclaimBefore))
+                .orderByAsc("id")
+                .last("LIMIT " + Math.max(outboxBatchSize, 1));
+
+        for (CallbackTask task : callbackTaskMapper.selectList(queryWrapper)) {
+            deliverTask(task.getId());
+        }
+    }
+
+    private void enqueueCallbackTask(
+            final String matterId,
+            final String callbackType,
+            final String callbackUrl,
+            final Map<String, Object> payload) {
+        CallbackTask task = CallbackTask.builder()
+                .matterId(matterId)
+                .callbackType(callbackType)
+                .callbackUrl(callbackUrl)
+                .callbackPayload(serializePayload(payload))
+                .status(CallbackTask.STATUS_PENDING)
+                .retryCount(0)
+                .maxRetries(defaultOutboxMaxRetries)
+                .build();
+        callbackTaskMapper.insert(task);
+        scheduleAsyncDelivery(task.getId());
+    }
+
+    private void scheduleAsyncDelivery(final Long taskId) {
+        Runnable delivery = () -> {
+            try {
+                deliverTask(taskId);
+            } catch (Exception e) {
+                log.error("异步投递回调任务失败: taskId={}", taskId, e);
+            }
+        };
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()
+                && TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    taskExecutor.execute(delivery);
+                }
+            });
+            return;
+        }
+
+        taskExecutor.execute(delivery);
+    }
+
+    private void deliverTask(final Long taskId) {
+        CallbackTask task = callbackTaskMapper.selectById(taskId);
+        if (task == null || CallbackTask.STATUS_SENT.equals(task.getStatus())
+                || CallbackTask.STATUS_DEAD.equals(task.getStatus())) {
+            return;
+        }
+        if (!claimTask(task)) {
+            return;
+        }
+
+        try {
+            ClientMatter matter = loadMatter(task.getMatterId());
+            sendCallback(task.getCallbackUrl(), deserializePayload(task.getCallbackPayload()),
+                    resolveCallbackApiKey(matter));
+            markTaskSent(task.getId());
+            log.info("回调任务投递成功: taskId={}, type={}", task.getId(), task.getCallbackType());
+        } catch (Exception e) {
+            handleTaskFailure(task, e);
+        }
+    }
+
+    private ClientMatter loadMatter(final String matterId) {
+        if (matterId == null || matterId.isBlank()) {
+            return null;
+        }
+        return matterMapper.selectById(matterId);
+    }
+
+    private boolean claimTask(final CallbackTask task) {
+        LocalDateTime reclaimBefore = LocalDateTime.now().minusMinutes(staleSendingMinutes);
+        if (CallbackTask.STATUS_PENDING.equals(task.getStatus())) {
+            return updateTaskStatus(task, CallbackTask.STATUS_PENDING);
+        }
+        if (CallbackTask.STATUS_SENDING.equals(task.getStatus())
+                && task.getUpdatedAt() != null
+                && !task.getUpdatedAt().isAfter(reclaimBefore)) {
+            return updateTaskStatus(task, CallbackTask.STATUS_SENDING);
+        }
+        return false;
+    }
+
+    private boolean updateTaskStatus(final CallbackTask task, final String currentStatus) {
+        CallbackTask update = new CallbackTask();
+        update.setStatus(CallbackTask.STATUS_SENDING);
+        update.setLastAttemptAt(LocalDateTime.now());
+        update.setLastError(null);
+        update.setNextRetryAt(null);
+
+        UpdateWrapper<CallbackTask> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", task.getId())
+                .eq("status", currentStatus)
+                .eq("updated_at", task.getUpdatedAt());
+        return callbackTaskMapper.update(update, wrapper) > 0;
+    }
+
+    private void markTaskSent(final Long taskId) {
+        CallbackTask update = new CallbackTask();
+        update.setStatus(CallbackTask.STATUS_SENT);
+        update.setLastError(null);
+        update.setNextRetryAt(null);
+
+        UpdateWrapper<CallbackTask> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", taskId);
+        callbackTaskMapper.update(update, wrapper);
+    }
+
+    private void handleTaskFailure(final CallbackTask task, final Exception exception) {
+        int failedAttempts = (task.getRetryCount() == null ? 0 : task.getRetryCount()) + 1;
+        int maxRetries = task.getMaxRetries() == null ? defaultOutboxMaxRetries : task.getMaxRetries();
+
+        CallbackTask update = new CallbackTask();
+        update.setRetryCount(failedAttempts);
+        update.setLastAttemptAt(LocalDateTime.now());
+        update.setLastError(abbreviateError(exception));
+
+        if (failedAttempts >= maxRetries) {
+            update.setStatus(CallbackTask.STATUS_DEAD);
+            update.setNextRetryAt(null);
+            log.error("回调任务达到最大重试次数: taskId={}, type={}",
+                    task.getId(), task.getCallbackType(), exception);
+        } else {
+            update.setStatus(CallbackTask.STATUS_PENDING);
+            update.setNextRetryAt(LocalDateTime.now().plusMinutes(calculateRetryDelayMinutes(failedAttempts)));
+            log.warn("回调任务投递失败，等待补偿重试: taskId={}, type={}, retryCount={}",
+                    task.getId(), task.getCallbackType(), failedAttempts, exception);
+        }
+
+        UpdateWrapper<CallbackTask> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", task.getId());
+        callbackTaskMapper.update(update, wrapper);
+    }
+
+    private int calculateRetryDelayMinutes(final int failedAttempts) {
+        int baseDelay = Math.max(outboxRetryDelayMinutes, 1);
+        return baseDelay * (int) Math.pow(2, Math.max(failedAttempts - 1, 0));
+    }
+
+    private String serializePayload(final Map<String, Object> payload) {
+        try {
+            return objectMapper.writeValueAsString(payload);
+        } catch (Exception e) {
+            throw new IllegalStateException("序列化回调载荷失败", e);
+        }
+    }
+
+    private Map<String, Object> deserializePayload(final String payload) {
+        try {
+            return objectMapper.readValue(payload, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            throw new IllegalStateException("反序列化回调载荷失败", e);
+        }
+    }
+
+    private String abbreviateError(final Exception exception) {
+        String message = exception.getMessage();
+        if (message == null || message.isBlank()) {
+            message = exception.getClass().getSimpleName();
+        }
+        if (message.length() <= MAX_ERROR_LENGTH) {
+            return message;
+        }
+        return message.substring(0, MAX_ERROR_LENGTH);
+    }
+
     /**
-     * 发送回调请求（带重试机制）
-     *
-     * @param url 回调URL
-     * @param data 回调数据
-     */
-    /**
-     * 验证回调 URL 安全性
-     * 当 callback.allow-internal=false 时，会阻止回调到内网地址（防止 SSRF 攻击）
-     * 企业内网部署场景（callback.allow-internal=true）允许内网回调
+     * 验证回调 URL 安全性。
      */
     private void validateCallbackUrl(final String url) {
         if (url == null || url.isBlank()) {
@@ -303,12 +512,10 @@ public class CallbackService {
             if (host == null || host.isBlank()) {
                 throw new IllegalArgumentException("回调地址缺少主机名");
             }
-            // 如果允许内网回调，跳过内网检查（企业内网部署场景）
             if (isAllowInternalCallback()) {
                 log.debug("允许内网回调已启用，跳过内网地址检查: {}", host);
                 return;
             }
-            // 检查是否为内网地址
             InetAddress addr = InetAddress.getByName(host);
             if (addr.isLoopbackAddress() || addr.isLinkLocalAddress()
                     || addr.isSiteLocalAddress() || addr.isAnyLocalAddress()) {
@@ -321,25 +528,19 @@ public class CallbackService {
         }
     }
 
-    private void sendCallback(
-            final String url, final Map<String, Object> data, final String callbackApiKey) {
-        // SSRF 防护：验证回调 URL 不指向内网
+    private void sendCallback(final String url, final Map<String, Object> data, final String callbackApiKey) {
         validateCallbackUrl(url);
 
         Exception lastException = null;
-        
         for (int attempt = 1; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
             try {
                 doSendCallback(url, data, callbackApiKey);
-                return; // 成功则直接返回
+                return;
             } catch (Exception e) {
                 lastException = e;
-                log.warn("回调请求失败，第{}次尝试: url={}, error={}", 
-                        attempt, url, e.getMessage());
-                
+                log.warn("回调请求失败，第{}次尝试: url={}, error={}", attempt, url, e.getMessage());
                 if (attempt < MAX_RETRY_ATTEMPTS) {
                     try {
-                        // 使用指数退避策略
                         long delayMs = RETRY_DELAY_MS * (long) Math.pow(2, attempt - 1);
                         Thread.sleep(delayMs);
                     } catch (InterruptedException ie) {
@@ -350,20 +551,13 @@ public class CallbackService {
                 }
             }
         }
-        
-        // 所有重试都失败
+
         log.error("回调请求在{}次重试后仍然失败: url={}", MAX_RETRY_ATTEMPTS, url, lastException);
         if (lastException != null) {
             throw new RuntimeException("回调失败: " + lastException.getMessage(), lastException);
         }
     }
 
-    /**
-     * 实际发送回调请求
-     *
-     * @param url 回调URL
-     * @param data 回调数据
-     */
     private String buildLawFirmCallbackUrl(final String baseUrl, final String endpointPath) {
         String base = baseUrl == null ? "" : baseUrl.trim();
         while (base.endsWith("/")) {
@@ -375,12 +569,10 @@ public class CallbackService {
         return base + LAW_FIRM_API_PREFIX + endpointPath;
     }
 
-    private void doSendCallback(
-            final String url, final Map<String, Object> data, final String callbackApiKey) {
+    private void doSendCallback(final String url, final Map<String, Object> data, final String callbackApiKey) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // 添加回调 API Key（如果配置了）
         if (callbackApiKey != null && !callbackApiKey.isEmpty()) {
             headers.set("X-Callback-Key", callbackApiKey);
             headers.set("Authorization", "Bearer " + callbackApiKey);
@@ -388,20 +580,16 @@ public class CallbackService {
             String nonce = UUID.randomUUID().toString().replace("-", "");
             headers.set(CALLBACK_TIMESTAMP_HEADER, timestamp);
             headers.set(CALLBACK_NONCE_HEADER, nonce);
-            headers.set(
-                    CALLBACK_SIGNATURE_HEADER,
+            headers.set(CALLBACK_SIGNATURE_HEADER,
                     signCallback(callbackApiKey, "POST", normalizeCallbackPath(url), timestamp, nonce));
         }
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(data, headers);
-        ResponseEntity<String> response = restTemplate.exchange(
-                url, HttpMethod.POST, entity, String.class);
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            log.debug("回调请求成功: url={}", url);
-        } else {
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("回调请求返回非成功状态: " + response.getStatusCode());
         }
+        log.debug("回调请求成功: url={}", url);
     }
 
     private String normalizeCallbackPath(final String url) {
@@ -435,102 +623,6 @@ public class CallbackService {
         }
     }
 
-    /**
-     * 异步回调通知发送成功给管理系统
-     *
-     * @param record 通知记录
-     */
-    @Async
-    public void callbackNotificationSuccess(final NotificationRecord record) {
-        if (!isCallbackEnabled()) {
-            log.debug("回调未启用，跳过通知成功回调");
-            return;
-        }
-
-        ClientMatter matter = record.getMatterId() != null ? matterMapper.selectById(record.getMatterId()) : null;
-        String callbackUrl = resolveLawFirmCallbackUrl(matter);
-        if (callbackUrl == null || callbackUrl.isEmpty()) {
-            log.debug("未配置回调地址，跳过通知成功回调");
-            return;
-        }
-
-        try {
-            // 构建回调数据
-            Map<String, Object> callbackData = new HashMap<>();
-            callbackData.put("matterId", record.getLawFirmMatterId() != null ? record.getLawFirmMatterId() : "");
-            callbackData.put("clientId", record.getClientId() != null ? record.getClientId() : 0L);
-            callbackData.put("clientName", record.getClientName() != null ? record.getClientName() : "");
-            callbackData.put("notificationType", record.getNotificationType());
-            callbackData.put("recipient", record.getRecipient() != null ? record.getRecipient() : "");
-            callbackData.put("status", record.getStatus());
-            callbackData.put("sentAt", record.getSentAt() != null
-                    ? record.getSentAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                    : null);
-            callbackData.put("eventType", "NOTIFICATION_SUCCESS"); // 事件类型：通知成功
-
-            // 发送回调请求
-            String fullCallbackUrl =
-                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/notification-success");
-            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
-
-            log.info("通知成功回调成功: matterId={}, notificationType={}",
-                    record.getMatterId(), record.getNotificationType());
-
-        } catch (Exception e) {
-            log.error("通知成功回调失败: matterId={}", record.getMatterId(), e);
-            // 回调失败不影响主流程，只记录日志
-        }
-    }
-
-    /**
-     * 异步回调通知发送失败给管理系统
-     *
-     * @param record 通知记录
-     */
-    @Async
-    public void callbackNotificationFailure(final NotificationRecord record) {
-        if (!isCallbackEnabled()) {
-            log.debug("回调未启用，跳过通知失败回调");
-            return;
-        }
-
-        ClientMatter matter = record.getMatterId() != null ? matterMapper.selectById(record.getMatterId()) : null;
-        String callbackUrl = resolveLawFirmCallbackUrl(matter);
-        if (callbackUrl == null || callbackUrl.isEmpty()) {
-            log.debug("未配置回调地址，跳过通知失败回调");
-            return;
-        }
-
-        try {
-            // 构建回调数据
-            Map<String, Object> callbackData = new HashMap<>();
-            callbackData.put("matterId", record.getLawFirmMatterId() != null ? record.getLawFirmMatterId() : "");
-            callbackData.put("clientId", record.getClientId() != null ? record.getClientId() : 0L);
-            callbackData.put("clientName", record.getClientName() != null ? record.getClientName() : "");
-            callbackData.put("notificationType", record.getNotificationType());
-            callbackData.put("recipient", record.getRecipient() != null ? record.getRecipient() : "");
-            callbackData.put("status", record.getStatus());
-            callbackData.put("errorCode", record.getErrorCode() != null ? record.getErrorCode() : "");
-            callbackData.put("errorMessage", record.getErrorMessage() != null ? record.getErrorMessage() : "");
-            callbackData.put("sentAt", record.getSentAt() != null
-                    ? record.getSentAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                    : null);
-            callbackData.put("eventType", "NOTIFICATION_FAILURE"); // 事件类型：通知失败
-
-            // 发送回调请求
-            String fullCallbackUrl =
-                    buildLawFirmCallbackUrl(callbackUrl, "/open/client/notification-failure");
-            sendCallback(fullCallbackUrl, callbackData, resolveCallbackApiKey(matter));
-
-            log.info("通知失败回调成功: matterId={}, notificationType={}, errorCode={}",
-                    record.getMatterId(), record.getNotificationType(), record.getErrorCode());
-
-        } catch (Exception e) {
-            log.error("通知失败回调失败: matterId={}", record.getMatterId(), e);
-            // 回调失败不影响主流程，只记录日志
-        }
-    }
-
     private String resolveLawFirmCallbackUrl(final ClientMatter matter) {
         Map<String, Object> metadata = parseMatterMetadata(matter);
         Object callbackUrl = metadata.get(CALLBACK_URL_KEY);
@@ -541,8 +633,11 @@ public class CallbackService {
     }
 
     private String resolveCallbackApiKey(final ClientMatter matter) {
-        Map<String, Object> metadata = parseMatterMetadata(matter);
-        Object apiKeyIdObj = metadata.get(SOURCE_API_KEY_ID_KEY);
+        Object apiKeyIdObj = matter != null ? matter.getSourceApiKeyId() : null;
+        if (apiKeyIdObj == null) {
+            Map<String, Object> metadata = parseMatterMetadata(matter);
+            apiKeyIdObj = metadata.get(SOURCE_API_KEY_ID_KEY);
+        }
         if (apiKeyIdObj != null) {
             try {
                 Long apiKeyId = Long.parseLong(String.valueOf(apiKeyIdObj));

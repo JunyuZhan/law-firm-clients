@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * 配置更新事件监听器
  * 监听配置更新事件，自动清除相关客户端缓存，确保配置立即生效
  *
- * @author client-service
+ * @author junyuzhan
  * @since 2026-02-03
  */
 @Slf4j

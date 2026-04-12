@@ -3,6 +3,7 @@ package com.clientservice.application.service;
 import com.clientservice.application.dto.LetterVerificationReceiveDTO;
 import com.clientservice.application.dto.LetterVerificationResultDTO;
 import com.clientservice.common.exception.BusinessException;
+import com.clientservice.common.exception.ErrorCode;
 import com.clientservice.domain.entity.LetterVerification;
 import com.clientservice.infrastructure.persistence.mapper.LetterVerificationMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("LetterVerificationService 单元测试")
 class LetterVerificationServiceTest {
+
+    private static final Long SOURCE_API_KEY_ID = 1L;
 
     @Mock
     private LetterVerificationMapper letterVerificationMapper;
@@ -61,6 +64,7 @@ class LetterVerificationServiceTest {
         letterVerification = LetterVerification.builder()
                 .id(1L)
                 .letterId(1001L)
+                .sourceApiKeyId(SOURCE_API_KEY_ID)
                 .applicationNo("LTR202603020001")
                 .verificationCode("abc123def456")
                 .letterType("ATTORNEY_LETTER")
@@ -87,10 +91,11 @@ class LetterVerificationServiceTest {
         @Test
         @DisplayName("接收验证数据成功 - 新数据")
         void receiveVerificationData_NewData_ShouldSuccess() {
+            when(letterVerificationMapper.selectByApplicationNoAndSource(anyString(), anyLong())).thenReturn(null);
             when(letterVerificationMapper.selectByApplicationNo(anyString())).thenReturn(null);
             when(letterVerificationMapper.insert(any(LetterVerification.class))).thenReturn(1);
 
-            assertDoesNotThrow(() -> letterVerificationService.receiveVerificationData(receiveDTO));
+            assertDoesNotThrow(() -> letterVerificationService.receiveVerificationData(receiveDTO, SOURCE_API_KEY_ID));
 
             verify(letterVerificationMapper, times(1)).insert(any(LetterVerification.class));
             verify(letterVerificationMapper, never()).updateById(any(LetterVerification.class));
@@ -99,10 +104,10 @@ class LetterVerificationServiceTest {
         @Test
         @DisplayName("接收验证数据成功 - 更新已存在数据")
         void receiveVerificationData_ExistingData_ShouldUpdate() {
-            when(letterVerificationMapper.selectByApplicationNo(anyString())).thenReturn(letterVerification);
+            when(letterVerificationMapper.selectByApplicationNoAndSource(anyString(), anyLong())).thenReturn(letterVerification);
             when(letterVerificationMapper.updateById(any(LetterVerification.class))).thenReturn(1);
 
-            assertDoesNotThrow(() -> letterVerificationService.receiveVerificationData(receiveDTO));
+            assertDoesNotThrow(() -> letterVerificationService.receiveVerificationData(receiveDTO, SOURCE_API_KEY_ID));
 
             verify(letterVerificationMapper, times(1)).updateById(any(LetterVerification.class));
             verify(letterVerificationMapper, never()).insert(any(LetterVerification.class));
@@ -111,7 +116,26 @@ class LetterVerificationServiceTest {
         @Test
         @DisplayName("接收空数据应该抛出异常")
         void receiveVerificationData_NullData_ShouldThrowException() {
-            assertThrows(BusinessException.class, () -> letterVerificationService.receiveVerificationData(null));
+            assertThrows(BusinessException.class,
+                    () -> letterVerificationService.receiveVerificationData(null, SOURCE_API_KEY_ID));
+        }
+
+        @Test
+        @DisplayName("接收其他来源已存在的函件编号应该拒绝")
+        void receiveVerificationData_ConflictSource_ShouldThrowForbidden() {
+            LetterVerification conflict = LetterVerification.builder()
+                    .id(2L)
+                    .applicationNo(receiveDTO.getApplicationNo())
+                    .sourceApiKeyId(2L)
+                    .build();
+            when(letterVerificationMapper.selectByApplicationNoAndSource(anyString(), anyLong())).thenReturn(null);
+            when(letterVerificationMapper.selectByApplicationNo(anyString())).thenReturn(conflict);
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> letterVerificationService.receiveVerificationData(receiveDTO, SOURCE_API_KEY_ID));
+
+            assertEquals(ErrorCode.FORBIDDEN, exception.getCode());
+            assertTrue(exception.getMessage().contains("无权覆盖其他来源"));
         }
     }
 
@@ -249,26 +273,48 @@ class LetterVerificationServiceTest {
         @Test
         @DisplayName("撤销验证成功")
         void revokeVerification_ShouldSuccess() {
-            when(letterVerificationMapper.selectByLetterId(anyLong())).thenReturn(letterVerification);
-            doNothing().when(letterVerificationMapper).revokeByLetterId(anyLong());
+            when(letterVerificationMapper.selectByLetterIdAndSource(anyLong(), anyLong())).thenReturn(letterVerification);
+            doNothing().when(letterVerificationMapper).revokeByLetterIdAndSource(anyLong(), anyLong());
 
-            assertDoesNotThrow(() -> letterVerificationService.revokeVerification(1001L));
+            assertDoesNotThrow(() -> letterVerificationService.revokeVerification(1001L, SOURCE_API_KEY_ID));
 
-            verify(letterVerificationMapper, times(1)).revokeByLetterId(1001L);
+            verify(letterVerificationMapper, times(1)).revokeByLetterIdAndSource(1001L, SOURCE_API_KEY_ID);
         }
 
         @Test
         @DisplayName("撤销不存在的函件应该抛出异常")
         void revokeVerification_NotFound_ShouldThrowException() {
+            when(letterVerificationMapper.selectByLetterIdAndSource(anyLong(), anyLong())).thenReturn(null);
             when(letterVerificationMapper.selectByLetterId(anyLong())).thenReturn(null);
 
-            assertThrows(BusinessException.class, () -> letterVerificationService.revokeVerification(9999L));
+            assertThrows(BusinessException.class,
+                    () -> letterVerificationService.revokeVerification(9999L, SOURCE_API_KEY_ID));
         }
 
         @Test
         @DisplayName("撤销时函件ID为空应该抛出异常")
         void revokeVerification_NullId_ShouldThrowException() {
-            assertThrows(BusinessException.class, () -> letterVerificationService.revokeVerification(null));
+            assertThrows(BusinessException.class,
+                    () -> letterVerificationService.revokeVerification(null, SOURCE_API_KEY_ID));
+        }
+
+        @Test
+        @DisplayName("撤销其他来源函件应该返回403")
+        void revokeVerification_MismatchedSource_ShouldThrowForbidden() {
+            LetterVerification conflict = LetterVerification.builder()
+                    .id(2L)
+                    .letterId(1001L)
+                    .sourceApiKeyId(2L)
+                    .applicationNo(receiveDTO.getApplicationNo())
+                    .build();
+            when(letterVerificationMapper.selectByLetterIdAndSource(anyLong(), anyLong())).thenReturn(null);
+            when(letterVerificationMapper.selectByLetterId(anyLong())).thenReturn(conflict);
+
+            BusinessException exception = assertThrows(BusinessException.class,
+                    () -> letterVerificationService.revokeVerification(1001L, SOURCE_API_KEY_ID));
+
+            assertEquals(ErrorCode.FORBIDDEN, exception.getCode());
+            assertTrue(exception.getMessage().contains("无权撤销"));
         }
     }
 }

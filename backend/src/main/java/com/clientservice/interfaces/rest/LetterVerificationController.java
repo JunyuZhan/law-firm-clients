@@ -56,7 +56,7 @@ public class LetterVerificationController {
         ApiKey apiKey = apiKeyService.validateApiKey(authorization);
         log.info("API密钥验证成功: keyName={}, lawFirmName={}", apiKey.getKeyName(), apiKey.getLawFirmName());
 
-        letterVerificationService.receiveVerificationData(dto);
+        letterVerificationService.receiveVerificationData(dto, apiKey.getId());
 
         String verifyUrl = letterVerificationService.generateVerifyUrl(dto.getApplicationNo(), request);
         
@@ -141,7 +141,7 @@ public class LetterVerificationController {
         ApiKey apiKey = apiKeyService.validateApiKey(authorization);
         log.info("API密钥验证成功: keyName={}", apiKey.getKeyName());
 
-        letterVerificationService.revokeVerification(letterId);
+        letterVerificationService.revokeVerification(letterId, apiKey.getId());
 
         log.info("撤销函件验证成功: letterId={}", letterId);
         return Result.success("撤销成功", null);

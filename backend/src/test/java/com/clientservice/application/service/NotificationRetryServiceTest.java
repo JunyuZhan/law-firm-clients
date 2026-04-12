@@ -36,6 +36,9 @@ class NotificationRetryServiceTest {
     @Mock
     private WechatNotificationService wechatNotificationService;
 
+    @Mock
+    private CallbackService callbackService;
+
     @InjectMocks
     private NotificationRetryService notificationRetryService;
 
@@ -89,6 +92,7 @@ class NotificationRetryServiceTest {
         assertNotNull(updatedRecord.getLastRetryAt());
         assertNotNull(updatedRecord.getSentAt());
         assertNull(updatedRecord.getNextRetryAt());
+        verify(callbackService).callbackNotificationSuccess(updatedRecord);
     }
 
     @Test
@@ -117,6 +121,7 @@ class NotificationRetryServiceTest {
         
         NotificationRecord updatedRecord = recordCaptor.getValue();
         assertEquals(NotificationRecord.STATUS_SUCCESS, updatedRecord.getStatus());
+        verify(callbackService).callbackNotificationSuccess(updatedRecord);
     }
 
     @Test
@@ -145,6 +150,7 @@ class NotificationRetryServiceTest {
         
         NotificationRecord updatedRecord = recordCaptor.getValue();
         assertEquals(NotificationRecord.STATUS_SUCCESS, updatedRecord.getStatus());
+        verify(callbackService).callbackNotificationSuccess(updatedRecord);
     }
 
     @Test
@@ -174,6 +180,7 @@ class NotificationRetryServiceTest {
         
         NotificationRecord updatedRecord = recordCaptor.getValue();
         assertEquals(NotificationRecord.STATUS_SUCCESS, updatedRecord.getStatus());
+        verify(callbackService).callbackNotificationSuccess(updatedRecord);
     }
 
     @Test
@@ -208,6 +215,7 @@ class NotificationRetryServiceTest {
         // Delay for 1st retry (retryCount 1) is 30 * 2^(1-1) = 30 mins
         // We can't easily assert exact time, but we can check it's in future
         assertTrue(updatedRecord.getNextRetryAt().isAfter(LocalDateTime.now()));
+        verify(callbackService, never()).callbackNotificationSuccess(any());
     }
 
     @Test
@@ -237,6 +245,8 @@ class NotificationRetryServiceTest {
         assertEquals(NotificationRecord.STATUS_FAILED, updatedRecord.getStatus());
         assertNull(updatedRecord.getNextRetryAt());
         assertNotNull(updatedRecord.getErrorMessage());
+        verify(callbackService, never()).callbackNotificationSuccess(any());
+        verify(callbackService).callbackNotificationFailure(updatedRecord);
     }
     
     @Test

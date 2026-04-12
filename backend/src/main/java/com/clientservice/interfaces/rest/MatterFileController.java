@@ -65,8 +65,8 @@ public class MatterFileController {
             return Result.error(ErrorCode.BAD_REQUEST, "文件ID不能为空");
         }
 
-        // 删除文件
-        fileService.deleteFile(actualFileId);
+        // 删除文件（校验文件所属项目是否归属于当前来源 API Key）
+        fileService.deleteFileForSource(actualFileId, apiKey.getId());
 
         log.info("文件删除回调成功: fileId={}", actualFileId);
 

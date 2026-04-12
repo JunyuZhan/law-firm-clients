@@ -4,7 +4,8 @@
 CREATE TABLE IF NOT EXISTS public.letter_verification (
     id BIGSERIAL PRIMARY KEY,
     letter_id BIGINT NOT NULL,                       -- 律所系统函件ID
-    application_no VARCHAR(50) NOT NULL UNIQUE,      -- 函件申请编号
+    source_api_key_id BIGINT,                        -- 来源 API Key ID
+    application_no VARCHAR(50) NOT NULL,             -- 函件申请编号
     verification_code VARCHAR(100) NOT NULL,         -- 验证码
     letter_type VARCHAR(50),                         -- 函件类型编码
     letter_type_name VARCHAR(100),                   -- 函件类型名称
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS public.letter_verification (
 
 COMMENT ON TABLE public.letter_verification IS '函件验证数据表';
 COMMENT ON COLUMN public.letter_verification.letter_id IS '律所系统函件ID';
+COMMENT ON COLUMN public.letter_verification.source_api_key_id IS '来源 API Key ID，用于多来源隔离';
 COMMENT ON COLUMN public.letter_verification.application_no IS '函件申请编号';
 COMMENT ON COLUMN public.letter_verification.verification_code IS '验证码（HMAC-SHA256生成）';
 COMMENT ON COLUMN public.letter_verification.letter_type IS '函件类型编码';
@@ -48,3 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_letter_verification_code ON letter_verification(v
 CREATE INDEX IF NOT EXISTS idx_letter_verification_letter_id ON letter_verification(letter_id);
 CREATE INDEX IF NOT EXISTS idx_letter_verification_status ON letter_verification(status);
 CREATE INDEX IF NOT EXISTS idx_letter_verification_application_no ON letter_verification(application_no);
+CREATE INDEX IF NOT EXISTS idx_letter_verification_source_api_key_id ON letter_verification(source_api_key_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_letter_verification_source_application_no
+    ON letter_verification(source_api_key_id, application_no)
+    WHERE deleted = false;

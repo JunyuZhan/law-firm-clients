@@ -42,6 +42,9 @@ public class ClientMatter extends BaseEntity {
     /** 客户名称 */
     private String clientName;
 
+    /** 来源 API Key ID */
+    private Long sourceApiKeyId;
+
     /** 项目数据（完整JSON） */
     @TableField(typeHandler = PostgresJsonTypeHandler.class)
     private String matterData;

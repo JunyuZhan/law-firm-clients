@@ -1,6 +1,7 @@
 package com.clientservice.application.task;
 
 import com.clientservice.application.service.AccessLogService;
+import com.clientservice.application.service.CallbackService;
 import com.clientservice.application.service.MatterService;
 import com.clientservice.application.service.NotificationRetryService;
 import com.clientservice.domain.entity.ClientMatter;
@@ -25,6 +26,7 @@ public class MatterExpireTask {
     private final MatterService matterService;
     private final ClientMatterMapper matterMapper;
     private final AccessLogService accessLogService;
+    private final CallbackService callbackService;
     private final NotificationRetryService notificationRetryService;
 
     /** 访问日志保留天数（默认90天） */
@@ -108,6 +110,20 @@ public class MatterExpireTask {
             notificationRetryService.retryFailedNotifications();
         } catch (Exception e) {
             log.error("重试失败通知时发生异常", e);
+        }
+    }
+
+    /**
+     * 重试失败的主系统回调。
+     * 每5分钟执行一次。
+     */
+    @Scheduled(cron = "0 */5 * * * ?")
+    public void retryPendingCallbacks() {
+        log.info("开始补偿重试主系统回调...");
+        try {
+            callbackService.retryPendingCallbacks();
+        } catch (Exception e) {
+            log.error("补偿重试主系统回调时发生异常", e);
         }
     }
 }

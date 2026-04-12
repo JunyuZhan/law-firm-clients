@@ -28,6 +28,9 @@ public class LetterVerification extends BaseEntity {
     /** 律所系统函件ID */
     private Long letterId;
 
+    /** 来源 API Key ID */
+    private Long sourceApiKeyId;
+
     /** 函件申请编号 */
     private String applicationNo;
 

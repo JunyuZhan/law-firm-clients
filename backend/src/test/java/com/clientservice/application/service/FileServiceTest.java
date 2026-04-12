@@ -5,12 +5,15 @@ import com.clientservice.application.dto.ClientFileUploadRequest;
 import com.clientservice.common.exception.BusinessException;
 import com.clientservice.common.exception.ErrorCode;
 import com.clientservice.domain.entity.ClientFile;
+import com.clientservice.domain.entity.ClientMatter;
+import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
 import com.clientservice.infrastructure.persistence.mapper.ClientFileMapper;
 import com.clientservice.infrastructure.scanner.VirusScanResult;
 import com.clientservice.infrastructure.scanner.VirusScanner;
 import com.clientservice.infrastructure.scanner.VirusScannerFactory;
 import com.clientservice.infrastructure.storage.StorageStrategy;
 import com.clientservice.infrastructure.storage.StorageStrategyFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -45,6 +49,9 @@ class FileServiceTest {
     private ClientFileMapper fileMapper;
 
     @Mock
+    private ClientMatterMapper matterMapper;
+
+    @Mock
     private StorageStrategyFactory storageStrategyFactory;
 
     @Mock
@@ -55,6 +62,9 @@ class FileServiceTest {
 
     @Mock
     private VirusScanner virusScanner;
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     private FileService fileService;
@@ -413,6 +423,47 @@ class FileServiceTest {
             assertEquals(ErrorCode.NOT_FOUND, exception.getCode());
             assertTrue(exception.getMessage().contains("文件不存在"));
         }
+
+        @Test
+        @DisplayName("律所删除回调在来源匹配时应该成功")
+        void deleteFileForSource_WithMatchingSource_ShouldSuccess() throws Exception {
+            ClientFile file = createTestFile();
+            file.setId("file-id");
+            file.setStoragePath("matters/matter-id/file-id.pdf");
+            ClientMatter matter = createTestMatter("{\"_sourceApiKeyId\":1001}");
+            matter.setSourceApiKeyId(1001L);
+
+            when(fileMapper.selectById("file-id")).thenReturn(file);
+            when(matterMapper.selectById("matter-id")).thenReturn(matter);
+            when(fileMapper.updateById(any(ClientFile.class))).thenReturn(1);
+            doNothing().when(storageStrategy).deleteFile("matters/matter-id/file-id.pdf");
+
+            assertDoesNotThrow(() -> fileService.deleteFileForSource("file-id", 1001L));
+
+            verify(fileMapper).updateById(any(ClientFile.class));
+            verify(storageStrategy).deleteFile("matters/matter-id/file-id.pdf");
+        }
+
+        @Test
+        @DisplayName("律所删除回调在来源不匹配时应该拒绝")
+        void deleteFileForSource_WithMismatchedSource_ShouldThrowForbidden() {
+            ClientFile file = createTestFile();
+            file.setId("file-id");
+            ClientMatter matter = createTestMatter("{\"_sourceApiKeyId\":2002}");
+            matter.setSourceApiKeyId(2002L);
+
+            when(fileMapper.selectById("file-id")).thenReturn(file);
+            when(matterMapper.selectById("matter-id")).thenReturn(matter);
+
+            BusinessException exception =
+                    assertThrows(BusinessException.class,
+                            () -> fileService.deleteFileForSource("file-id", 1001L));
+
+            assertEquals(ErrorCode.FORBIDDEN, exception.getCode());
+            assertTrue(exception.getMessage().contains("无权删除该文件"));
+            verify(fileMapper, never()).updateById(any(ClientFile.class));
+            verifyNoInteractions(storageStrategy);
+        }
     }
 
     /**
@@ -433,5 +484,13 @@ class FileServiceTest {
         file.setStatus(ClientFile.STATUS_ACTIVE);
         file.setDeleted(false);
         return file;
+    }
+
+    private ClientMatter createTestMatter(final String matterData) {
+        ClientMatter matter = new ClientMatter();
+        matter.setId("matter-id");
+        matter.setMatterData(matterData);
+        matter.setDeleted(false);
+        return matter;
     }
 }

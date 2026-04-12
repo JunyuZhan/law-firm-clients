@@ -11,6 +11,15 @@
         LIMIT 1
     </select>
 
+    <select id="selectBySourceAndLawFirmMatterId" resultType="com.clientservice.domain.entity.ClientMatter">
+        SELECT * FROM client_matter
+        WHERE source_api_key_id = #{sourceApiKeyId}
+        AND law_firm_matter_id = #{lawFirmMatterId}
+        AND deleted = false
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
     <!-- 根据访问令牌查询 -->
     <select id="selectByAccessToken" resultType="com.clientservice.domain.entity.ClientMatter">
         SELECT * FROM client_matter

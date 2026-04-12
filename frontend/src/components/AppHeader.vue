@@ -156,7 +156,7 @@ defineEmits<{
 
 const appConfigStore = useAppConfigStore()
 const logoUrl = computed(() => appConfigStore.logoUrl)
-const lawFirmName = computed(() => appConfigStore.displayName || '律师事务所')
+const lawFirmName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName || '律师事务所')
 const portalSystemLabel = computed(() => appConfigStore.appShortName || '客户服务系统')
 const portalSubtitle = computed(() => '客户服务系统')
 const detailSubtitle = computed(() => '项目进展与文件')

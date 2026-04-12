@@ -82,8 +82,8 @@ public class MatterController {
         ApiKey apiKey = apiKeyService.validateApiKey(authorization);
         log.info("API密钥验证成功: keyName={}", apiKey.getKeyName());
 
-        // 获取项目详情
-        ClientMatter matter = matterService.getMatterById(id);
+        // 获取项目详情（校验项目归属当前来源 API Key）
+        ClientMatter matter = matterService.getMatterByIdForSource(id, apiKey.getId());
 
         return Result.success(matter);
     }

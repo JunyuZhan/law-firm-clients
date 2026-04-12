@@ -35,12 +35,13 @@ public class LetterVerificationService {
      * @param dto 验证数据DTO
      */
     @Transactional
-    public void receiveVerificationData(final LetterVerificationReceiveDTO dto) {
+    public void receiveVerificationData(final LetterVerificationReceiveDTO dto, final Long sourceApiKeyId) {
         if (dto == null) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "验证数据不能为空");
         }
 
-        LetterVerification existing = letterVerificationMapper.selectByApplicationNo(dto.getApplicationNo());
+        LetterVerification existing =
+                letterVerificationMapper.selectByApplicationNoAndSource(dto.getApplicationNo(), sourceApiKeyId);
         
         if (existing != null) {
             existing.setVerificationCode(dto.getVerificationCode());
@@ -55,11 +56,19 @@ public class LetterVerificationService {
             existing.setValidUntil(dto.getValidUntil());
             existing.setRemark(dto.getRemark());
             existing.setStatus(LetterVerification.STATUS_ACTIVE);
+            existing.setSourceApiKeyId(sourceApiKeyId);
             letterVerificationMapper.updateById(existing);
             log.info("更新函件验证数据: applicationNo={}", dto.getApplicationNo());
         } else {
+            LetterVerification conflict = letterVerificationMapper.selectByApplicationNo(dto.getApplicationNo());
+            if (conflict != null && !java.util.Objects.equals(conflict.getSourceApiKeyId(), sourceApiKeyId)) {
+                log.warn("拒绝覆盖其他来源函件验证数据: applicationNo={}, sourceApiKeyId={}, boundApiKeyId={}",
+                        dto.getApplicationNo(), sourceApiKeyId, conflict.getSourceApiKeyId());
+                throw new BusinessException(ErrorCode.FORBIDDEN, "无权覆盖其他来源的函件验证数据");
+            }
             LetterVerification entity = LetterVerification.builder()
                     .letterId(dto.getLetterId())
+                    .sourceApiKeyId(sourceApiKeyId)
                     .applicationNo(dto.getApplicationNo())
                     .verificationCode(dto.getVerificationCode())
                     .letterType(dto.getLetterType())
@@ -195,17 +204,23 @@ public class LetterVerificationService {
      * @param letterId 律所系统函件ID
      */
     @Transactional
-    public void revokeVerification(final Long letterId) {
+    public void revokeVerification(final Long letterId, final Long sourceApiKeyId) {
         if (letterId == null) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "函件ID不能为空");
         }
 
-        LetterVerification entity = letterVerificationMapper.selectByLetterId(letterId);
+        LetterVerification entity = letterVerificationMapper.selectByLetterIdAndSource(letterId, sourceApiKeyId);
         if (entity == null) {
+            LetterVerification conflict = letterVerificationMapper.selectByLetterId(letterId);
+            if (conflict != null) {
+                log.warn("拒绝撤销其他来源函件验证数据: letterId={}, sourceApiKeyId={}, boundApiKeyId={}",
+                        letterId, sourceApiKeyId, conflict.getSourceApiKeyId());
+                throw new BusinessException(ErrorCode.FORBIDDEN, "无权撤销该函件验证信息");
+            }
             throw new BusinessException(ErrorCode.NOT_FOUND, "未找到该函件验证信息");
         }
 
-        letterVerificationMapper.revokeByLetterId(letterId);
+        letterVerificationMapper.revokeByLetterIdAndSource(letterId, sourceApiKeyId);
         log.info("撤销函件验证: letterId={}, applicationNo={}", letterId, entity.getApplicationNo());
     }
 

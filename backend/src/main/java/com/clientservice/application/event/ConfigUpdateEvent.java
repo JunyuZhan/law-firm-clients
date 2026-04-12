@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEvent;
  * 配置更新事件
  * 当系统配置更新时发布此事件，用于通知相关组件刷新缓存
  *
- * @author client-service
+ * @author junyuzhan
  * @since 2026-02-03
  */
 @Getter

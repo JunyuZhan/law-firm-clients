@@ -5,16 +5,21 @@ import com.clientservice.application.dto.ClientFileUploadRequest;
 import com.clientservice.common.exception.BusinessException;
 import com.clientservice.common.exception.ErrorCode;
 import com.clientservice.common.util.TokenGenerator;
+import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.domain.entity.ClientFile;
+import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
 import com.clientservice.infrastructure.persistence.mapper.ClientFileMapper;
 import com.clientservice.infrastructure.scanner.VirusScanResult;
 import com.clientservice.infrastructure.scanner.VirusScannerFactory;
 import com.clientservice.infrastructure.storage.StorageStrategy;
 import com.clientservice.infrastructure.storage.StorageStrategyFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +36,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class FileService {
 
+    private static final String SOURCE_API_KEY_ID_KEY = "_sourceApiKeyId";
+
     private final ClientFileMapper fileMapper;
+    private final ClientMatterMapper matterMapper;
     private final StorageStrategyFactory storageStrategyFactory;
     private final VirusScannerFactory virusScannerFactory;
+    private final ObjectMapper objectMapper;
 
     /** 最大文件大小（字节），默认10MB */
     @Value("${client-service.file.max-size:10485760}")
@@ -477,11 +486,67 @@ public class FileService {
      */
     @Transactional
     public void deleteFile(final String fileId) {
+        performDelete(loadRequiredFile(fileId));
+    }
+
+    /**
+     * 删除律所系统来源的文件回调，并校验来源 API Key 归属。
+     *
+     * @param fileId 文件ID
+     * @param sourceApiKeyId 回调来源 API Key ID
+     */
+    @Transactional
+    public void deleteFileForSource(final String fileId, final Long sourceApiKeyId) {
+        ClientFile file = loadRequiredFile(fileId);
+        ClientMatter matter = matterMapper.selectById(file.getMatterId());
+        if (matter == null || matter.getDeleted()) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "项目不存在");
+        }
+
+        Long boundApiKeyId = extractSourceApiKeyId(matter);
+        if (boundApiKeyId == null || !Objects.equals(boundApiKeyId, sourceApiKeyId)) {
+            log.warn(
+                    "拒绝删除不属于当前来源的文件: fileId={}, matterId={}, sourceApiKeyId={}, boundApiKeyId={}",
+                    fileId,
+                    file.getMatterId(),
+                    sourceApiKeyId,
+                    boundApiKeyId);
+            throw new BusinessException(ErrorCode.FORBIDDEN, "无权删除该文件");
+        }
+
+        performDelete(file);
+    }
+
+    private ClientFile loadRequiredFile(final String fileId) {
         ClientFile file = fileMapper.selectById(fileId);
         if (file == null || file.getDeleted()) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "文件不存在");
         }
+        return file;
+    }
 
+    private Long extractSourceApiKeyId(final ClientMatter matter) {
+        if (matter != null && matter.getSourceApiKeyId() != null) {
+            return matter.getSourceApiKeyId();
+        }
+        String matterData = matter.getMatterData();
+        if (matterData == null || matterData.isBlank()) {
+            return null;
+        }
+        try {
+            JsonNode root = objectMapper.readTree(matterData);
+            JsonNode apiKeyNode = root.get(SOURCE_API_KEY_ID_KEY);
+            if (apiKeyNode == null || apiKeyNode.isNull()) {
+                return null;
+            }
+            return apiKeyNode.isNumber() ? apiKeyNode.longValue() : Long.parseLong(apiKeyNode.asText());
+        } catch (Exception e) {
+            log.warn("解析项目来源 API Key 失败: matterId={}", matter.getId(), e);
+            return null;
+        }
+    }
+
+    private void performDelete(final ClientFile file) {
         // 删除物理文件
         StorageStrategy storageStrategy = storageStrategyFactory.getStorageStrategy();
         try {
@@ -494,7 +559,7 @@ public class FileService {
         file.setStatus(ClientFile.STATUS_DELETED);
         fileMapper.updateById(file);
 
-        log.info("文件删除成功: fileId={}", fileId);
+        log.info("文件删除成功: fileId={}", file.getId());
     }
 
     /**

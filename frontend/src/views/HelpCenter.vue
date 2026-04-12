@@ -104,7 +104,7 @@ const faqItems = [
   {
     key: 'matter-access',
     title: '如何进入项目？',
-    content: '打开律师发来的链接；或在首页粘贴完整访问链接；已登录可从「我的项目」进入。',
+    content: '请直接打开承办律师发送的完整专属链接；如果最近访问过项目，也可从「我的项目」继续进入。',
   },
   {
     key: 'file-access',

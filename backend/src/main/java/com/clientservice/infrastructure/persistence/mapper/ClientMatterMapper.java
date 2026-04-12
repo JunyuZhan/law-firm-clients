@@ -20,6 +20,17 @@ public interface ClientMatterMapper extends BaseMapper<ClientMatter> {
     ClientMatter selectByLawFirmMatterId(@Param("lawFirmMatterId") Long lawFirmMatterId);
 
     /**
+     * 根据来源 API Key 与律所系统项目ID查询
+     *
+     * @param sourceApiKeyId 来源 API Key ID
+     * @param lawFirmMatterId 律所系统项目ID
+     * @return 项目数据
+     */
+    ClientMatter selectBySourceAndLawFirmMatterId(
+            @Param("sourceApiKeyId") Long sourceApiKeyId,
+            @Param("lawFirmMatterId") Long lawFirmMatterId);
+
+    /**
      * 根据访问令牌查询
      *
      * @param accessToken 访问令牌

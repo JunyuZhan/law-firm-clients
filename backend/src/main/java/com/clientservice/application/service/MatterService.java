@@ -13,6 +13,7 @@ import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -115,7 +116,10 @@ public class MatterService {
             }
 
             // 2. 检查是否已存在（根据律所系统项目ID）
-            ClientMatter existing = matterMapper.selectByLawFirmMatterId(matterId);
+            Long sourceApiKeyId = sourceApiKey != null ? sourceApiKey.getId() : null;
+            ClientMatter existing = sourceApiKeyId != null
+                    ? matterMapper.selectBySourceAndLawFirmMatterId(sourceApiKeyId, matterId)
+                    : matterMapper.selectByLawFirmMatterId(matterId);
             if (existing != null) {
                 // 保存旧token（用于清除缓存）
                 String oldToken = existing.getAccessToken();
@@ -131,9 +135,11 @@ public class MatterService {
             try {
                 return createNewMatter(matterId, request, httpRequest, sourceApiKey);
             } catch (DataIntegrityViolationException e) {
-                log.warn("并发插入检测: lawFirmMatterId={} 已存在，转为更新操作", matterId);
+                log.warn("并发插入检测: lawFirmMatterId={}, sourceApiKeyId={} 已存在，转为更新操作", matterId, sourceApiKeyId);
                 // 重新查询并更新
-                existing = matterMapper.selectByLawFirmMatterId(matterId);
+                existing = sourceApiKeyId != null
+                        ? matterMapper.selectBySourceAndLawFirmMatterId(sourceApiKeyId, matterId)
+                        : matterMapper.selectByLawFirmMatterId(matterId);
                 if (existing != null) {
                     // 保存旧token（用于清除缓存）
                     String oldToken = existing.getAccessToken();
@@ -215,6 +221,7 @@ public class MatterService {
                 .lawFirmMatterId(lawFirmMatterId)
                 .clientId(request.getClientId())
                 .clientName(request.getClientName())
+                .sourceApiKeyId(sourceApiKey != null ? sourceApiKey.getId() : null)
                 .matterData(matterDataJson)
                 .scopes(String.join(",", request.getScopes()))
                 .validDays(validDays)
@@ -274,6 +281,7 @@ public class MatterService {
 
         // 更新实体
         existing.setClientName(request.getClientName());
+        existing.setSourceApiKeyId(sourceApiKey != null ? sourceApiKey.getId() : null);
         existing.setMatterData(matterDataJson);
         existing.setScopes(String.join(",", request.getScopes()));
         existing.setValidDays(validDays);
@@ -350,6 +358,27 @@ public class MatterService {
     }
 
     /**
+     * 根据ID获取项目，并校验来源 API Key 归属。
+     *
+     * @param id 项目ID
+     * @param sourceApiKeyId 来源 API Key ID
+     * @return 项目数据
+     */
+    public ClientMatter getMatterByIdForSource(final String id, final Long sourceApiKeyId) {
+        ClientMatter matter = getMatterById(id);
+        Long boundApiKeyId = extractSourceApiKeyId(matter);
+        if (boundApiKeyId == null || !boundApiKeyId.equals(sourceApiKeyId)) {
+            log.warn(
+                    "拒绝访问不属于当前来源的项目: matterId={}, sourceApiKeyId={}, boundApiKeyId={}",
+                    id,
+                    sourceApiKeyId,
+                    boundApiKeyId);
+            throw new BusinessException(ErrorCode.FORBIDDEN, "无权访问该项目");
+        }
+        return matter;
+    }
+
+    /**
      * 撤销项目访问（清除缓存）
      *
      * @param id 项目ID
@@ -420,6 +449,26 @@ public class MatterService {
             clearMatterCache(id, matter.getAccessToken());
             
             log.info("项目已过期: id={}, clientId={}", id, matter.getClientId());
+        }
+    }
+
+    private Long extractSourceApiKeyId(final ClientMatter matter) {
+        if (matter != null && matter.getSourceApiKeyId() != null) {
+            return matter.getSourceApiKeyId();
+        }
+        if (matter == null || matter.getMatterData() == null || matter.getMatterData().isBlank()) {
+            return null;
+        }
+        try {
+            JsonNode root = objectMapper.readTree(matter.getMatterData());
+            JsonNode apiKeyNode = root.get(SOURCE_API_KEY_ID_KEY);
+            if (apiKeyNode == null || apiKeyNode.isNull()) {
+                return null;
+            }
+            return apiKeyNode.isNumber() ? apiKeyNode.longValue() : Long.parseLong(apiKeyNode.asText());
+        } catch (Exception e) {
+            log.warn("解析项目来源 API Key 失败: matterId={}", matter.getId(), e);
+            return null;
         }
     }
 

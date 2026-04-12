@@ -2,6 +2,8 @@ package com.clientservice.application.service;
 
 import com.clientservice.application.dto.MatterReceiveRequest;
 import com.clientservice.common.exception.BusinessException;
+import com.clientservice.common.exception.ErrorCode;
+import com.clientservice.domain.entity.ApiKey;
 import com.clientservice.common.util.UrlGenerator;
 import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
@@ -49,6 +51,7 @@ class MatterServiceTest {
     private MatterService matterService;
 
     private MatterReceiveRequest request;
+    private ApiKey sourceApiKey;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -85,6 +88,9 @@ class MatterServiceTest {
         
         request.setScopes(Arrays.asList("MATTER_INFO", "MATTER_PROGRESS"));
         request.setValidDays(30);
+
+        sourceApiKey = new ApiKey();
+        sourceApiKey.setId(1L);
     }
 
     @Nested
@@ -95,13 +101,13 @@ class MatterServiceTest {
         @DisplayName("正常接收项目数据")
         void receiveMatterData_ShouldSuccess() {
             // Given
-            when(clientMatterMapper.selectByLawFirmMatterId(anyLong()))
+            when(clientMatterMapper.selectBySourceAndLawFirmMatterId(anyLong(), anyLong()))
                     .thenReturn(null);
             when(clientMatterMapper.insert(any(ClientMatter.class))).thenReturn(1);
             doNothing().when(notificationService).sendNotificationAsync(any(ClientMatter.class));
 
             // When
-            var result = matterService.receiveMatterData(request);
+            var result = matterService.receiveMatterData(request, null, sourceApiKey);
 
             // Then
             assertNotNull(result);
@@ -119,13 +125,13 @@ class MatterServiceTest {
             existing.setId("CS1706860800000123456");
             existing.setStatus("ACTIVE");
             
-            when(clientMatterMapper.selectByLawFirmMatterId(anyLong()))
+            when(clientMatterMapper.selectBySourceAndLawFirmMatterId(anyLong(), anyLong()))
                     .thenReturn(existing);
             when(clientMatterMapper.updateById(any(ClientMatter.class))).thenReturn(1);
             doNothing().when(notificationService).sendNotificationAsync(any(ClientMatter.class));
 
             // When
-            var result = matterService.receiveMatterData(request);
+            var result = matterService.receiveMatterData(request, null, sourceApiKey);
 
             // Then
             assertNotNull(result);
@@ -192,6 +198,47 @@ class MatterServiceTest {
                 matterService.getMatterByToken(token);
             });
             verify(clientMatterMapper, times(1)).updateStatus(anyString(), eq("EXPIRED"));
+        }
+    }
+
+    @Nested
+    @DisplayName("根据ID获取项目测试")
+    class GetMatterByIdTests {
+
+        @Test
+        @DisplayName("来源匹配时应该返回项目")
+        void getMatterByIdForSource_WithMatchingSource_ShouldReturnMatter() throws Exception {
+            String matterId = "CS1706860800000123456";
+            ClientMatter matter = new ClientMatter();
+            matter.setId(matterId);
+            matter.setDeleted(false);
+            matter.setSourceApiKeyId(1L);
+
+            when(clientMatterMapper.selectById(matterId)).thenReturn(matter);
+
+            ClientMatter result = matterService.getMatterByIdForSource(matterId, 1L);
+
+            assertNotNull(result);
+            assertEquals(matterId, result.getId());
+        }
+
+        @Test
+        @DisplayName("来源不匹配时应该抛出403")
+        void getMatterByIdForSource_WithMismatchedSource_ShouldThrowForbidden() throws Exception {
+            String matterId = "CS1706860800000123456";
+            ClientMatter matter = new ClientMatter();
+            matter.setId(matterId);
+            matter.setDeleted(false);
+            matter.setSourceApiKeyId(2L);
+
+            when(clientMatterMapper.selectById(matterId)).thenReturn(matter);
+
+            BusinessException exception = assertThrows(
+                    BusinessException.class,
+                    () -> matterService.getMatterByIdForSource(matterId, 1L));
+
+            assertEquals(ErrorCode.FORBIDDEN, exception.getCode());
+            assertTrue(exception.getMessage().contains("无权访问该项目"));
         }
     }
 

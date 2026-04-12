@@ -9,24 +9,30 @@ test.describe('Portal smoke', () => {
   test('renders the portal as a focused entry gateway', async ({ page }) => {
     await page.goto('/portal')
 
-    await expect(page.locator('.logo-text h1')).toContainText('汉科客户服务系统')
-    await expect(page.locator('.main-title')).toContainText('汉科客户服务')
-    await expect(page.locator('.hero-value-line')).toContainText('专业事项')
-    await expect(page.locator('.footer-meta')).toContainText('请通过承办律师获取访问链接')
-    await expect(page.getByRole('button', { name: '帮助中心' })).toBeVisible()
-    await page.getByText('链接打不开？粘贴完整访问链接').click()
-    await expect(page.getByRole('button', { name: '继续访问' })).toBeVisible()
+    await expect(page.locator('.logo-text').getByRole('heading', { level: 1 })).toContainText('汉科律师事务所')
+    await expect(page.locator('.logo-system-label')).toContainText('汉科客户服务')
+    await expect(page.getByRole('heading', { level: 1, name: '汉科客户服务' })).toBeVisible()
+    await expect(page.locator('.main-subtitle')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.locator('.footer-meta')).toContainText('具体项目内容需通过专属链接访问')
+
+    await page.getByRole('button', { name: '了解系统' }).click()
+    await expect(page).toHaveURL(/\/help$/)
+    await expect(page.getByRole('heading', { level: 1, name: '帮助中心' })).toBeVisible()
+    await page.getByRole('button', { name: /如何进入项目/ }).click()
+    await expect(page.getByText('请直接打开承办律师发送的完整专属链接')).toBeVisible()
   })
 
   test('stays readable on a narrow viewport', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('/portal')
 
-    await expect(page.locator('.logo-text h1')).toContainText('汉科客户服务系统')
-    await expect(page.locator('.main-title')).toContainText('汉科客户服务')
-    await expect(page.locator('.footer-meta')).toContainText('请通过承办律师获取访问链接')
-    await expect(page.getByRole('button', { name: '帮助中心' })).toBeVisible()
-    await page.getByText('链接打不开？粘贴完整访问链接').click()
-    await expect(page.getByRole('button', { name: '继续访问' })).toBeVisible()
+    await expect(page.locator('.logo-text').getByRole('heading', { level: 1 })).toContainText('汉科律师事务所')
+    await expect(page.getByRole('heading', { level: 1, name: '汉科客户服务' })).toBeVisible()
+    await expect(page.locator('.main-subtitle')).toContainText('专业事项，一个清晰的客户入口')
+    await expect(page.locator('.footer-meta')).toContainText('具体项目内容需通过专属链接访问')
+
+    await page.getByRole('button', { name: '了解系统' }).click()
+    await expect(page).toHaveURL(/\/help$/)
+    await expect(page.getByRole('heading', { level: 1, name: '帮助中心' })).toBeVisible()
   })
 })

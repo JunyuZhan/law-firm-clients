@@ -54,11 +54,11 @@
             </div>
 
             <aside class="hero-side hero-surface hero-surface--soft">
-              <strong class="hero-side-title">系统说明</strong>
+              <strong class="hero-side-title">访问提示</strong>
               <ul class="hero-points">
-                <li>本系统用于律所客户服务与项目协作展示。</li>
-                <li>项目页面需通过律师发送的专属链接访问。</li>
-                <li>未授权访问者无法查看具体项目与文件内容。</li>
+                <li>门户页用于展示律所与客户服务系统信息。</li>
+                <li>进入具体项目，请使用承办律师发送的专属链接。</li>
+                <li>如链接异常，可前往帮助中心查看说明。</li>
               </ul>
             </aside>
           </div>
@@ -67,15 +67,15 @@
         <section class="section-shell intro-section">
           <div class="intro-grid">
             <article class="intro-card">
-              <h2 class="intro-title">关于客户服务系统</h2>
+              <h2 class="intro-title">系统定位</h2>
               <p class="intro-copy">
-                这是律所面向客户提供的数字化服务系统，用于承载项目协作、文件往来、进度沟通等服务场景。
+                这是律所面向客户提供的数字化服务系统，用于承载项目协作、文件往来与服务沟通。
               </p>
             </article>
             <article class="intro-card">
               <h2 class="intro-title">访问方式</h2>
               <p class="intro-copy">
-                如需进入具体项目页面，请使用承办律师发送的专属访问链接。门户页仅作律所与系统说明，不展示具体项目数据。
+                门户页用于说明系统与访问方式；具体项目数据仅在授权后的专属链接中展示。
               </p>
             </article>
           </div>
@@ -88,7 +88,7 @@
               <h2 class="feature-heading">客户服务系统提供的核心支持</h2>
             </div>
             <p class="feature-summary">
-              以下内容用于说明系统承载的服务能力，不代表门户页直接开放全部功能入口。
+              以下能力会在具体项目中按授权提供，门户页仅作能力说明。
             </p>
           </div>
 
@@ -169,7 +169,7 @@ const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024
 
 const appConfigStore = useAppConfigStore()
 const icpLicense = computed(() => appConfigStore.icpLicense)
-const lawFirmName = computed(() => appConfigStore.displayName || '律师事务所')
+const lawFirmName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName || '律师事务所')
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
 const footerCopyright = computed(() => appConfigStore.copyright || `© ${new Date().getFullYear()} ${lawFirmName.value}`)
 const isMobile = computed(() => windowWidth.value <= 768)
@@ -179,7 +179,7 @@ const portalDescription = computed(
   () => appConfigStore.appSlogan || '面向客户提供项目协作、资料交付与服务沟通的数字化服务系统。',
 )
 const portalAccessNote = computed(
-  () => '具体项目内容需通过律师发送的专属链接访问；门户页主要用于展示律所品牌与客户服务系统定位。',
+  () => '如需进入具体项目，请使用承办律师发送的专属链接；门户页主要用于说明系统与访问方式。',
 )
 
 const featureCards = [

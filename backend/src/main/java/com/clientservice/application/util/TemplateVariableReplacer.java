@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * 模板变量替换工具类
  * 统一处理通知模板中的变量替换逻辑
  *
- * @author client-service
+ * @author junyuzhan
  * @since 2026-02-03
  */
 @Slf4j
