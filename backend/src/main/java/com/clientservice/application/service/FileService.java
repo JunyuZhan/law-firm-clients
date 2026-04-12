@@ -526,7 +526,10 @@ public class FileService {
     }
 
     private Long extractSourceApiKeyId(final ClientMatter matter) {
-        if (matter != null && matter.getSourceApiKeyId() != null) {
+        if (matter == null) {
+            return null;
+        }
+        if (matter.getSourceApiKeyId() != null) {
             return matter.getSourceApiKeyId();
         }
         String matterData = matter.getMatterData();
