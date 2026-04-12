@@ -7,104 +7,170 @@
       class="content"
       tabindex="-1"
     >
-      <section class="portal-stage section-shell fade-in">
-        <div class="stage-grid">
-          <div class="stage-copy">
-            <p
-              v-if="cardEyebrow"
-              class="stage-eyebrow"
+      <section class="portal-hero section-shell fade-in">
+        <div class="hero-copy">
+          <p
+            v-if="heroEyebrow"
+            class="hero-eyebrow"
+          >
+            {{ heroEyebrow }}
+          </p>
+          <h1 class="hero-title">
+            {{ heroTitle }}
+          </h1>
+          <p class="hero-lead">
+            {{ heroLead }}
+          </p>
+
+          <div class="hero-actions">
+            <a
+              href="#instructions"
+              class="hero-primary"
             >
-              {{ cardEyebrow }}
-            </p>
+              访问机制说明
+            </a>
+            <a
+              :href="contactHref"
+              :target="lawFirmWebsite ? '_blank' : undefined"
+              :rel="lawFirmWebsite ? 'noopener' : undefined"
+              class="hero-secondary"
+            >
+              联络承办律师
+            </a>
+          </div>
+        </div>
+      </section>
 
-            <div class="title-block">
-              <p class="title-prefix">
-                Private Client System
-              </p>
-              <h1 class="stage-title">
-                {{ heroTitle }}
-              </h1>
+      <section
+        id="capabilities"
+        class="portal-section section-shell"
+      >
+        <div class="section-head">
+          <p class="section-kicker">服务能力</p>
+          <h2>客户协作与资料管理</h2>
+        </div>
+
+        <div class="capability-grid">
+          <article class="capability-card">
+            <div class="capability-icon">
+              <FileTextOutlined />
+            </div>
+            <h3>事务进度查阅</h3>
+            <p>系统化展示委托事项的关键节点与当前状态，帮助客户及时掌握事务进展情况及后续预定计划。</p>
+          </article>
+
+          <article class="capability-card capability-card--dark">
+            <div class="capability-icon capability-icon--dark">
+              <FolderOpenOutlined />
+            </div>
+            <h3>电子档案库</h3>
+            <p>集中存储法律意见书、合同文本及证据材料等数字化档案，基于严格权限控制实现有序存取。</p>
+          </article>
+
+          <article class="capability-card">
+            <div class="capability-icon">
+              <NotificationOutlined />
+            </div>
+            <h3>关键节点通知</h3>
+            <p>针对重要节点及法律时效提供定向信息反馈，确保客户在第一时间获悉事务的实质性更新。</p>
+          </article>
+
+          <article class="capability-card">
+            <div class="capability-icon">
+              <MessageOutlined />
+            </div>
+            <h3>专业协作空间</h3>
+            <p>整合意见反馈、文书校阅等功能，减少信息碎片化，为法律问题研讨提供统一协作环境。</p>
+          </article>
+        </div>
+      </section>
+
+      <section
+        id="instructions"
+        class="portal-section portal-section--plain section-shell"
+      >
+        <div class="instruction-layout">
+          <div class="instruction-copy">
+            <p class="section-kicker">管理说明</p>
+            <h2>受控访问机制说明</h2>
+
+            <div class="instruction-list">
+              <article class="instruction-item">
+                <span>01</span>
+                <div>
+                  <h3>定向准入制</h3>
+                  <p>本门户仅向已建立正式委托关系的特定客户开放，不设公开注册入口，以确保相关资料保持必要的隔离性。</p>
+                </div>
+              </article>
+
+              <article class="instruction-item">
+                <span>02</span>
+                <div>
+                  <h3>基于受控链接的访问机制</h3>
+                  <p>访问权限由承办律师根据案件保密要求进行管理，客户通过预留的联络渠道获取对应的访问凭证。</p>
+                </div>
+              </article>
+
+              <article class="instruction-item">
+                <span>03</span>
+                <div>
+                  <h3>权限动态管理</h3>
+                  <p>访问范围严格限定于当前委托事项，并依据协作进度及合规要求进行持续审核与管理。</p>
+                </div>
+              </article>
             </div>
 
-            <p class="stage-lead">
-              {{ heroLead }}
+            <p
+              v-if="accessNotice"
+              class="instruction-note"
+            >
+              {{ accessNotice }}
             </p>
-
-            <div class="stage-note">
-              <span class="stage-note__label">Access Notice</span>
-              <p v-if="accessNoticeDisplay">
-                {{ accessNoticeDisplay }}
-              </p>
-              <p v-else>
-                门户页仅用于说明系统与访问方式，不提供公开登录。客户收到律师发送的带 Token 专属链接后，直接进入对应项目页面。
-              </p>
-            </div>
           </div>
 
-          <aside class="stage-panel">
-            <div class="panel-surface">
-              <div class="panel-head">
-                <span class="panel-kicker">Controlled Access</span>
-                <strong>Private Link Only</strong>
+          <aside class="instruction-panel">
+            <div class="mock-card">
+              <div class="mock-head">
+                <span class="mock-dot" />
+                <span class="mock-line" />
               </div>
-
-              <ol class="panel-steps">
-                <li>
-                  <span>01</span>
-                  <div>
-                    <strong>律师发送专属链接</strong>
-                    <p>每位客户通过对应项目的私有链接访问，不经过公开入口。</p>
-                  </div>
-                </li>
-                <li>
-                  <span>02</span>
-                  <div>
-                    <strong>系统完成 Token 校验</strong>
-                    <p>链接中的验证信息用于识别访问范围与有效期。</p>
-                  </div>
-                </li>
-                <li>
-                  <span>03</span>
-                  <div>
-                    <strong>直接进入项目协作页面</strong>
-                    <p>客户查看项目进展、资料与通知，不需要先在门户页登录。</p>
-                  </div>
-                </li>
-              </ol>
+              <div class="mock-body">
+                <div class="mock-field" />
+                <div class="mock-field" />
+                <div class="mock-lock">
+                  <LockOutlined />
+                  <span />
+                </div>
+              </div>
             </div>
           </aside>
         </div>
       </section>
 
+      <section
+        id="contact"
+        class="commitment section-shell"
+      >
+        <SafetyCertificateOutlined class="commitment-icon" />
+        <h2>专业隐私承诺</h2>
+        <div class="commitment-copy">
+          <p>我们高度重视法律事务的私密性。本门户的设计与运行逻辑均遵循律师职业道德规范及行业数据保护要求。</p>
+          <p>通过访问控制与协作流程管理，确保数字化案卷与线上沟通记录始终处于必要边界之内。维护客户的信息安全与利益，是服务过程中的基本前提。</p>
+        </div>
+        <div class="commitment-support">
+          <p class="support-label">业务支持</p>
+          <p>如在访问过程中遇到问题或需调整协作权限，请通过预留联络方式直接联系您的承办律师团队。</p>
+        </div>
+      </section>
+
       <footer
-        v-if="footerText || staffEntryLabel || lawFirmName"
+        v-if="lawFirmName || footerText"
         class="portal-footer section-shell"
       >
-        <div class="footer-rule" />
-        <div class="footer-meta">
-          <p
-            v-if="lawFirmName"
-            class="footer-brand"
-          >
-            {{ lawFirmName }}
-          </p>
-          <p
-            v-if="footerText"
-            class="footer-copy"
-          >
-            {{ footerText }}
-          </p>
-        </div>
-        <p
-          v-if="staffEntryLabel"
-          class="portal-staff-line"
-        >
-          <router-link
-            to="/admin/login"
-            class="portal-staff-link"
-          >
-            {{ staffEntryLabel }}
-          </router-link>
+        <p class="footer-line">
+          <span v-if="lawFirmName">{{ lawFirmName }}</span>
+          <span v-if="lawFirmName && footerText"> | </span>
+          <span v-if="footerText">{{ footerText }}</span>
         </p>
       </footer>
     </a-layout-content>
@@ -113,6 +179,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import {
+  FileTextOutlined,
+  FolderOpenOutlined,
+  LockOutlined,
+  MessageOutlined,
+  NotificationOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import { useAppConfigStore } from '@/stores/appConfig'
 import { APP_SLOGAN } from '@/config/app'
@@ -120,297 +194,426 @@ import { APP_SLOGAN } from '@/config/app'
 const appConfigStore = useAppConfigStore()
 
 const slogan = computed(() => appConfigStore.appSlogan?.trim() || APP_SLOGAN)
-const lawFirmName = computed(() => appConfigStore.lawFirmName?.trim() || appConfigStore.displayName?.trim() || '')
+const lawFirmName = computed(() => appConfigStore.lawFirmName?.trim() || appConfigStore.displayName?.trim() || '律师事务所')
+const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite?.trim() || '')
+const accessNotice = computed(() => appConfigStore.portalAccessNotice?.trim() || '')
+const contactHref = computed(() => lawFirmWebsite.value || '#contact')
 
-const cardEyebrow = computed(() => {
+const heroEyebrow = computed(() => {
   const custom = appConfigStore.portalEyebrowEn?.trim()
   if (custom) return custom
-  return appConfigStore.appShortNameEn?.trim() || 'Private Client Portal'
+  return appConfigStore.appShortNameEn?.trim() || 'Client Collaboration Portal'
 })
-
-const accessNoticeDisplay = computed(() => appConfigStore.portalAccessNotice?.trim() || '')
-const staffEntryLabel = computed(() => appConfigStore.staffEntryLabel?.trim() || '')
 
 const footerText = computed(() => {
   const icp = appConfigStore.icpLicense?.trim()
   const copy = appConfigStore.copyright?.trim()
-  if (icp && copy) return `${copy} · ${icp}`
-  return icp || copy || ''
+  if (copy && icp) return `${copy} | ${icp}`
+  return copy || icp || ''
 })
 
-const heroTitle = computed(() => lawFirmName.value || appConfigStore.displayName?.trim() || '客户协作门户')
+const heroTitle = computed(() => `${lawFirmName.value}${appConfigStore.appShortName?.trim() ? ` ${appConfigStore.appShortName.trim()}` : ' 客户协作门户'}`)
 
 const heroLead = computed(() => {
   if (slogan.value) {
-    return `${slogan.value}。客户通过律师发送的专属链接进入对应项目，在同一界面查看进展、接收通知并获取相关资料。`
+    return `${slogan.value}。本门户旨在为委托客户提供受控的数字化协作环境，用于查阅经授权的法律文书、追踪事务进展，并与承办律师团队保持高效专业的联络。`
   }
-  return '客户通过律师发送的专属链接进入对应项目，在同一界面查看进展、接收通知并获取相关资料。'
+  return '本门户旨在为委托客户提供受控的数字化协作环境，用于查阅经授权的法律文书、追踪事务进展，并与承办律师团队保持高效专业的联络。'
 })
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-
 .portal-page {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 14% 18%, rgba(202, 138, 4, 0.08), transparent 26%),
-    radial-gradient(circle at 88% 20%, rgba(30, 64, 175, 0.1), transparent 30%),
-    linear-gradient(180deg, #fcfbf8 0%, #f8fafc 48%, #eef2f7 100%);
+  background: var(--lex-surface-strong);
 }
 
 .content {
   display: grid;
-  gap: 18px;
+  gap: 0;
   padding-bottom: 40px;
 }
 
-.portal-stage {
-  position: relative;
-  overflow: hidden;
-  padding: 36px;
-  border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(249, 250, 251, 0.92)),
-    var(--lex-surface-strong);
-  box-shadow:
-    0 20px 60px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+.portal-hero,
+.portal-section,
+.commitment,
+.portal-footer {
+  padding-top: 72px;
+  padding-bottom: 72px;
 }
 
-.portal-stage::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(15, 23, 42, 0.05) calc(100% - 1px)),
-    linear-gradient(180deg, transparent 0, transparent calc(100% - 1px), rgba(15, 23, 42, 0.05) calc(100% - 1px));
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 88%);
+.portal-hero {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  background: #fff;
 }
 
-.stage-grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 430px);
-  gap: 36px;
-  align-items: stretch;
+.hero-copy {
+  max-width: 760px;
 }
 
-.stage-copy {
-  display: grid;
-  align-content: start;
-  gap: 28px;
-  min-width: 0;
-}
-
-.stage-eyebrow,
-.title-prefix,
-.stage-note__label,
-.panel-kicker {
-  margin: 0;
-  color: var(--lex-accent-strong);
+.hero-eyebrow,
+.section-kicker,
+.support-label {
+  margin: 0 0 16px;
+  color: var(--lex-primary-soft);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
 }
 
-.title-block {
-  display: grid;
-  gap: 12px;
-}
-
-.stage-title {
-  max-width: 11ch;
+.hero-title {
   margin: 0;
-  color: #0f172a;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(44px, 6vw, 78px);
-  line-height: 0.96;
+  color: var(--text-primary);
+  font-size: clamp(42px, 6vw, 72px);
+  font-weight: 700;
+  line-height: 1.08;
   letter-spacing: -0.04em;
 }
 
-.stage-lead,
-.stage-note p,
-.panel-steps p,
-.footer-copy,
-.portal-staff-line {
+.hero-lead,
+.capability-card p,
+.instruction-item p,
+.commitment-copy p,
+.commitment-support p,
+.footer-line {
   margin: 0;
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-}
-
-.stage-lead {
-  max-width: 42rem;
   color: var(--text-secondary);
-  font-size: 17px;
-  line-height: 1.95;
+  line-height: 1.85;
 }
 
-.stage-note {
-  display: grid;
-  gap: 12px;
-  max-width: 44rem;
-  padding: 22px 24px;
-  border-left: 2px solid rgba(202, 138, 4, 0.42);
-  background: rgba(255, 255, 255, 0.58);
+.hero-lead {
+  max-width: 740px;
+  margin-top: 28px;
+  font-size: 18px;
 }
 
-.stage-note p {
-  color: var(--text-secondary);
-  line-height: 1.9;
-}
-
-.stage-panel {
+.hero-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 36px;
 }
 
-.panel-surface {
-  width: 100%;
-  display: grid;
-  gap: 26px;
-  padding: 26px;
-  border-radius: 16px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.98) 100%);
-  color: #f8fafc;
-  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
-}
-
-.panel-head {
-  display: grid;
-  gap: 10px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.panel-head strong {
-  font-size: 28px;
-  line-height: 1.05;
+.hero-primary,
+.hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: 4px;
+  font-size: 14px;
   font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.panel-steps {
-  display: grid;
-  gap: 18px;
+.hero-primary {
+  background: var(--lex-primary);
+  color: #fff;
+}
+
+.hero-secondary {
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  background: #fff;
+}
+
+.hero-primary:hover,
+.hero-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.portal-section {
+  background: var(--lex-bg-muted);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.portal-section--plain {
+  background: #fff;
+}
+
+.section-head {
+  margin-bottom: 40px;
+}
+
+.section-head h2,
+.instruction-copy h2,
+.commitment h2 {
   margin: 0;
-  padding: 0;
-  list-style: none;
+  color: var(--text-primary);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
-.panel-steps li {
+.capability-grid {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
 }
 
-.panel-steps span {
+.capability-card {
+  padding: 40px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.capability-card--dark {
+  background: var(--lex-surface-dark);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.capability-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 28px;
+  border-radius: 4px;
+  background: var(--lex-primary-container, rgba(30, 64, 175, 0.1));
+  color: var(--lex-primary);
+  font-size: 24px;
+}
+
+.capability-icon--dark {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.capability-card h3 {
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.capability-card--dark h3,
+.capability-card--dark p {
+  color: rgba(248, 250, 252, 0.92);
+}
+
+.instruction-layout {
   display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: rgba(202, 138, 4, 0.12);
-  color: #f8fafc;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.instruction-list {
+  display: grid;
+  gap: 30px;
+  margin-top: 36px;
+}
+
+.instruction-note {
+  margin: 32px 0 0;
+  padding: 18px 20px;
+  border-left: 3px solid rgba(30, 64, 175, 0.4);
+  background: rgba(241, 245, 249, 0.78);
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.instruction-item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 24px;
+}
+
+.instruction-item span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--lex-primary);
+  color: var(--lex-primary);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
 }
 
-.panel-steps strong {
+.instruction-item h3 {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-size: 18px;
+}
+
+.instruction-panel {
+  display: flex;
+  justify-content: center;
+}
+
+.mock-card {
+  width: min(100%, 360px);
+  padding: 36px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: var(--lex-bg-muted);
+}
+
+.mock-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.mock-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--lex-primary);
+}
+
+.mock-line {
+  width: 96px;
+  height: 6px;
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.mock-body {
+  display: grid;
+  gap: 18px;
+}
+
+.mock-field {
+  height: 36px;
+  background: #fff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.mock-lock {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(30, 64, 175, 0.18);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--lex-primary);
+}
+
+.mock-lock span {
   display: block;
-  margin-bottom: 6px;
-  font-size: 15px;
-  line-height: 1.5;
+  width: 72px;
+  height: 6px;
+  background: rgba(30, 64, 175, 0.18);
 }
 
-.panel-steps p {
-  color: rgba(226, 232, 240, 0.78);
-  font-size: 13px;
-  line-height: 1.8;
+.commitment {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  background: var(--lex-surface-dark);
+  color: #fff;
+}
+
+.commitment-icon {
+  margin-bottom: 18px;
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.commitment h2 {
+  color: #fff;
+}
+
+.commitment-copy {
+  max-width: 820px;
+  margin-top: 28px;
+  display: grid;
+  gap: 22px;
+}
+
+.commitment-copy p,
+.commitment-support p {
+  color: rgba(226, 232, 240, 0.84);
+  font-size: 18px;
+}
+
+.commitment-support {
+  max-width: 820px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.support-label {
+  color: rgba(226, 232, 240, 0.44);
 }
 
 .portal-footer {
   display: grid;
-  gap: 12px;
-  padding-top: 2px;
-}
-
-.footer-rule {
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, rgba(15, 23, 42, 0.16) 18%, rgba(15, 23, 42, 0.16) 82%, transparent 100%);
-}
-
-.footer-meta {
-  display: grid;
-  gap: 6px;
   justify-items: center;
-}
-
-.footer-brand {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-.footer-copy {
-  color: var(--text-tertiary);
-  font-size: 12px;
-  line-height: 1.7;
   text-align: center;
+  background: #fff;
 }
 
-.portal-staff-line {
-  color: var(--text-tertiary);
+.footer-line {
   font-size: 12px;
-  line-height: 1.7;
-  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.portal-staff-link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.portal-staff-link:hover {
-  color: var(--lex-primary-soft);
-}
-
-@media (max-width: 1024px) {
-  .stage-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 1200px) {
+  .capability-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .stage-title {
-    max-width: none;
+  .instruction-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
   }
 }
 
 @media (max-width: 768px) {
-  .portal-stage {
-    padding: 22px;
-    border-radius: 14px;
+  .portal-hero,
+  .portal-section,
+  .commitment,
+  .portal-footer {
+    padding-top: 48px;
+    padding-bottom: 48px;
   }
 
-  .stage-grid {
-    gap: 24px;
+  .hero-title {
+    font-size: clamp(34px, 10vw, 52px);
   }
 
-  .stage-copy {
-    gap: 22px;
+  .hero-lead,
+  .commitment-copy p,
+  .commitment-support p {
+    font-size: 16px;
   }
 
-  .stage-lead {
-    font-size: 15px;
+  .capability-grid {
+    grid-template-columns: 1fr;
   }
 
-  .panel-surface {
-    padding: 20px;
+  .capability-card,
+  .mock-card {
+    padding: 24px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-primary,
+  .hero-secondary {
+    width: 100%;
+  }
+
+  .instruction-item {
+    grid-template-columns: 1fr;
+  }
+
+  .instruction-note {
+    margin-top: 24px;
+    padding: 16px;
   }
 }
 </style>

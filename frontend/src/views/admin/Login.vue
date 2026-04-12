@@ -3,9 +3,10 @@
     <div class="login-shell">
       <section class="login-frame">
         <aside class="frame-aside">
-          <div class="aside-top">
-            <p class="aside-kicker">Admin Console</p>
-
+          <div class="aside-brand">
+            <p class="brand-name">
+              {{ organizationName || '律师事务所' }}
+            </p>
             <div class="brand-lockup">
               <div class="logo-shell">
                 <img
@@ -31,50 +32,28 @@
               </div>
 
               <div class="brand-copy">
-                <p class="brand-caption">
-                  {{ organizationName || 'Law Firm Clients' }}
-                </p>
                 <h1 class="brand-title">
                   {{ systemName }}
                 </h1>
+                <p class="brand-subtitle">
+                  客户服务管理后台
+                </p>
               </div>
             </div>
 
+            <div class="brand-rule" />
             <p class="aside-lead">
-              统一管理客户项目、通知分发、文件资料与门户品牌配置。
+              统一管理客户项目、通知与文件资料。
             </p>
-          </div>
-
-          <div class="signal-grid">
-            <article class="signal-card">
-              <span>Project Control</span>
-              <p>集中维护项目状态、访问有效期与客户可见范围。</p>
-            </article>
-            <article class="signal-card">
-              <span>Operational Flow</span>
-              <p>统一管理通知触达、文件交付与协作记录。</p>
-            </article>
-            <article class="signal-card">
-              <span>Brand Source</span>
-              <p>系统名称、Logo 与门户文案优先读取后台配置。</p>
-            </article>
-          </div>
-
-          <div class="aside-footer">
-            <div class="status-chip">
-              <span class="status-dot" />
-              <span>Secure administrative workspace</span>
-            </div>
           </div>
         </aside>
 
         <section class="frame-form">
           <div class="form-panel">
             <div class="form-header">
-              <p class="form-kicker">Management Login</p>
-              <h2 class="form-title">进入管理后台</h2>
+              <h2 class="form-title">管理后台登录</h2>
               <p class="form-hint">
-                使用管理员账号登录系统工作台。
+                请输入账号和密码
               </p>
             </div>
 
@@ -159,9 +138,6 @@
             />
 
             <div class="form-footer">
-              <p class="config-note">
-                品牌展示优先读取后台配置，未配置时回退到默认值。
-              </p>
               <p v-if="appConfigStore.copyright">
                 {{ appConfigStore.copyright }}
               </p>
@@ -302,58 +278,53 @@ onMounted(() => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  padding: 24px;
-  background:
-    radial-gradient(circle at 12% 16%, rgba(30, 64, 175, 0.18), transparent 24%),
-    radial-gradient(circle at 88% 18%, rgba(245, 158, 11, 0.09), transparent 22%),
-    linear-gradient(180deg, #020617 0%, #0f172a 56%, #111827 100%);
+  background: var(--lex-bg);
 }
 
 .login-shell {
-  width: min(1200px, 100%);
-  min-height: calc(100vh - 48px);
+  width: 100%;
+  min-height: 100vh;
   margin: 0 auto;
   display: grid;
   place-items: center;
+  padding: 24px;
 }
 
 .login-frame {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 460px);
-  border-radius: 22px;
+  grid-template-columns: minmax(320px, 0.82fr) minmax(420px, 1fr);
+  max-width: 1180px;
+  min-height: 720px;
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(15, 23, 42, 0.8);
-  box-shadow: 0 32px 90px rgba(2, 6, 23, 0.45);
-  backdrop-filter: blur(18px);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: var(--lex-surface-strong);
+  box-shadow: 0 32px 90px rgba(15, 23, 42, 0.14);
 }
 
 .frame-aside {
   display: grid;
-  align-content: space-between;
-  gap: 30px;
-  padding: 38px;
+  align-content: center;
+  padding: 48px;
   background:
     radial-gradient(circle at top right, rgba(59, 130, 246, 0.18), transparent 28%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.88) 100%);
+    linear-gradient(180deg, rgba(2, 6, 23, 0.98) 0%, rgba(15, 23, 42, 0.96) 100%);
   color: #f8fafc;
 }
 
-.aside-top {
+.aside-brand {
   display: grid;
   gap: 22px;
+  max-width: 360px;
 }
 
-.aside-kicker,
-.form-kicker,
-.signal-card span {
+.brand-name {
   margin: 0;
-  color: rgba(245, 158, 11, 0.88);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.92);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
 }
 
 .brand-lockup {
@@ -388,97 +359,54 @@ onMounted(() => {
 
 .brand-copy {
   display: grid;
-  gap: 8px;
-}
-
-.brand-caption {
-  margin: 0;
-  color: rgba(226, 232, 240, 0.68);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  gap: 6px;
 }
 
 .brand-title {
   margin: 0;
   color: #f8fafc;
   font-family: var(--font-heading);
-  font-size: clamp(30px, 4vw, 42px);
-  line-height: 1.02;
+  font-size: clamp(30px, 4vw, 40px);
+  line-height: 1.08;
+}
+
+.brand-subtitle {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.68);
+  font-size: 18px;
+}
+
+.brand-rule {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--lex-primary-soft);
 }
 
 .aside-lead {
-  max-width: 34rem;
   margin: 0;
   color: rgba(226, 232, 240, 0.82);
-  font-size: 18px;
-  line-height: 1.9;
-}
-
-.signal-grid {
-  display: grid;
-  gap: 14px;
-}
-
-.signal-card {
-  display: grid;
-  gap: 8px;
-  padding: 18px 18px 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.signal-card p {
-  margin: 0;
-  color: rgba(226, 232, 240, 0.72);
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.aside-footer {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.status-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(226, 232, 240, 0.78);
-  font-size: 13px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #22c55e;
-  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.14);
+  font-size: 17px;
+  line-height: 1.85;
 }
 
 .frame-form {
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 40px;
   background:
     linear-gradient(180deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.98) 100%);
 }
 
 .form-panel {
-  width: min(100%, 380px);
+  width: min(100%, 420px);
   display: grid;
-  gap: 18px;
+  gap: 20px;
 }
 
 .form-header {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .form-title {
@@ -492,20 +420,21 @@ onMounted(() => {
 .form-hint {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.75;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .login-form :deep(.ant-form-item) {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .login-input :deep(.ant-input),
 .login-input :deep(.ant-input-affix-wrapper) {
   min-height: 50px;
-  border-radius: 10px;
-  border-color: rgba(148, 163, 184, 0.24);
-  background: rgba(255, 255, 255, 0.96);
+  border-width: 0 0 2px;
+  border-radius: 10px 10px 0 0;
+  border-color: rgba(148, 163, 184, 0.3);
+  background: var(--lex-bg-muted);
   box-shadow: none;
 }
 
@@ -538,10 +467,10 @@ onMounted(() => {
 }
 
 .captcha-image {
-  min-width: 128px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  min-width: 132px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 10px;
-  background: #fff;
+  background: var(--lex-surface);
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -584,14 +513,10 @@ onMounted(() => {
 .form-footer {
   display: grid;
   gap: 4px;
-  margin-top: 6px;
+  margin-top: 10px;
   color: var(--text-tertiary);
   font-size: 12px;
   line-height: 1.75;
-}
-
-.config-note {
-  color: var(--text-secondary);
 }
 
 .icp-link a {
@@ -601,6 +526,7 @@ onMounted(() => {
 @media (max-width: 1024px) {
   .login-frame {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 
   .frame-aside {
@@ -618,7 +544,7 @@ onMounted(() => {
   }
 
   .login-shell {
-    min-height: calc(100vh - 32px);
+    padding: 16px;
   }
 
   .login-frame {
