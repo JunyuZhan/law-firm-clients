@@ -28,6 +28,25 @@ NC='\033[0m' # No Color
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCKER_DIR="$SCRIPT_DIR/docker"
 
+# 从 docker/.env 读取 NGINX_PORT，供健康检查与访问提示使用（与 compose 暴露端口一致）
+load_nginx_port_from_docker_env() {
+    NGINX_PORT=""
+    local env_file="$DOCKER_DIR/.env"
+    if [[ -f "$env_file" ]]; then
+        local line
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            [[ "$line" =~ ^[[:space:]]*# ]] && continue
+            [[ "$line" =~ ^[[:space:]]*NGINX_PORT= ]] || continue
+            NGINX_PORT="${line#*=}"
+            NGINX_PORT="${NGINX_PORT%$'\r'}"
+            NGINX_PORT="${NGINX_PORT//\"/}"
+            NGINX_PORT="${NGINX_PORT//\'/}"
+            break
+        done < "$env_file"
+    fi
+    export NGINX_PORT="${NGINX_PORT:-80}"
+}
+
 # 日志函数
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -603,6 +622,7 @@ upgrade_system() {
 
 # 查看状态
 show_status() {
+    load_nginx_port_from_docker_env
     log_info "服务状态:"
     cd "$DOCKER_DIR"
     echo ""
@@ -646,6 +666,7 @@ show_status() {
 
 # 等待服务就绪
 wait_for_services() {
+    load_nginx_port_from_docker_env
     log_info "等待服务就绪..."
     
     local max_attempts=30
@@ -669,6 +690,7 @@ wait_for_services() {
 
 # 显示访问信息
 show_access_info() {
+    load_nginx_port_from_docker_env
     echo ""
     echo "================================================="
     echo -e "${GREEN}部署完成！${NC}"
