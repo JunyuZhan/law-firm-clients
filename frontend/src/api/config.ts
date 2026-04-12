@@ -86,6 +86,12 @@ export interface PortalConfig {
   icpLicense: string       // ICP备案号
   copyright: string        // 版权信息
   logoUrl: string          // Logo地址
+  /** 门户页英文眉标（可选） */
+  portalEyebrowEn?: string
+  /** 门户页客户说明（公开页主文案） */
+  portalAccessNotice?: string
+  /** 工作人员入口页脚链文案（可选，空则不显示） */
+  staffEntryLabel?: string
 }
 
 /**

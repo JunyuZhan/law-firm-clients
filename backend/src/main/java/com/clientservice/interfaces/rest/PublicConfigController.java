@@ -41,6 +41,9 @@ public class PublicConfigController {
             "system.law-firm-website",  // 律所官网
             "system.app-slogan",        // 首页标语
             "system.copyright",         // 版权信息
+            "system.portal-eyebrow-en", // 门户页英文眉标（可选）
+            "system.portal-access-notice", // 门户页客户说明（公开页主文案）
+            "system.staff-entry-label", // 门户页工作人员入口按钮文案
             // 系统品牌配置
             "system.app-name",          // 系统名称（浏览器标题）
             "system.app-short-name",    // 系统简称（管理后台侧边栏）
@@ -119,7 +122,11 @@ public class PublicConfigController {
         result.put("copyright", sysConfigService.getConfigValue("system.copyright", ""));
         // Logo地址
         result.put("logoUrl", sysConfigService.getConfigValue("system.logo-url", ""));
-        
+        // 门户公开落地页文案
+        result.put("portalEyebrowEn", sysConfigService.getConfigValue("system.portal-eyebrow-en", ""));
+        result.put("portalAccessNotice", sysConfigService.getConfigValue("system.portal-access-notice", ""));
+        result.put("staffEntryLabel", sysConfigService.getConfigValue("system.staff-entry-label", ""));
+
         return Result.success(result);
     }
 

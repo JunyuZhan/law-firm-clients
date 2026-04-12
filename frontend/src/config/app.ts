@@ -61,3 +61,12 @@ export const LOGO_COLLAPSED_URL = import.meta.env.VITE_LOGO_COLLAPSED_URL || '/l
 
 // ICP备案号（可选，不配置则不显示）
 export const ICP_LICENSE = import.meta.env.VITE_ICP_LICENSE || ''
+
+/** 门户公开页：英文眉标（可选；未配置时可用品牌「系统英文简称」） */
+export const PORTAL_EYEBROW_EN = import.meta.env.VITE_PORTAL_EYEBROW_EN || ''
+
+/** 门户公开页：主说明文案（建议在后台「系统配置 → 门户配置」填写） */
+export const PORTAL_ACCESS_NOTICE = import.meta.env.VITE_PORTAL_ACCESS_NOTICE || ''
+
+/** 门户公开页：工作人员入口按钮文案（空则不显示该按钮） */
+export const STAFF_ENTRY_LABEL = import.meta.env.VITE_STAFF_ENTRY_LABEL || ''

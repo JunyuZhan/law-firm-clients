@@ -14,7 +14,7 @@
         </div>
         <div class="mini-stat">
           <span>门户字段</span>
-          <strong>{{ portalCompletion }}/5</strong>
+          <strong>{{ portalCompletion }}/8</strong>
         </div>
         <div class="mini-stat">
           <span>系统配置项</span>
@@ -36,7 +36,7 @@
         <div class="completion-item">
           <span>门户配置</span>
           <strong>{{ portalCompletionRate }}</strong>
-          <p>{{ portalCompletion }}/5</p>
+          <p>{{ portalCompletion }}/8</p>
         </div>
         <div class="completion-item">
           <span>系统配置项</span>
@@ -183,6 +183,37 @@
                 />
                 <div class="field-hint">
                   显示在门户欢迎区域
+                </div>
+              </a-form-item>
+              <a-form-item label="门户页英文眉标（可选）">
+                <a-input
+                  v-model:value="portalConfig.portalEyebrowEn"
+                  placeholder="留空则使用品牌配置中的「系统英文简称」"
+                  @blur="savePortalConfig('system.portal-eyebrow-en', portalConfig.portalEyebrowEn)"
+                />
+                <div class="field-hint">
+                  显示在公开门户页主标题上方
+                </div>
+              </a-form-item>
+              <a-form-item label="门户页客户说明（公开页主文案）">
+                <a-textarea
+                  v-model:value="portalConfig.portalAccessNotice"
+                  :rows="4"
+                  placeholder="说明客户如何通过律师发送的链接使用本系统"
+                  @blur="savePortalConfig('system.portal-access-notice', portalConfig.portalAccessNotice)"
+                />
+                <div class="field-hint">
+                  显示在公开门户页中央；留空则不显示该段落
+                </div>
+              </a-form-item>
+              <a-form-item label="工作人员入口（页脚小字链）">
+                <a-input
+                  v-model:value="portalConfig.staffEntryLabel"
+                  placeholder="如：工作人员入口；留空则不显示"
+                  @blur="savePortalConfig('system.staff-entry-label', portalConfig.staffEntryLabel)"
+                />
+                <div class="field-hint">
+                  显示在公开门户页底部，链向管理后台登录；勿写敏感信息
                 </div>
               </a-form-item>
               <a-form-item label="ICP 备案号">
@@ -582,6 +613,9 @@ const portalConfig = reactive({
   lawFirmName: '',
   lawFirmWebsite: '',
   appSlogan: '',
+  portalEyebrowEn: '',
+  portalAccessNotice: '',
+  staffEntryLabel: '',
   icpLicense: '',
   copyright: '',
 })
@@ -621,9 +655,18 @@ const brandCompletion = computed(() =>
 const brandCompletionRate = computed(() => `${Math.round((brandCompletion.value / 4) * 100)}%`)
 
 const portalCompletion = computed(() =>
-  [portalConfig.lawFirmName, portalConfig.lawFirmWebsite, portalConfig.appSlogan, portalConfig.icpLicense, portalConfig.copyright].filter(Boolean).length,
+  [
+    portalConfig.lawFirmName,
+    portalConfig.lawFirmWebsite,
+    portalConfig.appSlogan,
+    portalConfig.portalEyebrowEn,
+    portalConfig.portalAccessNotice,
+    portalConfig.staffEntryLabel,
+    portalConfig.icpLicense,
+    portalConfig.copyright,
+  ].filter(Boolean).length,
 )
-const portalCompletionRate = computed(() => `${Math.round((portalCompletion.value / 5) * 100)}%`)
+const portalCompletionRate = computed(() => `${Math.round((portalCompletion.value / 8) * 100)}%`)
 
 const columns = [
   { title: '配置键', key: 'configKey', dataIndex: 'configKey', ellipsis: true, width: 180 },
@@ -648,6 +691,9 @@ async function loadConfigData() {
       portalConfig.lawFirmName = portalRes.data.lawFirmName || ''
       portalConfig.lawFirmWebsite = portalRes.data.lawFirmWebsite || ''
       portalConfig.appSlogan = portalRes.data.appSlogan || ''
+      portalConfig.portalEyebrowEn = portalRes.data.portalEyebrowEn ?? ''
+      portalConfig.portalAccessNotice = portalRes.data.portalAccessNotice ?? ''
+      portalConfig.staffEntryLabel = portalRes.data.staffEntryLabel ?? ''
       portalConfig.icpLicense = portalRes.data.icpLicense || ''
       portalConfig.copyright = portalRes.data.copyright || ''
     }
@@ -711,6 +757,9 @@ function savePortalConfig(key: string, value: string) {
     'system.law-firm-name': '律所名称',
     'system.law-firm-website': '律所官网',
     'system.app-slogan': '首页标语',
+    'system.portal-eyebrow-en': '门户页英文眉标',
+    'system.portal-access-notice': '门户页客户说明',
+    'system.staff-entry-label': '工作人员入口（页脚链）',
     'system.icp-license': 'ICP备案号',
     'system.copyright': '版权信息',
   }

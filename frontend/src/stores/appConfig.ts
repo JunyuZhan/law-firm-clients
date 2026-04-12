@@ -10,6 +10,9 @@ import {
   LAW_FIRM_WEBSITE,
   LOGO_URL,
   ICP_LICENSE,
+  PORTAL_ACCESS_NOTICE,
+  PORTAL_EYEBROW_EN,
+  STAFF_ENTRY_LABEL,
 } from '@/config/app'
 import logger from '@/utils/logger'
 
@@ -29,6 +32,9 @@ export const useAppConfigStore = defineStore('appConfig', () => {
   const logoUrl = ref(LOGO_URL)
   const icpLicense = ref(ICP_LICENSE)
   const copyright = ref('')
+  const portalEyebrowEn = ref(PORTAL_EYEBROW_EN)
+  const portalAccessNotice = ref(PORTAL_ACCESS_NOTICE)
+  const staffEntryLabel = ref(STAFF_ENTRY_LABEL)
   const displayName = computed(() => appName.value || lawFirmName.value || appShortName.value || APP_NAME)
 
   // 加载状态
@@ -58,6 +64,15 @@ export const useAppConfigStore = defineStore('appConfig', () => {
         if (portal.icpLicense) icpLicense.value = portal.icpLicense
         if (portal.copyright) copyright.value = portal.copyright
         if (portal.logoUrl) logoUrl.value = portal.logoUrl
+        if (portal.portalEyebrowEn != null) {
+          portalEyebrowEn.value = portal.portalEyebrowEn
+        }
+        if (portal.portalAccessNotice != null) {
+          portalAccessNotice.value = portal.portalAccessNotice
+        }
+        if (portal.staffEntryLabel != null) {
+          staffEntryLabel.value = portal.staffEntryLabel
+        }
       }
       
       // 应用品牌配置
@@ -90,6 +105,9 @@ export const useAppConfigStore = defineStore('appConfig', () => {
     logoUrl,
     icpLicense,
     copyright,
+    portalEyebrowEn,
+    portalAccessNotice,
+    staffEntryLabel,
     // 状态
     loaded,
     loading,

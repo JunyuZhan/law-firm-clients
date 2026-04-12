@@ -98,6 +98,29 @@
               placeholder="例如：专业事项，一个清晰的客户入口"
             />
           </a-form-item>
+          <a-form-item label="门户页英文眉标（可选）">
+            <a-input
+              v-model:value="form.portalEyebrowEn"
+              maxlength="80"
+              placeholder="留空则使用上方「系统简称（英文）」"
+            />
+          </a-form-item>
+          <a-form-item label="门户页客户说明（公开）">
+            <a-textarea
+              v-model:value="form.portalAccessNotice"
+              :rows="3"
+              maxlength="500"
+              show-count
+              placeholder="公开门户页主文案"
+            />
+          </a-form-item>
+          <a-form-item label="工作人员入口（页脚小字链）">
+            <a-input
+              v-model:value="form.staffEntryLabel"
+              maxlength="40"
+              placeholder="留空则不显示"
+            />
+          </a-form-item>
           <a-form-item label="ICP备案号">
             <a-input
               v-model:value="form.icpLicense"
@@ -148,6 +171,9 @@
               {{ form.lawFirmName || defaultValues.lawFirmName }}
             </div>
             <strong>{{ form.appSlogan || defaultValues.appSlogan }}</strong>
+            <p class="preview-access">
+              {{ form.portalAccessNotice ?? defaultValues.portalAccessNotice }}
+            </p>
             <p>用于门户首页、帮助页、登录页和后台导航中的统一品牌表达。</p>
           </div>
 
@@ -186,6 +212,10 @@ const defaultValues = {
   appShortNameEn: 'Law Firm Clients',
   lawFirmName: '律师事务所',
   appSlogan: '专业事项，一个清晰的客户入口',
+  portalEyebrowEn: '',
+  portalAccessNotice:
+    '本系统由律师事务所为客户提供专项服务。查看项目进展与材料，请使用承办律师向您发送的专属访问链接。',
+  staffEntryLabel: '工作人员入口',
   copyright: '© 2026 律师事务所',
 }
 
@@ -197,6 +227,9 @@ const form = reactive({
   lawFirmName: '',
   lawFirmWebsite: '',
   appSlogan: '',
+  portalEyebrowEn: '',
+  portalAccessNotice: '',
+  staffEntryLabel: '',
   icpLicense: '',
   copyright: '',
 })
@@ -232,6 +265,9 @@ async function loadSetupData() {
       form.lawFirmName = portalRes.data.lawFirmName || defaultValues.lawFirmName
       form.lawFirmWebsite = portalRes.data.lawFirmWebsite || ''
       form.appSlogan = portalRes.data.appSlogan || defaultValues.appSlogan
+      form.portalEyebrowEn = portalRes.data.portalEyebrowEn ?? ''
+      form.portalAccessNotice = portalRes.data.portalAccessNotice ?? defaultValues.portalAccessNotice
+      form.staffEntryLabel = portalRes.data.staffEntryLabel ?? defaultValues.staffEntryLabel
       form.icpLicense = portalRes.data.icpLicense || ''
       form.copyright = portalRes.data.copyright || defaultValues.copyright
       if (!form.logoUrl && portalRes.data.logoUrl) {
@@ -259,6 +295,9 @@ async function saveSetup() {
       ['system.law-firm-name', form.lawFirmName || defaultValues.lawFirmName],
       ['system.law-firm-website', form.lawFirmWebsite],
       ['system.app-slogan', form.appSlogan || defaultValues.appSlogan],
+      ['system.portal-eyebrow-en', form.portalEyebrowEn],
+      ['system.portal-access-notice', form.portalAccessNotice || defaultValues.portalAccessNotice],
+      ['system.staff-entry-label', form.staffEntryLabel || defaultValues.staffEntryLabel],
       ['system.icp-license', form.icpLicense],
       ['system.copyright', form.copyright || defaultValues.copyright],
     ] as const
@@ -440,6 +479,13 @@ onMounted(() => {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.75;
+}
+
+.preview-access {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
 }
 
 .preview-footer {

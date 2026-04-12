@@ -28,6 +28,9 @@ export async function mockPublicConfig(page: Page) {
         icpLicense: '沪ICP备12345678号',
         copyright: '© 2026 汉科律师事务所',
         logoUrl: '',
+        portalEyebrowEn: 'Hanke Client Portal',
+        portalAccessNotice: '具体项目内容需通过承办律师向您发送的专属链接访问。',
+        staffEntryLabel: '工作人员入口',
       })),
     })
   })
