@@ -229,7 +229,7 @@ onMounted(() => {
    - 编写集成测试（如需要）
 
 10. **文档更新**
-    - 更新`TODO.md`
+    - 更新`docs/development/TODO.md`
     - 更新`README.md`（如需要）
     - 更新API文档（如需要）
 
@@ -503,7 +503,7 @@ public List<MatterListDTO> getMatterList(...) {
 
 ### 3. README更新
 - 新增功能后更新`README.md`
-- 更新`TODO.md`标记完成状态
+- 更新`docs/development/TODO.md`标记完成状态
 - 重要变更更新`CHANGELOG.md`（如有）
 
 ---

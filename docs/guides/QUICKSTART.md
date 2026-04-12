@@ -193,7 +193,7 @@ docker-compose exec app sh
 - [API接口文档](./API.md)
 - [系统设计文档](./docs/CLIENT_SERVICE_SYSTEM_DESIGN.md)
 - [Docker部署指南](./docker/README.md)
-- [开发任务清单](./TODO.md)
+- [开发任务清单](../development/TODO.md)
 
 ---
 
