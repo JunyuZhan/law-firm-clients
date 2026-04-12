@@ -164,14 +164,22 @@
       </section>
 
       <footer
-        v-if="lawFirmName || footerText"
         class="portal-footer section-shell"
       >
-        <p class="footer-line">
-          <span v-if="lawFirmName">{{ lawFirmName }}</span>
-          <span v-if="lawFirmName && footerText"> | </span>
-          <span v-if="footerText">{{ footerText }}</span>
-        </p>
+        <div class="footer-meta">
+          <p class="footer-brand">
+            {{ lawFirmName }}
+          </p>
+          <p class="footer-copy">
+            {{ copyrightText }}
+          </p>
+          <p
+            v-if="icpText"
+            class="footer-icp"
+          >
+            {{ icpText }}
+          </p>
+        </div>
       </footer>
     </a-layout-content>
   </div>
@@ -189,7 +197,7 @@ import {
 } from '@ant-design/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import { useAppConfigStore } from '@/stores/appConfig'
-import { APP_SLOGAN } from '@/config/app'
+import { APP_SLOGAN, COPYRIGHT_TEXT } from '@/config/app'
 
 const appConfigStore = useAppConfigStore()
 
@@ -198,21 +206,41 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName?.trim() || appConf
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite?.trim() || '')
 const accessNotice = computed(() => appConfigStore.portalAccessNotice?.trim() || '')
 const contactHref = computed(() => lawFirmWebsite.value || '#contact')
+const currentYear = new Date().getFullYear()
+const appShortName = computed(() => appConfigStore.appShortName?.trim() || '')
 
 const heroEyebrow = computed(() => {
   const custom = appConfigStore.portalEyebrowEn?.trim()
-  if (custom) return custom
-  return appConfigStore.appShortNameEn?.trim() || 'Client Collaboration Portal'
+  return custom || ''
 })
 
-const footerText = computed(() => {
-  const icp = appConfigStore.icpLicense?.trim()
-  const copy = appConfigStore.copyright?.trim()
-  if (copy && icp) return `${copy} | ${icp}`
-  return copy || icp || ''
+const copyrightText = computed(() => {
+  const configured = appConfigStore.copyright?.trim()
+  if (configured) return configured
+
+  const fallbackName = lawFirmName.value || COPYRIGHT_TEXT
+  return `© ${currentYear} ${fallbackName} 版权所有`
 })
 
-const heroTitle = computed(() => `${lawFirmName.value}${appConfigStore.appShortName?.trim() ? ` ${appConfigStore.appShortName.trim()}` : ' 客户协作门户'}`)
+const icpText = computed(() => appConfigStore.icpLicense?.trim() || '')
+
+const heroTitle = computed(() => {
+  const shortName = appShortName.value
+  if (!shortName) return `${lawFirmName.value} 客户协作门户`
+
+  const normalizedLawFirmName = lawFirmName.value.replace(/\s+/g, '').toLowerCase()
+  const normalizedShortName = shortName.replace(/\s+/g, '').toLowerCase()
+
+  if (
+    normalizedShortName === normalizedLawFirmName ||
+    normalizedShortName.includes(normalizedLawFirmName) ||
+    normalizedLawFirmName.includes(normalizedShortName)
+  ) {
+    return `${lawFirmName.value} 客户协作门户`
+  }
+
+  return `${lawFirmName.value} ${shortName}`
+})
 
 const heroLead = computed(() => {
   if (slogan.value) {
@@ -275,8 +303,7 @@ const heroLead = computed(() => {
 .capability-card p,
 .instruction-item p,
 .commitment-copy p,
-.commitment-support p,
-.footer-line {
+.commitment-support p {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.85;
@@ -551,11 +578,29 @@ const heroLead = computed(() => {
   background: #fff;
 }
 
-.footer-line {
+.footer-meta {
+  display: grid;
+  gap: 8px;
+}
+
+.footer-brand,
+.footer-copy,
+.footer-icp {
+  margin: 0;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  line-height: 1.8;
+}
+
+.footer-brand {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.footer-copy,
+.footer-icp {
+  letter-spacing: 0.04em;
 }
 
 @media (max-width: 1200px) {

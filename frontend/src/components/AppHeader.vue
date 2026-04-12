@@ -254,6 +254,7 @@ const detailSubtitle = computed(() => '项目进展与文件')
 
 .logo-text {
   min-width: 0;
+  flex: 1;
 }
 
 .logo-text h1 {
@@ -261,9 +262,9 @@ const detailSubtitle = computed(() => '项目进展与文件')
   font-size: 18px;
   line-height: 1.3;
   color: var(--lex-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .logo-system-label {
@@ -271,9 +272,9 @@ const detailSubtitle = computed(() => '项目进展与文件')
   font-size: 12px;
   line-height: 1.6;
   color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .title-section {
@@ -346,7 +347,9 @@ const detailSubtitle = computed(() => '项目进展与文件')
   }
 
   .logo-system-label {
-    display: none;
+    margin-top: 2px;
+    font-size: 11px;
+    line-height: 1.5;
   }
 
   .title-section {
