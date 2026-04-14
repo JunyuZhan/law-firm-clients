@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /**
  * Design tokens — Law Firm Clients (Stripe-inspired structure + project brand colors).
@@ -80,9 +80,9 @@
   --spacing-xl: 32px;
   --spacing-2xl: 40px;
 
-  --font-heading: 'Fira Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-body: 'Fira Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'Fira Code', 'SFMono-Regular', Consolas, monospace;
+  --font-heading: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+  --font-body: 'IBM Plex Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
 
   --shell-max-width: 1280px;
   --shell-gutter: 24px;

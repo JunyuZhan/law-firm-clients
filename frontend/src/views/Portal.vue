@@ -8,35 +8,39 @@
       tabindex="-1"
     >
       <section class="portal-hero section-shell fade-in">
-        <div class="hero-copy">
-          <p
-            v-if="heroEyebrow"
-            class="hero-eyebrow"
-          >
-            {{ heroEyebrow }}
-          </p>
-          <h1 class="hero-title">
-            {{ heroTitle }}
-          </h1>
-          <p class="hero-lead">
-            {{ heroLead }}
-          </p>
+        <div class="hero-layout">
+          <div class="hero-panel">
+            <div class="hero-copy">
+              <p
+                v-if="heroEyebrow"
+                class="hero-eyebrow"
+              >
+                {{ heroEyebrow }}
+              </p>
+              <h1 class="hero-title">
+                {{ heroTitle }}
+              </h1>
+              <p class="hero-lead">
+                {{ heroLead }}
+              </p>
 
-          <div class="hero-actions">
-            <a
-              href="#instructions"
-              class="hero-primary"
-            >
-              访问机制说明
-            </a>
-            <a
-              :href="contactHref"
-              :target="lawFirmWebsite ? '_blank' : undefined"
-              :rel="lawFirmWebsite ? 'noopener' : undefined"
-              class="hero-secondary"
-            >
-              联络承办律师
-            </a>
+              <div class="hero-actions">
+                <a
+                  href="#instructions"
+                  class="hero-primary"
+                >
+                  访问机制说明
+                </a>
+                <a
+                  :href="contactHref"
+                  :target="lawFirmWebsite ? '_blank' : undefined"
+                  :rel="lawFirmWebsite ? 'noopener' : undefined"
+                  class="hero-secondary"
+                >
+                  联络承办律师
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -45,43 +49,45 @@
         id="capabilities"
         class="portal-section section-shell"
       >
-        <div class="section-head">
-          <p class="section-kicker">服务能力</p>
-          <h2>客户协作与资料管理</h2>
-        </div>
+        <div class="section-frame">
+          <div class="section-head">
+            <p class="section-kicker">服务能力</p>
+            <h2>客户协作与资料管理</h2>
+          </div>
 
-        <div class="capability-grid">
-          <article class="capability-card">
-            <div class="capability-icon">
-              <FileTextOutlined />
-            </div>
-            <h3>事务进度查阅</h3>
-            <p>系统化展示委托事项的关键节点与当前状态，帮助客户及时掌握事务进展情况及后续预定计划。</p>
-          </article>
+          <div class="capability-grid">
+            <article class="capability-card">
+              <div class="capability-icon">
+                <FileTextOutlined />
+              </div>
+              <h3>事务进度查阅</h3>
+              <p>系统化展示委托事项的关键节点与当前状态，帮助客户及时掌握事务进展情况及后续预定计划。</p>
+            </article>
 
-          <article class="capability-card capability-card--dark">
-            <div class="capability-icon capability-icon--dark">
-              <FolderOpenOutlined />
-            </div>
-            <h3>电子档案库</h3>
-            <p>集中存储法律意见书、合同文本及证据材料等数字化档案，基于严格权限控制实现有序存取。</p>
-          </article>
+            <article class="capability-card">
+              <div class="capability-icon">
+                <FolderOpenOutlined />
+              </div>
+              <h3>电子档案库</h3>
+              <p>集中存储法律意见书、合同文本及证据材料等数字化档案，基于严格权限控制实现有序存取。</p>
+            </article>
 
-          <article class="capability-card">
-            <div class="capability-icon">
-              <NotificationOutlined />
-            </div>
-            <h3>关键节点通知</h3>
-            <p>针对重要节点及法律时效提供定向信息反馈，确保客户在第一时间获悉事务的实质性更新。</p>
-          </article>
+            <article class="capability-card">
+              <div class="capability-icon">
+                <NotificationOutlined />
+              </div>
+              <h3>关键节点通知</h3>
+              <p>针对重要节点及法律时效提供定向信息反馈，确保客户在第一时间获悉事务的实质性更新。</p>
+            </article>
 
-          <article class="capability-card">
-            <div class="capability-icon">
-              <MessageOutlined />
-            </div>
-            <h3>专业协作空间</h3>
-            <p>整合意见反馈、文书校阅等功能，减少信息碎片化，为法律问题研讨提供统一协作环境。</p>
-          </article>
+            <article class="capability-card">
+              <div class="capability-icon">
+                <MessageOutlined />
+              </div>
+              <h3>专业协作空间</h3>
+              <p>整合意见反馈、文书校阅等功能，减少信息碎片化，为法律问题研讨提供统一协作环境。</p>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -89,61 +95,63 @@
         id="instructions"
         class="portal-section portal-section--plain section-shell"
       >
-        <div class="instruction-layout">
-          <div class="instruction-copy">
-            <p class="section-kicker">管理说明</p>
-            <h2>受控访问机制说明</h2>
+        <div class="section-frame section-frame--plain">
+          <div class="instruction-layout">
+            <div class="instruction-copy">
+              <p class="section-kicker">管理说明</p>
+              <h2>受控访问机制说明</h2>
 
-            <div class="instruction-list">
-              <article class="instruction-item">
-                <span>01</span>
-                <div>
-                  <h3>定向准入制</h3>
-                  <p>本门户仅向已建立正式委托关系的特定客户开放，不设公开注册入口，以确保相关资料保持必要的隔离性。</p>
-                </div>
-              </article>
+              <div class="instruction-list">
+                <article class="instruction-item">
+                  <span>01</span>
+                  <div>
+                    <h3>定向准入制</h3>
+                    <p>本门户仅向已建立正式委托关系的特定客户开放，不设公开注册入口，以确保相关资料保持必要的隔离性。</p>
+                  </div>
+                </article>
 
-              <article class="instruction-item">
-                <span>02</span>
-                <div>
-                  <h3>基于受控链接的访问机制</h3>
-                  <p>访问权限由承办律师根据案件保密要求进行管理，客户通过预留的联络渠道获取对应的访问凭证。</p>
-                </div>
-              </article>
+                <article class="instruction-item">
+                  <span>02</span>
+                  <div>
+                    <h3>基于受控链接的访问机制</h3>
+                    <p>访问权限由承办律师根据案件保密要求进行管理，客户通过预留的联络渠道获取对应的访问凭证。</p>
+                  </div>
+                </article>
 
-              <article class="instruction-item">
-                <span>03</span>
-                <div>
-                  <h3>权限动态管理</h3>
-                  <p>访问范围严格限定于当前委托事项，并依据协作进度及合规要求进行持续审核与管理。</p>
-                </div>
-              </article>
+                <article class="instruction-item">
+                  <span>03</span>
+                  <div>
+                    <h3>权限动态管理</h3>
+                    <p>访问范围严格限定于当前委托事项，并依据协作进度及合规要求进行持续审核与管理。</p>
+                  </div>
+                </article>
+              </div>
+
+              <p
+                v-if="accessNotice"
+                class="instruction-note"
+              >
+                {{ accessNotice }}
+              </p>
             </div>
 
-            <p
-              v-if="accessNotice"
-              class="instruction-note"
-            >
-              {{ accessNotice }}
-            </p>
+            <aside class="instruction-panel">
+              <div class="mock-card">
+                <div class="mock-head">
+                  <span class="mock-dot" />
+                  <span class="mock-line" />
+                </div>
+                <div class="mock-body">
+                  <div class="mock-field" />
+                  <div class="mock-field" />
+                  <div class="mock-lock">
+                    <LockOutlined />
+                    <span />
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>
-
-          <aside class="instruction-panel">
-            <div class="mock-card">
-              <div class="mock-head">
-                <span class="mock-dot" />
-                <span class="mock-line" />
-              </div>
-              <div class="mock-body">
-                <div class="mock-field" />
-                <div class="mock-field" />
-                <div class="mock-lock">
-                  <LockOutlined />
-                  <span />
-                </div>
-              </div>
-            </div>
-          </aside>
         </div>
       </section>
 
@@ -151,15 +159,17 @@
         id="contact"
         class="commitment section-shell"
       >
-        <SafetyCertificateOutlined class="commitment-icon" />
-        <h2>专业隐私承诺</h2>
-        <div class="commitment-copy">
-          <p>我们高度重视法律事务的私密性。本门户的设计与运行逻辑均遵循律师职业道德规范及行业数据保护要求。</p>
-          <p>通过访问控制与协作流程管理，确保数字化案卷与线上沟通记录始终处于必要边界之内。维护客户的信息安全与利益，是服务过程中的基本前提。</p>
-        </div>
-        <div class="commitment-support">
-          <p class="support-label">业务支持</p>
-          <p>如在访问过程中遇到问题或需调整协作权限，请通过预留联络方式直接联系您的承办律师团队。</p>
+        <div class="commitment-frame">
+          <SafetyCertificateOutlined class="commitment-icon" />
+          <h2>专业隐私承诺</h2>
+          <div class="commitment-copy">
+            <p>我们高度重视法律事务的私密性。本门户的设计与运行逻辑均遵循律师职业道德规范及行业数据保护要求。</p>
+            <p>通过访问控制与协作流程管理，确保数字化案卷与线上沟通记录始终处于必要边界之内。维护客户的信息安全与利益，是服务过程中的基本前提。</p>
+          </div>
+          <div class="commitment-support">
+            <p class="support-label">业务支持</p>
+            <p>如在访问过程中遇到问题或需调整协作权限，请通过预留联络方式直接联系您的承办律师团队。</p>
+          </div>
         </div>
       </section>
 
@@ -253,7 +263,7 @@ const heroLead = computed(() => {
 <style scoped>
 .portal-page {
   min-height: 100vh;
-  background: var(--lex-surface-strong);
+  background: #f7f5f1;
 }
 
 .content {
@@ -271,12 +281,26 @@ const heroLead = computed(() => {
 }
 
 .portal-hero {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  background: #fff;
+  padding-top: 104px;
+  padding-bottom: 120px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  background: transparent;
+}
+
+.hero-layout {
+  display: block;
+}
+
+.hero-panel {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .hero-copy {
-  max-width: 760px;
+  max-width: 840px;
 }
 
 .hero-eyebrow,
@@ -293,10 +317,10 @@ const heroLead = computed(() => {
 .hero-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: clamp(42px, 6vw, 72px);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  font-size: clamp(48px, 6vw, 76px);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
 }
 
 .hero-lead,
@@ -310,16 +334,17 @@ const heroLead = computed(() => {
 }
 
 .hero-lead {
-  max-width: 740px;
-  margin-top: 28px;
-  font-size: 18px;
+  max-width: 700px;
+  margin-top: 32px;
+  font-size: 19px;
+  line-height: 2;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 36px;
+  gap: 18px;
+  margin-top: 44px;
 }
 
 .hero-primary,
@@ -353,16 +378,29 @@ const heroLead = computed(() => {
 }
 
 .portal-section {
-  background: var(--lex-bg-muted);
+  background: transparent;
   border-bottom: 1px solid rgba(148, 163, 184, 0.14);
 }
 
 .portal-section--plain {
-  background: #fff;
+  background: transparent;
+}
+
+.section-frame {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.section-frame--plain {
+  background: transparent;
 }
 
 .section-head {
-  margin-bottom: 40px;
+  margin-bottom: 56px;
+  max-width: 720px;
 }
 
 .section-head h2,
@@ -377,20 +415,15 @@ const heroLead = computed(() => {
 
 .capability-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 48px;
 }
 
 .capability-card {
-  padding: 40px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 4px;
-  background: #fff;
-}
-
-.capability-card--dark {
-  background: var(--lex-surface-dark);
-  border-color: rgba(255, 255, 255, 0.08);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .capability-icon {
@@ -412,22 +445,17 @@ const heroLead = computed(() => {
 }
 
 .capability-card h3 {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   color: var(--text-primary);
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.3;
-}
-
-.capability-card--dark h3,
-.capability-card--dark p {
-  color: rgba(248, 250, 252, 0.92);
 }
 
 .instruction-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-  gap: 64px;
-  align-items: center;
+  gap: 88px;
+  align-items: start;
 }
 
 .instruction-list {
@@ -437,10 +465,10 @@ const heroLead = computed(() => {
 }
 
 .instruction-note {
-  margin: 32px 0 0;
-  padding: 18px 20px;
-  border-left: 3px solid rgba(30, 64, 175, 0.4);
-  background: rgba(241, 245, 249, 0.78);
+  margin: 40px 0 0;
+  padding: 0 0 0 18px;
+  border-left: 2px solid rgba(30, 64, 175, 0.3);
+  background: transparent;
   color: var(--text-secondary);
   line-height: 1.8;
 }
@@ -477,8 +505,8 @@ const heroLead = computed(() => {
 .mock-card {
   width: min(100%, 360px);
   padding: 36px;
-  border: 1px solid rgba(148, 163, 184, 0.24);
-  background: var(--lex-bg-muted);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .mock-head {
@@ -530,11 +558,18 @@ const heroLead = computed(() => {
 }
 
 .commitment {
+  background: var(--lex-surface-dark);
+  color: #fff;
+}
+
+.commitment-frame {
   display: grid;
   justify-items: center;
   text-align: center;
-  background: var(--lex-surface-dark);
-  color: #fff;
+  padding: 96px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .commitment-icon {
@@ -575,7 +610,7 @@ const heroLead = computed(() => {
   display: grid;
   justify-items: center;
   text-align: center;
-  background: #fff;
+  background: transparent;
 }
 
 .footer-meta {
@@ -635,9 +670,9 @@ const heroLead = computed(() => {
 
   .capability-grid {
     grid-template-columns: 1fr;
+    gap: 32px;
   }
 
-  .capability-card,
   .mock-card {
     padding: 24px;
   }

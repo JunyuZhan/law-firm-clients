@@ -1,7 +1,7 @@
 <template>
   <header
     class="app-header"
-    :class="[variant, variant === 'detail' ? 'has-welcome' : '']"
+    :class="[variant, variant === 'detail' ? 'has-welcome' : '', variant === 'portal' && !title ? 'portal-no-title' : '']"
   >
     <div class="header-backdrop" />
     <div class="header-content section-shell">
@@ -220,6 +220,14 @@ const detailSubtitle = computed(() => '项目进展与文件')
 
 .app-header.portal .header-center {
   justify-content: flex-start;
+}
+
+.app-header.portal-no-title .header-content {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.app-header.portal-no-title .header-center {
+  display: none;
 }
 
 .portal-left-group {
