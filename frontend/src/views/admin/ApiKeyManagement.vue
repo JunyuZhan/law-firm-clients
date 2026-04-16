@@ -29,10 +29,10 @@
       <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
         <div class="guide-card__head dashboard-guide-head">
           <div>
-              <h3>{{ ADMIN_API_KEY_TEXTS.guide.title }}</h3>
+            <h3>{{ ADMIN_API_KEY_TEXTS.guide.title }}</h3>
           </div>
           <a-tag color="processing">
-              {{ ADMIN_API_KEY_TEXTS.guide.tag }}
+            {{ ADMIN_API_KEY_TEXTS.guide.tag }}
           </a-tag>
         </div>
         <a-descriptions

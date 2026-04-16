@@ -29,8 +29,12 @@
       <main>
         <section class="portal-hero">
           <div class="portal-hero__copy">
-            <h1 class="portal-hero__title">{{ lawFirmName }} 客户服务系统</h1>
-            <p class="portal-hero__eyebrow">{{ heroEyebrow }}</p>
+            <h1 class="portal-hero__title">
+              {{ lawFirmName }} 客户服务系统
+            </h1>
+            <p class="portal-hero__eyebrow">
+              {{ heroEyebrow }}
+            </p>
 
             <div class="portal-hero__feature-list">
               <article
@@ -119,8 +123,14 @@
         </div>
 
         <div class="portal-footer__links">
-          <a href="#portal-features">服务条款</a>
-          <a href="#portal-features">隐私政策</a>
+          <a
+            href="#portal-features"
+            aria-label="查看服务条款"
+          >服务条款</a>
+          <a
+            href="#portal-features"
+            aria-label="查看隐私政策"
+          >隐私政策</a>
         </div>
       </footer>
     </div>
@@ -285,7 +295,6 @@ function goToAdminLogin() {
   width: min(100%, 1450px);
   margin: 0 auto;
   border: 1px solid rgba(15, 23, 42, 0.18);
-  border-radius: 18px;
   overflow: hidden;
   background: #f8fafc;
   box-shadow: 0 30px 80px rgba(15, 23, 42, 0.24);
@@ -347,16 +356,20 @@ function goToAdminLogin() {
 
 .portal-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.02fr) minmax(400px, 0.98fr);
+  grid-template-columns: 1fr 500px;
   gap: 56px;
   align-items: center;
   padding: 48px 28px 64px;
 }
 
+.portal-hero__copy {
+  max-width: 680px;
+}
+
 .portal-hero__title {
   margin: 0;
   color: var(--lex-primary);
-  font-size: clamp(36px, 3.6vw, 58px);
+  font-size: clamp(28px, 4vw, 58px);
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -470,17 +483,15 @@ function goToAdminLogin() {
 
 .portal-tools__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid #d8e0ea;
-  border-left: 1px solid #d8e0ea;
-  background: #fff;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: #d8e0ea;
+  border: 1px solid #d8e0ea;
 }
 
 .portal-tool-card {
   min-height: 220px;
   padding: 24px 22px;
-  border-right: 1px solid #d8e0ea;
-  border-bottom: 1px solid #d8e0ea;
   background: #fff;
 }
 
@@ -534,9 +545,10 @@ function goToAdminLogin() {
 
 .portal-security__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 26px;
-  width: min(100%, 980px);
+  max-width: 980px;
+  width: 100%;
 }
 
 .portal-security__item h3,
@@ -587,12 +599,26 @@ function goToAdminLogin() {
     gap: 28px;
   }
 
+  .portal-hero__copy {
+    max-width: 100%;
+  }
+
   .portal-hero__visual {
     justify-content: flex-start;
   }
+}
 
+@media (max-width: 900px) {
   .portal-tools__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .portal-tool-card h3 {
+    font-size: 16px;
+  }
+
+  .portal-tool-card p {
+    font-size: 13px;
   }
 }
 
@@ -602,7 +628,6 @@ function goToAdminLogin() {
   }
 
   .portal-shell {
-    border-radius: 0;
     border: none;
   }
 
@@ -616,8 +641,26 @@ function goToAdminLogin() {
   }
 
   .portal-hero {
+    grid-template-columns: 1fr;
     padding-top: 24px;
     padding-bottom: 40px;
+  }
+
+  .portal-hero__visual {
+    display: none;
+  }
+
+  .portal-hero__title {
+    font-size: 32px;
+  }
+
+  .hero-highlight h2 {
+    font-size: 18px;
+  }
+
+  .portal-section-head h2,
+  .portal-security h2 {
+    font-size: 24px;
   }
 
   .portal-tools__grid,
@@ -625,18 +668,18 @@ function goToAdminLogin() {
     grid-template-columns: 1fr;
   }
 
+  .portal-tool-card {
+    min-height: 180px;
+    padding: 20px 18px;
+  }
+
+  .portal-tool-card h3 {
+    font-size: 16px;
+  }
+
   .portal-footer {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .hero-highlight h2 {
-    font-size: 19px;
-  }
-
-  .portal-section-head h2,
-  .portal-security h2 {
-    font-size: 28px;
   }
 }
 </style>

@@ -193,13 +193,13 @@
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space>
-                <a-button
-                  type="link"
-                  size="small"
-                  @click="handleEdit(record)"
-                >
-                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.actions.edit }}
-                </a-button>
+              <a-button
+                type="link"
+                size="small"
+                @click="handleEdit(record)"
+              >
+                {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.actions.edit }}
+              </a-button>
               <a-popconfirm
                 :title="UI_CONFIRM_TEXTS.removeTemplate"
                 @confirm="handleDelete(record)"

@@ -30,14 +30,22 @@
             <p class="brand-label">
               {{ organizationName || '律师事务所' }}
             </p>
-            <p class="brand-heading">{{ UI_TEXTS.loginTitle }}</p>
+            <p class="brand-heading">
+              {{ UI_TEXTS.loginTitle }}
+            </p>
           </div>
         </div>
 
         <div class="brand-copy">
-          <p class="brand-kicker">Administrator Access</p>
-          <h1 class="form-title">{{ appSlogan }}</h1>
-          <p class="form-subtitle">管理员通过本入口进入系统后台，统一处理客户协作、案件流转、通知记录与平台配置。</p>
+          <p class="brand-kicker">
+            Administrator Access
+          </p>
+          <h1 class="form-title">
+            {{ appSlogan }}
+          </h1>
+          <p class="form-subtitle">
+            管理员通过本入口进入系统后台，统一处理客户协作、案件流转、通知记录与平台配置。
+          </p>
         </div>
 
         <div class="brand-points">
@@ -58,7 +66,9 @@
 
       <div class="form-panel">
         <div class="form-panel-head">
-          <p class="form-eyebrow">管理端登录</p>
+          <p class="form-eyebrow">
+            管理端登录
+          </p>
           <h2>进入工作台</h2>
           <p>请使用已分配的账户信息完成身份校验后进入管理后台。</p>
         </div>

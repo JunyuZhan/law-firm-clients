@@ -46,7 +46,9 @@
             :name="item.key"
             :title="item.title"
           >
-            <p class="faq-answer">{{ item.content }}</p>
+            <p class="faq-answer">
+              {{ item.content }}
+            </p>
           </van-collapse-item>
         </van-collapse>
       </section>

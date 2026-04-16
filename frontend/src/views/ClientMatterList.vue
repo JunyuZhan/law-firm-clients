@@ -66,8 +66,12 @@
             >
               <div class="matter-card__head">
                 <div>
-                  <p class="matter-card__eyebrow">案件编号 {{ item.id }}</p>
-                  <h3 class="matter-card__title">{{ item.matterName }}</h3>
+                  <p class="matter-card__eyebrow">
+                    案件编号 {{ item.id }}
+                  </p>
+                  <h3 class="matter-card__title">
+                    {{ item.matterName }}
+                  </h3>
                 </div>
                 <van-tag
                   plain
@@ -101,10 +105,15 @@
         <div class="matter-sheet__handle" />
         <div class="matter-sheet__header">
           <div>
-            <p class="matter-sheet__eyebrow">案件事务概览</p>
+            <p class="matter-sheet__eyebrow">
+              案件事务概览
+            </p>
             <h2>{{ selectedMatter.matterName }}</h2>
           </div>
-          <van-tag plain :type="getStatusTone(selectedMatter.status)">
+          <van-tag
+            plain
+            :type="getStatusTone(selectedMatter.status)"
+          >
             {{ getStatusName(selectedMatter.status) }}
           </van-tag>
         </div>
