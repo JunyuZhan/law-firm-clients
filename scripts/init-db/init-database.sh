@@ -20,7 +20,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # 配置
-CONTAINER_NAME="client-postgres"
+CONTAINER_NAME="client-service-postgres"
 DB_NAME="client_service"
 DB_USER="postgres"
 DB_PASSWORD="${POSTGRES_PASSWORD:-postgres}"

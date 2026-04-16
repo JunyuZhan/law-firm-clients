@@ -431,7 +431,7 @@ pg_dump -h localhost -U postgres client_service > backup.sql
 
 ```bash
 # Docker方式
-docker cp client-backend:/data/client-service/files ./backup/files
+docker cp client-service-backend:/data/client-service/files ./backup/files
 
 # 传统方式
 tar -czf files-backup.tar.gz /data/client-service/files
@@ -453,7 +453,7 @@ psql -h localhost -U postgres client_service < backup.sql
 
 ```bash
 # Docker方式
-docker cp ./backup/files client-backend:/data/client-service/files
+docker cp ./backup/files client-service-backend:/data/client-service/files
 
 # 传统方式
 tar -xzf files-backup.tar.gz -C /

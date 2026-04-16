@@ -1,7 +1,7 @@
 # =====================================================
 # 客户服务系统 Docker Compose 配置
 # =====================================================
-name: client
+name: client-service
 # 架构：Nginx (80) -> 前端静态文件 + 后端 API 代理
 # 数据库和缓存仅内部网络访问，不暴露端口
 # =====================================================
@@ -17,17 +17,18 @@ services:
   # ========== Nginx 入口（唯一对外暴露端口）==========
   # 使用非 root 用户运行（安全最佳实践）
   nginx:
+    image: client-service-frontend:latest
     build:
       context: ..
       dockerfile: docker/Dockerfile.frontend
-    container_name: client-nginx
+    container_name: client-service-nginx
     ports:
       - "${NGINX_PORT:-8080}:8080"
     depends_on:
       app:
         condition: service_healthy
     networks:
-      - client-network
+      - client-service-network
     restart: unless-stopped
     logging: *default-logging
     healthcheck:
@@ -38,10 +39,11 @@ services:
 
   # ========== 后端应用 ==========
   app:
+    image: client-service-backend:latest
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: client-backend
+    container_name: client-service-backend
     # 不暴露端口，仅通过 Nginx 代理访问
     expose:
       - "8081"
@@ -64,15 +66,15 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-}
       MINIO_BUCKET: ${MINIO_BUCKET:-client-service}
     volumes:
-      - client_file_storage:/data/client-service/files
-      - client_app_logs:/app/logs
+      - client_service_file_storage:/data/client-service/files
+      - client_service_app_logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - client-network
+      - client-service-network
     restart: unless-stopped
     logging: *default-logging
     healthcheck:
@@ -85,7 +87,7 @@ services:
   # ========== PostgreSQL 数据库 ==========
   postgres:
     image: postgres:15-alpine
-    container_name: client-postgres
+    container_name: client-service-postgres
     # 不暴露端口，仅内部网络访问
     expose:
       - "5432"
@@ -94,10 +96,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}
     volumes:
-      - client_postgres_data:/var/lib/postgresql/data
+      - client_service_postgres_data:/var/lib/postgresql/data
       - ../scripts/init-db:/docker-entrypoint-initdb.d
     networks:
-      - client-network
+      - client-service-network
     restart: unless-stopped
     logging: *default-logging
     healthcheck:
@@ -109,7 +111,7 @@ services:
   # ========== Redis 缓存 ==========
   redis:
     image: redis:7-alpine
-    container_name: client-redis
+    container_name: client-service-redis
     # 不暴露端口，仅内部网络访问
     expose:
       - "6379"
@@ -118,9 +120,9 @@ services:
       --appendonly yes 
       ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
     volumes:
-      - client_redis_data:/data
+      - client_service_redis_data:/data
     networks:
-      - client-network
+      - client-service-network
     restart: unless-stopped
     logging: *default-logging
     healthcheck:
@@ -133,7 +135,7 @@ services:
   # 取消注释以启用 MinIO
   # minio:
   #   image: minio/minio:latest
-  #   container_name: client-minio
+  #   container_name: client-service-minio
   #   ports:
   #     # Console 管理界面（运维访问）
   #     - "${MINIO_CONSOLE_PORT:-9001}:9001"
@@ -147,7 +149,7 @@ services:
   #   volumes:
   #     - minio_data:/data
   #   networks:
-  #     - client-network
+  #     - client-service-network
   #   restart: unless-stopped
   #   healthcheck:
   #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -167,7 +169,7 @@ services:
   #
   # onlyoffice:
   #   image: onlyoffice/documentserver:8.0
-  #   container_name: client-onlyoffice
+  #   container_name: client-service-onlyoffice
   #   expose:
   #     - "80"
   #   environment:
@@ -183,7 +185,7 @@ services:
   #     - onlyoffice_logs:/var/log/onlyoffice
   #     - onlyoffice_fonts:/var/www/onlyoffice/documentserver/fonts
   #   networks:
-  #     - client-network
+  #     - client-service-network
   #   restart: unless-stopped
   #   healthcheck:
   #     test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
@@ -192,18 +194,18 @@ services:
   #     retries: 3
 
 networks:
-  client-network:
+  client-service-network:
     driver: bridge
 
 volumes:
-  client_postgres_data:
-    name: client-postgres-data
-  client_redis_data:
-    name: client-redis-data
-  client_file_storage:
-    name: client-file-storage
-  client_app_logs:
-    name: client-app-logs
+  client_service_postgres_data:
+    name: client-service-postgres-data
+  client_service_redis_data:
+    name: client-service-redis-data
+  client_service_file_storage:
+    name: client-service-file-storage
+  client_service_app_logs:
+    name: client-service-app-logs
   # minio_data:       # 取消注释以启用 MinIO
   # onlyoffice_data:  # 取消注释以启用 OnlyOffice
   # onlyoffice_logs:  # 取消注释以启用 OnlyOffice

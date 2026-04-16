@@ -144,7 +144,7 @@ Docker Compose配置了以下数据卷：
 docker-compose exec postgres pg_dump -U postgres client_service > backup.sql
 
 # 备份文件存储
-docker cp client-backend:/data/client-service/files ./backup/files
+docker cp client-service-backend:/data/client-service/files ./backup/files
 ```
 
 ### 恢复数据

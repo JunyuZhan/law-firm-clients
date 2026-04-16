@@ -561,7 +561,7 @@ backup_data() {
     
     # 备份文件存储
     log_info "备份文件存储..."
-    if docker cp client-backend:/data/client-service/files "$BACKUP_DIR/$BACKUP_NAME/files" 2>/dev/null; then
+    if docker cp client-service-backend:/data/client-service/files "$BACKUP_DIR/$BACKUP_NAME/files" 2>/dev/null; then
         log_success "文件存储备份完成"
     else
         log_warn "文件存储目录为空或不存在"
@@ -641,21 +641,21 @@ show_status() {
     fi
     
     # 检查后端
-    if docker exec client-backend curl -sf http://localhost:8081/api/health > /dev/null 2>&1; then
+    if docker exec client-service-backend curl -sf http://localhost:8081/api/health > /dev/null 2>&1; then
         echo -e "  后端:     ${GREEN}✓ 正常${NC}"
     else
         echo -e "  后端:     ${RED}✗ 异常${NC}"
     fi
     
     # 检查数据库
-    if docker exec client-postgres pg_isready > /dev/null 2>&1; then
+    if docker exec client-service-postgres pg_isready > /dev/null 2>&1; then
         echo -e "  数据库:   ${GREEN}✓ 正常${NC}"
     else
         echo -e "  数据库:   ${RED}✗ 异常${NC}"
     fi
     
     # 检查 Redis
-    if docker exec client-redis redis-cli ping > /dev/null 2>&1; then
+    if docker exec client-service-redis redis-cli ping > /dev/null 2>&1; then
         echo -e "  Redis:    ${GREEN}✓ 正常${NC}"
     else
         echo -e "  Redis:    ${RED}✗ 异常${NC}"

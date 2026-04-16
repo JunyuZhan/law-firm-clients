@@ -31,7 +31,7 @@ fi
 # 备份文件存储
 echo "备份文件存储..."
 if docker-compose ps app | grep -q "Up"; then
-    if docker cp client-backend:/data/client-service/files "$BACKUP_DIR/$BACKUP_NAME/files" 2>/dev/null; then
+    if docker cp client-service-backend:/data/client-service/files "$BACKUP_DIR/$BACKUP_NAME/files" 2>/dev/null; then
         echo "文件存储备份完成"
     else
         echo "警告: 文件存储目录为空或不存在"

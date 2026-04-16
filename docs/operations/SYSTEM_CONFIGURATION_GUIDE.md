@@ -221,7 +221,7 @@ https://{客服系统域名或IP}:8080/api
 
 **方法2：通过数据库直接配置**
 ```bash
-docker exec client-postgres psql -U postgres -d client_service -c \
+docker exec client-service-postgres psql -U postgres -d client_service -c \
   "UPDATE sys_config SET config_value = 'http://{客服系统域名或IP}:8080' WHERE config_key = 'system.base-url';"
 ```
 
@@ -239,7 +239,7 @@ docker exec client-postgres psql -U postgres -d client_service -c \
 ### 验证客户服务系统配置
 
 ```bash
-docker exec client-postgres psql -U postgres -d client_service -c \
+docker exec client-service-postgres psql -U postgres -d client_service -c \
   "SELECT config_key, config_value FROM sys_config WHERE config_key LIKE 'callback%' OR config_key = 'system.base-url';"
 ```
 
@@ -290,7 +290,7 @@ enabled          = true
 
 **A:**
 1. 查看容器端口映射：`docker ps | grep client`
-2. 查看nginx配置：`docker exec client-nginx cat /etc/nginx/nginx.conf`
+2. 查看nginx配置：`docker exec client-service-nginx cat /etc/nginx/nginx.conf`
 
 ### Q3: API密钥在哪里查看？
 
@@ -309,7 +309,7 @@ enabled          = true
 **A:**
 1. 检查配置值是否正确（特别是URL是否包含`/api`和端口）
 2. 检查服务是否启用
-3. 查看日志：`docker logs client-backend --tail 100`
+3. 查看日志：`docker logs client-service-backend --tail 100`
 4. 测试网络连通性：`curl http://目标地址/api/actuator/health`
 
 ---
