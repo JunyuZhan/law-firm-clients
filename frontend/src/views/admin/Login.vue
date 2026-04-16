@@ -35,24 +35,22 @@
         </div>
 
         <div class="brand-copy">
-          <p class="brand-kicker">Secure Access Gateway</p>
-          <h1 class="form-title">专业 · 诚信 · 高效</h1>
-          <p class="form-subtitle">面向管理成员的受控入口，用于统一处理案件、通知、文书与客户协作事项。</p>
+          <p class="brand-kicker">Administrator Access</p>
+          <h1 class="form-title">{{ appSlogan }}</h1>
+          <p class="form-subtitle">管理员通过本入口进入系统后台，统一处理客户协作、案件流转、通知记录与平台配置。</p>
         </div>
 
         <div class="brand-points">
           <article class="brand-point">
-            <span class="point-index">01</span>
             <div>
-              <h2>受控访问</h2>
-              <p>仅向经授权的管理成员开放，统一纳入权限边界与登录审计。</p>
+              <h2>管理员受控入口</h2>
+              <p>仅向已授权的系统管理员开放，所有登录行为均纳入身份校验与权限边界控制。</p>
             </div>
           </article>
           <article class="brand-point">
-            <span class="point-index">02</span>
             <div>
-              <h2>数据边界</h2>
-              <p>案件、文书与客户协作空间按授权范围隔离，保持资料治理秩序。</p>
+              <h2>统一资料治理</h2>
+              <p>案件、文书、通知与客户协作信息在统一后台中维护，保持数据口径与操作秩序一致。</p>
             </div>
           </article>
         </div>
@@ -187,6 +185,7 @@ const appConfigStore = useAppConfigStore()
 
 const currentYear = new Date().getFullYear()
 const organizationName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName)
+const appSlogan = computed(() => appConfigStore.appSlogan?.trim() || '专业 · 诚信 · 高效')
 const footerCopyright = computed(() => {
   const normalized = appConfigStore.copyright
     .split(/\r?\n/)
@@ -312,29 +311,29 @@ onMounted(() => {
   place-items: center;
   padding: 32px;
   background:
-    radial-gradient(circle at top left, rgba(27, 59, 95, 0.1), transparent 34%),
-    linear-gradient(180deg, #f6f4ef 0%, #f3f0ea 52%, #ece7df 100%);
+    radial-gradient(circle at top left, rgba(27, 59, 95, 0.12), transparent 32%),
+    linear-gradient(180deg, #f6f7f9 0%, #eef1f5 54%, #f7f9fc 100%);
 }
 
 .login-shell {
   width: min(1120px, 100%);
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 420px);
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 430px);
   border: 1px solid rgba(16, 42, 67, 0.08);
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.88);
   box-shadow: 0 24px 60px rgba(16, 42, 67, 0.08);
   backdrop-filter: blur(18px);
 }
 
 .brand-panel {
   display: grid;
-  align-content: space-between;
-  gap: 44px;
-  min-height: 720px;
+  align-content: start;
+  gap: 40px;
+  min-height: 680px;
   padding: 56px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0.18) 100%),
-    linear-gradient(145deg, rgba(16, 42, 67, 0.04) 0%, rgba(27, 59, 95, 0.01) 100%);
+    radial-gradient(circle at top right, rgba(27, 59, 95, 0.06), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 100%);
   border-right: 1px solid rgba(16, 42, 67, 0.08);
 }
 
@@ -346,19 +345,19 @@ onMounted(() => {
 
 .brand-lockup {
   display: grid;
-  gap: 4px;
+  gap: 6px;
 }
 
 .logo-shell {
-  width: 68px;
-  height: 68px;
+  width: 62px;
+  height: 62px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 18px;
-  border: 1px solid rgba(16, 42, 67, 0.1);
-  background: rgba(255, 255, 255, 0.82);
+  border-radius: 16px;
+  border: 1px solid rgba(16, 42, 67, 0.12);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 12px 24px rgba(16, 42, 67, 0.06);
 }
 
@@ -370,8 +369,8 @@ onMounted(() => {
 
 .brand-copy {
   display: grid;
-  gap: 18px;
-  max-width: 560px;
+  gap: 16px;
+  max-width: 520px;
 }
 
 .brand-label {
@@ -379,14 +378,14 @@ onMounted(() => {
   color: #1b3b5f;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .brand-heading {
   margin: 0;
   color: #486581;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.5;
 }
@@ -395,23 +394,23 @@ onMounted(() => {
   margin: 0;
   color: rgba(72, 101, 129, 0.82);
   font-size: 12px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
 .form-title {
   margin: 0;
-  font-family: 'EB Garamond', 'PingFang SC', serif;
-  font-size: clamp(44px, 4vw, 64px);
+  font-family: 'EB Garamond', 'STSong', 'Songti SC', serif;
+  font-size: clamp(54px, 6vw, 82px);
   font-weight: 600;
-  line-height: 1.06;
+  line-height: 0.96;
   color: #102a43;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.05em;
 }
 
 .form-subtitle {
   margin: 0;
-  max-width: 520px;
+  max-width: 460px;
   font-size: 16px;
   color: #627d98;
   line-height: 1.9;
@@ -419,37 +418,24 @@ onMounted(() => {
 
 .brand-points {
   display: grid;
-  gap: 20px;
-  max-width: 560px;
+  gap: 18px;
+  max-width: 520px;
+  margin-top: auto;
 }
 
 .brand-point {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
   align-items: start;
-  padding-top: 20px;
+  padding-top: 18px;
   border-top: 1px solid rgba(16, 42, 67, 0.08);
-}
-
-.point-index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 999px;
-  border: 1px solid rgba(16, 42, 67, 0.12);
-  color: #1b3b5f;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
 }
 
 .brand-point h2 {
   margin: 0 0 8px;
   color: #102a43;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
 }
 
@@ -464,8 +450,8 @@ onMounted(() => {
   display: grid;
   align-content: center;
   gap: 28px;
-  padding: 56px 48px;
-  background: rgba(255, 255, 255, 0.96);
+  padding: 56px 44px;
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .form-panel-head {
@@ -485,9 +471,11 @@ onMounted(() => {
 .form-panel-head h2 {
   margin: 0;
   color: #102a43;
-  font-size: 30px;
+  font-family: 'EB Garamond', 'STSong', 'Songti SC', serif;
+  font-size: 34px;
   font-weight: 600;
   line-height: 1.2;
+  letter-spacing: -0.03em;
 }
 
 .form-panel-head p {
@@ -499,6 +487,11 @@ onMounted(() => {
 
 .login-form {
   margin-bottom: 12px;
+}
+
+.login-form :deep(.ant-input-affix-wrapper),
+.login-form :deep(.ant-input) {
+  border-radius: 4px;
 }
 
 .login-form :deep(.ant-form-item) {
@@ -553,7 +546,8 @@ onMounted(() => {
   height: 48px !important;
   font-size: 16px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .error-alert {
@@ -613,6 +607,10 @@ onMounted(() => {
   .logo-shell {
     width: 56px;
     height: 56px;
+  }
+
+  .form-title {
+    font-size: clamp(40px, 16vw, 56px);
   }
 
   .captcha-row {
