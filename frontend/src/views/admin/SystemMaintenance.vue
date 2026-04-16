@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          状态、升级、备份与日志；按需刷新。
+          {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.intro }}
         </p>
       </div>
       <a-button
@@ -14,26 +14,26 @@
         <template #icon>
           <ReloadOutlined />
         </template>
-        刷新状态
+        {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.actions.refreshStatus }}
       </a-button>
     </section>
 
     <section class="ops-overview">
       <article class="ops-metric">
-        <span>数据库连接</span>
-        <strong>{{ status.database?.connected ? '正常' : '待检查' }}</strong>
+        <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.database }}</span>
+        <strong>{{ status.database?.connected ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.normal : ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.waiting }}</strong>
       </article>
       <article class="ops-metric">
-        <span>文件存储</span>
-        <strong>{{ status.storage?.available ? '可用' : '待检查' }}</strong>
+        <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.storage }}</span>
+        <strong>{{ status.storage?.available ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.available : ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.waiting }}</strong>
       </article>
       <article class="ops-metric">
-        <span>备份文件</span>
+        <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.backups }}</span>
         <strong>{{ backups.length }}</strong>
       </article>
       <article class="ops-metric">
-        <span>版本状态</span>
-        <strong>{{ gitInfo.hasUpdate ? '可升级' : gitInfo.currentVersion ? '最新' : '未检查' }}</strong>
+        <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.version }}</span>
+        <strong>{{ gitInfo.hasUpdate ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.upgradeable : gitInfo.currentVersion ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.latest : ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.unchecked }}</strong>
       </article>
     </section>
 
@@ -47,20 +47,20 @@
         :md="8"
       >
         <a-card
-          title="数据库状态"
+          :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.databaseTitle"
           :loading="loading"
           class="maintenance-card"
         >
           <template #extra>
             <a-tag :color="status.database?.connected ? 'green' : 'red'">
-              {{ status.database?.connected ? '正常' : '异常' }}
+              {{ status.database?.connected ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.normal : ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.abnormal }}
             </a-tag>
           </template>
           <a-descriptions
             :column="1"
             size="small"
           >
-            <a-descriptions-item label="数据库大小">
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.databaseSizeLabel">
               {{ status.database?.sizeFormatted || '-' }}
             </a-descriptions-item>
           </a-descriptions>
@@ -72,7 +72,7 @@
               class="stat-item"
             >
               <span class="stat-label">{{ name }}</span>
-              <span class="stat-value">{{ count }} 条</span>
+              <span class="stat-value">{{ count }} {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.recordsSuffix }}</span>
             </div>
           </div>
         </a-card>
@@ -84,26 +84,26 @@
         :md="8"
       >
         <a-card
-          title="文件存储"
+          :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.storageTitle"
           :loading="loading"
           class="maintenance-card"
         >
           <template #extra>
             <a-tag :color="status.storage?.available ? 'green' : 'red'">
-              {{ status.storage?.available ? '正常' : '异常' }}
+              {{ status.storage?.available ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.normal : ADMIN_SYSTEM_MAINTENANCE_TEXTS.overview.abnormal }}
             </a-tag>
           </template>
           <a-descriptions
             :column="1"
             size="small"
           >
-            <a-descriptions-item label="文件数量">
-              {{ status.storage?.fileCount || 0 }} 个
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.fileCountLabel">
+              {{ status.storage?.fileCount || 0 }} {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.filesSuffix }}
             </a-descriptions-item>
-            <a-descriptions-item label="占用空间">
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.storageUsageLabel">
               {{ status.storage?.totalSizeFormatted || '-' }}
             </a-descriptions-item>
-            <a-descriptions-item label="存储路径">
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.storagePathLabel">
               <a-typography-text
                 code
                 style="font-size: 12px"
@@ -121,7 +121,7 @@
         :md="8"
       >
         <a-card
-          title="服务器信息"
+          :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.serverTitle"
           :loading="loading"
           class="maintenance-card"
         >
@@ -129,19 +129,19 @@
             :column="1"
             size="small"
           >
-            <a-descriptions-item label="Java 版本">
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.javaVersionLabel">
               {{ status.system?.javaVersion || '-' }}
             </a-descriptions-item>
-            <a-descriptions-item label="操作系统">
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.osLabel">
               {{ status.system?.osName || '-' }}
             </a-descriptions-item>
-            <a-descriptions-item label="CPU 核心">
-              {{ status.system?.availableProcessors || '-' }} 核
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.cpuLabel">
+              {{ status.system?.availableProcessors || '-' }} {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.cpuSuffix }}
             </a-descriptions-item>
-            <a-descriptions-item label="可用内存">
-              {{ status.system?.freeMemoryMB || '-' }} / {{ status.system?.maxMemoryMB || '-' }} MB
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.memoryLabel">
+              {{ status.system?.freeMemoryMB || '-' }} / {{ status.system?.maxMemoryMB || '-' }} {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.memorySuffix }}
             </a-descriptions-item>
-            <a-descriptions-item label="服务器时间">
+            <a-descriptions-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cards.serverTimeLabel">
               {{ status.system?.serverTime || '-' }}
             </a-descriptions-item>
           </a-descriptions>
@@ -151,7 +151,7 @@
 
     <!-- 系统升级 -->
     <a-card
-      title="系统升级"
+      :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.systemUpgrade"
       class="maintenance-card section-card"
     >
       <template #extra>
@@ -159,29 +159,29 @@
           :loading="gitLoading"
           @click="refreshGitInfo"
         >
-          <ReloadOutlined /> 检查更新
+          <ReloadOutlined /> {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.checkUpdates }}
         </a-button>
       </template>
 
       <div class="section-head dashboard-section-head">
         <div>
-          <h3>升级与版本检查</h3>
+          <h3>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.upgradeCheckTitle }}</h3>
         </div>
-        <p>先确认当前版本与远端版本差异，再决定是否进入升级指南。</p>
+        <p>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.upgradeCheckDesc }}</p>
       </div>
 
       <div class="upgrade-summary">
         <div class="upgrade-summary-item">
-          <span>当前版本</span>
+          <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.currentVersion }}</span>
           <strong>{{ gitInfo.currentVersion || '-' }}</strong>
         </div>
         <div class="upgrade-summary-item">
-          <span>远端版本</span>
+          <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.remoteVersion }}</span>
           <strong>{{ gitInfo.remoteVersion || '-' }}</strong>
         </div>
         <div class="upgrade-summary-item">
-          <span>升级判断</span>
-          <strong>{{ gitInfo.hasUpdate ? '建议进入升级流程' : gitInfo.currentVersion ? '当前已是最新版本' : '等待检查' }}</strong>
+          <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.decision }}</span>
+          <strong>{{ gitInfo.hasUpdate ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.suggestUpgrade : gitInfo.currentVersion ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.alreadyLatest : ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.waitingCheck }}</strong>
         </div>
       </div>
 
@@ -221,7 +221,7 @@
       <!-- 状态提示 -->
       <a-alert
         v-if="gitInfo.hasUpdate"
-        message="发现新版本"
+        :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.newVersion"
         :description="gitInfo.updateMessage"
         type="success"
         show-icon
@@ -235,20 +235,20 @@
             :href="gitInfo.releaseUrl"
             target="_blank"
           >
-            查看更新日志
+            {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.releaseNotes }}
           </a-button>
         </template>
       </a-alert>
       <a-alert
         v-else-if="gitInfo.currentVersion && gitInfo.remoteVersion"
-        :message="gitInfo.updateMessage || '已是最新版本'"
+        :message="gitInfo.updateMessage || ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.latestVersionMessage"
         type="info"
         show-icon
         style="margin-bottom: 16px"
       />
       <a-alert
         v-if="gitInfo.error"
-        message="检查失败"
+        :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.failedTitle"
         :description="gitInfo.error"
         type="warning"
         show-icon
@@ -263,13 +263,13 @@
           size="large"
           @click="showUpgradeGuide"
         >
-          <RocketOutlined /> 查看升级指南
+          <RocketOutlined /> {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.guideButton }}
         </a-button>
         <span
           v-if="!gitInfo.hasUpdate && gitInfo.currentVersion"
           class="upgrade-status-text"
         >
-          当前已是最新版本
+          {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.alreadyLatest }}
         </span>
       </div>
 
@@ -280,14 +280,16 @@
         show-icon
       >
         <template #message>
-          升级说明
+          {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.guideTitle }}
         </template>
         <template #description>
           <ul style="padding-left: 20px; margin: 8px 0 0">
-            <li>容器化部署需要在服务器上手动执行升级命令</li>
-            <li>点击"查看升级指南"获取具体操作步骤</li>
-            <li>升级过程中服务可能会短暂中断</li>
-            <li>建议在低峰期执行升级操作</li>
+            <li
+              v-for="item in ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.guideItems"
+              :key="item"
+            >
+              {{ item }}
+            </li>
           </ul>
         </template>
       </a-alert>
@@ -296,13 +298,13 @@
     <!-- 升级指南弹窗 -->
     <a-modal
       v-model:open="upgradeGuideVisible"
-      title="升级指南"
+      :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.guideModalTitle"
       :footer="null"
       :width="modalWidth"
       wrap-class-name="upgrade-modal"
     >
       <a-alert
-        message="请在服务器上执行以下命令完成升级"
+        :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.guideAlert"
         :description="upgradeGuideData.message"
         type="info"
         show-icon
@@ -313,8 +315,8 @@
         <pre class="code-block">{{ upgradeGuideData.commands }}</pre>
         <a-alert
           v-if="copySuccess"
-          message="命令已自动复制到剪贴板"
-          description="您可以直接在终端中粘贴执行（记得修改路径为实际项目目录）"
+          :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.copyAlertTitle"
+          :description="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.copyAlertDesc"
           type="success"
           show-icon
           style="margin-top: 12px"
@@ -325,14 +327,14 @@
           style="margin-top: 8px"
           @click="handleReCopy"
         >
-          <CopyOutlined /> {{ copySuccess ? '重新复制' : '复制命令' }}
+          <CopyOutlined /> {{ copySuccess ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.copyAgain : ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.copyNow }}
         </a-button>
       </div>
       
       <a-divider />
       
       <a-typography-text type="secondary">
-        <p><strong>操作步骤：</strong></p>
+        <p><strong>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.stepsTitle }}</strong></p>
         <ol>
           <li
             v-for="(step, index) in (upgradeGuideData.steps || [])"
@@ -350,20 +352,20 @@
           :href="gitInfo.releaseUrl"
           target="_blank"
         >
-          查看 GitHub Releases
+          {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.githubReleases }}
         </a-button>
         <a-button
           type="primary"
           @click="upgradeGuideVisible = false"
         >
-          知道了
+          {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.acknowledged }}
         </a-button>
       </div>
     </a-modal>
 
     <!-- 数据备份 -->
     <a-card
-      title="数据备份"
+      :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.backupTitle"
       class="maintenance-card section-card"
     >
       <template #extra>
@@ -372,21 +374,21 @@
           :loading="backupLoading"
           @click="createBackup"
         >
-          <DownloadOutlined /> 创建备份
+          <DownloadOutlined /> {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.create }}
         </a-button>
       </template>
 
       <div class="section-head dashboard-section-head">
         <div>
-          <h3>备份管理</h3>
+          <h3>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.backupManageTitle }}</h3>
         </div>
-        <p>页面内可直接创建、下载和删除备份文件，用于升级前留档和恢复准备。</p>
+        <p>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.backupManageDesc }}</p>
       </div>
 
       <div class="compact-info-row">
         <a-alert
-          message="备份说明"
-          description="点击「创建备份」会导出数据库中的所有数据为 SQL 文件。建议定期备份，特别是在升级系统前。"
+          :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.noteTitle"
+          :description="ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.noteDesc"
           type="info"
           show-icon
         />
@@ -394,12 +396,12 @@
 
       <div class="backup-summary">
         <div class="backup-summary-item">
-          <span>当前备份数</span>
+          <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.count }}</span>
           <strong>{{ backups.length }}</strong>
         </div>
         <div class="backup-summary-item">
-          <span>建议动作</span>
-          <strong>升级前先创建新备份</strong>
+          <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.suggestion }}</span>
+          <strong>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.suggestionValue }}</strong>
         </div>
       </div>
 
@@ -419,10 +421,10 @@
                 size="small"
                 @click="downloadBackup(record)"
               >
-                <DownloadOutlined /> 下载
+                <DownloadOutlined /> {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.actions.download }}
               </a-button>
               <a-popconfirm
-                title="确定删除此备份？"
+                :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.confirmDelete"
                 @confirm="deleteBackup(record)"
               >
                 <a-button
@@ -430,7 +432,7 @@
                   danger
                   size="small"
                 >
-                  <DeleteOutlined /> 删除
+                  <DeleteOutlined /> {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.actions.remove }}
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -441,25 +443,25 @@
 
     <!-- 日志管理 -->
     <a-card
-      title="日志管理"
+      :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.logsTitle"
       class="maintenance-card section-card"
     >
       <div class="section-head dashboard-section-head">
         <div>
-          <h3>访问与审计日志</h3>
+          <h3>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.logsTitle }}</h3>
         </div>
-        <p>登录日志和下载日志按时间与对象筛选，便于快速排查异常行为。</p>
+        <p>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.logsDesc }}</p>
       </div>
 
       <div class="compact-info-row compact-info-row--subtle">
-        <span>优先按时间范围收窄结果，再导出 CSV。</span>
+        <span>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.hint }}</span>
       </div>
 
       <a-tabs v-model:active-key="logActiveTab">
         <!-- 登录日志 -->
         <a-tab-pane
           key="login"
-          tab="登录日志"
+          :tab="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.loginTab"
         >
           <div class="log-filter-card">
             <a-form
@@ -468,22 +470,22 @@
               style="margin-bottom: 0"
               class="log-filter-form"
             >
-              <a-form-item label="开始时间">
+              <a-form-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.startLabel">
                 <a-date-picker
                   v-model:value="loginLogFilter.startTime"
                   show-time
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="选择开始时间"
+                  :placeholder="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.startPlaceholder"
                   style="width: 200px"
                   class="log-date-picker"
                 />
               </a-form-item>
-              <a-form-item label="结束时间">
+              <a-form-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.endLabel">
                 <a-date-picker
                   v-model:value="loginLogFilter.endTime"
                   show-time
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="选择结束时间"
+                  :placeholder="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.endPlaceholder"
                   style="width: 200px"
                   class="log-date-picker"
                 />
@@ -494,16 +496,16 @@
                     type="primary"
                     @click="loadLoginLogs"
                   >
-                    查询
+                    {{ UI_TEXTS.search }}
                   </a-button>
                   <a-button @click="resetLoginLogFilter">
-                    重置
+                    {{ UI_TEXTS.reset }}
                   </a-button>
                   <a-button
                     :loading="exportLoading"
                     @click="exportLoginLogs"
                   >
-                    <DownloadOutlined /> <span class="btn-text">导出 CSV</span>
+                    <DownloadOutlined /> <span class="btn-text">{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.exportCsv }}</span>
                   </a-button>
                 </a-space>
               </a-form-item>
@@ -522,7 +524,7 @@
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'success'">
                 <a-tag :color="record.success ? 'green' : 'red'">
-                  {{ record.success ? '成功' : '失败' }}
+                  {{ record.success ? ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.successTag : ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.failureTag }}
                 </a-tag>
               </template>
               <template v-else-if="column.key === 'loginTime'">
@@ -535,7 +537,7 @@
         <!-- 下载日志 -->
         <a-tab-pane
           key="download"
-          tab="下载日志"
+          :tab="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.downloadTab"
         >
           <div class="log-filter-card">
             <a-form
@@ -544,31 +546,31 @@
               style="margin-bottom: 0"
               class="log-filter-form"
             >
-              <a-form-item label="项目ID">
+              <a-form-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.matterIdLabel">
                 <a-input
                   v-model:value="downloadLogFilter.matterId"
-                  placeholder="输入项目ID"
+                  :placeholder="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.matterIdPlaceholder"
                   style="width: 150px"
                   allow-clear
                   class="log-input"
                 />
               </a-form-item>
-              <a-form-item label="开始时间">
+              <a-form-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.startLabel">
                 <a-date-picker
                   v-model:value="downloadLogFilter.startTime"
                   show-time
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="选择开始时间"
+                  :placeholder="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.startPlaceholder"
                   style="width: 200px"
                   class="log-date-picker"
                 />
               </a-form-item>
-              <a-form-item label="结束时间">
+              <a-form-item :label="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.endLabel">
                 <a-date-picker
                   v-model:value="downloadLogFilter.endTime"
                   show-time
                   format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="选择结束时间"
+                  :placeholder="ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.endPlaceholder"
                   style="width: 200px"
                   class="log-date-picker"
                 />
@@ -579,16 +581,16 @@
                     type="primary"
                     @click="loadDownloadLogs"
                   >
-                    查询
+                    {{ UI_TEXTS.search }}
                   </a-button>
                   <a-button @click="resetDownloadLogFilter">
-                    重置
+                    {{ UI_TEXTS.reset }}
                   </a-button>
                   <a-button
                     :loading="exportLoading"
                     @click="exportDownloadLogs"
                   >
-                    <DownloadOutlined /> <span class="btn-text">导出 CSV</span>
+                    <DownloadOutlined /> <span class="btn-text">{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.exportCsv }}</span>
                   </a-button>
                 </a-space>
               </a-form-item>
@@ -616,43 +618,43 @@
 
     <!-- 快捷操作指南 -->
     <a-card
-      title="命令行操作（高级）"
+      :title="ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.cliTitle"
       class="maintenance-card section-card"
     >
       <div class="section-head dashboard-section-head">
         <div>
-          <h3>命令行操作</h3>
+          <h3>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.cliManageTitle }}</h3>
         </div>
-        <p>保留给熟悉部署环境的管理员，用于升级、备份、查看日志和重启服务。</p>
+        <p>{{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.sections.cliManageDesc }}</p>
       </div>
 
       <a-collapse>
         <a-collapse-panel
           key="1"
-          header="一键升级"
+          :header="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cli.upgrade"
         >
           <a-typography-paragraph>
             <pre class="code-block">cd client-service
 ./deploy.sh --upgrade</pre>
           </a-typography-paragraph>
           <a-typography-text type="secondary">
-            自动执行：备份 → 拉取代码 → 重建镜像 → 重启服务
+            {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.cli.upgradeDesc }}
           </a-typography-text>
         </a-collapse-panel>
         <a-collapse-panel
           key="2"
-          header="命令行备份"
+          :header="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cli.backup"
         >
           <a-typography-paragraph>
             <pre class="code-block">./deploy.sh --backup</pre>
           </a-typography-paragraph>
           <a-typography-text type="secondary">
-            备份数据库 + 文件 + 配置到 backups/ 目录
+            {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.cli.backupDesc }}
           </a-typography-text>
         </a-collapse-panel>
         <a-collapse-panel
           key="3"
-          header="查看日志"
+          :header="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cli.logs"
         >
           <a-typography-paragraph>
             <pre class="code-block">./deploy.sh --logs</pre>
@@ -660,7 +662,7 @@
         </a-collapse-panel>
         <a-collapse-panel
           key="4"
-          header="重启服务"
+          :header="ADMIN_SYSTEM_MAINTENANCE_TEXTS.cli.restart"
         >
           <a-typography-paragraph>
             <pre class="code-block">./deploy.sh --restart</pre>
@@ -687,6 +689,8 @@ import {
 import request from '@/api/request'
 import logger from '@/utils/logger'
 import { useAuthStore } from '@/stores/auth'
+import { UI_CONFIRM_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_SYSTEM_MAINTENANCE_TEXTS } from '@/constants/adminTexts'
 
 // 获取token的统一方法
 const authStore = useAuthStore()
@@ -700,7 +704,7 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
     return await fetch(url, { ...options, signal: controller.signal })
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
-      throw new Error('请求超时，请稍后重试')
+      throw new Error(ADMIN_SYSTEM_MAINTENANCE_TEXTS.feedback.requestTimeout)
     }
     throw error
   } finally {
@@ -797,10 +801,10 @@ const backupListLoading = ref(false)
 const backups = ref<BackupInfo[]>([])
 
 const backupColumns = [
-  { title: '文件名', dataIndex: 'filename', key: 'filename' },
-  { title: '大小', dataIndex: 'sizeFormatted', key: 'size', width: 100 },
-  { title: '创建时间', dataIndex: 'lastModified', key: 'lastModified', width: 200 },
-  { title: '操作', key: 'action', width: 150 },
+  { title: ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.tableFilename, dataIndex: 'filename', key: 'filename' },
+  { title: ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.tableSize, dataIndex: 'sizeFormatted', key: 'size', width: 100 },
+  { title: ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.tableCreatedAt, dataIndex: 'lastModified', key: 'lastModified', width: 200 },
+  { title: ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.tableAction, key: 'action', width: 150 },
 ]
 
 // 日志管理相关
@@ -820,7 +824,7 @@ const loginLogPagination = ref({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.totalPrefix}${total}${ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.totalSuffix}`,
 })
 
 const loginLogColumns = [
@@ -846,7 +850,7 @@ const downloadLogPagination = ref({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.totalPrefix}${total}${ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.totalSuffix}`,
 })
 
 const downloadLogColumns = [
@@ -868,7 +872,7 @@ const refreshStatus = async () => {
       status.value = res.data as SystemStatus
     }
   } catch (e) {
-    message.error('获取系统状态失败')
+    message.error(UI_FEEDBACK_TEXTS.systemInfoLoadFailed)
   } finally {
     loading.value = false
   }
@@ -892,22 +896,22 @@ const loadBackups = async () => {
 // 创建备份
 const createBackup = () => {
   Modal.confirm({
-    title: '确认创建数据库备份',
-    content: '备份操作可能需要一定时间，期间请勿进行其他数据库操作。确定要继续吗？',
-    okText: '确认备份',
-    cancelText: '取消',
+    title: UI_CONFIRM_TEXTS.createBackupTitle,
+    content: UI_CONFIRM_TEXTS.createBackupContent,
+    okText: ADMIN_SYSTEM_MAINTENANCE_TEXTS.actions.confirmBackup,
+    cancelText: ADMIN_SYSTEM_MAINTENANCE_TEXTS.actions.cancel,
     onOk: async () => {
       backupLoading.value = true
       try {
         const res = await request.post('/api/admin/system/backup/database')
         if (res.success) {
-          message.success(`备份创建成功：${(res.data as { filename?: string }).filename || ''}`)
+          message.success(`${ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.successPrefix}${(res.data as { filename?: string }).filename || ''}`)
           loadBackups()
         } else {
-          message.error(res.message || '备份失败')
+          message.error(res.message || ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.failed)
         }
       } catch (e) {
-        message.error('创建备份失败')
+        message.error(UI_FEEDBACK_TEXTS.backupCreateFailed)
       } finally {
         backupLoading.value = false
       }
@@ -918,7 +922,7 @@ const createBackup = () => {
 // 下载备份
 const downloadBackup = async (record: BackupInfo) => {
   if (!record?.filename) {
-    message.error('无法获取备份文件名')
+    message.error(UI_FEEDBACK_TEXTS.operationFailed)
     return
   }
   try {
@@ -930,7 +934,7 @@ const downloadBackup = async (record: BackupInfo) => {
     }, 120000)
     
     if (!response.ok) {
-      throw new Error('下载失败')
+      throw new Error(UI_FEEDBACK_TEXTS.backupDownloadFailed)
     }
     
     const blob = await response.blob()
@@ -941,26 +945,26 @@ const downloadBackup = async (record: BackupInfo) => {
     link.click()
     window.URL.revokeObjectURL(url)
   } catch (e) {
-    message.error('下载失败')
+    message.error(UI_FEEDBACK_TEXTS.backupDownloadFailed)
   }
 }
 
 // 删除备份
 const deleteBackup = async (record: BackupInfo) => {
   if (!record?.filename) {
-    message.error('无法获取备份文件名')
+    message.error(UI_FEEDBACK_TEXTS.operationFailed)
     return
   }
   try {
     const res = await request.delete(`/api/admin/system/backup/${record.filename}`)
     if (res.success) {
-      message.success('删除成功')
+      message.success(ADMIN_SYSTEM_MAINTENANCE_TEXTS.backup.removed)
       loadBackups()
     } else {
-      message.error(res.message || '删除失败')
+      message.error(res.message || UI_FEEDBACK_TEXTS.backupDeleteFailed)
     }
   } catch (e) {
-    message.error('删除失败')
+    message.error(UI_FEEDBACK_TEXTS.backupDeleteFailed)
   }
 }
 
@@ -981,13 +985,13 @@ const refreshGitInfo = async () => {
       }
       gitInfo.value = data
       if (data.hasUpdate) {
-        message.success('发现新版本可用')
+        message.success(ADMIN_SYSTEM_MAINTENANCE_TEXTS.feedback.updateFound)
       } else if (data.currentVersion && data.remoteVersion) {
-        message.info('当前已是最新版本')
+        message.info(ADMIN_SYSTEM_MAINTENANCE_TEXTS.feedback.alreadyLatest)
       }
     }
   } catch (e) {
-    message.error('获取版本信息失败')
+    message.error(UI_FEEDBACK_TEXTS.systemInfoLoadFailed)
   } finally {
     gitLoading.value = false
   }
@@ -1016,10 +1020,10 @@ const showUpgradeGuide = async () => {
       const success = await copyUpgradeCommands()
       copySuccess.value = success
     } else {
-      message.error(res.message || '获取升级指南失败')
+      message.error(res.message || ADMIN_SYSTEM_MAINTENANCE_TEXTS.feedback.guideLoadFailed)
     }
   } catch (e: unknown) {
-    message.error(getErrorMessage(e, '获取升级指南失败'))
+    message.error(getErrorMessage(e, ADMIN_SYSTEM_MAINTENANCE_TEXTS.feedback.guideLoadFailed))
   }
 }
 
@@ -1027,7 +1031,7 @@ const showUpgradeGuide = async () => {
 const copyUpgradeCommands = async () => {
   const commands = upgradeGuideData.value.commands || ''
   if (!commands) {
-    message.warning('没有可复制的命令')
+    message.warning(ADMIN_SYSTEM_MAINTENANCE_TEXTS.feedback.noCommands)
     return false
   }
   
@@ -1035,7 +1039,7 @@ const copyUpgradeCommands = async () => {
   if (navigator.clipboard && window.isSecureContext) {
     try {
       await navigator.clipboard.writeText(commands)
-      message.success('命令已复制到剪贴板，可直接粘贴到终端执行')
+      message.success(UI_FEEDBACK_TEXTS.copySuccess)
       return true
     } catch {
       return fallbackCopy(commands)
@@ -1055,11 +1059,11 @@ const fallbackCopy = (text: string): boolean => {
   textarea.select()
   try {
     document.execCommand('copy')
-    message.success('命令已复制到剪贴板，可直接粘贴到终端执行')
+    message.success(UI_FEEDBACK_TEXTS.copySuccess)
     document.body.removeChild(textarea)
     return true
   } catch {
-    message.error('复制失败，请手动复制')
+    message.error(UI_FEEDBACK_TEXTS.copyFailed)
     document.body.removeChild(textarea)
     return false
   }
@@ -1096,7 +1100,7 @@ const loadLoginLogs = async () => {
       loginLogPagination.value.total = data.total || 0
     }
   } catch (e) {
-    message.error('加载登录日志失败')
+    message.error(ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.loadLoginFailed)
   } finally {
     loginLogLoading.value = false
   }
@@ -1149,7 +1153,7 @@ const exportLoginLogs = async () => {
     })
     
     if (!response.ok) {
-      throw new Error('导出失败')
+      throw new Error(ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.exportFailed)
     }
     
     const blob = await response.blob()
@@ -1160,9 +1164,9 @@ const exportLoginLogs = async () => {
     link.click()
     window.URL.revokeObjectURL(downloadUrl)
     
-    message.success('导出成功')
+    message.success(UI_FEEDBACK_TEXTS.exportSuccess)
   } catch (e) {
-    message.error('导出失败')
+    message.error(UI_FEEDBACK_TEXTS.exportFailed)
   } finally {
     exportLoading.value = false
   }
@@ -1196,7 +1200,7 @@ const loadDownloadLogs = async () => {
       downloadLogPagination.value.total = data.total || 0
     }
   } catch (e) {
-    message.error('加载下载日志失败')
+    message.error(ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.loadDownloadFailed)
   } finally {
     downloadLogLoading.value = false
   }
@@ -1252,7 +1256,7 @@ const exportDownloadLogs = async () => {
     })
     
     if (!response.ok) {
-      throw new Error('导出失败')
+      throw new Error(ADMIN_SYSTEM_MAINTENANCE_TEXTS.logs.exportFailed)
     }
     
     const blob = await response.blob()
@@ -1263,9 +1267,9 @@ const exportDownloadLogs = async () => {
     link.click()
     window.URL.revokeObjectURL(downloadUrl)
     
-    message.success('导出成功')
+    message.success(UI_FEEDBACK_TEXTS.exportSuccess)
   } catch (e) {
-    message.error('导出失败')
+    message.error(UI_FEEDBACK_TEXTS.exportFailed)
   } finally {
     exportLoading.value = false
   }

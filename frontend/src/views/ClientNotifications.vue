@@ -54,41 +54,41 @@
               有新消息时将会通知您
             </p>
           </div>
-          <a-list
+          <div
             v-else
-            :data-source="notifications"
             class="notification-list"
           >
-            <template #renderItem="{ item }">
-              <a-list-item class="notification-item">
-                <a-list-item-meta>
-                  <template #avatar>
-                    <a-badge
-                      :dot="!item.read"
-                      :offset="[-4, 4]"
-                    >
-                      <BellOutlined class="notif-icon" />
-                    </a-badge>
-                  </template>
-                  <template #title>
-                    <div class="notif-title-row">
-                      <span class="notif-title">{{ item.title }}</span>
-                      <span
-                        v-if="!item.read"
-                        class="notif-state"
-                      >未读</span>
-                    </div>
-                  </template>
-                  <template #description>
-                    <div class="notif-content">
-                      <p>{{ item.content }}</p>
-                      <span class="notif-time">{{ formatTime(item.createdAt) }}</span>
-                    </div>
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </template>
-          </a-list>
+            <article
+              v-for="item in notifications"
+              :key="item.id"
+              class="notification-card"
+              :class="{ 'notification-card--unread': !item.read }"
+            >
+              <div class="notification-card__head">
+                <a-badge
+                  :dot="!item.read"
+                  :offset="[-4, 4]"
+                >
+                  <div class="notification-card__icon">
+                    <BellOutlined class="notif-icon" />
+                  </div>
+                </a-badge>
+                <div class="notification-card__title-wrap">
+                  <div class="notif-title-row">
+                    <span class="notif-title">{{ item.title }}</span>
+                    <span
+                      v-if="!item.read"
+                      class="notif-state"
+                    >未读</span>
+                  </div>
+                  <span class="notif-time">{{ formatTime(item.createdAt) }}</span>
+                </div>
+              </div>
+              <p class="notification-card__content">
+                {{ item.content }}
+              </p>
+            </article>
+          </div>
         </a-spin>
       </section>
     </a-layout-content>
@@ -156,6 +156,55 @@ onMounted(() => {
   gap: 12px;
 }
 
+.notification-list {
+  display: grid;
+  gap: 12px;
+}
+
+.notification-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(27, 59, 95, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.94));
+  box-shadow: 0 14px 30px rgba(16, 42, 67, 0.08);
+}
+
+.notification-card--unread {
+  border-color: rgba(27, 59, 95, 0.18);
+  box-shadow: 0 18px 36px rgba(27, 59, 95, 0.12);
+}
+
+.notification-card__head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.notification-card__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: rgba(27, 59, 95, 0.08);
+}
+
+.notification-card__title-wrap {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.notification-card__content {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
 .notif-icon {
   font-size: 20px;
   color: var(--lex-primary-soft);
@@ -186,24 +235,9 @@ onMounted(() => {
   font-weight: 600;
 }
 
-.notif-content {
-  display: grid;
-  gap: 8px;
-}
-
-.notif-content p {
-  margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
 .notif-time {
   font-size: 12px;
   color: var(--text-tertiary);
-}
-
-.notification-item:hover {
-  background: var(--lex-bg-muted);
 }
 
 .skeleton-list {

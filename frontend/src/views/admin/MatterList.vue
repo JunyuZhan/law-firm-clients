@@ -3,39 +3,39 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          查看状态、有效期与访问链接；支持筛选与刷新。
+          {{ ADMIN_MATTER_LIST_TEXTS.intro }}
         </p>
       </div>
       <a-button @click="loadData">
         <template #icon>
           <ReloadOutlined />
         </template>
-        刷新数据
+        {{ ADMIN_MATTER_LIST_TEXTS.actions.refreshData }}
       </a-button>
     </section>
 
     <section class="stats-grid">
       <article class="stats-card">
-        <span class="stats-label">总项目数</span>
+        <span class="stats-label">{{ ADMIN_MATTER_LIST_TEXTS.stats.total }}</span>
         <strong>{{ summaryStats.total }}</strong>
       </article>
       <article class="stats-card success">
-        <span class="stats-label">有效访问</span>
+        <span class="stats-label">{{ ADMIN_MATTER_LIST_TEXTS.stats.active }}</span>
         <strong>{{ summaryStats.active }}</strong>
       </article>
       <article class="stats-card warning">
-        <span class="stats-label">已过期</span>
+        <span class="stats-label">{{ ADMIN_MATTER_LIST_TEXTS.stats.expired }}</span>
         <strong>{{ summaryStats.expired }}</strong>
       </article>
       <article class="stats-card danger">
-        <span class="stats-label">已撤销</span>
+        <span class="stats-label">{{ ADMIN_MATTER_LIST_TEXTS.stats.revoked }}</span>
         <strong>{{ summaryStats.revoked }}</strong>
       </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head">
-        <h3>筛选</h3>
+        <h3>{{ ADMIN_MATTER_LIST_TEXTS.filter.title }}</h3>
       </div>
 
       <a-form
@@ -44,33 +44,33 @@
         class="matter-filter-form"
         @finish="handleSearch"
       >
-        <a-form-item label="客户ID">
+        <a-form-item :label="ADMIN_MATTER_LIST_TEXTS.filter.clientIdLabel">
           <a-input-number
             v-model:value="searchForm.clientId"
-            placeholder="请输入客户ID"
+            :placeholder="ADMIN_MATTER_LIST_TEXTS.filter.clientIdPlaceholder"
             allow-clear
             style="width: 180px"
           />
         </a-form-item>
-        <a-form-item label="状态">
+        <a-form-item :label="ADMIN_MATTER_LIST_TEXTS.filter.statusLabel">
           <a-select
             v-model:value="searchForm.status"
-            placeholder="请选择状态"
+            :placeholder="ADMIN_MATTER_LIST_TEXTS.filter.statusPlaceholder"
             allow-clear
             style="width: 150px"
           >
             <a-select-option value="ACTIVE">
-              有效
+              {{ ADMIN_MATTER_LIST_TEXTS.statusOptions.active }}
             </a-select-option>
             <a-select-option value="EXPIRED">
-              已过期
+              {{ ADMIN_MATTER_LIST_TEXTS.statusOptions.expired }}
             </a-select-option>
             <a-select-option value="REVOKED">
-              已撤销
+              {{ ADMIN_MATTER_LIST_TEXTS.statusOptions.revoked }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="时间范围">
+        <a-form-item :label="ADMIN_MATTER_LIST_TEXTS.filter.dateRangeLabel">
           <a-range-picker
             v-model:value="dateRange"
             show-time
@@ -84,10 +84,10 @@
               type="primary"
               html-type="submit"
             >
-              查询
+              {{ UI_TEXTS.search }}
             </a-button>
             <a-button @click="handleReset">
-              重置
+              {{ UI_TEXTS.reset }}
             </a-button>
           </a-space>
         </a-form-item>
@@ -96,11 +96,11 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table">
-        <h3>项目列表</h3>
+        <h3>{{ UI_TEXTS.matterManagement }}</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>共 {{ dataSource.length }} 条</span>
+        <span>{{ ADMIN_MATTER_LIST_TEXTS.filter.totalPrefix }}{{ dataSource.length }}{{ ADMIN_MATTER_LIST_TEXTS.filter.totalSuffix }}</span>
       </div>
 
       <a-table
@@ -143,11 +143,11 @@
                 size="small"
                 @click="handleView(record)"
               >
-                查看
+                {{ ADMIN_MATTER_LIST_TEXTS.actions.view }}
               </a-button>
               <a-popconfirm
                 v-if="record.status === 'ACTIVE'"
-                title="确定要撤销这个项目的访问吗？"
+                :title="UI_CONFIRM_TEXTS.revokeMatter"
                 @confirm="handleRevoke(record)"
               >
                 <a-button
@@ -155,7 +155,7 @@
                   size="small"
                   danger
                 >
-                  撤销
+                  {{ ADMIN_MATTER_LIST_TEXTS.actions.revoke }}
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -176,6 +176,8 @@ import { formatDate, isExpired } from '@/utils/date'
 import { getMatterStatusColor, getMatterStatusText } from '@/utils/status'
 import type { Dayjs } from 'dayjs'
 import { useRouter } from 'vue-router'
+import { UI_CONFIRM_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_MATTER_LIST_TEXTS } from '@/constants/adminTexts'
 
 const router = useRouter()
 const loading = ref(false)
@@ -195,18 +197,18 @@ const pagination = ref({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_MATTER_LIST_TEXTS.filter.totalPrefix}${total}${ADMIN_MATTER_LIST_TEXTS.filter.totalSuffix}`,
 })
 
 const columns = [
-  { title: '项目ID', key: 'id', dataIndex: 'id', ellipsis: true, width: 160, align: 'center' },
-  { title: '客户名称', key: 'clientName', dataIndex: 'clientName', ellipsis: true, width: 140, align: 'center' },
-  { title: '状态', key: 'status', width: 96, align: 'center' },
-  { title: '有效期（天）', key: 'validDays', dataIndex: 'validDays', width: 104, align: 'center' },
-  { title: '过期时间', key: 'expiresAt', width: 160, align: 'center' },
-  { title: '访问链接', key: 'accessUrl', ellipsis: true, width: 260, align: 'center' },
-  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
-  { title: '操作', key: 'action', width: 108, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.matterId, key: 'id', dataIndex: 'id', ellipsis: true, width: 160, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.clientName, key: 'clientName', dataIndex: 'clientName', ellipsis: true, width: 140, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.status, key: 'status', width: 96, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.validDays, key: 'validDays', dataIndex: 'validDays', width: 104, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.expiresAt, key: 'expiresAt', width: 160, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.accessUrl, key: 'accessUrl', ellipsis: true, width: 260, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.createdAt, key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
+  { title: ADMIN_MATTER_LIST_TEXTS.table.action, key: 'action', width: 108, align: 'center' },
 ]
 
 const summaryStats = computed(() => {
@@ -233,7 +235,7 @@ async function loadData() {
     dataSource.value = res.data || []
     pagination.value.total = dataSource.value.length
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '加载项目列表失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_MATTER_LIST_TEXTS.feedback.loadFailed
     message.error(errorMessage)
   } finally {
     loading.value = false
@@ -279,10 +281,10 @@ function handleView(record: MatterListItem) {
 async function handleRevoke(record: MatterListItem) {
   try {
     await revokeMatter(record.id)
-    message.success('项目访问已撤销')
+    message.success(UI_FEEDBACK_TEXTS.matterRevoked)
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '撤销项目失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_MATTER_LIST_TEXTS.feedback.revokeFailed
     message.error(errorMessage)
   }
 }

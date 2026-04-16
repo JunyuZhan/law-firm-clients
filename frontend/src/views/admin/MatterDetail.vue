@@ -14,7 +14,7 @@
               <template #icon>
                 <ArrowLeftOutlined />
               </template>
-              <span class="back-btn-text">返回列表</span>
+              <span class="back-btn-text">{{ UI_TEXTS.backToList }}</span>
             </a-button>
             <a-tag :color="getStatusColor(matterDetail.status)">
               {{ getStatusName(matterDetail.status) }}
@@ -23,79 +23,79 @@
 
           <div class="hero-copy">
             <h2 class="editorial-title hero-title">
-              {{ matterDetail.clientName || '项目详情' }}
+              {{ matterDetail.clientName || ADMIN_MATTER_DETAIL_TEXTS.fallbackTitle }}
             </h2>
             <p class="hero-text">
-              标识、状态、有效期与访问信息。
+              {{ ADMIN_MATTER_DETAIL_TEXTS.heroText }}
             </p>
           </div>
 
           <div class="hero-metrics">
             <div class="metric-card">
-              <span class="metric-label">项目ID</span>
+              <span class="metric-label">{{ ADMIN_MATTER_DETAIL_TEXTS.fields.matterId }}</span>
               <strong>{{ matterDetail.id }}</strong>
             </div>
             <div class="metric-card">
-              <span class="metric-label">律所项目ID</span>
+              <span class="metric-label">{{ ADMIN_MATTER_DETAIL_TEXTS.fields.lawFirmMatterId }}</span>
               <strong>{{ matterDetail.lawFirmMatterId }}</strong>
             </div>
             <div class="metric-card">
-              <span class="metric-label">过期时间</span>
+              <span class="metric-label">{{ ADMIN_MATTER_DETAIL_TEXTS.fields.expiresAt }}</span>
               <strong :class="{ expired: isExpired(matterDetail.expiresAt) }">{{ formatDate(matterDetail.expiresAt) }}</strong>
             </div>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>基本信息</h3>
+          <h3>{{ ADMIN_MATTER_DETAIL_TEXTS.sections.basicInfo }}</h3>
           <a-descriptions
             :column="{ xs: 1, sm: 2 }"
             bordered
           >
-            <a-descriptions-item label="项目ID">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.matterId">
               {{ matterDetail.id }}
             </a-descriptions-item>
-            <a-descriptions-item label="律所项目ID">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.lawFirmMatterId">
               {{ matterDetail.lawFirmMatterId }}
             </a-descriptions-item>
-            <a-descriptions-item label="客户ID">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.clientId">
               {{ matterDetail.clientId }}
             </a-descriptions-item>
-            <a-descriptions-item label="客户名称">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.clientName">
               {{ matterDetail.clientName }}
             </a-descriptions-item>
-            <a-descriptions-item label="状态">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.status">
               <a-tag :color="getStatusColor(matterDetail.status)">
                 {{ getStatusName(matterDetail.status) }}
               </a-tag>
             </a-descriptions-item>
-            <a-descriptions-item label="有效期（天）">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.validDays">
               {{ matterDetail.validDays }}
             </a-descriptions-item>
-            <a-descriptions-item label="过期时间">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.expiresAt">
               <span :class="{ expired: isExpired(matterDetail.expiresAt) }">
                 {{ formatDate(matterDetail.expiresAt) }}
               </span>
             </a-descriptions-item>
-            <a-descriptions-item label="权限范围">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.scopes">
               {{ matterDetail.scopes }}
             </a-descriptions-item>
-            <a-descriptions-item label="创建时间">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.createdAt">
               {{ formatDate(matterDetail.createdAt) }}
             </a-descriptions-item>
-            <a-descriptions-item label="更新时间">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.updatedAt">
               {{ formatDate(matterDetail.updatedAt) }}
             </a-descriptions-item>
           </a-descriptions>
         </section>
 
         <section class="detail-section">
-          <h3>访问信息</h3>
+          <h3>{{ ADMIN_MATTER_DETAIL_TEXTS.sections.accessInfo }}</h3>
           <a-descriptions
             :column="1"
             bordered
           >
-            <a-descriptions-item label="访问链接">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.accessUrl">
               <div class="access-url-wrapper">
                 <a
                   :href="matterDetail.accessUrl"
@@ -110,11 +110,11 @@
                   class="copy-btn"
                   @click="copyToClipboard(matterDetail.accessUrl)"
                 >
-                  复制
+                  {{ ADMIN_MATTER_DETAIL_TEXTS.actions.copy }}
                 </a-button>
               </div>
             </a-descriptions-item>
-            <a-descriptions-item label="访问令牌">
+            <a-descriptions-item :label="ADMIN_MATTER_DETAIL_TEXTS.fields.accessToken">
               <div class="token-display">
                 <a-typography-text :copyable="{ text: matterDetail.accessToken }">
                   {{ showToken ? matterDetail.accessToken : maskToken(matterDetail.accessToken) }}
@@ -124,7 +124,7 @@
                   size="small"
                   @click="showToken = !showToken"
                 >
-                  {{ showToken ? '隐藏' : '显示' }}
+                  {{ showToken ? ADMIN_MATTER_DETAIL_TEXTS.actions.hide : ADMIN_MATTER_DETAIL_TEXTS.actions.show }}
                 </a-button>
               </div>
             </a-descriptions-item>
@@ -132,7 +132,7 @@
         </section>
 
         <section class="detail-section">
-          <h3>项目数据</h3>
+          <h3>{{ ADMIN_MATTER_DETAIL_TEXTS.sections.matterData }}</h3>
           <pre class="matter-data-pre">{{ formatMatterData(matterDetail.matterData) }}</pre>
         </section>
 
@@ -147,10 +147,10 @@
               danger
               @click="handleRevoke"
             >
-              撤销访问
+              {{ ADMIN_MATTER_DETAIL_TEXTS.actions.revoke }}
             </a-button>
             <a-button @click="goBack">
-              返回列表
+              {{ UI_TEXTS.backToList }}
             </a-button>
           </a-space>
         </section>
@@ -167,6 +167,8 @@ import { ArrowLeftOutlined } from '@ant-design/icons-vue'
 import { getMatterDetail, revokeMatter, type MatterDetailInfo } from '@/api/matter'
 import { formatDate, isExpired } from '@/utils/date'
 import { getMatterStatusColor, getMatterStatusText } from '@/utils/status'
+import { UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_MATTER_DETAIL_TEXTS } from '@/constants/adminTexts'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,7 +184,7 @@ function maskToken(token: string): string {
 async function loadData() {
   const id = route.params.id as string
   if (!id || !/^[\w-]+$/.test(id)) {
-    message.error('项目ID无效')
+    message.error(ADMIN_MATTER_DETAIL_TEXTS.feedback.invalidId)
     goBack()
     return
   }
@@ -192,7 +194,7 @@ async function loadData() {
     const res = await getMatterDetail(id)
     matterDetail.value = res.data
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '加载项目详情失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_MATTER_DETAIL_TEXTS.feedback.loadFailed
     message.error(errorMessage)
     goBack()
   } finally {
@@ -209,10 +211,10 @@ async function handleRevoke() {
 
   try {
     await revokeMatter(matterDetail.value.id)
-    message.success('项目访问已撤销')
+    message.success(UI_FEEDBACK_TEXTS.matterRevoked)
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '撤销项目失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_MATTER_DETAIL_TEXTS.feedback.revokeFailed
     message.error(errorMessage)
   }
 }
@@ -220,7 +222,7 @@ async function handleRevoke() {
 function copyToClipboard(text: string) {
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).then(() => {
-      message.success('已复制到剪贴板')
+      message.success(UI_FEEDBACK_TEXTS.copySuccess)
     }).catch(() => {
       fallbackCopy(text)
     })
@@ -238,9 +240,9 @@ function fallbackCopy(text: string) {
   textarea.select()
   try {
     document.execCommand('copy')
-    message.success('已复制到剪贴板')
+    message.success(UI_FEEDBACK_TEXTS.copySuccess)
   } catch {
-    message.error('复制失败，请手动复制')
+    message.error(UI_FEEDBACK_TEXTS.copyFailed)
   }
   document.body.removeChild(textarea)
 }
@@ -249,7 +251,7 @@ const getStatusName = getMatterStatusText
 const getStatusColor = getMatterStatusColor
 
 function formatMatterData(data?: Record<string, unknown>): string {
-  if (!data) return '无数据'
+  if (!data) return ADMIN_MATTER_DETAIL_TEXTS.feedback.emptyData
   return JSON.stringify(data, null, 2)
 }
 
@@ -320,8 +322,8 @@ onMounted(() => {
   gap: 6px;
   padding: 16px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(21, 33, 46, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border-color-light);
 }
 
 .metric-label {
@@ -382,13 +384,13 @@ onMounted(() => {
 
 .matter-data-pre {
   margin: 0;
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.84);
   padding: 18px;
   border-radius: 18px;
   overflow-x: auto;
   font-size: 12px;
   line-height: 1.7;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color-light);
 }
 
 .detail-actions {

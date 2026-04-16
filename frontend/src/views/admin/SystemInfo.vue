@@ -8,13 +8,13 @@
       </div>
       <div class="intro-actions">
         <a-button @click="loadRuntimeInfo">
-          刷新版本
+          {{ UI_TEXTS.refresh }}版本
         </a-button>
         <a-button
           type="primary"
           @click="loadDependencyStatus"
         >
-          刷新健康状态
+          {{ UI_TEXTS.refresh }}健康状态
         </a-button>
       </div>
     </section>
@@ -178,7 +178,7 @@
               type="link"
               @click="copyDocPath(doc.path)"
             >
-              复制路径
+              {{ UI_TEXTS.copyPath }}
             </a-button>
           </div>
           <div class="doc-path">
@@ -198,6 +198,7 @@ import {
   getSystemRuntimeInfo,
   type DependencyStatusItem,
 } from '@/api/config'
+import { UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
 
 const runtimeInfo = reactive({
   applicationName: '',
@@ -268,7 +269,7 @@ async function loadRuntimeInfo() {
       Object.assign(runtimeInfo, res.data)
     }
   } catch {
-    message.error('加载系统运行时信息失败')
+    message.error(UI_FEEDBACK_TEXTS.systemInfoLoadFailed)
   }
 }
 
@@ -280,7 +281,7 @@ async function loadDependencyStatus() {
       dependencyStatus.items = Array.isArray(res.data.items) ? res.data.items : []
     }
   } catch {
-    message.error('加载依赖状态失败')
+    message.error(UI_FEEDBACK_TEXTS.dependencyStatusLoadFailed)
   }
 }
 
@@ -307,9 +308,9 @@ function normalizeDependencyDetails(details: Record<string, string | number | bo
 async function copyDocPath(path: string) {
   try {
     await navigator.clipboard.writeText(path)
-    message.success('文档路径已复制')
+    message.success(UI_FEEDBACK_TEXTS.copySuccess)
   } catch {
-    message.error('复制失败，请手动复制')
+    message.error(UI_FEEDBACK_TEXTS.copyFailed)
   }
 }
 
@@ -375,9 +376,9 @@ onMounted(() => {
 .dependency-item,
 .doc-item {
   padding: 14px 16px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border-color-light);
 }
 
 .dependency-row,
@@ -426,9 +427,9 @@ onMounted(() => {
   display: grid;
   gap: 6px;
   padding: 14px 16px;
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--lex-bg-muted);
-  border: 1px solid var(--lex-outline);
+  border: 1px solid var(--border-color-light);
 }
 
 .doc-summary-item span {

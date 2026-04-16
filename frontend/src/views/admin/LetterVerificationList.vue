@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          查询函件验证记录与状态；可展开统计。
+          {{ ADMIN_LETTER_VERIFICATION_TEXTS.intro }}
         </p>
       </div>
       <a-space>
@@ -11,13 +11,13 @@
           <template #icon>
             <BarChartOutlined />
           </template>
-          {{ showStatistics ? '收起统计' : '查看统计' }}
+          {{ showStatistics ? UI_TEXTS.collapseStatistics : UI_TEXTS.viewStatistics }}
         </a-button>
         <a-button @click="loadData">
           <template #icon>
             <ReloadOutlined />
           </template>
-          刷新
+          {{ UI_TEXTS.refresh }}
         </a-button>
       </a-space>
     </section>
@@ -27,26 +27,26 @@
       class="stats-grid"
     >
       <article class="stats-card">
-        <span class="stats-label">总记录数</span>
+        <span class="stats-label">{{ ADMIN_LETTER_VERIFICATION_TEXTS.stats.total }}</span>
         <strong>{{ statistics.total }}</strong>
       </article>
       <article class="stats-card success">
-        <span class="stats-label">有效</span>
+        <span class="stats-label">{{ ADMIN_LETTER_VERIFICATION_TEXTS.stats.active }}</span>
         <strong>{{ statistics.active }}</strong>
       </article>
       <article class="stats-card warning">
-        <span class="stats-label">已过期</span>
+        <span class="stats-label">{{ ADMIN_LETTER_VERIFICATION_TEXTS.stats.expired }}</span>
         <strong>{{ statistics.expired }}</strong>
       </article>
       <article class="stats-card danger">
-        <span class="stats-label">已撤销</span>
+        <span class="stats-label">{{ ADMIN_LETTER_VERIFICATION_TEXTS.stats.revoked }}</span>
         <strong>{{ statistics.revoked }}</strong>
       </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
-        <h3>筛选</h3>
+        <h3>{{ ADMIN_LETTER_VERIFICATION_TEXTS.filter.title }}</h3>
       </div>
 
       <a-form
@@ -55,25 +55,25 @@
         class="verification-filter-form"
         @finish="handleSearch"
       >
-        <a-form-item label="状态">
+        <a-form-item :label="ADMIN_LETTER_VERIFICATION_TEXTS.filter.statusLabel">
           <a-select
             v-model:value="searchForm.status"
-            placeholder="请选择状态"
+            :placeholder="ADMIN_LETTER_VERIFICATION_TEXTS.filter.statusPlaceholder"
             allow-clear
             style="width: 140px"
           >
             <a-select-option value="ACTIVE">
-              有效
+              {{ ADMIN_LETTER_VERIFICATION_TEXTS.statusOptions.active }}
             </a-select-option>
             <a-select-option value="REVOKED">
-              已撤销
+              {{ ADMIN_LETTER_VERIFICATION_TEXTS.statusOptions.revoked }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="关键词">
+        <a-form-item :label="ADMIN_LETTER_VERIFICATION_TEXTS.filter.keywordLabel">
           <a-input
             v-model:value="searchForm.keyword"
-            placeholder="编号/律所/律师/接收单位"
+            :placeholder="ADMIN_LETTER_VERIFICATION_TEXTS.filter.keywordPlaceholder"
             allow-clear
             style="width: 240px"
           />
@@ -84,10 +84,10 @@
               type="primary"
               html-type="submit"
             >
-              查询
+              {{ UI_TEXTS.search }}
             </a-button>
             <a-button @click="handleReset">
-              重置
+              {{ UI_TEXTS.reset }}
             </a-button>
           </a-space>
         </a-form-item>
@@ -96,12 +96,12 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <h3>记录列表</h3>
+        <h3>{{ ADMIN_LETTER_VERIFICATION_TEXTS.table.title }}</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>共 {{ dataSource.length }} 条</span>
-        <span v-if="revocableCount">可撤销 {{ revocableCount }} 条</span>
+        <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.filter.totalPrefix }}{{ dataSource.length }}{{ ADMIN_LETTER_VERIFICATION_TEXTS.filter.totalSuffix }}</span>
+        <span v-if="revocableCount">{{ ADMIN_LETTER_VERIFICATION_TEXTS.filter.revocablePrefix }}{{ revocableCount }}{{ ADMIN_LETTER_VERIFICATION_TEXTS.filter.revocableSuffix }}</span>
       </div>
 
       <a-table
@@ -136,7 +136,7 @@
               {{ formatDateTime(record.lastVerifyAt) }}
               <a-tooltip
                 v-if="record.lastVerifyIp"
-                :title="'IP: ' + record.lastVerifyIp"
+                :title="ADMIN_LETTER_VERIFICATION_TEXTS.table.ipPrefix + record.lastVerifyIp"
               >
                 <InfoCircleOutlined class="verify-tip" />
               </a-tooltip>
@@ -153,11 +153,11 @@
                 size="small"
                 @click="handleView(record)"
               >
-                详情
+                {{ ADMIN_LETTER_VERIFICATION_TEXTS.actions.detail }}
               </a-button>
               <a-popconfirm
                 v-if="record.status === 'ACTIVE' && !isExpired(record.validUntil)"
-                title="确定要撤销这个函件验证吗？"
+                :title="UI_CONFIRM_TEXTS.revokeVerification"
                 @confirm="handleRevoke(record)"
               >
                 <a-button
@@ -165,7 +165,7 @@
                   size="small"
                   danger
                 >
-                  失效
+                  {{ ADMIN_LETTER_VERIFICATION_TEXTS.actions.invalidate }}
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -183,7 +183,7 @@
       <template #title>
         <div class="drawer-title-block">
           <div class="drawer-title">
-            函件验证详情
+            {{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.title }}
           </div>
         </div>
       </template>
@@ -195,7 +195,7 @@
         <section class="detail-hero">
           <div>
             <div class="detail-label">
-              函件编号
+              {{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.applicationNo }}
             </div>
             <h3>{{ currentRecord.applicationNo }}</h3>
           </div>
@@ -207,58 +207,58 @@
         <section class="detail-panel">
           <div class="detail-grid">
             <div class="detail-item">
-              <span>函件类型</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.letterType }}</span>
               <strong>{{ currentRecord.letterTypeName || '-' }}</strong>
             </div>
             <div class="detail-item">
-              <span>律师事务所</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.firmName }}</span>
               <strong>{{ currentRecord.firmName || '-' }}</strong>
             </div>
             <div class="detail-item">
-              <span>出函律师</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.lawyerNames }}</span>
               <strong>{{ currentRecord.lawyerNames || '-' }}</strong>
             </div>
             <div class="detail-item">
-              <span>接收单位</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.targetUnit }}</span>
               <strong>{{ currentRecord.targetUnit || '-' }}</strong>
             </div>
             <div class="detail-item">
-              <span>关联项目</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.matterName }}</span>
               <strong>{{ currentRecord.matterName || '-' }}</strong>
             </div>
             <div class="detail-item">
-              <span>验证次数</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.verifyCount }}</span>
               <strong>{{ currentRecord.verifyCount }}</strong>
             </div>
             <div class="detail-item">
-              <span>审批时间</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.approvedAt }}</span>
               <strong>{{ formatDateTime(currentRecord.approvedAt) }}</strong>
             </div>
             <div class="detail-item">
-              <span>盖章时间</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.printedAt }}</span>
               <strong>{{ formatDateTime(currentRecord.printedAt) }}</strong>
             </div>
             <div class="detail-item">
-              <span>有效期至</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.validUntil }}</span>
               <strong :class="{ expired: isExpired(currentRecord.validUntil) }">
                 {{ formatDateTime(currentRecord.validUntil) }}
-                {{ isExpired(currentRecord.validUntil) ? '（已过期）' : '' }}
+                {{ isExpired(currentRecord.validUntil) ? ADMIN_LETTER_VERIFICATION_TEXTS.drawer.expiredSuffix : '' }}
               </strong>
             </div>
             <div class="detail-item">
-              <span>最后验证时间</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.lastVerifyAt }}</span>
               <strong>{{ formatDateTime(currentRecord.lastVerifyAt) || '-' }}</strong>
             </div>
             <div class="detail-item">
-              <span>最后验证IP</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.lastVerifyIp }}</span>
               <strong>{{ currentRecord.lastVerifyIp || '-' }}</strong>
             </div>
             <div class="detail-item full">
-              <span>备注</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.remark }}</span>
               <strong>{{ currentRecord.remark || '-' }}</strong>
             </div>
             <div class="detail-item full">
-              <span>创建时间</span>
+              <span>{{ ADMIN_LETTER_VERIFICATION_TEXTS.drawer.createdAt }}</span>
               <strong>{{ formatDateTime(currentRecord.createdAt) }}</strong>
             </div>
           </div>
@@ -275,6 +275,8 @@ import type { TablePaginationConfig } from 'ant-design-vue'
 import { ReloadOutlined, BarChartOutlined, InfoCircleOutlined } from '@ant-design/icons-vue'
 import { getVerificationList, revokeVerification, getVerificationStatistics } from '@/api/letter-verification'
 import type { LetterVerificationRecord } from '@/api/letter-verification'
+import { UI_CONFIRM_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_LETTER_VERIFICATION_TEXTS } from '@/constants/adminTexts'
 
 const loading = ref(false)
 const dataSource = ref<LetterVerificationRecord[]>([])
@@ -300,20 +302,20 @@ const pagination = ref({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_LETTER_VERIFICATION_TEXTS.filter.totalPrefix}${total}${ADMIN_LETTER_VERIFICATION_TEXTS.filter.totalSuffix}`,
 })
 
 const columns = [
-  { title: '函件编号', key: 'applicationNo', dataIndex: 'applicationNo', width: 140, align: 'center' },
-  { title: '函件类型', key: 'letterTypeName', dataIndex: 'letterTypeName', width: 96, align: 'center', ellipsis: true },
-  { title: '律师事务所', key: 'firmName', dataIndex: 'firmName', width: 140, align: 'center', ellipsis: true },
-  { title: '出函律师', key: 'lawyerNames', dataIndex: 'lawyerNames', width: 110, align: 'center', ellipsis: true },
-  { title: '接收单位', key: 'targetUnit', dataIndex: 'targetUnit', width: 140, align: 'center', ellipsis: true },
-  { title: '状态', key: 'status', width: 84, align: 'center' },
-  { title: '有效期至', key: 'validUntil', width: 150, align: 'center' },
-  { title: '验证次数', key: 'verifyCount', width: 92, align: 'center' },
-  { title: '最后验证', key: 'lastVerifyAt', width: 160, align: 'center' },
-  { title: '操作', key: 'action', width: 108, align: 'center' },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.applicationNo, key: 'applicationNo', dataIndex: 'applicationNo', width: 140, align: 'center' },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.letterTypeName, key: 'letterTypeName', dataIndex: 'letterTypeName', width: 96, align: 'center', ellipsis: true },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.firmName, key: 'firmName', dataIndex: 'firmName', width: 140, align: 'center', ellipsis: true },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.lawyerNames, key: 'lawyerNames', dataIndex: 'lawyerNames', width: 110, align: 'center', ellipsis: true },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.targetUnit, key: 'targetUnit', dataIndex: 'targetUnit', width: 140, align: 'center', ellipsis: true },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.status, key: 'status', width: 84, align: 'center' },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.validUntil, key: 'validUntil', width: 150, align: 'center' },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.verifyCount, key: 'verifyCount', width: 92, align: 'center' },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.lastVerifyAt, key: 'lastVerifyAt', width: 160, align: 'center' },
+  { title: ADMIN_LETTER_VERIFICATION_TEXTS.table.action, key: 'action', width: 108, align: 'center' },
 ]
 
 async function loadData() {
@@ -328,7 +330,7 @@ async function loadData() {
     dataSource.value = res.data.records || []
     pagination.value.total = res.data.total || 0
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '加载数据失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_LETTER_VERIFICATION_TEXTS.feedback.loadFailed
     message.error(errorMessage)
   } finally {
     loading.value = false
@@ -344,7 +346,7 @@ async function loadStatistics() {
     statistics.revoked = res.data.revoked || 0
     showStatistics.value = !showStatistics.value
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '加载统计数据失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_LETTER_VERIFICATION_TEXTS.feedback.loadStatsFailed
     message.error(errorMessage)
   }
 }
@@ -376,19 +378,19 @@ function handleView(record: LetterVerificationRecord) {
 async function handleRevoke(record: LetterVerificationRecord) {
   try {
     await revokeVerification(record.id)
-    message.success('已撤销')
+    message.success(UI_FEEDBACK_TEXTS.verificationRevoked)
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '撤销失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_LETTER_VERIFICATION_TEXTS.feedback.revokeFailed
     message.error(errorMessage)
   }
 }
 
 function getStatusName(record: LetterVerificationRecord): string {
-  if (record.status === 'REVOKED') return '已撤销'
-  if (record.status === 'ACTIVE' && isExpired(record.validUntil)) return '已过期'
-  if (record.status === 'ACTIVE') return '有效'
-  return '未知'
+  if (record.status === 'REVOKED') return ADMIN_LETTER_VERIFICATION_TEXTS.statusOptions.revoked
+  if (record.status === 'ACTIVE' && isExpired(record.validUntil)) return ADMIN_LETTER_VERIFICATION_TEXTS.statusOptions.expired
+  if (record.status === 'ACTIVE') return ADMIN_LETTER_VERIFICATION_TEXTS.statusOptions.active
+  return ADMIN_LETTER_VERIFICATION_TEXTS.statusOptions.unknown
 }
 
 function getStatusColor(record: LetterVerificationRecord): string {
@@ -429,9 +431,9 @@ onMounted(() => {
 .guide-card,
 .detail-hero,
 .detail-panel {
-  background: var(--lex-surface);
-  border: 1px solid var(--lex-outline);
-  border-radius: 8px;
+  background: var(--lex-surface-strong);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -459,9 +461,9 @@ onMounted(() => {
   display: grid;
   gap: 6px;
   padding: 14px 16px;
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--lex-bg-muted);
-  border: 1px solid var(--lex-outline);
+  border: 1px solid var(--border-color-light);
 }
 
 .rule-item span {

@@ -3,14 +3,14 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          邮件 / 短信 / 微信渠道与参数；保存后生效。
+          {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.intro }}
         </p>
       </div>
       <a-button @click="loadData">
         <template #icon>
           <ReloadOutlined />
         </template>
-        刷新
+        {{ UI_TEXTS.refresh }}
       </a-button>
     </section>
 
@@ -18,16 +18,16 @@
       <article class="config-card overview-card overview-card--wide">
         <div class="overview-card__head">
           <div>
-            <h3>配置说明</h3>
+            <h3>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.overviewTitle }}</h3>
           </div>
           <a-tag color="processing">
-            即时生效
+            {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.overviewTag }}
           </a-tag>
         </div>
         <p>
-          配置存数据库；缺键时回退 <code>application.yml</code>。
+          {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.overviewDescPrefix }} <code>application.yml</code>。
           <router-link to="/admin/notification-templates">
-            管理通知模板
+            {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.overviewLink }}
           </router-link>
         </p>
       </article>
@@ -35,27 +35,27 @@
 
     <section class="stats-grid">
       <div class="stats-card">
-        <span class="stats-label">启用渠道</span>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.enabledChannels }}</span>
         <strong>{{ enabledChannelCount }}/3</strong>
       </div>
       <div class="stats-card success">
-        <span class="stats-label">邮件</span>
-        <strong>{{ emailForm.enabled ? 'ON' : 'OFF' }}</strong>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.email }}</span>
+        <strong>{{ emailForm.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.on : ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.off }}</strong>
       </div>
       <div class="stats-card info">
-        <span class="stats-label">短信</span>
-        <strong>{{ smsForm.enabled ? 'ON' : 'OFF' }}</strong>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.sms }}</span>
+        <strong>{{ smsForm.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.on : ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.off }}</strong>
       </div>
       <div class="stats-card danger">
-        <span class="stats-label">微信</span>
-        <strong>{{ wechatForm.enabled ? 'ON' : 'OFF' }}</strong>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.wechat }}</span>
+        <strong>{{ wechatForm.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.on : ADMIN_NOTIFICATION_SETTINGS_TEXTS.stats.off }}</strong>
       </div>
     </section>
 
     <a-spin :spinning="loading">
       <section class="section-shell-card">
         <div class="section-head dashboard-section-head">
-          <h3>通知通道</h3>
+          <h3>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.channelSectionTitle }}</h3>
         </div>
       </section>
 
@@ -66,9 +66,9 @@
               <div class="channel-kicker">
                 Email
               </div>
-              <h3>邮件通知</h3>
+              <h3>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.title }}</h3>
               <p class="channel-description">
-                用于项目变更通知、访问链接发送和正式邮件触达。
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.desc }}
               </p>
             </div>
             <div class="channel-switch">
@@ -76,18 +76,18 @@
                 v-model:checked="emailForm.enabled"
                 @change="handleEmailEnabledChange"
               />
-              <span>{{ emailForm.enabled ? '已启用' : '已禁用' }}</span>
+              <span>{{ emailForm.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.channel.enabled : ADMIN_NOTIFICATION_SETTINGS_TEXTS.channel.disabled }}</span>
             </div>
           </div>
 
           <div class="channel-meta">
             <div class="channel-meta-item">
-              <span>接入状态</span>
-              <strong>{{ emailForm.smtpHost ? 'SMTP 已配置' : '等待配置' }}</strong>
+              <span>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.accessStatusLabel }}</span>
+              <strong>{{ emailForm.smtpHost ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.statusConfigured : ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.statusPending }}</strong>
             </div>
             <div class="channel-meta-item">
-              <span>发件身份</span>
-              <strong>{{ emailForm.fromName || emailForm.from || '未设置' }}</strong>
+              <span>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderIdentityLabel }}</span>
+              <strong>{{ emailForm.fromName || emailForm.from || ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.identityUnset }}</strong>
             </div>
           </div>
 
@@ -98,55 +98,55 @@
           >
             <template v-if="emailForm.enabled">
               <div class="subsection-title">
-                SMTP 服务器配置
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpTitle }}
               </div>
-              <a-form-item label="SMTP 服务器地址">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpHostLabel">
                 <a-input
                   v-model:value="emailForm.smtpHost"
-                  placeholder="请输入 SMTP 服务器地址（如：smtp.example.com）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpHostPlaceholder"
                 />
               </a-form-item>
-              <a-form-item label="SMTP 端口">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpPortLabel">
                 <a-input-number
                   v-model:value="emailForm.smtpPort"
-                  placeholder="请输入 SMTP 端口（如：587）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpPortPlaceholder"
                   :min="1"
                   :max="65535"
                   style="width: 100%"
                 />
               </a-form-item>
-              <a-form-item label="SMTP 用户名">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpUserLabel">
                 <a-input
                   v-model:value="emailForm.smtpUsername"
-                  placeholder="请输入 SMTP 用户名（通常是邮箱地址）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpUserPlaceholder"
                 />
               </a-form-item>
-              <a-form-item label="SMTP 密码">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpPasswordLabel">
                 <a-input-password
                   v-model:value="emailForm.smtpPassword"
-                  placeholder="请输入 SMTP 密码（或授权码）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpPasswordPlaceholder"
                 />
               </a-form-item>
               <a-alert
-                message="SMTP 配置保存后立即生效，无需重启服务。若通过环境变量 SPRING_MAIL_* 覆盖，则环境变量优先。"
+                :message="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpAlert"
                 type="info"
                 show-icon
                 class="inline-alert"
               />
 
               <div class="subsection-title">
-                发件人信息
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderTitle }}
               </div>
-              <a-form-item label="发件人邮箱">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderEmailLabel">
                 <a-input
                   v-model:value="emailForm.from"
-                  placeholder="请输入发件人邮箱（如：noreply@example.com）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderEmailPlaceholder"
                 />
               </a-form-item>
-              <a-form-item label="发件人名称">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderNameLabel">
                 <a-input
                   v-model:value="emailForm.fromName"
-                  placeholder="请输入发件人名称（如：客户服务系统）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderNamePlaceholder"
                 />
               </a-form-item>
             </template>
@@ -156,7 +156,7 @@
                 :loading="saving"
                 @click="handleSaveEmailConfig"
               >
-                保存邮件配置
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.saveButton }}
               </a-button>
             </a-form-item>
           </a-form>
@@ -168,9 +168,9 @@
               <div class="channel-kicker">
                 SMS
               </div>
-              <h3>短信通知</h3>
+              <h3>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.title }}</h3>
               <p class="channel-description">
-                适合高到达率提醒，注意模板字段和服务商控制台保持严格一致。
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.desc }}
               </p>
             </div>
             <div class="channel-switch">
@@ -178,18 +178,18 @@
                 v-model:checked="smsForm.enabled"
                 @change="handleSmsEnabledChange"
               />
-              <span>{{ smsForm.enabled ? '已启用' : '已禁用' }}</span>
+              <span>{{ smsForm.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.channel.enabled : ADMIN_NOTIFICATION_SETTINGS_TEXTS.channel.disabled }}</span>
             </div>
           </div>
 
           <div class="channel-meta">
             <div class="channel-meta-item">
-              <span>服务商</span>
-              <strong>{{ smsForm.provider === 'tencent' ? '腾讯云' : '阿里云' }}</strong>
+              <span>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.providerMetaLabel }}</span>
+              <strong>{{ smsForm.provider === 'tencent' ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.tencentLabel : ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.aliyunLabel }}</strong>
             </div>
             <div class="channel-meta-item">
-              <span>模板映射</span>
-              <strong>{{ smsForm.provider === 'tencent' ? (smsForm.tencent.templateId || '未设置') : (smsForm.aliyun.templateCode || '未设置') }}</strong>
+              <span>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.templateMetaLabel }}</span>
+              <strong>{{ smsForm.provider === 'tencent' ? (smsForm.tencent.templateId || ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.unset) : (smsForm.aliyun.templateCode || ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.unset) }}</strong>
             </div>
           </div>
 
@@ -199,94 +199,94 @@
             class="channel-form"
           >
             <template v-if="smsForm.enabled">
-              <a-form-item label="服务商">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.providerLabel">
                 <a-select
                   v-model:value="smsForm.provider"
-                  placeholder="请选择短信服务商"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.providerPlaceholder"
                 >
                   <a-select-option value="aliyun">
-                    阿里云
+                    {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.aliyunLabel }}
                   </a-select-option>
                   <a-select-option value="tencent">
-                    腾讯云
+                    {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.tencentLabel }}
                   </a-select-option>
                 </a-select>
               </a-form-item>
 
               <template v-if="smsForm.provider === 'aliyun'">
-                <a-form-item label="Access Key ID">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.accessKeyIdLabel">
                   <a-input
                     v-model:value="smsForm.aliyun.accessKeyId"
-                    placeholder="请输入阿里云 Access Key ID"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.accessKeyIdPlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="Access Key Secret">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.accessKeySecretLabel">
                   <a-input-password
                     v-model:value="smsForm.aliyun.accessKeySecret"
-                    placeholder="请输入阿里云 Access Key Secret"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.accessKeySecretPlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="签名名称">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.signNameLabel">
                   <a-input
                     v-model:value="smsForm.aliyun.signName"
-                    placeholder="请输入短信签名名称"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.signNamePlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="模板代码">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.templateCodeLabel">
                   <a-input
                     v-model:value="smsForm.aliyun.templateCode"
-                    placeholder="请输入短信模板代码"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.templateCodePlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="API 端点">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.endpointLabel">
                   <a-input
                     v-model:value="smsForm.aliyun.endpoint"
-                    placeholder="请输入 API 端点（默认：dysmsapi.aliyuncs.com）"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.endpointPlaceholder"
                   />
                   <div class="field-note">
-                    可选，留空使用默认值
+                    {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.optionalHint }}
                   </div>
                 </a-form-item>
               </template>
 
               <template v-if="smsForm.provider === 'tencent'">
-                <a-form-item label="Secret ID">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.secretIdLabel">
                   <a-input
                     v-model:value="smsForm.tencent.secretId"
-                    placeholder="请输入腾讯云 Secret ID"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.secretIdPlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="Secret Key">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.secretKeyLabel">
                   <a-input-password
                     v-model:value="smsForm.tencent.secretKey"
-                    placeholder="请输入腾讯云 Secret Key"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.secretKeyPlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="应用ID">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.appIdLabel">
                   <a-input
                     v-model:value="smsForm.tencent.appId"
-                    placeholder="请输入腾讯云短信应用ID"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.appIdPlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="签名名称">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.signNameLabel">
                   <a-input
                     v-model:value="smsForm.tencent.signName"
-                    placeholder="请输入短信签名名称"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.signNamePlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="模板ID">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.templateIdLabel">
                   <a-input
                     v-model:value="smsForm.tencent.templateId"
-                    placeholder="请输入短信模板ID"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.templateIdPlaceholder"
                   />
                 </a-form-item>
-                <a-form-item label="区域">
+                <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.regionLabel">
                   <a-input
                     v-model:value="smsForm.tencent.region"
-                    placeholder="请输入区域（默认：ap-beijing）"
+                    :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.regionPlaceholder"
                   />
                   <div class="field-note">
-                    可选，留空使用默认值
+                    {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.optionalHint }}
                   </div>
                 </a-form-item>
               </template>
@@ -297,7 +297,7 @@
                 :loading="saving"
                 @click="handleSaveSmsConfig"
               >
-                保存短信配置
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.saveButton }}
               </a-button>
             </a-form-item>
           </a-form>
@@ -309,9 +309,9 @@
               <div class="channel-kicker">
                 WeChat
               </div>
-              <h3>微信通知</h3>
+              <h3>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.title }}</h3>
               <p class="channel-description">
-                适合模板消息推送，默认模板可在这里维护，复杂内容建议交给模板库。
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.desc }}
               </p>
             </div>
             <div class="channel-switch">
@@ -319,18 +319,18 @@
                 v-model:checked="wechatForm.enabled"
                 @change="handleWechatEnabledChange"
               />
-              <span>{{ wechatForm.enabled ? '已启用' : '已禁用' }}</span>
+              <span>{{ wechatForm.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.channel.enabled : ADMIN_NOTIFICATION_SETTINGS_TEXTS.channel.disabled }}</span>
             </div>
           </div>
 
           <div class="channel-meta">
             <div class="channel-meta-item">
-              <span>公众号凭证</span>
-              <strong>{{ wechatForm.appId ? '已填 AppID' : '待配置' }}</strong>
+              <span>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.credentialLabel }}</span>
+              <strong>{{ wechatForm.appId ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appIdFilled : ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.credentialPending }}</strong>
             </div>
             <div class="channel-meta-item">
-              <span>默认模板</span>
-              <strong>{{ wechatForm.templateId || '未设置' }}</strong>
+              <span>{{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.defaultTemplateLabel }}</span>
+              <strong>{{ wechatForm.templateId || ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.templateUnset }}</strong>
             </div>
           </div>
 
@@ -340,25 +340,25 @@
             class="channel-form"
           >
             <template v-if="wechatForm.enabled">
-              <a-form-item label="AppID">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appIdLabel">
                 <a-input
                   v-model:value="wechatForm.appId"
-                  placeholder="请输入微信公众号 AppID"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appIdPlaceholder"
                 />
               </a-form-item>
-              <a-form-item label="AppSecret">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appSecretLabel">
                 <a-input-password
                   v-model:value="wechatForm.appSecret"
-                  placeholder="请输入微信公众号 AppSecret"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appSecretPlaceholder"
                 />
               </a-form-item>
-              <a-form-item label="模板ID">
+              <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.templateLabel">
                 <a-input
                   v-model:value="wechatForm.templateId"
-                  placeholder="请输入微信模板消息ID（可选，也可在通知模板管理中配置）"
+                  :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.templatePlaceholder"
                 />
                 <div class="field-note">
-                  可以在通知模板管理页面配置更细的模板内容。
+                  {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.templateHint }}
                 </div>
               </a-form-item>
             </template>
@@ -368,7 +368,7 @@
                 :loading="saving"
                 @click="handleSaveWechatConfig"
               >
-                保存微信配置
+                {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.saveButton }}
               </a-button>
             </a-form-item>
           </a-form>
@@ -383,6 +383,8 @@ import { ref, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { ReloadOutlined } from '@ant-design/icons-vue'
 import { getConfigList, saveConfig, type SysConfigInfo } from '@/api/config'
+import { UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_NOTIFICATION_SETTINGS_TEXTS } from '@/constants/adminTexts'
 
 const loading = ref(false)
 const saving = ref(false)
@@ -470,7 +472,7 @@ async function loadData() {
     wechatForm.value.appSecret = findConfigValue(configs, 'client-service.notification.wechat.app-secret') || ''
     wechatForm.value.templateId = findConfigValue(configs, 'client-service.notification.wechat.template-id') || findConfigValue(configs, 'notification.wechat.template-id') || ''
   } catch (error: unknown) {
-    message.error(getErrorMessage(error, '加载配置失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configLoadFailed))
   } finally {
     loading.value = false
   }
@@ -497,9 +499,9 @@ async function handleSaveEmailConfig() {
       if (emailForm.value.from) await saveConfigValue('client-service.notification.email.from', emailForm.value.from, 'STRING', '邮件发件人邮箱')
       if (emailForm.value.fromName) await saveConfigValue('client-service.notification.email.from-name', emailForm.value.fromName, 'STRING', '邮件发件人名称')
     }
-    message.success('邮件配置已保存，SMTP 配置已立即生效')
+    message.success(ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.saveSuccess)
   } catch (error: unknown) {
-    message.error(getErrorMessage(error, '保存邮件配置失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configSaveFailed))
   } finally {
     saving.value = false
   }
@@ -526,9 +528,9 @@ async function handleSaveSmsConfig() {
         if (smsForm.value.tencent.region) await saveConfigValue('client-service.notification.sms.tencent.region', smsForm.value.tencent.region, 'STRING', '腾讯云短信区域')
       }
     }
-    message.success('短信配置已保存，配置更新后立即生效')
+    message.success(ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.saveSuccess)
   } catch (error: unknown) {
-    message.error(getErrorMessage(error, '保存短信配置失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configSaveFailed))
   } finally {
     saving.value = false
   }
@@ -543,9 +545,9 @@ async function handleSaveWechatConfig() {
       if (wechatForm.value.appSecret) await saveConfigValue('client-service.notification.wechat.app-secret', wechatForm.value.appSecret, 'STRING', '微信公众号 AppSecret')
       if (wechatForm.value.templateId) await saveConfigValue('client-service.notification.wechat.template-id', wechatForm.value.templateId, 'STRING', '微信模板消息ID')
     }
-    message.success('微信配置已保存')
+    message.success(ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.saveSuccess)
   } catch (error: unknown) {
-    message.error(getErrorMessage(error, '保存微信配置失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configSaveFailed))
   } finally {
     saving.value = false
   }
@@ -554,35 +556,35 @@ async function handleSaveWechatConfig() {
 async function handleEmailEnabledChange() {
   try {
     await saveConfigValue('client-service.notification.email.enabled', String(emailForm.value.enabled), 'BOOLEAN', '是否启用邮件通知')
-    message.success(emailForm.value.enabled ? '邮件通知已启用' : '邮件通知已禁用')
+    message.success(emailForm.value.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.enabledSuccess : ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.disabledSuccess)
     if (!emailForm.value.enabled) {
       emailForm.value.from = ''
       emailForm.value.fromName = ''
     }
   } catch (error: unknown) {
     emailForm.value.enabled = !emailForm.value.enabled
-    message.error(getErrorMessage(error, '保存失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configSaveFailed))
   }
 }
 
 async function handleSmsEnabledChange() {
   try {
     await saveConfigValue('client-service.notification.sms.enabled', String(smsForm.value.enabled), 'BOOLEAN', '是否启用短信通知')
-    message.success(smsForm.value.enabled ? '短信通知已启用' : '短信通知已禁用')
+    message.success(smsForm.value.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.enabledSuccess : ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.disabledSuccess)
     if (!smsForm.value.enabled) {
       smsForm.value.aliyun = { accessKeyId: '', accessKeySecret: '', signName: '', templateCode: '', endpoint: '' }
       smsForm.value.tencent = { secretId: '', secretKey: '', appId: '', signName: '', templateId: '', region: '' }
     }
   } catch (error: unknown) {
     smsForm.value.enabled = !smsForm.value.enabled
-    message.error(getErrorMessage(error, '保存失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configSaveFailed))
   }
 }
 
 async function handleWechatEnabledChange() {
   try {
     await saveConfigValue('client-service.notification.wechat.enabled', String(wechatForm.value.enabled), 'BOOLEAN', '是否启用微信通知')
-    message.success(wechatForm.value.enabled ? '微信通知已启用' : '微信通知已禁用')
+    message.success(wechatForm.value.enabled ? ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.enabledSuccess : ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.disabledSuccess)
     if (!wechatForm.value.enabled) {
       wechatForm.value.appId = ''
       wechatForm.value.appSecret = ''
@@ -590,7 +592,7 @@ async function handleWechatEnabledChange() {
     }
   } catch (error: unknown) {
     wechatForm.value.enabled = !wechatForm.value.enabled
-    message.error(getErrorMessage(error, '保存失败'))
+    message.error(getErrorMessage(error, UI_FEEDBACK_TEXTS.configSaveFailed))
   }
 }
 
@@ -657,9 +659,9 @@ onMounted(() => {
 .section-shell-card,
 .channel-card {
   padding: 22px;
-  background: var(--lex-surface);
-  border: 1px solid var(--lex-outline);
-  border-radius: 8px;
+  background: var(--lex-surface-strong);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -705,9 +707,9 @@ onMounted(() => {
 
 .channel-meta-item {
   padding: 14px 16px;
-  border-radius: 8px;
+  border-radius: 14px;
   background: var(--lex-bg-muted);
-  border: 1px solid var(--lex-outline);
+  border: 1px solid var(--border-color-light);
 }
 
 .channel-meta-item span {

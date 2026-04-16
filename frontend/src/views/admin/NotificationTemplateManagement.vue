@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          短信 / 微信 / 邮件模板与服务商映射。
+          {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.intro }}
         </p>
       </div>
       <a-space>
@@ -14,13 +14,13 @@
           <template #icon>
             <PlusOutlined />
           </template>
-          新增模板
+          {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.actions.create }}
         </a-button>
         <a-button @click="loadData">
           <template #icon>
             <ReloadOutlined />
           </template>
-          刷新
+          {{ UI_TEXTS.refresh }}
         </a-button>
       </a-space>
     </section>
@@ -30,15 +30,19 @@
         <article class="guide-card guide-card--wide dashboard-guide-card dashboard-guide-card--wide">
           <div class="guide-card__head dashboard-guide-head">
             <div>
-              <h3>模板使用说明</h3>
+              <h3>{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.guide.title }}</h3>
             </div>
             <a-tag color="processing">
-              统一管理
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.guide.tag }}
             </a-tag>
           </div>
           <ul class="guide-list">
-            <li>发送前替换变量；短信/微信需与平台侧模板一致。</li>
-            <li>邮件支持 HTML。</li>
+            <li
+              v-for="item in ADMIN_NOTIFICATION_TEMPLATE_TEXTS.guide.items"
+              :key="item"
+            >
+              {{ item }}
+            </li>
           </ul>
           <div class="token-cloud">
             <code>${matterName}</code>
@@ -52,26 +56,26 @@
 
     <section class="stats-grid">
       <div class="stats-card">
-        <span class="stats-label">模板总数</span>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.stats.total }}</span>
         <strong>{{ templateStats.total }}</strong>
       </div>
       <div class="stats-card success">
-        <span class="stats-label">启用中</span>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.stats.enabled }}</span>
         <strong>{{ templateStats.enabled }}</strong>
       </div>
       <div class="stats-card info">
-        <span class="stats-label">短信 / 微信 / 邮件</span>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.stats.channelMix }}</span>
         <strong>{{ templateStats.sms }}/{{ templateStats.wechat }}/{{ templateStats.email }}</strong>
       </div>
       <div class="stats-card danger">
-        <span class="stats-label">服务商映射</span>
+        <span class="stats-label">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.stats.providerMapping }}</span>
         <strong>{{ templateStats.providers }}</strong>
       </div>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
-        <h3>筛选</h3>
+        <h3>{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.title }}</h3>
       </div>
 
       <a-form
@@ -80,54 +84,54 @@
         class="template-filter-form"
         @finish="handleSearch"
       >
-        <a-form-item label="模板类型">
+        <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.typeLabel">
           <a-select
             v-model:value="searchForm.templateType"
-            placeholder="请选择模板类型"
+            :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.typePlaceholder"
             allow-clear
             style="width: 150px"
           >
             <a-select-option value="SMS">
-              短信
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.sms }}
             </a-select-option>
             <a-select-option value="WECHAT">
-              微信
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.wechat }}
             </a-select-option>
             <a-select-option value="EMAIL">
-              邮件
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.email }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="服务商">
+        <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.providerLabel">
           <a-select
             v-model:value="searchForm.provider"
-            placeholder="请选择服务商"
+            :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.providerPlaceholder"
             allow-clear
             style="width: 150px"
           >
             <a-select-option value="aliyun">
-              阿里云
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.aliyun }}
             </a-select-option>
             <a-select-option value="tencent">
-              腾讯云
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.tencent }}
             </a-select-option>
             <a-select-option value="wechat">
-              微信
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.wechatProvider }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="状态">
+        <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.statusLabel">
           <a-select
             v-model:value="searchForm.enabled"
-            placeholder="请选择状态"
+            :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.statusPlaceholder"
             allow-clear
             style="width: 120px"
           >
             <a-select-option :value="true">
-              启用
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.enabled }}
             </a-select-option>
             <a-select-option :value="false">
-              禁用
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.disabled }}
             </a-select-option>
           </a-select>
         </a-form-item>
@@ -137,10 +141,10 @@
               type="primary"
               html-type="submit"
             >
-              查询
+              {{ UI_TEXTS.search }}
             </a-button>
             <a-button @click="handleReset">
-              重置
+              {{ UI_TEXTS.reset }}
             </a-button>
           </a-space>
         </a-form-item>
@@ -149,12 +153,12 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <h3>模板列表</h3>
+        <h3>{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.title }}</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>共 {{ dataSource.length }} 条</span>
-        <span v-if="templateStats.enabled">启用 {{ templateStats.enabled }} 条</span>
+        <span>{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.totalPrefix }}{{ dataSource.length }}{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.totalSuffix }}</span>
+        <span v-if="templateStats.enabled">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.enabledPrefix }}{{ templateStats.enabled }}{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.enabledSuffix }}</span>
       </div>
 
       <a-table
@@ -189,15 +193,15 @@
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space>
-              <a-button
-                type="link"
-                size="small"
-                @click="handleEdit(record)"
-              >
-                编辑
-              </a-button>
+                <a-button
+                  type="link"
+                  size="small"
+                  @click="handleEdit(record)"
+                >
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.actions.edit }}
+                </a-button>
               <a-popconfirm
-                title="确定要删除这个模板吗？"
+                :title="UI_CONFIRM_TEXTS.removeTemplate"
                 @confirm="handleDelete(record)"
               >
                 <a-button
@@ -205,7 +209,7 @@
                   size="small"
                   danger
                 >
-                  移除
+                  {{ UI_TEXTS.remove }}
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -216,7 +220,7 @@
 
     <a-modal
       v-model:open="showCreateModal"
-      :title="editingRecord ? '编辑模板' : '新增模板'"
+      :title="editingRecord ? ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.editTitle : ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.createTitle"
       :width="modalWidth"
       wrap-class-name="template-modal"
       :confirm-loading="submitLoading"
@@ -233,12 +237,12 @@
             :sm="12"
           >
             <a-form-item
-              label="模板名称"
+              :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.nameLabel"
               required
             >
               <a-input
                 v-model:value="formData.templateName"
-                placeholder="请输入模板名称"
+                :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.namePlaceholder"
               />
             </a-form-item>
           </a-col>
@@ -247,23 +251,23 @@
             :sm="12"
           >
             <a-form-item
-              label="模板类型"
+              :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.typeLabel"
               required
             >
               <a-select
                 v-model:value="formData.templateType"
-                placeholder="请选择模板类型"
+                :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.typePlaceholder"
                 :disabled="!!editingRecord"
                 @change="handleTemplateTypeChange"
               >
                 <a-select-option value="SMS">
-                  短信
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.sms }}
                 </a-select-option>
                 <a-select-option value="WECHAT">
-                  微信
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.wechat }}
                 </a-select-option>
                 <a-select-option value="EMAIL">
-                  邮件
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.email }}
                 </a-select-option>
               </a-select>
             </a-form-item>
@@ -274,16 +278,16 @@
             :xs="24"
             :sm="12"
           >
-            <a-form-item label="模板代码">
+            <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.codeLabel">
               <a-input
                 v-model:value="formData.templateCode"
                 :placeholder="getTemplateCodePlaceholder()"
                 :disabled="!!editingRecord"
               />
               <div class="field-note">
-                <span v-if="formData.templateType === 'SMS'">模板代码需与服务商平台模板保持一致。</span>
-                <span v-else-if="formData.templateType === 'WECHAT'">模板 ID 需在微信公众平台申请。</span>
-                <span v-else-if="formData.templateType === 'EMAIL'">邮件模板无需填写模板代码。</span>
+                <span v-if="formData.templateType === 'SMS'">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.smsAliyunCode }}</span>
+                <span v-else-if="formData.templateType === 'WECHAT'">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.wechatTemplateId }}</span>
+                <span v-else-if="formData.templateType === 'EMAIL'">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.emailNoCode }}</span>
               </div>
             </a-form-item>
           </a-col>
@@ -291,46 +295,46 @@
             :xs="24"
             :sm="12"
           >
-            <a-form-item label="服务商">
+            <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.providerLabel">
               <a-select
                 v-model:value="formData.provider"
-                placeholder="请选择服务商"
+                :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.providerPlaceholder"
                 :disabled="!!editingRecord"
                 @change="handleProviderChange"
               >
                 <a-select-option value="aliyun">
-                  阿里云
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.aliyun }}
                 </a-select-option>
                 <a-select-option value="tencent">
-                  腾讯云
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.tencent }}
                 </a-select-option>
                 <a-select-option value="wechat">
-                  微信
+                  {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.wechatProvider }}
                 </a-select-option>
               </a-select>
               <div class="field-note">
-                <span v-if="formData.templateType === 'SMS' && !formData.provider">短信模板需选择服务商。</span>
-                <span v-else-if="formData.templateType === 'WECHAT' && formData.provider !== 'wechat'">微信模板建议固定使用“微信”服务商。</span>
-                <span v-else-if="formData.templateType === 'EMAIL'">邮件模板无需选择服务商。</span>
+                <span v-if="formData.templateType === 'SMS' && !formData.provider">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.smsProviderRequired }}</span>
+                <span v-else-if="formData.templateType === 'WECHAT' && formData.provider !== 'wechat'">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.wechatProviderSuggested }}</span>
+                <span v-else-if="formData.templateType === 'EMAIL'">{{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.emailNoProvider }}</span>
               </div>
             </a-form-item>
           </a-col>
         </a-row>
         <a-form-item
           v-if="formData.templateType === 'SMS'"
-          label="签名名称"
+          :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.signNameLabel"
         >
           <a-input
             v-model:value="formData.signName"
-            placeholder="请输入签名名称（在服务商平台申请的签名）"
+            :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.signNamePlaceholder"
             :disabled="!!editingRecord"
           />
           <div class="field-note">
-            短信模板通常需要匹配服务商平台上的签名。
+            {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.notes.smsSignHint }}
           </div>
         </a-form-item>
         <a-form-item
-          label="模板内容"
+          :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.contentLabel"
           required
         >
           <a-textarea
@@ -347,7 +351,7 @@
               class="hint-alert"
             />
             <a-alert
-              message="模板内容就是客户收到的消息结构，系统会自动替换变量后发送。"
+              :message="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.contentBusinessHint"
               type="warning"
               show-icon
               :closable="false"
@@ -362,28 +366,28 @@
               <template #icon>
                 <FileTextOutlined />
               </template>
-              点击加载示例模板
+              {{ ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.loadExample }}
             </a-button>
           </div>
         </a-form-item>
-        <a-form-item label="模板变量">
+        <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.variablesLabel">
           <a-textarea
             v-model:value="formData.templateVariables"
-            placeholder="请输入模板变量说明（JSON格式）"
+            :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.variablesPlaceholder"
             :rows="3"
           />
         </a-form-item>
-        <a-form-item label="状态">
+        <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.statusLabel">
           <a-switch
             v-model:checked="formData.enabled"
-            checked-children="启用"
-            un-checked-children="禁用"
+            :checked-children="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.enabled"
+            :un-checked-children="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.disabled"
           />
         </a-form-item>
-        <a-form-item label="描述">
+        <a-form-item :label="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.descriptionLabel">
           <a-textarea
             v-model:value="formData.description"
-            placeholder="请输入模板描述"
+            :placeholder="ADMIN_NOTIFICATION_TEMPLATE_TEXTS.modal.descriptionPlaceholder"
             :rows="2"
           />
         </a-form-item>
@@ -406,6 +410,8 @@ import {
   type CreateTemplateRequest,
   type UpdateTemplateRequest,
 } from '@/api/notificationTemplate'
+import { UI_CONFIRM_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_NOTIFICATION_TEMPLATE_TEXTS } from '@/constants/adminTexts'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -446,7 +452,7 @@ const pagination = ref({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.totalPrefix}${total}${ADMIN_NOTIFICATION_TEMPLATE_TEXTS.filter.totalSuffix}`,
 })
 
 const templateStats = computed(() => ({
@@ -458,16 +464,16 @@ const templateStats = computed(() => ({
   providers: dataSource.value.filter(item => !!item.provider).length,
 }))
 const columns = [
-  { title: 'ID', key: 'id', dataIndex: 'id', width: 72, align: 'center' },
-  { title: '模板名称', key: 'templateName', dataIndex: 'templateName', ellipsis: true, width: 140, align: 'center' },
-  { title: '模板类型', key: 'templateType', width: 100, align: 'center' },
-  { title: '模板代码', key: 'templateCode', dataIndex: 'templateCode', ellipsis: true, width: 140, align: 'center' },
-  { title: '服务商', key: 'provider', width: 100, align: 'center' },
-  { title: '签名名称', key: 'signName', dataIndex: 'signName', ellipsis: true, width: 110, align: 'center' },
-  { title: '模板内容', key: 'templateContent', ellipsis: true, width: 180, align: 'center' },
-  { title: '状态', key: 'enabled', width: 76, align: 'center' },
-  { title: '创建时间', key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
-  { title: '操作', key: 'action', width: 116, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.id, key: 'id', dataIndex: 'id', width: 72, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.name, key: 'templateName', dataIndex: 'templateName', ellipsis: true, width: 140, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.type, key: 'templateType', width: 100, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.code, key: 'templateCode', dataIndex: 'templateCode', ellipsis: true, width: 140, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.provider, key: 'provider', width: 100, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.signName, key: 'signName', dataIndex: 'signName', ellipsis: true, width: 110, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.content, key: 'templateContent', ellipsis: true, width: 180, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.status, key: 'enabled', width: 76, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.createdAt, key: 'createdAt', dataIndex: 'createdAt', width: 160, align: 'center' },
+  { title: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.table.action, key: 'action', width: 116, align: 'center' },
 ]
 
 async function loadData() {
@@ -483,7 +489,7 @@ async function loadData() {
     dataSource.value = res.data || []
     pagination.value.total = dataSource.value.length
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '加载模板列表失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_NOTIFICATION_TEMPLATE_TEXTS.feedback.loadFailed
     message.error(errorMessage)
   } finally {
     loading.value = false
@@ -529,10 +535,10 @@ function handleEdit(record: NotificationTemplateInfo) {
 async function handleDelete(record: NotificationTemplateInfo) {
   try {
     await deleteTemplate(record.id)
-    message.success('模板已删除')
+    message.success(UI_FEEDBACK_TEXTS.templateDeleted)
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '删除失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_NOTIFICATION_TEMPLATE_TEXTS.feedback.deleteFailed
     message.error(errorMessage)
   }
 }
@@ -540,10 +546,10 @@ async function handleDelete(record: NotificationTemplateInfo) {
 async function handleToggleEnabled(record: NotificationTemplateInfo, checked: boolean) {
   try {
     await updateTemplate(record.id, { enabled: checked })
-    message.success(checked ? '模板已启用' : '模板已禁用')
+    message.success(checked ? ADMIN_NOTIFICATION_TEMPLATE_TEXTS.feedback.enabledSuccess : ADMIN_NOTIFICATION_TEMPLATE_TEXTS.feedback.disabledSuccess)
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '操作失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_NOTIFICATION_TEMPLATE_TEXTS.feedback.toggleFailed
     message.error(errorMessage)
     await loadData()
   }
@@ -551,15 +557,15 @@ async function handleToggleEnabled(record: NotificationTemplateInfo, checked: bo
 
 async function handleSubmit() {
   if (!formData.value.templateName) {
-    message.warning('请填写模板名称')
+    message.warning(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.validation.nameRequired)
     return
   }
   if (!formData.value.templateType) {
-    message.warning('请选择模板类型')
+    message.warning(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.validation.typeRequired)
     return
   }
   if (!formData.value.templateContent) {
-    message.warning('请填写模板内容')
+    message.warning(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.validation.contentRequired)
     return
   }
 
@@ -575,7 +581,7 @@ async function handleSubmit() {
       }
 
       await updateTemplate(editingRecord.value.id, updateData)
-      message.success('模板已更新')
+      message.success(UI_FEEDBACK_TEXTS.templateUpdated)
     } else {
       const createData: CreateTemplateRequest = {
         templateName: formData.value.templateName!,
@@ -590,12 +596,12 @@ async function handleSubmit() {
       }
 
       await createTemplate(createData)
-      message.success('模板已创建')
+      message.success(UI_FEEDBACK_TEXTS.templateCreated)
     }
     handleCancel()
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '保存失败'
+    const errorMessage = error instanceof Error ? error.message : UI_FEEDBACK_TEXTS.configSaveFailed
     message.error(errorMessage)
   } finally {
     submitLoading.value = false
@@ -620,9 +626,9 @@ function handleCancel() {
 
 function getTemplateTypeName(type: string): string {
   const map: Record<string, string> = {
-    SMS: '短信',
-    WECHAT: '微信',
-    EMAIL: '邮件',
+    SMS: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.sms,
+    WECHAT: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.wechat,
+    EMAIL: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.email,
   }
   return map[type] || type
 }
@@ -639,9 +645,9 @@ function getTemplateTypeColor(type: string): string {
 function getProviderName(provider?: string): string {
   if (!provider) return '-'
   const map: Record<string, string> = {
-    aliyun: '阿里云',
-    tencent: '腾讯云',
-    wechat: '微信',
+    aliyun: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.aliyun,
+    tencent: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.tencent,
+    wechat: ADMIN_NOTIFICATION_TEMPLATE_TEXTS.options.wechatProvider,
   }
   return map[provider] || provider
 }
@@ -651,15 +657,15 @@ function getTemplateContentPlaceholder(): string {
   const provider = formData.value.provider
 
   if (type === 'SMS') {
-    if (provider === 'aliyun') return '请输入JSON格式，如：{"code":"${matterName}"}'
-    if (provider === 'tencent') return '请输入数组格式，如：["${matterName}","${accessUrl}"]'
-    return '请输入模板内容（JSON格式）'
+    if (provider === 'aliyun') return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.smsAliyunContent
+    if (provider === 'tencent') return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.smsTencentContent
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.smsDefaultContent
   } else if (type === 'WECHAT') {
-    return '请输入JSON格式，符合微信模板消息字段结构'
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.wechatContent
   } else if (type === 'EMAIL') {
-    return '请输入HTML格式，支持变量：${matterName}、${accessUrl}、${clientName}'
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.emailContent
   }
-  return '请输入模板内容'
+  return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.defaultContent
 }
 
 function getTemplateFormatHint(): string {
@@ -667,15 +673,15 @@ function getTemplateFormatHint(): string {
   const provider = formData.value.provider
 
   if (type === 'SMS') {
-    if (provider === 'aliyun') return '格式：JSON对象，变量名必须与阿里云平台模板变量一致。'
-    if (provider === 'tencent') return '格式：JSON数组，数组顺序必须与腾讯云模板变量顺序一致。'
-    return '请选择服务商后查看格式说明'
+    if (provider === 'aliyun') return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.formatHints.smsAliyun
+    if (provider === 'tencent') return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.formatHints.smsTencent
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.formatHints.chooseProvider
   } else if (type === 'WECHAT') {
-    return '格式：JSON对象，需符合微信模板消息的字段结构。'
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.formatHints.wechat
   } else if (type === 'EMAIL') {
-    return '格式：HTML格式，可直接组合完整邮件内容。'
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.formatHints.email
   }
-  return '请先选择模板类型'
+  return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.formatHints.chooseType
 }
 
 function getTemplateCodePlaceholder(): string {
@@ -683,13 +689,13 @@ function getTemplateCodePlaceholder(): string {
   const provider = formData.value.provider
 
   if (type === 'SMS') {
-    if (provider === 'aliyun') return '请输入模板代码（如：SMS_123456789）'
-    if (provider === 'tencent') return '请输入模板ID（如：123456）'
-    return '请先选择服务商'
+    if (provider === 'aliyun') return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.aliyunCode
+    if (provider === 'tencent') return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.tencentCode
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.providerFirst
   } else if (type === 'WECHAT') {
-    return '请输入模板ID（如：abc123def456）'
+    return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.wechatCode
   }
-  return '请输入模板代码'
+  return ADMIN_NOTIFICATION_TEMPLATE_TEXTS.placeholders.defaultCode
 }
 
 function handleTemplateTypeChange() {
@@ -719,14 +725,14 @@ function loadExample() {
       formData.value.templateContent = '{"code":"${matterName}","url":"${accessUrl}"}'
       formData.value.templateCode = formData.value.templateCode || 'SMS_123456789'
       formData.value.signName = formData.value.signName || '律师事务所'
-      message.info('已加载阿里云短信模板示例')
+      message.info(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.examples.aliyunLoaded)
     } else if (provider === 'tencent') {
       formData.value.templateContent = '["${matterName}","${accessUrl}"]'
       formData.value.templateCode = formData.value.templateCode || '123456'
       formData.value.signName = formData.value.signName || '律师事务所'
-      message.info('已加载腾讯云短信模板示例')
+      message.info(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.examples.tencentLoaded)
     } else {
-      message.warning('请先选择服务商（阿里云或腾讯云）')
+      message.warning(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.examples.providerRequired)
     }
   } else if (type === 'WECHAT') {
     formData.value.templateContent = JSON.stringify({
@@ -736,7 +742,7 @@ function loadExample() {
       remark: { value: '点击查看详情', color: '#173177' },
     }, null, 2)
     formData.value.templateCode = formData.value.templateCode || 'abc123def456'
-    message.info('已加载微信模板示例')
+    message.info(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.examples.wechatLoaded)
   } else if (type === 'EMAIL') {
     formData.value.templateContent = `<!DOCTYPE html>
 <html>
@@ -751,9 +757,9 @@ function loadExample() {
   </div>
 </body>
 </html>`
-    message.info('已加载邮件模板示例')
+    message.info(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.examples.emailLoaded)
   } else {
-    message.warning('请先选择模板类型')
+    message.warning(ADMIN_NOTIFICATION_TEMPLATE_TEXTS.examples.typeRequired)
   }
 }
 

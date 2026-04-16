@@ -38,47 +38,44 @@
         <h2 class="panel-title">
           快捷入口
         </h2>
-        <a-list>
-          <a-list-item @click="router.push('/files')">
-            <template #actions>
-              <ArrowRightOutlined />
+        <van-cell-group
+          inset
+          class="profile-cell-group"
+        >
+          <van-cell
+            title="文件中心"
+            label="预览、下载项目文件"
+            is-link
+            center
+            @click="router.push('/files')"
+          >
+            <template #icon>
+              <span class="portal-cell-icon">档</span>
             </template>
-            <a-list-item-meta>
-              <template #title>
-                文件中心
-              </template>
-              <template #description>
-                预览、下载项目文件
-              </template>
-            </a-list-item-meta>
-          </a-list-item>
-          <a-list-item @click="router.push('/notifications')">
-            <template #actions>
-              <ArrowRightOutlined />
+          </van-cell>
+          <van-cell
+            title="消息通知"
+            label="系统提醒与动态"
+            is-link
+            center
+            @click="router.push('/notifications')"
+          >
+            <template #icon>
+              <span class="portal-cell-icon">讯</span>
             </template>
-            <a-list-item-meta>
-              <template #title>
-                消息通知
-              </template>
-              <template #description>
-                系统提醒与动态
-              </template>
-            </a-list-item-meta>
-          </a-list-item>
-          <a-list-item @click="router.push('/help')">
-            <template #actions>
-              <ArrowRightOutlined />
+          </van-cell>
+          <van-cell
+            title="帮助中心"
+            label="常见问题与访问说明"
+            is-link
+            center
+            @click="router.push('/help')"
+          >
+            <template #icon>
+              <span class="portal-cell-icon">助</span>
             </template>
-            <a-list-item-meta>
-              <template #title>
-                帮助中心
-              </template>
-              <template #description>
-                常见问题与访问说明
-              </template>
-            </a-list-item-meta>
-          </a-list-item>
-        </a-list>
+          </van-cell>
+        </van-cell-group>
       </section>
     </a-layout-content>
     <MobileBottomNav />
@@ -88,7 +85,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { UserOutlined, ArrowRightOutlined } from '@ant-design/icons-vue'
+import { UserOutlined } from '@ant-design/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
 import { usePortalVisitorStore } from '@/stores/portalVisitor'
@@ -178,12 +175,39 @@ const clientIdText = computed(() => {
   color: var(--lex-primary);
 }
 
-:deep(.ant-list-item) {
-  cursor: pointer;
+.profile-cell-group {
+  border-radius: 20px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 28px rgba(16, 42, 67, 0.08);
 }
 
-:deep(.ant-list-item:hover) {
-  background: var(--lex-bg-muted);
+.portal-cell-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 12px;
+  border-radius: 10px;
+  background: rgba(27, 59, 95, 0.1);
+  color: var(--lex-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profile-cell-group :deep(.van-cell) {
+  padding: 16px;
+  background: transparent;
+}
+
+.profile-cell-group :deep(.van-cell__title) {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-cell-group :deep(.van-cell__label) {
+  margin-top: 4px;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {

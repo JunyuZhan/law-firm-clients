@@ -12,7 +12,7 @@
       <section class="page-intro section-shell">
         <div>
           <p class="intro-text">
-            点击项目进入详情；「有效」即可访问。
+            以移动端卡片方式展示案件，点击即可展开案件事务概览。
           </p>
         </div>
         <div class="stats-grid">
@@ -27,7 +27,7 @@
         </div>
       </section>
 
-      <section class="table-panel section-shell">
+      <section class="portal-card-list section-shell">
         <a-spin :spinning="loading">
           <div
             v-if="loading"
@@ -54,48 +54,91 @@
               请联系律所为您开通项目访问权限
             </p>
           </div>
-          <a-list
+          <div
             v-else
-            :data-source="matters"
+            class="matter-card-grid"
           >
-            <template #renderItem="{ item }">
-              <a-list-item
-                class="matter-item"
-                @click="goToMatter(item)"
-              >
-                <a-list-item-meta>
-                  <template #title>
-                    <div class="matter-title-row">
-                      <span class="matter-name">{{ item.matterName }}</span>
-                      <a-tag :color="getStatusColor(item.status)">
-                        {{ getStatusName(item.status) }}
-                      </a-tag>
-                    </div>
-                  </template>
-                  <template #description>
-                    <div class="matter-meta">
-                      <span>有效期至 {{ formatDate(item.expiresAt) }}</span>
-                    </div>
-                  </template>
-                </a-list-item-meta>
-                <template #actions>
-                  <span class="matter-action">进入</span>
-                  <ArrowRightOutlined />
-                </template>
-              </a-list-item>
-            </template>
-          </a-list>
+            <article
+              v-for="item in matters"
+              :key="item.id"
+              class="matter-card"
+              @click="openMatterPanel(item)"
+            >
+              <div class="matter-card__head">
+                <div>
+                  <p class="matter-card__eyebrow">案件编号 {{ item.id }}</p>
+                  <h3 class="matter-card__title">{{ item.matterName }}</h3>
+                </div>
+                <van-tag
+                  plain
+                  :type="getStatusTone(item.status)"
+                >
+                  {{ getStatusName(item.status) }}
+                </van-tag>
+              </div>
+              <div class="matter-card__meta">
+                <span>承办人 {{ item.counsel || '待同步' }}</span>
+                <span>有效期至 {{ formatDate(item.expiresAt) }}</span>
+              </div>
+            </article>
+          </div>
         </a-spin>
       </section>
     </a-layout-content>
     <MobileBottomNav />
+
+    <van-popup
+      v-model:show="detailOpen"
+      round
+      position="bottom"
+      :style="{ height: '85vh' }"
+      class="matter-detail-popup"
+    >
+      <div
+        v-if="selectedMatter"
+        class="matter-sheet"
+      >
+        <div class="matter-sheet__handle" />
+        <div class="matter-sheet__header">
+          <div>
+            <p class="matter-sheet__eyebrow">案件事务概览</p>
+            <h2>{{ selectedMatter.matterName }}</h2>
+          </div>
+          <van-tag plain :type="getStatusTone(selectedMatter.status)">
+            {{ getStatusName(selectedMatter.status) }}
+          </van-tag>
+        </div>
+        <div class="matter-sheet__panel">
+          <div class="matter-sheet__row">
+            <span>案件编号</span>
+            <strong>{{ selectedMatter.id }}</strong>
+          </div>
+          <div class="matter-sheet__row">
+            <span>承办律师</span>
+            <strong>{{ selectedMatter.counsel || '待同步' }}</strong>
+          </div>
+          <div class="matter-sheet__row">
+            <span>访问有效期</span>
+            <strong>{{ formatDate(selectedMatter.expiresAt) }}</strong>
+          </div>
+        </div>
+        <van-button
+          type="primary"
+          block
+          class="matter-sheet__button"
+          @click="goToMatter(selectedMatter)"
+        >
+          进入案件动态
+        </van-button>
+      </div>
+    </van-popup>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { FileTextOutlined, ArrowRightOutlined } from '@ant-design/icons-vue'
+import { FileTextOutlined } from '@ant-design/icons-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
 
@@ -105,22 +148,16 @@ interface MatterItem {
   status: string
   expiresAt: string
   accessToken: string
+  counsel?: string
 }
 
 const router = useRouter()
 const loading = ref(false)
 const matters = ref<MatterItem[]>([])
+const detailOpen = ref(false)
+const selectedMatter = ref<MatterItem | null>(null)
 
 const activeCount = computed(() => matters.value.filter(item => item.status === 'ACTIVE').length)
-
-function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    ACTIVE: 'green',
-    EXPIRED: 'orange',
-    REVOKED: 'red',
-  }
-  return colors[status] || 'default'
-}
 
 function getStatusName(status: string): string {
   const names: Record<string, string> = {
@@ -131,13 +168,28 @@ function getStatusName(status: string): string {
   return names[status] || status
 }
 
+function getStatusTone(status: string): 'primary' | 'success' | 'warning' | 'danger' {
+  const tones: Record<string, 'primary' | 'success' | 'warning' | 'danger'> = {
+    ACTIVE: 'success',
+    EXPIRED: 'warning',
+    REVOKED: 'danger',
+  }
+  return tones[status] || 'primary'
+}
+
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '-'
   return dateStr.split('T')[0]
 }
 
 function goToMatter(item: MatterItem) {
+  detailOpen.value = false
   router.push(`/matter/${item.id}?token=${item.accessToken}`)
+}
+
+function openMatterPanel(item: MatterItem) {
+  selectedMatter.value = item
+  detailOpen.value = true
 }
 </script>
 
@@ -147,37 +199,107 @@ function goToMatter(item: MatterItem) {
   gap: 20px;
 }
 
-.matter-title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+.portal-card-list {
+  display: grid;
+  gap: 12px;
 }
 
-.matter-name {
-  font-weight: 600;
-  color: var(--text-primary);
+.matter-card-grid {
+  display: grid;
+  gap: 12px;
 }
 
-.matter-meta {
+.matter-card {
+  padding: 18px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(217, 226, 236, 0.92);
+  box-shadow: 0 10px 24px rgba(16, 42, 67, 0.08);
+}
+
+.matter-card__head {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.matter-card__eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+}
+
+.matter-card__title {
+  margin: 0;
+  color: var(--lex-primary);
+  font-size: 18px;
+}
+
+.matter-card__meta {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   color: var(--text-secondary);
 }
 
-.matter-action {
-  color: var(--lex-primary-soft);
-  font-size: 13px;
-  font-weight: 600;
+.matter-sheet {
+  padding: 16px 16px 24px;
+  display: grid;
+  gap: 20px;
 }
 
-.matter-item {
-  cursor: pointer;
+.matter-sheet__handle {
+  width: 44px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(98, 125, 152, 0.36);
+  margin: 0 auto;
 }
 
-.matter-item:hover {
+.matter-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.matter-sheet__eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.08em;
+}
+
+.matter-sheet__header h2 {
+  margin: 0;
+  color: var(--lex-primary);
+  font-size: 22px;
+}
+
+.matter-sheet__panel {
+  display: grid;
+  gap: 12px;
+  padding: 18px 16px;
+  border-radius: 14px;
   background: var(--lex-bg-muted);
+}
+
+.matter-sheet__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.matter-sheet__row strong {
+  color: var(--text-primary);
+}
+
+.matter-sheet__button {
+  height: 44px;
 }
 
 .skeleton-list {

@@ -171,6 +171,10 @@ const detailSubtitle = computed(() => '项目进展与文件')
   background: transparent;
 }
 
+.app-header.portal {
+  color: #fff;
+}
+
 .header-backdrop {
   position: absolute;
   inset: 0;
@@ -178,6 +182,11 @@ const detailSubtitle = computed(() => '项目进展与文件')
   backdrop-filter: blur(var(--backdrop-blur));
   border-bottom: 1px solid var(--border-color);
   pointer-events: none;
+}
+
+.app-header.portal .header-backdrop {
+  background: linear-gradient(135deg, #1b3b5f 0%, #2d5a8e 100%);
+  border-bottom: 0;
 }
 
 .header-content {
@@ -258,6 +267,25 @@ const detailSubtitle = computed(() => '项目进展与文件')
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.app-header.portal .logo-text h1,
+.app-header.portal .logo-system-label,
+.app-header.portal .welcome-text,
+.app-header.portal .page-title,
+.app-header.portal .page-caption {
+  color: #fff;
+}
+
+.app-header.portal .header-btn {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.app-header.portal .header-btn:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .logo-text {

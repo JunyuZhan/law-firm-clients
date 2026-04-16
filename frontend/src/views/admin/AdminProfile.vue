@@ -3,12 +3,12 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          资料与安全设置。
+          {{ ADMIN_PROFILE_TEXTS.intro }}
         </p>
       </div>
       <a-space>
         <a-button @click="router.back()">
-          返回上一页
+          {{ UI_TEXTS.back }}
         </a-button>
         <a-button
           type="primary"
@@ -17,27 +17,27 @@
           <template #icon>
             <LogoutOutlined />
           </template>
-          退出登录
+          {{ UI_TEXTS.logout }}
         </a-button>
       </a-space>
     </section>
 
     <section class="stats-grid">
       <div class="stats-card">
-        <span class="stats-label">账户身份</span>
-        <strong>{{ userInfo.realName || userInfo.username || '管理员' }}</strong>
+        <span class="stats-label">{{ ADMIN_PROFILE_TEXTS.stats.identity }}</span>
+        <strong>{{ userInfo.realName || userInfo.username || ADMIN_PROFILE_TEXTS.stats.adminFallback }}</strong>
       </div>
       <div class="stats-card success">
-        <span class="stats-label">用户名</span>
+        <span class="stats-label">{{ ADMIN_PROFILE_TEXTS.stats.username }}</span>
         <strong>{{ userInfo.username || '-' }}</strong>
       </div>
       <div class="stats-card info">
-        <span class="stats-label">邮箱</span>
-        <strong>{{ userInfo.email ? userInfo.email : '未绑定' }}</strong>
+        <span class="stats-label">{{ ADMIN_PROFILE_TEXTS.stats.email }}</span>
+        <strong>{{ userInfo.email ? userInfo.email : ADMIN_PROFILE_TEXTS.stats.unbound }}</strong>
       </div>
       <div class="stats-card danger">
-        <span class="stats-label">密码</span>
-        <strong>定期更换</strong>
+        <span class="stats-label">{{ ADMIN_PROFILE_TEXTS.stats.password }}</span>
+        <strong>{{ ADMIN_PROFILE_TEXTS.stats.passwordAdvice }}</strong>
       </div>
     </section>
 
@@ -53,26 +53,26 @@
             </template>
           </a-avatar>
           <div class="identity-copy">
-            <h3>{{ userInfo.realName || userInfo.username || '管理员' }}</h3>
-            <p>后台账号。</p>
+            <h3>{{ userInfo.realName || userInfo.username || ADMIN_PROFILE_TEXTS.stats.adminFallback }}</h3>
+            <p>{{ ADMIN_PROFILE_TEXTS.identity.roleDesc }}</p>
           </div>
         </div>
 
         <div class="meta-list">
           <div class="meta-item">
-            <span>用户名</span>
+            <span>{{ ADMIN_PROFILE_TEXTS.identity.username }}</span>
             <strong>{{ userInfo.username || '-' }}</strong>
           </div>
           <div class="meta-item">
-            <span>真实姓名</span>
+            <span>{{ ADMIN_PROFILE_TEXTS.identity.realName }}</span>
             <strong>{{ userInfo.realName || '-' }}</strong>
           </div>
           <div class="meta-item">
-            <span>邮箱</span>
+            <span>{{ ADMIN_PROFILE_TEXTS.identity.email }}</span>
             <strong>{{ userInfo.email || '-' }}</strong>
           </div>
           <div class="meta-item">
-            <span>最后登录</span>
+            <span>{{ ADMIN_PROFILE_TEXTS.identity.lastLoginAt }}</span>
             <strong>{{ userInfo.lastLoginAt ? formatDate(userInfo.lastLoginAt) : '-' }}</strong>
           </div>
         </div>
@@ -81,17 +81,17 @@
       <article class="profile-card security-card">
         <div class="section-header">
           <div>
-            <h3>安全设置</h3>
+            <h3>{{ ADMIN_PROFILE_TEXTS.security.title }}</h3>
           </div>
           <div class="section-note">
-            建议定期轮换密码并避免重复使用旧密码。
+            {{ ADMIN_PROFILE_TEXTS.security.note }}
           </div>
         </div>
 
         <a-tabs v-model:active-key="activeTab">
           <a-tab-pane
             key="password"
-            tab="修改密码"
+            :tab="ADMIN_PROFILE_TEXTS.security.passwordTab"
           >
             <a-form
               ref="passwordFormRef"
@@ -102,12 +102,12 @@
               @finish="handlePasswordChange"
             >
               <a-form-item
-                label="当前密码"
+                :label="ADMIN_PROFILE_TEXTS.security.oldPasswordLabel"
                 name="oldPassword"
               >
                 <a-input-password
                   v-model:value="passwordForm.oldPassword"
-                  placeholder="请输入当前使用的密码"
+                  :placeholder="ADMIN_PROFILE_TEXTS.security.oldPasswordPlaceholder"
                 >
                   <template #prefix>
                     <LockOutlined />
@@ -116,12 +116,12 @@
               </a-form-item>
 
               <a-form-item
-                label="新密码"
+                :label="ADMIN_PROFILE_TEXTS.security.newPasswordLabel"
                 name="newPassword"
               >
                 <a-input-password
                   v-model:value="passwordForm.newPassword"
-                  placeholder="请输入新密码（至少8位）"
+                  :placeholder="ADMIN_PROFILE_TEXTS.security.newPasswordPlaceholder"
                 >
                   <template #prefix>
                     <KeyOutlined />
@@ -130,12 +130,12 @@
               </a-form-item>
 
               <a-form-item
-                label="确认新密码"
+                :label="ADMIN_PROFILE_TEXTS.security.confirmPasswordLabel"
                 name="confirmPassword"
               >
                 <a-input-password
                   v-model:value="passwordForm.confirmPassword"
-                  placeholder="请再次输入新密码"
+                  :placeholder="ADMIN_PROFILE_TEXTS.security.confirmPasswordPlaceholder"
                 >
                   <template #prefix>
                     <CheckOutlined />
@@ -149,7 +149,7 @@
                   html-type="submit"
                   :loading="changingPassword"
                 >
-                  修改密码
+                  {{ ADMIN_PROFILE_TEXTS.security.submit }}
                 </a-button>
               </div>
             </a-form>
@@ -177,6 +177,8 @@ import { changePassword } from '@/api/auth'
 import type { UserInfo } from '@/api/auth'
 import { formatDate } from '@/utils/date'
 import logger from '@/utils/logger'
+import { UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_PROFILE_TEXTS } from '@/constants/adminTexts'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -194,21 +196,21 @@ const passwordForm = reactive({
 
 const validateConfirmPassword = async (_rule: Rule, value: string) => {
   if (value === '') {
-    return Promise.reject('请再次输入新密码')
+    return Promise.reject(ADMIN_PROFILE_TEXTS.validation.confirmRequired)
   }
   if (value !== passwordForm.newPassword) {
-    return Promise.reject('两次输入的密码不一致')
+    return Promise.reject(ADMIN_PROFILE_TEXTS.validation.confirmMismatch)
   }
   return Promise.resolve()
 }
 
 const passwordRules: Record<string, Rule[]> = {
   oldPassword: [
-    { required: true, message: '请输入当前密码', trigger: 'blur' },
+    { required: true, message: ADMIN_PROFILE_TEXTS.validation.oldPasswordRequired, trigger: 'blur' },
   ],
   newPassword: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 8, message: '密码长度至少为8位', trigger: 'blur' },
+    { required: true, message: ADMIN_PROFILE_TEXTS.validation.newPasswordRequired, trigger: 'blur' },
+    { min: 8, message: ADMIN_PROFILE_TEXTS.validation.passwordMinLength, trigger: 'blur' },
   ],
   confirmPassword: [
     { required: true, validator: validateConfirmPassword, trigger: 'blur' },
@@ -223,12 +225,12 @@ const handlePasswordChange = async () => {
       newPassword: passwordForm.newPassword,
     })
 
-    message.success('密码修改成功，请重新登录')
+    message.success(UI_FEEDBACK_TEXTS.profilePasswordUpdated)
     authStore.logout()
     router.push('/admin/login')
   } catch (error: unknown) {
     logger.error('修改密码失败', error)
-    message.error(error instanceof Error ? error.message : '修改密码失败')
+    message.error(error instanceof Error ? error.message : UI_FEEDBACK_TEXTS.operationFailed)
   } finally {
     changingPassword.value = false
   }
@@ -248,9 +250,9 @@ const handleLogout = () => {
 
 .guide-card,
 .profile-card {
-  background: var(--lex-surface);
-  border: 1px solid var(--lex-outline);
-  border-radius: 8px;
+  background: var(--lex-surface-strong);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   box-shadow: var(--shadow-sm);
 }
 

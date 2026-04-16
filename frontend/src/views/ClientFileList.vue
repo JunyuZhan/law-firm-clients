@@ -12,7 +12,7 @@
       <section class="page-intro section-shell">
         <div>
           <p class="intro-text">
-            当前项目的文件，可预览或下载。需先从项目页进入以携带有效访问权限。
+            当前项目的文书与证据材料，以移动端动作面板方式进行预览、下载与分享。
           </p>
         </div>
         <div class="stats-grid">
@@ -75,59 +75,51 @@
               律所将为您上传相关文件
             </p>
           </div>
-          <a-list
+          <div
             v-else
-            :data-source="files"
-            class="file-list"
+            class="file-card-grid"
           >
-            <template #renderItem="{ item }">
-              <a-list-item class="file-item">
-                <a-list-item-meta>
-                  <template #avatar>
-                    <FileOutlined class="file-icon" />
-                  </template>
-                  <template #title>
-                    <span class="file-name">{{ item.fileName }}</span>
-                  </template>
-                  <template #description>
-                    <div class="file-meta">
-                      <span>{{ formatDate(item.uploadedAt) }}</span>
-                      <span>{{ formatSize(item.fileSize) }}</span>
-                    </div>
-                  </template>
-                </a-list-item-meta>
-                <template #actions>
-                  <a-space>
-                    <a-button
-                      type="text"
-                      size="small"
-                      @click="handlePreview(item)"
-                    >
-                      <EyeOutlined /> 查看
-                    </a-button>
-                    <a-button
-                      type="text"
-                      size="small"
-                      @click="handleDownload(item)"
-                    >
-                      <DownloadOutlined /> 下载
-                    </a-button>
-                  </a-space>
-                </template>
-              </a-list-item>
-            </template>
-          </a-list>
+            <article
+              v-for="item in files"
+              :key="item.id"
+              class="file-card"
+              @click="openFileActions(item)"
+            >
+              <div class="file-card__icon">
+                <Icon
+                  :icon="getFileVisual(item).icon"
+                  :style="{ color: getFileVisual(item).color }"
+                />
+              </div>
+              <div class="file-card__copy">
+                <strong class="file-name">{{ item.fileName }}</strong>
+                <div class="file-meta">
+                  <span>{{ formatDate(item.uploadedAt) }}</span>
+                  <span>{{ formatSize(item.fileSize) }}</span>
+                </div>
+              </div>
+            </article>
+          </div>
         </a-spin>
       </section>
     </a-layout-content>
     <MobileBottomNav />
+
+    <van-action-sheet
+      v-model:show="actionSheetOpen"
+      :actions="fileActions"
+      cancel-text="取消"
+      close-on-click-action
+      @select="handleFileAction"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { FileOutlined, EyeOutlined, DownloadOutlined } from '@ant-design/icons-vue'
+import { FileOutlined } from '@ant-design/icons-vue'
+import { Icon } from '@iconify/vue'
 import { message } from 'ant-design-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
@@ -141,6 +133,13 @@ const loading = ref(false)
 const files = ref<FileInfo[]>([])
 const matterId = ref('')
 const token = ref('')
+const actionSheetOpen = ref(false)
+const selectedFile = ref<FileInfo | null>(null)
+const fileActions = [
+  { name: '预览', key: 'preview' },
+  { name: '下载', key: 'download' },
+  { name: '分享', key: 'share' },
+]
 
 const latestFileDate = computed(() => {
   const dates = files.value
@@ -207,6 +206,48 @@ function handleDownload(item: FileInfo) {
   downloadFile(item.id, matterId.value, token.value)
 }
 
+function getFileVisual(item: FileInfo): { icon: string; color: string } {
+  const ext = item.fileName.split('.').pop()?.toLowerCase() || ''
+  if (ext === 'pdf') return { icon: 'mdi:file-pdf-box', color: '#b42318' }
+  if (['doc', 'docx'].includes(ext)) return { icon: 'mdi:file-word-box', color: '#175cd3' }
+  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return { icon: 'mdi:file-image', color: '#2d6a4f' }
+  return { icon: 'mdi:file-document-outline', color: '#486581' }
+}
+
+function openFileActions(item: FileInfo) {
+  selectedFile.value = item
+  actionSheetOpen.value = true
+}
+
+async function handleFileAction(action: { key?: string; name: string }) {
+  const item = selectedFile.value
+  if (!item) return
+
+  if (action.key === 'preview') {
+    handlePreview(item)
+    return
+  }
+
+  if (action.key === 'download') {
+    handleDownload(item)
+    return
+  }
+
+  if (action.key === 'share' && matterId.value && token.value) {
+    const shareUrl = `${window.location.origin}${previewFile(item.id, matterId.value, token.value)}`
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: item.fileName, url: shareUrl })
+      } else {
+        await navigator.clipboard.writeText(shareUrl)
+        message.success('预览链接已复制')
+      }
+    } catch {
+      message.warning('分享未完成')
+    }
+  }
+}
+
 watch(
   () => [route.query.matterId, route.query.token],
   () => {
@@ -227,19 +268,43 @@ onMounted(() => {
   gap: 20px;
 }
 
-.file-list :deep(.ant-list-items) {
+.file-card-grid {
   display: grid;
   gap: 12px;
 }
 
-.file-icon {
-  font-size: 24px;
-  color: var(--lex-primary-soft);
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(217, 226, 236, 0.92);
+  box-shadow: 0 10px 24px rgba(16, 42, 67, 0.08);
+}
+
+.file-card__icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--lex-bg-muted);
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.file-card__copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
 }
 
 .file-name {
   font-weight: 600;
   color: var(--text-primary);
+  word-break: break-word;
 }
 
 .file-meta {
@@ -247,10 +312,6 @@ onMounted(() => {
   gap: 14px;
   flex-wrap: wrap;
   color: var(--text-secondary);
-}
-
-.file-item:hover {
-  background: var(--lex-bg-muted);
 }
 
 .skeleton-list {
@@ -263,17 +324,5 @@ onMounted(() => {
   border-radius: 8px;
   background: var(--lex-bg-muted);
   border: 1px solid var(--border-color-light);
-}
-
-.empty-actions {
-  justify-content: center;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 </style>

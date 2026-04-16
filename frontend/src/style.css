@@ -46,7 +46,7 @@ canvas {
 .ant-card {
   border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow-sm) !important;
-  border: 1px solid var(--border-color) !important;
+  border: 0 !important;
   background: var(--lex-surface-strong) !important;
   overflow: hidden;
 }
@@ -83,13 +83,13 @@ canvas {
 }
 
 .ant-btn-primary:not(.ant-btn-dangerous) {
-  background: var(--lex-hero-gradient) !important;
+  background: var(--lex-primary) !important;
   border: 1px solid transparent !important;
 }
 
 .ant-btn-primary:not(.ant-btn-dangerous):hover,
 .ant-btn-primary:not(.ant-btn-dangerous):focus {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+  background: #102a43 !important;
   border-color: transparent !important;
 }
 
@@ -160,15 +160,16 @@ canvas {
 }
 
 .ant-table-thead > tr > th {
-  background: var(--lex-bg) !important;
-  color: var(--lex-primary) !important;
+  background: #fafbfc !important;
+  color: #102a43 !important;
   font-weight: 600 !important;
   border-bottom: 1px solid var(--border-color-light) !important;
 }
 
 .ant-table-tbody > tr > td {
-  border-bottom: 12px solid transparent !important;
+  border-bottom: 1px solid var(--border-color-light) !important;
   background: var(--lex-surface-strong);
+  height: 56px;
 }
 
 .ant-table-tbody > tr.ant-table-row:hover > td:not(.ant-table-cell-fix-right):not(.ant-table-cell-fix-left),
@@ -255,7 +256,7 @@ th.ant-table-cell-fix-left {
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
-  padding: 18px 22px;
+  padding: 20px 24px;
   border-radius: var(--radius-lg);
   background: var(--lex-surface-strong);
   border: 1px solid var(--border-color);

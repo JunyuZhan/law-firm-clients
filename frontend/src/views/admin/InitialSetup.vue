@@ -3,22 +3,22 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          品牌与门户文案；完成后可在系统配置中补充高级项。
+          {{ ADMIN_INITIAL_SETUP_TEXTS.intro }}
         </p>
       </div>
       <div class="intro-actions">
         <a-button @click="goTo('/admin/system-info')">
-          查看系统信息
+          {{ ADMIN_INITIAL_SETUP_TEXTS.actions.systemInfo }}
         </a-button>
         <a-button @click="goTo('/admin/config')">
-          前往系统配置
+          {{ ADMIN_INITIAL_SETUP_TEXTS.actions.systemConfig }}
         </a-button>
         <a-button
           type="primary"
           :loading="saving"
           @click="saveSetup"
         >
-          保存初始化配置
+          {{ ADMIN_INITIAL_SETUP_TEXTS.actions.saveSetup }}
         </a-button>
       </div>
     </section>
@@ -32,8 +32,8 @@
           :closable="false"
         />
         <div class="status-actions">
-          <span class="status-label">交付路径</span>
-          <strong>首次初始化 → 系统信息 → 系统配置</strong>
+          <span class="status-label">{{ ADMIN_INITIAL_SETUP_TEXTS.status.pathLabel }}</span>
+          <strong>{{ ADMIN_INITIAL_SETUP_TEXTS.status.pathValue }}</strong>
         </div>
       </div>
     </section>
@@ -42,7 +42,7 @@
       <article class="config-card">
         <div class="section-head">
           <div>
-            <h3>基础品牌初始化</h3>
+            <h3>{{ ADMIN_INITIAL_SETUP_TEXTS.sections.brandInit }}</h3>
           </div>
         </div>
 
@@ -54,55 +54,55 @@
             <a-input
               v-model:value="form.appName"
               maxlength="50"
-              placeholder="例如：某某律师事务所客户服务系统"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.appName"
             />
           </a-form-item>
           <a-form-item label="系统简称（中文）">
             <a-input
               v-model:value="form.appShortName"
               maxlength="30"
-              placeholder="例如：某某律所客服"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.appShortName"
             />
           </a-form-item>
           <a-form-item label="系统简称（英文）">
             <a-input
               v-model:value="form.appShortNameEn"
               maxlength="50"
-              placeholder="例如：Law Firm Clients"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.appShortNameEn"
             />
           </a-form-item>
           <a-form-item label="Logo 地址">
             <a-input
               v-model:value="form.logoUrl"
-              placeholder="可填写 /logo.png 或完整 https:// URL"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.logoUrl"
             />
           </a-form-item>
           <a-form-item label="律所名称">
             <a-input
               v-model:value="form.lawFirmName"
               maxlength="50"
-              placeholder="例如：某某律师事务所"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.lawFirmName"
             />
           </a-form-item>
           <a-form-item label="律所官网">
             <a-input
               v-model:value="form.lawFirmWebsite"
               maxlength="120"
-              placeholder="例如：https://www.example.com"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.lawFirmWebsite"
             />
           </a-form-item>
           <a-form-item label="首页标语">
             <a-input
               v-model:value="form.appSlogan"
               maxlength="80"
-              placeholder="例如：专业事项，一个清晰的客户入口"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.appSlogan"
             />
           </a-form-item>
           <a-form-item label="门户页英文眉标（可选）">
             <a-input
               v-model:value="form.portalEyebrowEn"
               maxlength="80"
-              placeholder="留空则使用上方「系统简称（英文）」"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.portalEyebrowEn"
             />
           </a-form-item>
           <a-form-item label="门户页客户说明（公开）">
@@ -111,28 +111,28 @@
               :rows="3"
               maxlength="500"
               show-count
-              placeholder="公开门户页主文案"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.portalAccessNotice"
             />
           </a-form-item>
           <a-form-item label="工作人员入口（页脚小字链）">
             <a-input
               v-model:value="form.staffEntryLabel"
               maxlength="40"
-              placeholder="留空则不显示"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.staffEntryLabel"
             />
           </a-form-item>
           <a-form-item label="ICP备案号">
             <a-input
               v-model:value="form.icpLicense"
               maxlength="80"
-              placeholder="例如：京ICP备12345678号-1"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.icpLicense"
             />
           </a-form-item>
           <a-form-item label="版权说明">
             <a-input
               v-model:value="form.copyright"
               maxlength="120"
-              placeholder="例如：© 2026 某某律师事务所"
+              :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.copyright"
             />
           </a-form-item>
         </a-form>
@@ -141,7 +141,7 @@
       <article class="config-card preview-card">
         <div class="section-head">
           <div>
-            <h3>效果预览</h3>
+            <h3>{{ ADMIN_INITIAL_SETUP_TEXTS.sections.preview }}</h3>
           </div>
         </div>
 
@@ -154,7 +154,7 @@
                 alt="Logo 预览"
                 class="preview-logo"
               >
-              <span v-else>未设置</span>
+              <span v-else>{{ ADMIN_INITIAL_SETUP_TEXTS.preview.logoEmpty }}</span>
             </div>
             <div>
               <div class="preview-name">
@@ -174,20 +174,23 @@
             <p class="preview-access">
               {{ form.portalAccessNotice ?? defaultValues.portalAccessNotice }}
             </p>
-            <p>用于门户首页、帮助页、登录页和后台导航中的统一品牌表达。</p>
+            <p>{{ ADMIN_INITIAL_SETUP_TEXTS.sections.previewUsage }}</p>
           </div>
 
           <div class="preview-footer">
-            <span>{{ form.icpLicense || '未设置ICP备案号' }}</span>
+            <span>{{ form.icpLicense || ADMIN_INITIAL_SETUP_TEXTS.preview.icpEmpty }}</span>
             <span>{{ form.copyright || defaultValues.copyright }}</span>
           </div>
         </div>
 
         <div class="next-step-card">
           <ul class="plain-list">
-            <li>初始化完成后，可进入“系统信息”页确认版本和文档入口是否齐全。</li>
-            <li>再进入“系统配置”补充基础 URL、回调和通知策略。</li>
-            <li>正式交付前，建议执行一次快速 API 冒烟测试。</li>
+            <li
+              v-for="item in ADMIN_INITIAL_SETUP_TEXTS.nextSteps"
+              :key="item"
+            >
+              {{ item }}
+            </li>
           </ul>
         </div>
       </article>
@@ -201,6 +204,8 @@ import { message } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { getBrandConfig, getPortalConfig, saveConfig } from '@/api/config'
 import { useAppConfigStore } from '@/stores/appConfig'
+import { UI_FEEDBACK_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_INITIAL_SETUP_TEXTS } from '@/constants/adminTexts'
 
 const appConfigStore = useAppConfigStore()
 const router = useRouter()
@@ -239,11 +244,11 @@ const setupStatus = computed(() => {
   return initialized
     ? {
       type: 'success' as const,
-      title: '当前站点已完成基础品牌初始化，可继续微调或重新保存。',
+      title: ADMIN_INITIAL_SETUP_TEXTS.status.initialized,
     }
     : {
       type: 'warning' as const,
-      title: '当前仍接近默认品牌配置，建议在正式交付前完成初始化。',
+      title: ADMIN_INITIAL_SETUP_TEXTS.status.pending,
     }
 })
 
@@ -275,13 +280,13 @@ async function loadSetupData() {
       }
     }
   } catch {
-    message.error('加载初始化配置失败')
+    message.error(UI_FEEDBACK_TEXTS.initLoadFailed)
   }
 }
 
 async function saveSetup() {
   if (!form.appName.trim()) {
-    message.warning('请先填写系统全称')
+    message.warning(ADMIN_INITIAL_SETUP_TEXTS.validation.appNameRequired)
     return
   }
 
@@ -306,13 +311,13 @@ async function saveSetup() {
       configKey,
       configValue,
       configType: 'STRING',
-      description: '首次初始化向导配置',
+      description: ADMIN_INITIAL_SETUP_TEXTS.saveDescription,
     })))
 
     await appConfigStore.loadConfig()
-    message.success('初始化配置保存成功')
+    message.success(UI_FEEDBACK_TEXTS.initSaved)
   } catch {
-    message.error('初始化配置保存失败')
+    message.error(UI_FEEDBACK_TEXTS.initSaveFailed)
   } finally {
     saving.value = false
   }
@@ -354,9 +359,9 @@ onMounted(() => {
   display: grid;
   gap: 4px;
   padding: 14px 16px;
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--lex-bg-muted);
-  border: 1px solid color-mix(in srgb, var(--lex-accent) 22%, var(--lex-outline));
+  border: 1px solid color-mix(in srgb, var(--lex-accent) 22%, var(--border-color));
 }
 
 .status-label {
@@ -413,11 +418,11 @@ onMounted(() => {
   display: grid;
   gap: 14px;
   padding: 18px;
-  border-radius: 8px;
+  border-radius: 16px;
   background:
     radial-gradient(circle at top right, rgba(37, 99, 235, 0.08), transparent 28%),
     rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--border-color-light);
 }
 
 .preview-brand {
@@ -429,12 +434,12 @@ onMounted(() => {
 .preview-logo-wrap {
   width: 68px;
   height: 68px;
-  border-radius: 8px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--border-color-light);
   color: var(--text-tertiary);
   flex: none;
 }
@@ -501,9 +506,9 @@ onMounted(() => {
   gap: 6px;
   margin-top: 14px;
   padding: 14px;
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--lex-bg-muted);
-  border: 1px solid var(--lex-outline);
+  border: 1px solid var(--border-color-light);
 }
 
 .plain-list {

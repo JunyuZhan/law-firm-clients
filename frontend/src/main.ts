@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import Antd, { message } from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
+import Vant from 'vant'
+import 'vant/lib/index.css'
 import App from './App.vue'
 import router from './router'
 import logger from './utils/logger'
@@ -31,5 +33,6 @@ window.addEventListener('unhandledrejection', (event) => {
 app.use(createPinia())
 app.use(router)
 app.use(Antd)
+app.use(Vant)
 
 app.mount('#app')

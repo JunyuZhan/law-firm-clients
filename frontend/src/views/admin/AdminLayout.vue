@@ -152,7 +152,7 @@
                       <template #icon>
                         <LogoutOutlined />
                       </template>
-                      退出登录
+                      {{ UI_TEXTS.logout }}
                     </a-menu-item>
                   </a-menu>
                 </template>
@@ -167,9 +167,9 @@
         tabindex="-1"
       >
         <div class="content-shell fade-in">
-          <div class="content-wrapper">
+          <PageContainer class="content-wrapper">
             <router-view />
-          </div>
+          </PageContainer>
         </div>
       </a-layout-content>
     </a-layout>
@@ -204,6 +204,9 @@ import type { MenuProps } from 'ant-design-vue'
 import { LOGO_COLLAPSED_URL } from '@/config/app'
 import { useAppConfigStore } from '@/stores/appConfig'
 import logger from '@/utils/logger'
+import PageContainer from '@/components/PageContainer.vue'
+import { UI_ACTION_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_LAYOUT_TEXTS } from '@/constants/adminTexts'
 
 const router = useRouter()
 const route = useRoute()
@@ -234,7 +237,7 @@ const currentPageTitle = computed(() => {
 
 const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
 const isMobile = computed(() => windowWidth.value <= 768)
-const expandedSidebarWidth = computed(() => (windowWidth.value <= 1024 ? 200 : 240))
+const expandedSidebarWidth = computed(() => 220)
 const currentSidebarWidth = computed(() => {
   if (isMobile.value) {
     return 0
@@ -303,8 +306,8 @@ function showIdleWarning() {
   warningModal = Modal.warning({
     title: '会话即将过期',
     content: `您已 ${idleMinutes} 分钟无操作，系统将在 ${remainingMinutes} 分钟后自动登出。请点击"继续使用"保持登录状态。`,
-    okText: '继续使用',
-    cancelText: '立即登出',
+    okText: UI_ACTION_TEXTS.continueUsing,
+    cancelText: UI_ACTION_TEXTS.logoutNow,
     onOk: () => {
       resetIdleTimer()
     },
@@ -329,7 +332,7 @@ function handleAutoLogout() {
     warningTimer = null
   }
 
-  message.warning('由于长时间无操作，系统已自动登出')
+  message.warning(UI_FEEDBACK_TEXTS.autoLogout)
   authStore.logout()
   router.push('/admin/login')
 }
@@ -441,12 +444,12 @@ function viewReleaseNotes() {
     window.open(updateInfo.value.releaseUrl, '_blank')
   } else if (updateInfo.value.releaseNotes) {
     Modal.info({
-      title: `v${updateInfo.value.latestVersion || '未知版本'} 更新内容`,
+      title: `v${updateInfo.value.latestVersion || ADMIN_LAYOUT_TEXTS.update.unknownVersion}${ADMIN_LAYOUT_TEXTS.update.releaseNotesTitleSuffix}`,
       content: updateInfo.value.releaseNotes,
       width: 600,
     })
   } else {
-    message.info('暂无更新说明')
+    message.info(ADMIN_LAYOUT_TEXTS.update.emptyReleaseNotes)
   }
 }
 
@@ -461,15 +464,15 @@ function dismissUpdate() {
 
 async function ignoreVersion() {
   if (!updateInfo.value.latestVersion) {
-    message.warning('无法获取版本号')
+    message.warning(ADMIN_LAYOUT_TEXTS.update.missingVersion)
     return
   }
   try {
     await request.post(`/api/admin/system/version/ignore?version=${updateInfo.value.latestVersion}`)
     updateInfo.value.hasUpdate = false
-    message.success('已忽略此版本，下次有新版本时会再次提醒')
+    message.success(ADMIN_LAYOUT_TEXTS.update.ignoredVersion)
   } catch {
-    message.error('操作失败')
+    message.error(UI_FEEDBACK_TEXTS.operationFailed)
   }
 }
 
@@ -507,78 +510,78 @@ const rawMenuItems = [
   {
     key: '/admin/matters',
     icon: () => h(AppstoreOutlined),
-    label: '项目列表',
-    title: '项目列表',
+    label: UI_TEXTS.matterManagement,
+    title: UI_TEXTS.matterManagement,
     superAdminOnly: true,
   },
   {
     key: '/admin/files',
     icon: () => h(FolderOutlined),
-    label: '文件管理',
-    title: '文件管理',
+    label: ADMIN_LAYOUT_TEXTS.menu.fileManagement,
+    title: ADMIN_LAYOUT_TEXTS.menu.fileManagement,
     superAdminOnly: true,
   },
   {
     key: '/admin/setup',
     icon: () => h(CompassOutlined),
-    label: '首次初始化',
-    title: '首次初始化',
+    label: ADMIN_LAYOUT_TEXTS.menu.initialSetup,
+    title: ADMIN_LAYOUT_TEXTS.menu.initialSetup,
     superAdminOnly: true,
   },
   {
     key: '/admin/system-info',
     icon: () => h(InfoCircleOutlined),
-    label: '系统信息',
-    title: '系统信息',
+    label: ADMIN_LAYOUT_TEXTS.menu.systemInfo,
+    title: ADMIN_LAYOUT_TEXTS.menu.systemInfo,
     superAdminOnly: true,
   },
   {
     key: '/admin/letter-verifications',
     icon: () => h(SafetyCertificateOutlined),
-    label: '函件验证',
-    title: '函件验证',
+    label: ADMIN_LAYOUT_TEXTS.menu.letterVerification,
+    title: ADMIN_LAYOUT_TEXTS.menu.letterVerification,
     superAdminOnly: true,
   },
   {
     key: '/admin/notifications',
     icon: () => h(BellOutlined),
-    label: '通知记录',
-    title: '通知记录',
+    label: UI_TEXTS.progressNoticeCenter,
+    title: UI_TEXTS.progressNoticeCenter,
     superAdminOnly: true,
   },
   {
     key: '/admin/notification-templates',
     icon: () => h(FileSyncOutlined),
-    label: '通知模板',
-    title: '通知模板',
+    label: ADMIN_LAYOUT_TEXTS.menu.notificationTemplates,
+    title: ADMIN_LAYOUT_TEXTS.menu.notificationTemplates,
     superAdminOnly: true,
   },
   {
     key: '/admin/notification-settings',
     icon: () => h(SettingFilled),
-    label: '通知配置',
-    title: '通知配置',
+    label: UI_TEXTS.autoRetryStrategy,
+    title: UI_TEXTS.autoRetryStrategy,
     superAdminOnly: true,
   },
   {
     key: '/admin/api-keys',
     icon: () => h(ApiOutlined),
-    label: 'API密钥管理',
-    title: 'API密钥管理',
+    label: ADMIN_LAYOUT_TEXTS.menu.apiKeyManagement,
+    title: ADMIN_LAYOUT_TEXTS.menu.apiKeyManagement,
     superAdminOnly: true,
   },
   {
     key: '/admin/config',
     icon: () => h(SettingFilled),
-    label: '系统配置',
-    title: '系统配置',
+    label: ADMIN_LAYOUT_TEXTS.menu.systemConfig,
+    title: ADMIN_LAYOUT_TEXTS.menu.systemConfig,
     superAdminOnly: true,
   },
   {
     key: '/admin/maintenance',
     icon: () => h(ToolOutlined),
-    label: '系统维护',
-    title: '系统维护',
+    label: ADMIN_LAYOUT_TEXTS.menu.systemMaintenance,
+    title: ADMIN_LAYOUT_TEXTS.menu.systemMaintenance,
     superAdminOnly: true,
   },
 ]
@@ -602,10 +605,10 @@ function handleMenuClick({ key }: { key: string }) {
 async function handleLogout() {
   try {
     await authStore.logout()
-    message.success('已退出登录')
+    message.success(UI_FEEDBACK_TEXTS.logoutSuccess)
     router.push('/admin/login')
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '退出登录失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_LAYOUT_TEXTS.feedback.logoutFailed
     message.error(errorMessage)
   }
 }
@@ -690,7 +693,7 @@ async function handleLogout() {
 }
 
 .sider {
-  background: linear-gradient(180deg, var(--lex-surface-dark) 0%, var(--lex-surface-dark-muted) 100%) !important;
+  background: #001529 !important;
   position: fixed;
   left: 0;
   top: 0;
@@ -856,15 +859,14 @@ async function handleLogout() {
 }
 
 .header {
-  background: rgba(255, 255, 255, 0.88) !important;
-  backdrop-filter: blur(var(--backdrop-blur));
+  background: #ffffff !important;
   padding: 0;
   position: fixed;
   top: 0;
   left: var(--sidebar-width);
   right: 0;
   z-index: 99;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #e8ecef;
   transition: left 0.24s ease;
 }
 

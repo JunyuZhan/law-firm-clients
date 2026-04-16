@@ -3,7 +3,7 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          按条件筛选；支持批量删除与过期清理。
+          {{ ADMIN_FILE_MANAGEMENT_TEXTS.intro }}
         </p>
       </div>
       <a-space
@@ -18,96 +18,96 @@
           <template #icon>
             <DeleteOutlined />
           </template>
-          <span class="btn-text">批量删除</span>
+          <span class="btn-text">{{ ADMIN_FILE_MANAGEMENT_TEXTS.actions.batchRemove }}</span>
         </a-button>
         <a-button @click="handleCleanup">
           <template #icon>
             <ClearOutlined />
           </template>
-          <span class="btn-text">清理过期文件</span>
+          <span class="btn-text">{{ ADMIN_FILE_MANAGEMENT_TEXTS.actions.cleanupExpired }}</span>
         </a-button>
       </a-space>
     </section>
 
     <section class="stats-grid">
       <article class="stats-card">
-        <span class="stats-label">总文件数</span>
+        <span class="stats-label">{{ ADMIN_FILE_MANAGEMENT_TEXTS.stats.total }}</span>
         <strong>{{ statistics.totalCount }}</strong>
       </article>
       <article class="stats-card success">
-        <span class="stats-label">活跃文件</span>
+        <span class="stats-label">{{ ADMIN_FILE_MANAGEMENT_TEXTS.stats.active }}</span>
         <strong>{{ statistics.activeCount }}</strong>
       </article>
       <article class="stats-card danger">
-        <span class="stats-label">已删除</span>
+        <span class="stats-label">{{ ADMIN_FILE_MANAGEMENT_TEXTS.stats.deleted }}</span>
         <strong>{{ statistics.deletedCount }}</strong>
       </article>
       <article class="stats-card info">
-        <span class="stats-label">存储空间</span>
+        <span class="stats-label">{{ ADMIN_FILE_MANAGEMENT_TEXTS.stats.storage }}</span>
         <strong>{{ statistics.activeSizeFormatted }}</strong>
       </article>
     </section>
 
     <section class="filter-panel">
       <div class="panel-head dashboard-panel-head">
-        <h3>筛选</h3>
+        <h3>{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.title }}</h3>
       </div>
 
       <a-form
         layout="inline"
         class="filter-form"
       >
-        <a-form-item label="项目ID">
+        <a-form-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.filter.matterIdLabel">
           <a-input
             v-model:value="filters.matterId"
-            placeholder="输入项目ID"
+            :placeholder="ADMIN_FILE_MANAGEMENT_TEXTS.filter.matterIdPlaceholder"
             allow-clear
             style="width: 180px"
             @press-enter="loadFiles"
           />
         </a-form-item>
-        <a-form-item label="状态">
+        <a-form-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.filter.statusLabel">
           <a-select
             v-model:value="filters.status"
-            placeholder="选择状态"
+            :placeholder="ADMIN_FILE_MANAGEMENT_TEXTS.filter.statusPlaceholder"
             allow-clear
             style="width: 130px"
             @change="loadFiles"
           >
             <a-select-option value="ACTIVE">
-              活跃
+              {{ ADMIN_FILE_MANAGEMENT_TEXTS.statusOptions.active }}
             </a-select-option>
             <a-select-option value="DELETED">
-              已删除
+              {{ ADMIN_FILE_MANAGEMENT_TEXTS.statusOptions.deleted }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="类别">
+        <a-form-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.filter.categoryLabel">
           <a-select
             v-model:value="filters.fileCategory"
-            placeholder="选择类别"
+            :placeholder="ADMIN_FILE_MANAGEMENT_TEXTS.filter.categoryPlaceholder"
             allow-clear
             style="width: 150px"
             @change="loadFiles"
           >
             <a-select-option value="EVIDENCE">
-              证据材料
+              {{ ADMIN_FILE_MANAGEMENT_TEXTS.categories.evidence }}
             </a-select-option>
             <a-select-option value="CONTRACT">
-              合同文件
+              {{ ADMIN_FILE_MANAGEMENT_TEXTS.categories.contract }}
             </a-select-option>
             <a-select-option value="ID_CARD">
-              身份证件
+              {{ ADMIN_FILE_MANAGEMENT_TEXTS.categories.idCard }}
             </a-select-option>
             <a-select-option value="OTHER">
-              其他
+              {{ ADMIN_FILE_MANAGEMENT_TEXTS.categories.other }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="关键字">
+        <a-form-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.filter.keywordLabel">
           <a-input
             v-model:value="filters.keyword"
-            placeholder="文件名/描述"
+            :placeholder="ADMIN_FILE_MANAGEMENT_TEXTS.filter.keywordPlaceholder"
             allow-clear
             style="width: 200px"
             @press-enter="loadFiles"
@@ -121,7 +121,7 @@
             <template #icon>
               <SearchOutlined />
             </template>
-            搜索
+            {{ UI_TEXTS.search }}
           </a-button>
         </a-form-item>
       </a-form>
@@ -129,12 +129,12 @@
 
     <section class="table-panel">
       <div class="panel-head panel-head--table dashboard-panel-head dashboard-panel-head--table">
-        <h3>文件列表</h3>
+        <h3>{{ ADMIN_FILE_MANAGEMENT_TEXTS.table.title }}</h3>
       </div>
 
       <div class="table-summary dashboard-table-summary">
-        <span>共 {{ files.length }} 条</span>
-        <span v-if="selectedRowKeys.length">已选 {{ selectedRowKeys.length }} 条</span>
+        <span>{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.totalPrefix }}{{ files.length }}{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.totalSuffix }}</span>
+        <span v-if="selectedRowKeys.length">{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.selectedPrefix }}{{ selectedRowKeys.length }}{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.selectedSuffix }}</span>
       </div>
 
       <a-table
@@ -180,10 +180,10 @@
                 size="small"
                 @click="showDetail(record)"
               >
-                详情
+                {{ ADMIN_FILE_MANAGEMENT_TEXTS.actions.detail }}
               </a-button>
               <a-popconfirm
-                title="确定删除此文件？"
+                :title="UI_CONFIRM_TEXTS.removeFile"
                 @confirm="handleDelete(record.id)"
               >
                 <a-button
@@ -191,7 +191,7 @@
                   size="small"
                   danger
                 >
-                  移除
+                  {{ UI_TEXTS.remove }}
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -202,7 +202,7 @@
 
     <a-modal
       v-model:open="detailVisible"
-      title="文件详情"
+      :title="ADMIN_FILE_MANAGEMENT_TEXTS.detail.title"
       :footer="null"
       :width="modalWidth"
       wrap-class-name="file-detail-modal"
@@ -213,36 +213,36 @@
         bordered
         size="small"
       >
-        <a-descriptions-item label="文件ID">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.fileId">
           {{ currentFile.id }}
         </a-descriptions-item>
-        <a-descriptions-item label="文件名">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.fileName">
           {{ currentFile.fileName }}
         </a-descriptions-item>
-        <a-descriptions-item label="项目ID">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.matterId">
           {{ currentFile.matterId }}
         </a-descriptions-item>
-        <a-descriptions-item label="文件大小">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.fileSize">
           {{ formatFileSize(currentFile.fileSize) }}
         </a-descriptions-item>
-        <a-descriptions-item label="文件类型">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.fileType">
           {{ currentFile.fileType }}
         </a-descriptions-item>
-        <a-descriptions-item label="文件类别">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.fileCategory">
           <a-tag :color="getCategoryColor(currentFile.fileCategory)">
             {{ getCategoryLabel(currentFile.fileCategory) }}
           </a-tag>
         </a-descriptions-item>
-        <a-descriptions-item label="存储路径">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.storagePath">
           <code>{{ currentFile.storagePath }}</code>
         </a-descriptions-item>
-        <a-descriptions-item label="描述">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.description">
           {{ currentFile.description || '-' }}
         </a-descriptions-item>
-        <a-descriptions-item label="上传时间">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.uploadedAt">
           {{ formatDate(currentFile.uploadedAt) }}
         </a-descriptions-item>
-        <a-descriptions-item label="状态">
+        <a-descriptions-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.detail.status">
           <a-tag :color="currentFile.status === 'ACTIVE' ? 'green' : 'red'">
             {{ currentFile.status === 'ACTIVE' ? '活跃' : '已删除' }}
           </a-tag>
@@ -252,14 +252,14 @@
 
     <a-modal
       v-model:open="cleanupVisible"
-      title="清理过期文件"
+      :title="ADMIN_FILE_MANAGEMENT_TEXTS.actions.cleanupTitle"
       :confirm-loading="cleanupLoading"
       :width="modalWidth"
       wrap-class-name="cleanup-modal"
       @ok="confirmCleanup"
     >
       <a-form layout="vertical">
-        <a-form-item label="清理范围">
+        <a-form-item :label="ADMIN_FILE_MANAGEMENT_TEXTS.actions.cleanupRange">
           <a-input-number
             v-model:value="cleanupDays"
             :min="1"
@@ -267,7 +267,7 @@
             style="width: 100%"
           />
           <div class="cleanup-help">
-            清理 {{ cleanupDays }} 天前标记为删除的文件（物理删除）
+            {{ ADMIN_FILE_MANAGEMENT_TEXTS.actions.cleanupHelpPrefix }}{{ cleanupDays }}{{ ADMIN_FILE_MANAGEMENT_TEXTS.actions.cleanupHelpSuffix }}
           </div>
         </a-form-item>
       </a-form>
@@ -287,6 +287,8 @@ import {
 import request from '@/api/request'
 import type { TableProps } from 'ant-design-vue'
 import logger from '@/utils/logger'
+import { UI_CONFIRM_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_FILE_MANAGEMENT_TEXTS } from '@/constants/adminTexts'
 
 interface FileItem {
   id: string
@@ -340,7 +342,7 @@ const pagination = reactive({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_FILE_MANAGEMENT_TEXTS.filter.totalPrefix}${total}${ADMIN_FILE_MANAGEMENT_TEXTS.filter.totalSuffix}`,
 })
 
 const selectedRowKeys = ref<string[]>([])
@@ -368,13 +370,13 @@ function handleResize() {
 }
 
 const columns: TableProps['columns'] = [
-  { title: '文件名', dataIndex: 'fileName', key: 'fileName', ellipsis: true },
-  { title: '项目ID', dataIndex: 'matterId', key: 'matterId', width: 132, ellipsis: true },
-  { title: '大小', dataIndex: 'fileSize', key: 'fileSize', width: 96 },
-  { title: '类别', dataIndex: 'fileCategory', key: 'fileCategory', width: 96 },
-  { title: '状态', dataIndex: 'status', key: 'status', width: 84 },
-  { title: '上传时间', dataIndex: 'uploadedAt', key: 'uploadedAt', width: 148 },
-  { title: '操作', key: 'action', width: 140, align: 'center' },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.fileName, dataIndex: 'fileName', key: 'fileName', ellipsis: true },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.matterId, dataIndex: 'matterId', key: 'matterId', width: 132, ellipsis: true },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.size, dataIndex: 'fileSize', key: 'fileSize', width: 96 },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.category, dataIndex: 'fileCategory', key: 'fileCategory', width: 96 },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.status, dataIndex: 'status', key: 'status', width: 84 },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.uploadedAt, dataIndex: 'uploadedAt', key: 'uploadedAt', width: 148 },
+  { title: ADMIN_FILE_MANAGEMENT_TEXTS.table.action, key: 'action', width: 140, align: 'center' },
 ]
 
 const loadStatistics = async () => {
@@ -383,7 +385,7 @@ const loadStatistics = async () => {
     const res = await request.get('/api/admin/files/statistics')
     Object.assign(statistics, res.data as Partial<Statistics>)
   } catch (error) {
-    logger.error('加载统计数据失败', error)
+    logger.error(ADMIN_FILE_MANAGEMENT_TEXTS.feedback.statsLoadFailed, error)
   } finally {
     statsLoading.value = false
   }
@@ -405,7 +407,7 @@ const loadFiles = async () => {
     files.value = (res.data as { list?: FileItem[]; total?: number }).list || []
     pagination.total = (res.data as { list?: FileItem[]; total?: number }).total || 0
   } catch (error) {
-    logger.error('加载文件列表失败', error)
+    logger.error(ADMIN_FILE_MANAGEMENT_TEXTS.feedback.listLoadFailed, error)
   } finally {
     loading.value = false
   }
@@ -425,22 +427,22 @@ const showDetail = (record: FileItem) => {
 const handleDelete = async (fileId: string) => {
   try {
     await request.delete(`/api/admin/files/${fileId}`)
-    message.success('删除成功')
+    message.success(UI_FEEDBACK_TEXTS.fileRemoved)
     loadFiles()
     loadStatistics()
   } catch {
-    message.error('删除失败')
+    message.error(UI_FEEDBACK_TEXTS.fileRemoveFailed)
   }
 }
 
 const handleBatchDelete = () => {
   if (selectedRowKeys.value.length === 0) return
   Modal.confirm({
-    title: '确认批量删除',
-    content: `确定要删除选中的 ${selectedRowKeys.value.length} 个文件吗？此操作不可恢复。`,
-    okText: '确认删除',
+    title: UI_CONFIRM_TEXTS.batchRemoveFilesTitle,
+    content: `${ADMIN_FILE_MANAGEMENT_TEXTS.confirm.batchRemoveContentPrefix}${selectedRowKeys.value.length}${ADMIN_FILE_MANAGEMENT_TEXTS.confirm.batchRemoveContentMiddle}`,
+    okText: UI_TEXTS.remove,
     okType: 'danger',
-    cancelText: '取消',
+    cancelText: ADMIN_FILE_MANAGEMENT_TEXTS.confirm.cancel,
     onOk: doBatchDelete,
   })
 }
@@ -450,12 +452,12 @@ const doBatchDelete = async () => {
     const res = await request.delete('/api/admin/files/batch', {
       data: selectedRowKeys.value,
     })
-    message.success(`成功删除 ${(res.data as { successCount?: number }).successCount || 0} 个文件`)
+    message.success(`${ADMIN_FILE_MANAGEMENT_TEXTS.feedback.batchRemovedPrefix}${(res.data as { successCount?: number }).successCount || 0}${ADMIN_FILE_MANAGEMENT_TEXTS.feedback.batchRemovedSuffix}`)
     selectedRowKeys.value = []
     loadFiles()
     loadStatistics()
   } catch {
-    message.error('批量删除失败')
+    message.error(UI_FEEDBACK_TEXTS.batchRemoveFailed)
   }
 }
 
@@ -469,12 +471,12 @@ const confirmCleanup = async () => {
     const res = await request.post('/api/admin/files/cleanup', null, {
       params: { days: cleanupDays.value },
     })
-    message.success(`成功清理 ${(res.data as { cleanedCount?: number }).cleanedCount || 0} 个文件`)
+    message.success(`${ADMIN_FILE_MANAGEMENT_TEXTS.feedback.cleanedPrefix}${(res.data as { cleanedCount?: number }).cleanedCount || 0}${ADMIN_FILE_MANAGEMENT_TEXTS.feedback.cleanedSuffix}`)
     cleanupVisible.value = false
     loadFiles()
     loadStatistics()
   } catch {
-    message.error('清理失败')
+    message.error(UI_FEEDBACK_TEXTS.cleanupFailed)
   } finally {
     cleanupLoading.value = false
   }
@@ -495,10 +497,10 @@ const formatDate = (date: string) => {
 
 const getCategoryLabel = (category: string) => {
   const labels: Record<string, string> = {
-    EVIDENCE: '证据材料',
-    CONTRACT: '合同文件',
-    ID_CARD: '身份证件',
-    OTHER: '其他',
+    EVIDENCE: ADMIN_FILE_MANAGEMENT_TEXTS.categories.evidence,
+    CONTRACT: ADMIN_FILE_MANAGEMENT_TEXTS.categories.contract,
+    ID_CARD: ADMIN_FILE_MANAGEMENT_TEXTS.categories.idCard,
+    OTHER: ADMIN_FILE_MANAGEMENT_TEXTS.categories.other,
   }
   return labels[category] || category
 }

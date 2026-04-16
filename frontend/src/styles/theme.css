@@ -1,47 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-/**
- * Design tokens — Law Firm Clients (Stripe-inspired structure + project brand colors).
- * Semantic names --lex-* are kept for compatibility across views; values follow REDESIGN-SPEC / MASTER.md.
- */
 :root {
-  --lex-bg: #f8fafc;
-  --lex-bg-muted: #f1f5f9;
-  --lex-surface: rgba(255, 255, 255, 0.92);
+  --lex-bg: #f5f7fa;
+  --lex-bg-muted: #eef2f6;
+  --lex-surface: rgba(255, 255, 255, 0.94);
   --lex-surface-strong: #ffffff;
-  --lex-surface-inset: #e2e8f0;
-  --lex-surface-dark: #0f172a;
-  --lex-surface-dark-muted: #1e293b;
-  --lex-surface-dark-soft: rgba(15, 23, 42, 0.94);
-  --lex-primary: #1e3a8a;
-  --lex-primary-soft: #1e40af;
-  --lex-accent: #f59e0b;
-  --lex-accent-soft: rgba(245, 158, 11, 0.14);
-  --lex-accent-strong: #d97706;
-  --lex-muted: #64748b;
-  --lex-muted-soft: #94a3b8;
-  --lex-text: #0f172a;
-  --lex-text-secondary: #475569;
-  --lex-text-tertiary: #94a3b8;
-  --lex-outline: #e2e8f0;
-  --lex-outline-soft: #f1f5f9;
-  --lex-panel-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.06);
-  --lex-float-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-  --lex-glow: radial-gradient(circle at top, rgba(30, 64, 175, 0.12), transparent 55%);
-  --lex-hero-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --lex-surface-inset: #d9e2ec;
+  --lex-surface-dark: #001529;
+  --lex-surface-dark-muted: #0f2740;
+  --lex-surface-dark-soft: rgba(0, 21, 41, 0.96);
+  --lex-primary: #1b3b5f;
+  --lex-primary-soft: #2d5a8e;
+  --lex-accent: #486581;
+  --lex-accent-soft: rgba(72, 101, 129, 0.12);
+  --lex-accent-strong: #243b53;
+  --lex-muted: #627d98;
+  --lex-muted-soft: #9fb3c8;
+  --lex-text: #102a43;
+  --lex-text-secondary: #486581;
+  --lex-text-tertiary: #829ab1;
+  --lex-outline: #e8ecef;
+  --lex-outline-soft: #eef2f6;
+  --lex-panel-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --lex-float-shadow: 0 16px 32px rgba(16, 42, 67, 0.12);
+  --lex-glow: radial-gradient(circle at top, rgba(27, 59, 95, 0.1), transparent 58%);
+  --lex-hero-gradient: linear-gradient(135deg, #1b3b5f 0%, #2d5a8e 100%);
 
-  --primary-color: var(--lex-primary-soft);
-  --primary-color-light: #3b82f6;
-  --primary-color-lighter: rgba(30, 64, 175, 0.12);
-  --primary-color-dark: var(--lex-primary);
+  --primary-color: var(--lex-primary);
+  --primary-color-light: #2d5a8e;
+  --primary-color-lighter: rgba(27, 59, 95, 0.08);
+  --primary-color-dark: #102a43;
 
-  --accent-color: var(--lex-accent);
-  --accent-color-light: var(--lex-accent-soft);
-  --accent-color-lighter: rgba(245, 158, 11, 0.1);
-  --accent-color-deep: var(--lex-accent-strong);
+  --accent-color: #486581;
+  --accent-color-light: rgba(72, 101, 129, 0.12);
+  --accent-color-lighter: rgba(72, 101, 129, 0.08);
+  --accent-color-deep: #243b53;
 
-  --cta-color: var(--lex-accent);
-  --cta-color-hover: #d97706;
+  --cta-color: #1b3b5f;
+  --cta-color-hover: #102a43;
 
   --bg-primary: var(--lex-bg);
   --bg-secondary: var(--lex-bg-muted);
@@ -58,20 +52,20 @@
   --border-color: var(--lex-outline);
   --border-color-light: var(--lex-outline-soft);
 
-  --success-color: #15803d;
-  --warning-color: #ca8a04;
-  --error-color: #dc2626;
-  --info-color: var(--lex-primary-soft);
+  --success-color: #2d6a4f;
+  --warning-color: #9c6b1a;
+  --error-color: #a61e2d;
+  --info-color: var(--lex-primary);
 
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-xs: 0 1px 2px rgba(16, 42, 67, 0.04);
   --shadow-sm: var(--lex-panel-shadow);
-  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.1);
+  --shadow-md: 0 12px 24px rgba(16, 42, 67, 0.08);
+  --shadow-lg: 0 24px 48px rgba(16, 42, 67, 0.12);
 
-  --radius-sm: 6px;
+  --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -80,9 +74,9 @@
   --spacing-xl: 32px;
   --spacing-2xl: 40px;
 
-  --font-heading: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
-  --font-body: 'IBM Plex Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-heading: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-body: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-mono: 'SFMono-Regular', 'JetBrains Mono', Consolas, monospace;
 
   --shell-max-width: 1280px;
   --shell-gutter: 24px;
@@ -103,13 +97,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-primary);
   background:
-    radial-gradient(circle at 12% 0%, rgba(30, 64, 175, 0.08), transparent 42%),
-    radial-gradient(circle at 88% 8%, rgba(245, 158, 11, 0.06), transparent 38%),
-    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 55%, #e2e8f0 100%);
+    radial-gradient(circle at 12% 0%, rgba(27, 59, 95, 0.08), transparent 42%),
+    radial-gradient(circle at 88% 8%, rgba(72, 101, 129, 0.08), transparent 38%),
+    linear-gradient(180deg, #f8fafc 0%, #f5f7fa 48%, #e9eef5 100%);
 }
 
 ::selection {
-  background: rgba(30, 64, 175, 0.18);
+  background: rgba(27, 59, 95, 0.18);
   color: var(--lex-text);
 }
 
@@ -124,7 +118,7 @@ body {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.2);
+  background: rgba(16, 42, 67, 0.2);
   border-radius: 999px;
 }
 

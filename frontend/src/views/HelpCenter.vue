@@ -36,15 +36,19 @@
         <div class="section-head">
           <h3>常见问题</h3>
         </div>
-        <a-collapse ghost>
-          <a-collapse-panel
+        <van-collapse
+          v-model="activeNames"
+          class="faq-collapse"
+        >
+          <van-collapse-item
             v-for="item in faqItems"
             :key="item.key"
-            :header="item.title"
+            :name="item.key"
+            :title="item.title"
           >
-            <p>{{ item.content }}</p>
-          </a-collapse-panel>
-        </a-collapse>
+            <p class="faq-answer">{{ item.content }}</p>
+          </van-collapse-item>
+        </van-collapse>
       </section>
 
       <section class="guide-grid section-shell">
@@ -84,7 +88,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
@@ -99,6 +103,7 @@ const lawFirmName = computed(() => appConfigStore.lawFirmName || '律师事务�
 const lawFirmWebsite = computed(() => appConfigStore.lawFirmWebsite)
 const appSlogan = computed(() => appConfigStore.appSlogan || '专业 · 诚信 · 高效')
 const visitorName = computed(() => portalVisitorStore.displayName || '当前访客')
+const activeNames = ref(['matter-access'])
 
 const faqItems = [
   {
@@ -226,6 +231,33 @@ function goBack() {
   margin: 0;
   font-size: 18px;
   color: var(--lex-primary);
+}
+
+.faq-collapse {
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.faq-collapse :deep(.van-cell) {
+  padding: 16px 0;
+  background: transparent;
+}
+
+.faq-collapse :deep(.van-collapse-item__content) {
+  padding: 0 0 16px;
+  background: transparent;
+}
+
+.faq-collapse :deep(.van-cell__title) {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.faq-answer {
+  margin: 0;
+  line-height: 1.75;
+  color: var(--text-secondary);
 }
 
 .guide-card h3 {

@@ -3,21 +3,21 @@
     <section class="page-intro">
       <div>
         <p class="intro-text">
-          品牌、门户与系统参数；高级项在对应页签。
+          {{ ADMIN_SYSTEM_CONFIG_TEXTS.intro }}
         </p>
       </div>
 
       <div class="intro-side">
         <div class="mini-stat">
-          <span>品牌字段</span>
+          <span>{{ ADMIN_SYSTEM_CONFIG_TEXTS.miniStats.brandFields }}</span>
           <strong>{{ brandCompletion }}/4</strong>
         </div>
         <div class="mini-stat">
-          <span>门户字段</span>
+          <span>{{ ADMIN_SYSTEM_CONFIG_TEXTS.miniStats.portalFields }}</span>
           <strong>{{ portalCompletion }}/8</strong>
         </div>
         <div class="mini-stat">
-          <span>系统配置项</span>
+          <span>{{ ADMIN_SYSTEM_CONFIG_TEXTS.miniStats.systemConfigItems }}</span>
           <strong>{{ dataSource.length }}</strong>
         </div>
       </div>
@@ -25,21 +25,21 @@
 
     <section class="completion-strip config-card">
       <div class="completion-head">
-        <h3>配置完整度</h3>
+        <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.completionTitle }}</h3>
       </div>
       <div class="completion-grid">
         <div class="completion-item">
-          <span>品牌配置</span>
+          <span>{{ ADMIN_SYSTEM_CONFIG_TEXTS.completion.brand }}</span>
           <strong>{{ brandCompletionRate }}</strong>
           <p>{{ brandCompletion }}/4</p>
         </div>
         <div class="completion-item">
-          <span>门户配置</span>
+          <span>{{ ADMIN_SYSTEM_CONFIG_TEXTS.completion.portal }}</span>
           <strong>{{ portalCompletionRate }}</strong>
           <p>{{ portalCompletion }}/8</p>
         </div>
         <div class="completion-item">
-          <span>系统配置项</span>
+          <span>{{ ADMIN_SYSTEM_CONFIG_TEXTS.completion.system }}</span>
           <strong>{{ dataSource.length }}</strong>
         </div>
       </div>
@@ -52,44 +52,44 @@
     >
       <a-tab-pane
         key="brand"
-        tab="品牌配置"
+        :tab="ADMIN_SYSTEM_CONFIG_TEXTS.tabs.brand"
       >
         <div class="config-grid">
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <h3>系统名称</h3>
+                <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.systemNameTitle }}</h3>
               </div>
             </div>
             <a-form layout="vertical">
-              <a-form-item label="系统全称（浏览器标题）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.brand.appNameLabel">
                 <a-input
                   v-model:value="brandConfig.appName"
-                  placeholder="如：XX律师事务所客户服务系统"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.brand.appNamePlaceholder"
                   @blur="saveBrandConfig('system.app-name', brandConfig.appName)"
                 />
                 <div class="field-hint">
-                  显示在浏览器标签页标题
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.appNameHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="系统简称（中文）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.brand.shortNameLabel">
                 <a-input
                   v-model:value="brandConfig.appShortName"
-                  placeholder="如：XX律所客服"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.brand.shortNamePlaceholder"
                   @blur="saveBrandConfig('system.app-short-name', brandConfig.appShortName)"
                 />
                 <div class="field-hint">
-                  显示在管理后台侧边栏
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.shortNameHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="系统简称（英文）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.brand.shortNameEnLabel">
                 <a-input
                   v-model:value="brandConfig.appShortNameEn"
-                  placeholder="如：XX Law Service（可选）"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.brand.shortNameEnPlaceholder"
                   @blur="saveBrandConfig('system.app-short-name-en', brandConfig.appShortNameEn)"
                 />
                 <div class="field-hint">
-                  可选字段；如需双语品牌展示，可显示在管理后台侧边栏下方
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.shortNameEnHint }}
                 </div>
               </a-form-item>
             </a-form>
@@ -98,21 +98,21 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <h3>Logo 设置</h3>
+                <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoTitle }}</h3>
               </div>
             </div>
             <a-form layout="vertical">
-              <a-form-item label="Logo 图片地址">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoUrlLabel">
                 <a-input
                   v-model:value="brandConfig.logoUrl"
-                  placeholder="如：/logo.png 或 https://..."
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoPlaceholder"
                   @blur="saveBrandConfig('system.logo-url', brandConfig.logoUrl)"
                 />
                 <div class="field-hint">
-                  支持相对路径或完整 URL
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="Logo 预览">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoPreviewLabel">
                 <div class="logo-preview">
                   <img
                     v-if="brandConfig.logoUrl"
@@ -124,7 +124,7 @@
                     v-else
                     class="logo-placeholder"
                   >
-                    暂未设置 Logo
+                    {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoEmpty }}
                   </div>
                 </div>
               </a-form-item>
@@ -135,34 +135,34 @@
 
       <a-tab-pane
         key="portal"
-        tab="门户配置"
+        :tab="ADMIN_SYSTEM_CONFIG_TEXTS.tabs.portal"
       >
         <div class="config-grid">
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <h3>律所信息</h3>
+                <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.lawFirmTitle }}</h3>
               </div>
             </div>
             <a-form layout="vertical">
-              <a-form-item label="律所名称">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.lawFirmNameLabel">
                 <a-input
                   v-model:value="portalConfig.lawFirmName"
-                  placeholder="如：XX律师事务所"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.lawFirmNamePlaceholder"
                   @blur="savePortalConfig('system.law-firm-name', portalConfig.lawFirmName)"
                 />
                 <div class="field-hint">
-                  显示在门户页面头部和底部
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.lawFirmNameHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="律所官网">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.websiteLabel">
                 <a-input
                   v-model:value="portalConfig.lawFirmWebsite"
-                  placeholder="如：https://www.example.com"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.websitePlaceholder"
                   @blur="savePortalConfig('system.law-firm-website', portalConfig.lawFirmWebsite)"
                 />
                 <div class="field-hint">
-                  点击律所名称时跳转的链接
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.websiteHint }}
                 </div>
               </a-form-item>
             </a-form>
@@ -171,69 +171,69 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <h3>页面内容</h3>
+                <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.pageContentTitle }}</h3>
               </div>
             </div>
             <a-form layout="vertical">
-              <a-form-item label="首页标语">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.sloganLabel">
                 <a-input
                   v-model:value="portalConfig.appSlogan"
-                  placeholder="如：专业 · 诚信 · 高效"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.sloganPlaceholder"
                   @blur="savePortalConfig('system.app-slogan', portalConfig.appSlogan)"
                 />
                 <div class="field-hint">
-                  显示在门户欢迎区域
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.sloganHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="门户页英文眉标（可选）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.eyebrowLabel">
                 <a-input
                   v-model:value="portalConfig.portalEyebrowEn"
-                  placeholder="留空则使用品牌配置中的「系统英文简称」"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.eyebrowPlaceholder"
                   @blur="savePortalConfig('system.portal-eyebrow-en', portalConfig.portalEyebrowEn)"
                 />
                 <div class="field-hint">
-                  显示在公开门户页主标题上方
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.eyebrowHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="门户页客户说明（公开页主文案）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.accessNoticeLabel">
                 <a-textarea
                   v-model:value="portalConfig.portalAccessNotice"
                   :rows="4"
-                  placeholder="说明客户如何通过律师发送的链接使用本系统"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.accessNoticePlaceholder"
                   @blur="savePortalConfig('system.portal-access-notice', portalConfig.portalAccessNotice)"
                 />
                 <div class="field-hint">
-                  显示在公开门户页中央；留空则不显示该段落
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.accessNoticeHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="工作人员入口（页脚小字链）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.staffEntryLabelText">
                 <a-input
                   v-model:value="portalConfig.staffEntryLabel"
-                  placeholder="如：工作人员入口；留空则不显示"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.staffEntryPlaceholder"
                   @blur="savePortalConfig('system.staff-entry-label', portalConfig.staffEntryLabel)"
                 />
                 <div class="field-hint">
-                  显示在公开门户页底部，链向管理后台登录；勿写敏感信息
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.staffEntryHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="ICP 备案号">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.icpLabel">
                 <a-input
                   v-model:value="portalConfig.icpLicense"
-                  placeholder="如：京ICP备XXXXXXXX号"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.icpPlaceholder"
                   @blur="savePortalConfig('system.icp-license', portalConfig.icpLicense)"
                 />
                 <div class="field-hint">
-                  显示在页面底部，可选
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.icpHint }}
                 </div>
               </a-form-item>
-              <a-form-item label="版权信息">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.portal.copyrightLabel">
                 <a-input
                   v-model:value="portalConfig.copyright"
-                  placeholder="如：© 2024 XX律师事务所"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.portal.copyrightPlaceholder"
                   @blur="savePortalConfig('system.copyright', portalConfig.copyright)"
                 />
                 <div class="field-hint">
-                  显示在页面底部
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.portal.copyrightHint }}
                 </div>
               </a-form-item>
             </a-form>
@@ -243,26 +243,26 @@
 
       <a-tab-pane
         key="system"
-        tab="系统配置"
+        :tab="ADMIN_SYSTEM_CONFIG_TEXTS.tabs.system"
       >
         <div class="config-grid">
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <h3>系统地址</h3>
+                <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.systemUrlTitle }}</h3>
               </div>
             </div>
             <a-form layout="vertical">
-              <a-form-item label="系统基础 URL（必填）">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.baseUrlLabel">
                 <a-input
                   v-model:value="systemConfig.baseUrl"
-                  placeholder="如：https://client.yourfirm.com"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.baseUrlPlaceholder"
                   @blur="saveSystemConfig('system.base-url', systemConfig.baseUrl)"
                 />
                 <div class="field-hint">
-                  客户服务系统的外网访问地址，用于生成客户访问链接。
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.baseUrlHint }}
                   <br>
-                  <span class="hint-example">示例：https://client.yourfirm.com 或 http://192.168.1.100:8080</span>
+                  <span class="hint-example">{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.baseUrlExample }}</span>
                 </div>
               </a-form-item>
             </a-form>
@@ -271,11 +271,11 @@
           <section class="config-card">
             <div class="card-heading">
               <div>
-                <h3>回调配置</h3>
+                <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackTitle }}</h3>
               </div>
             </div>
             <a-form layout="vertical">
-              <a-form-item label="启用回调">
+              <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackEnabledLabel">
                 <a-switch
                   v-model:checked="systemConfig.callbackEnabled"
                   checked-children="开"
@@ -283,38 +283,38 @@
                   @change="saveSystemConfig('callback.enabled', systemConfig.callbackEnabled ? 'true' : 'false')"
                 />
                 <div class="field-hint">
-                  当客户访问项目或下载文件时，回调管理系统记录访问日志。
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackEnabledHint }}
                 </div>
               </a-form-item>
               <a-form-item
                 v-if="systemConfig.callbackEnabled"
-                label="律所系统地址"
+                :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackUrlLabel"
               >
                 <a-input
                   v-model:value="systemConfig.callbackUrl"
-                  placeholder="如：http://192.168.1.100/api"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackUrlPlaceholder"
                   @blur="saveSystemConfig('callback.law-firm-url', systemConfig.callbackUrl)"
                 />
                 <div class="field-hint">
-                  新主链路下通常无需手工填写。管理系统推送项目时会自动把自己的回调地址绑定到该项目；这里只作为历史项目或特殊覆盖场景兜底。
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackUrlHint }}
                 </div>
               </a-form-item>
               <a-form-item
                 v-if="systemConfig.callbackEnabled"
-                label="回调密钥"
+                :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackSecretLabel"
               >
                 <a-input-password
                   v-model:value="systemConfig.callbackApiKey"
-                  placeholder="与管理系统约定的回调校验密钥"
+                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackSecretPlaceholder"
                   @blur="saveSystemConfig('callback.api-key', systemConfig.callbackApiKey)"
                 />
                 <div class="field-hint">
-                  新主链路下通常优先复用当前项目来源 API key 的 Secret 作为回调校验；这里只作为旧链路或手工覆盖兜底。固定公网 IP 场景如需额外白名单控制，请在网关或反向代理侧配置。
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackSecretHint }}
                 </div>
               </a-form-item>
               <a-form-item
                 v-if="systemConfig.callbackEnabled"
-                label="允许内网回调"
+                :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackAllowInternalLabel"
               >
                 <a-switch
                   v-model:checked="systemConfig.callbackAllowInternal"
@@ -323,8 +323,8 @@
                   @change="saveSystemConfig('callback.allow-internal', systemConfig.callbackAllowInternal ? 'true' : 'false')"
                 />
                 <div class="field-hint">
-                  <span v-if="systemConfig.callbackAllowInternal">当前允许回调到内网地址，适用于企业内网部署。</span>
-                  <span v-else>当前禁止回调到内网地址，仅允许公网地址。</span>
+                  <span v-if="systemConfig.callbackAllowInternal">{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackAllowInternalYes }}</span>
+                  <span v-else>{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackAllowInternalNo }}</span>
                 </div>
               </a-form-item>
             </a-form>
@@ -334,13 +334,13 @@
 
       <a-tab-pane
         key="advanced"
-        tab="高级配置"
+        :tab="ADMIN_SYSTEM_CONFIG_TEXTS.tabs.advanced"
       >
         <section class="advanced-panel">
           <div class="advanced-header">
             <div>
-              <h3>所有配置项</h3>
-              <p>保留底层配置入口，便于管理未在可视化卡片中暴露的参数。</p>
+              <h3>{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.advancedTitle }}</h3>
+              <p>{{ ADMIN_SYSTEM_CONFIG_TEXTS.system.advancedDesc }}</p>
             </div>
             <a-space>
               <a-button
@@ -350,13 +350,13 @@
                 <template #icon>
                   <PlusOutlined />
                 </template>
-                新增配置
+                {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.addConfig }}
               </a-button>
               <a-button @click="loadData">
                 <template #icon>
                   <ReloadOutlined />
                 </template>
-                刷新
+                {{ UI_TEXTS.refresh }}
               </a-button>
             </a-space>
           </div>
@@ -367,32 +367,32 @@
             class="advanced-filter-form"
             @finish="handleSearch"
           >
-            <a-form-item label="配置键">
+            <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.searchKeyLabel">
               <a-input
                 v-model:value="searchForm.configKey"
-                placeholder="请输入配置键"
+                :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.searchKeyPlaceholder"
                 allow-clear
                 style="width: 220px"
               />
             </a-form-item>
-            <a-form-item label="配置类型">
+            <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.searchTypeLabel">
               <a-select
                 v-model:value="searchForm.configType"
-                placeholder="请选择配置类型"
+                :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.searchTypePlaceholder"
                 allow-clear
                 style="width: 150px"
               >
                 <a-select-option value="STRING">
-                  字符串
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.stringOption }}
                 </a-select-option>
                 <a-select-option value="NUMBER">
-                  数字
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.numberOption }}
                 </a-select-option>
                 <a-select-option value="BOOLEAN">
-                  布尔值
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanOption }}
                 </a-select-option>
                 <a-select-option value="JSON">
-                  JSON
+                  {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.jsonOption }}
                 </a-select-option>
               </a-select>
             </a-form-item>
@@ -402,10 +402,10 @@
                   type="primary"
                   html-type="submit"
                 >
-                  查询
+                  {{ UI_TEXTS.search }}
                 </a-button>
                 <a-button @click="handleReset">
-                  重置
+                  {{ UI_TEXTS.reset }}
                 </a-button>
               </a-space>
             </a-form-item>
@@ -425,7 +425,7 @@
               <template v-if="column.key === 'configValue'">
                 <template v-if="record.configType === 'BOOLEAN'">
                   <a-tag :color="record.configValue === 'true' ? 'green' : 'red'">
-                    {{ record.configValue === 'true' ? '是' : '否' }}
+                    {{ record.configValue === 'true' ? ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanTrue : ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanFalse }}
                   </a-tag>
                 </template>
                 <template v-else-if="record.configType === 'JSON'">
@@ -450,10 +450,10 @@
                     size="small"
                     @click="handleEdit(record)"
                   >
-                    编辑
+                    {{ ADMIN_SYSTEM_CONFIG_TEXTS.table.edit }}
                   </a-button>
                   <a-popconfirm
-                    title="确定要删除这个配置吗？"
+                    :title="UI_CONFIRM_TEXTS.removeConfig"
                     @confirm="handleDelete(record)"
                   >
                     <a-button
@@ -461,7 +461,7 @@
                       size="small"
                       danger
                     >
-                      删除
+                      {{ UI_TEXTS.remove }}
                     </a-button>
                   </a-popconfirm>
                 </a-space>
@@ -474,7 +474,7 @@
 
     <a-modal
       v-model:open="showCreateModal"
-      :title="editingRecord ? '编辑配置' : '新增配置'"
+      :title="editingRecord ? ADMIN_SYSTEM_CONFIG_TEXTS.system.modalEditTitle : ADMIN_SYSTEM_CONFIG_TEXTS.system.modalCreateTitle"
       :width="modalWidth"
       @ok="handleSubmit"
       @cancel="handleCancel"
@@ -484,75 +484,75 @@
         layout="vertical"
       >
         <a-form-item
-          label="配置键"
+          :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.keyLabel"
           required
         >
           <a-input
             v-model:value="formData.configKey"
-            placeholder="请输入配置键"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.searchKeyPlaceholder"
             :disabled="!!editingRecord"
           />
         </a-form-item>
         <a-form-item
-          label="配置值"
+          :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.valueLabel"
           required
         >
           <a-textarea
             v-if="formData.configType === 'JSON'"
             v-model:value="formData.configValue"
-            placeholder="请输入 JSON 格式的配置值"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.valueJsonPlaceholder"
             :rows="4"
           />
           <a-select
             v-else-if="formData.configType === 'BOOLEAN'"
             v-model:value="formData.configValue"
-            placeholder="请选择"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.valueBooleanPlaceholder"
           >
             <a-select-option value="true">
-              是
+              {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanTrue }}
             </a-select-option>
             <a-select-option value="false">
-              否
+              {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanFalse }}
             </a-select-option>
           </a-select>
           <a-input-number
             v-else-if="formData.configType === 'NUMBER'"
             v-model:value="formData.configValue"
-            placeholder="请输入数字"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.valueNumberPlaceholder"
             style="width: 100%"
           />
           <a-input
             v-else
             v-model:value="formData.configValue"
-            placeholder="请输入配置值"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.valueDefaultPlaceholder"
           />
         </a-form-item>
         <a-form-item
-          label="配置类型"
+          :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.typeLabel"
           required
         >
           <a-select
             v-model:value="formData.configType"
-            placeholder="请选择配置类型"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.searchTypePlaceholder"
           >
             <a-select-option value="STRING">
-              字符串
+              {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.stringOption }}
             </a-select-option>
             <a-select-option value="NUMBER">
-              数字
+              {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.numberOption }}
             </a-select-option>
             <a-select-option value="BOOLEAN">
-              布尔值
+              {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanOption }}
             </a-select-option>
             <a-select-option value="JSON">
-              JSON
+              {{ ADMIN_SYSTEM_CONFIG_TEXTS.system.jsonOption }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="描述">
+        <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.system.descriptionLabel">
           <a-textarea
             v-model:value="formData.description"
-            placeholder="请输入配置描述"
+            :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.descriptionPlaceholder"
             :rows="2"
           />
         </a-form-item>
@@ -564,7 +564,7 @@
       class="save-status"
       :class="saveStatus"
     >
-      {{ saveStatus === 'saving' ? '保存中...' : saveStatus === 'saved' ? '已保存' : '保存失败' }}
+      {{ saveStatus === 'saving' ? ADMIN_SYSTEM_CONFIG_TEXTS.system.saveSaving : saveStatus === 'saved' ? ADMIN_SYSTEM_CONFIG_TEXTS.system.saveSaved : ADMIN_SYSTEM_CONFIG_TEXTS.system.saveFailed }}
     </div>
   </div>
 </template>
@@ -586,6 +586,8 @@ import {
   type SaveConfigRequest,
   type UpdateConfigRequest,
 } from '@/api/config'
+import { UI_CONFIRM_TEXTS, UI_FEEDBACK_TEXTS, UI_TEXTS } from '@/constants/uiTexts'
+import { ADMIN_SYSTEM_CONFIG_TEXTS } from '@/constants/adminTexts'
 
 let saveStatusTimer: number | undefined
 const activeTab = ref('brand')
@@ -646,7 +648,7 @@ const pagination = ref({
   pageSize: 20,
   total: 0,
   showSizeChanger: true,
-  showTotal: (total: number) => `共 ${total} 条`,
+  showTotal: (total: number) => `${ADMIN_SYSTEM_CONFIG_TEXTS.system.totalPrefix}${total}${ADMIN_SYSTEM_CONFIG_TEXTS.system.totalSuffix}`,
 })
 
 const brandCompletion = computed(() =>
@@ -669,11 +671,11 @@ const portalCompletion = computed(() =>
 const portalCompletionRate = computed(() => `${Math.round((portalCompletion.value / 8) * 100)}%`)
 
 const columns = [
-  { title: '配置键', key: 'configKey', dataIndex: 'configKey', ellipsis: true, width: 180 },
-  { title: '配置值', key: 'configValue', ellipsis: true, width: 200 },
-  { title: '类型', key: 'configType', width: 80 },
-  { title: '描述', key: 'description', dataIndex: 'description', ellipsis: true, width: 150 },
-  { title: '操作', key: 'action', width: 120, fixed: 'right' as const },
+  { title: ADMIN_SYSTEM_CONFIG_TEXTS.table.configKey, key: 'configKey', dataIndex: 'configKey', ellipsis: true, width: 180 },
+  { title: ADMIN_SYSTEM_CONFIG_TEXTS.table.configValue, key: 'configValue', ellipsis: true, width: 200 },
+  { title: ADMIN_SYSTEM_CONFIG_TEXTS.table.type, key: 'configType', width: 80 },
+  { title: ADMIN_SYSTEM_CONFIG_TEXTS.table.description, key: 'description', dataIndex: 'description', ellipsis: true, width: 150 },
+  { title: ADMIN_SYSTEM_CONFIG_TEXTS.table.action, key: 'action', width: 120, fixed: 'right' as const },
 ]
 
 async function loadConfigData() {
@@ -711,7 +713,10 @@ async function loadConfigData() {
       systemConfig.callbackAllowInternal = allowInternalValue === '' || allowInternalValue === 'true'
     }
   } catch (error) {
-    logger.error('加载配置失败:', error instanceof Error ? error.message : '未知错误')
+    logger.error(
+      ADMIN_SYSTEM_CONFIG_TEXTS.feedback.loadConfigFailed,
+      error instanceof Error ? error.message : ADMIN_SYSTEM_CONFIG_TEXTS.feedback.unknownError,
+    )
   }
 }
 
@@ -736,7 +741,7 @@ async function saveConfigItem(key: string, value: string, description?: string) 
     saveStatusTimer = window.setTimeout(() => { saveStatus.value = '' }, 2000)
   } catch (error) {
     saveStatus.value = 'error'
-    const errorMessage = error instanceof Error ? error.message : '保存失败'
+    const errorMessage = error instanceof Error ? error.message : UI_FEEDBACK_TEXTS.configSaveFailed
     message.error(errorMessage)
     saveStatusTimer = window.setTimeout(() => { saveStatus.value = '' }, 3000)
   }
@@ -794,7 +799,7 @@ async function loadData() {
     dataSource.value = res.data || []
     pagination.value.total = dataSource.value.length
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '加载配置列表失败'
+    const errorMessage = error instanceof Error ? error.message : UI_FEEDBACK_TEXTS.configLoadFailed
     message.error(errorMessage)
   } finally {
     loading.value = false
@@ -830,21 +835,21 @@ function handleEdit(record: SysConfigInfo) {
 async function handleDelete(record: SysConfigInfo) {
   try {
     await deleteConfig(record.id)
-    message.success('配置已删除')
+    message.success(UI_FEEDBACK_TEXTS.configDeleted)
     await loadData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '删除失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_SYSTEM_CONFIG_TEXTS.feedback.deleteFailed
     message.error(errorMessage)
   }
 }
 
 async function handleSubmit() {
   if (!formData.value.configKey) {
-    message.warning('请填写配置键')
+    message.warning(ADMIN_SYSTEM_CONFIG_TEXTS.validation.configKeyRequired)
     return
   }
   if (!formData.value.configValue && formData.value.configValue !== '') {
-    message.warning('请填写配置值')
+    message.warning(ADMIN_SYSTEM_CONFIG_TEXTS.validation.configValueRequired)
     return
   }
 
@@ -855,7 +860,7 @@ async function handleSubmit() {
         configType: formData.value.configType,
         description: formData.value.description,
       })
-      message.success('配置已更新')
+      message.success(UI_FEEDBACK_TEXTS.configUpdated)
     } else {
       await saveConfig({
         configKey: formData.value.configKey,
@@ -863,13 +868,13 @@ async function handleSubmit() {
         configType: formData.value.configType || 'STRING',
         description: formData.value.description,
       })
-      message.success('配置已创建')
+      message.success(UI_FEEDBACK_TEXTS.configCreated)
     }
     handleCancel()
     await loadData()
     await loadConfigData()
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : '操作失败'
+    const errorMessage = error instanceof Error ? error.message : ADMIN_SYSTEM_CONFIG_TEXTS.feedback.operationFailed
     message.error(errorMessage)
   }
 }
@@ -882,10 +887,10 @@ function handleCancel() {
 
 function getConfigTypeName(type: string): string {
   const typeNames: Record<string, string> = {
-    STRING: '字符串',
-    NUMBER: '数字',
-    BOOLEAN: '布尔值',
-    JSON: 'JSON',
+    STRING: ADMIN_SYSTEM_CONFIG_TEXTS.system.stringOption,
+    NUMBER: ADMIN_SYSTEM_CONFIG_TEXTS.system.numberOption,
+    BOOLEAN: ADMIN_SYSTEM_CONFIG_TEXTS.system.booleanOption,
+    JSON: ADMIN_SYSTEM_CONFIG_TEXTS.system.jsonOption,
   }
   return typeNames[type] || type
 }
