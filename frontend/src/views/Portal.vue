@@ -9,39 +9,60 @@
     >
       <section class="portal-hero section-shell fade-in">
         <div class="hero-layout">
-          <div class="hero-panel">
-            <div class="hero-copy">
-              <p
-                v-if="heroEyebrow"
-                class="hero-eyebrow"
-              >
-                {{ heroEyebrow }}
-              </p>
-              <h1 class="hero-title">
-                {{ heroTitle }}
-              </h1>
-              <p class="hero-lead">
-                {{ heroLead }}
-              </p>
+          <div class="hero-copy">
+            <p
+              v-if="heroEyebrow"
+              class="hero-eyebrow"
+            >
+              {{ heroEyebrow }}
+            </p>
+            <p class="hero-brand">
+              {{ lawFirmName }}
+            </p>
+            <h1 class="hero-title">
+              {{ heroTitle }}
+            </h1>
+            <p class="hero-lead">
+              {{ heroLead }}
+            </p>
 
-              <div class="hero-actions">
-                <a
-                  href="#instructions"
-                  class="hero-primary"
-                >
-                  访问机制说明
-                </a>
-                <a
-                  :href="contactHref"
-                  :target="lawFirmWebsite ? '_blank' : undefined"
-                  :rel="lawFirmWebsite ? 'noopener' : undefined"
-                  class="hero-secondary"
-                >
-                  联络承办律师
-                </a>
-              </div>
+            <div class="hero-actions">
+              <a
+                href="#instructions"
+                class="hero-primary"
+              >
+                查阅访问说明
+              </a>
+              <a
+                :href="contactHref"
+                :target="lawFirmWebsite ? '_blank' : undefined"
+                :rel="lawFirmWebsite ? 'noopener' : undefined"
+                class="hero-secondary"
+              >
+                联络承办律师
+              </a>
             </div>
           </div>
+
+          <aside class="hero-aside">
+            <div class="hero-note-card">
+              <p class="note-kicker">受控访问说明</p>
+              <div class="hero-note-grid">
+                <article>
+                  <span>授权对象</span>
+                  <strong>仅限受托客户与经确认协作成员</strong>
+                </article>
+                <article>
+                  <span>资料范围</span>
+                  <strong>仅展示已授权的案件进展、文书与文件材料</strong>
+                </article>
+                <article>
+                  <span>联络机制</span>
+                  <strong>由承办律师团队统一管理访问凭证与协作边界</strong>
+                </article>
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -52,7 +73,8 @@
         <div class="section-frame">
           <div class="section-head">
             <p class="section-kicker">服务能力</p>
-            <h2>客户协作与资料管理</h2>
+            <h2>客户协作与资料治理</h2>
+            <p>围绕案件信息、数字化文书和受控通知建立统一协作界面，减少客户在邮件、聊天和附件中的信息切换成本。</p>
           </div>
 
           <div class="capability-grid">
@@ -100,6 +122,7 @@
             <div class="instruction-copy">
               <p class="section-kicker">管理说明</p>
               <h2>受控访问机制说明</h2>
+              <p class="instruction-intro">门户不追求开放注册，而是强调按案件、按授权、按协作关系开放。所有信息展示均服从于律师服务流程与资料边界。</p>
 
               <div class="instruction-list">
                 <article class="instruction-item">
@@ -177,7 +200,10 @@
         class="portal-footer section-shell"
       >
         <div class="footer-meta">
-          <p class="footer-brand">
+          <p
+            v-if="showFooterBrand"
+            class="footer-brand"
+          >
             {{ lawFirmName }}
           </p>
           <p class="footer-copy">
@@ -225,18 +251,39 @@ const heroEyebrow = computed(() => {
 })
 
 const copyrightText = computed(() => {
-  const configured = appConfigStore.copyright?.trim()
-  if (configured) return configured
+  const configuredLines = appConfigStore.copyright
+    ?.split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean) ?? []
+
+  if (configuredLines.length > 0) {
+    if (configuredLines.length === 1) {
+      return configuredLines[0]
+    }
+
+    const organization = lawFirmName.value.trim()
+    const dedupedLines = configuredLines.filter((line, index) => !(index === 0 && line === organization))
+    return dedupedLines.join(' ')
+  }
 
   const fallbackName = lawFirmName.value || COPYRIGHT_TEXT
   return `© ${currentYear} ${fallbackName} 版权所有`
 })
 
 const icpText = computed(() => appConfigStore.icpLicense?.trim() || '')
+const showFooterBrand = computed(() => {
+  const organization = lawFirmName.value.trim()
+  if (!organization) return false
+
+  const normalizedCopyright = copyrightText.value.replace(/\s+/g, '').toLowerCase()
+  const normalizedOrganization = organization.replace(/\s+/g, '').toLowerCase()
+
+  return !normalizedCopyright.includes(normalizedOrganization)
+})
 
 const heroTitle = computed(() => {
   const shortName = appShortName.value
-  if (!shortName) return `${lawFirmName.value} 客户协作门户`
+  if (!shortName) return '客户协作门户'
 
   const normalizedLawFirmName = lawFirmName.value.replace(/\s+/g, '').toLowerCase()
   const normalizedShortName = shortName.replace(/\s+/g, '').toLowerCase()
@@ -246,24 +293,26 @@ const heroTitle = computed(() => {
     normalizedShortName.includes(normalizedLawFirmName) ||
     normalizedLawFirmName.includes(normalizedShortName)
   ) {
-    return `${lawFirmName.value} 客户协作门户`
+    return '客户协作门户'
   }
 
-  return `${lawFirmName.value} ${shortName}`
+  return shortName
 })
 
 const heroLead = computed(() => {
   if (slogan.value) {
-    return `${slogan.value}。本门户旨在为委托客户提供受控的数字化协作环境，用于查阅经授权的法律文书、追踪事务进展，并与承办律师团队保持高效专业的联络。`
+    return `${slogan.value}。本门户面向已建立正式委托关系的客户开放，用于查阅经授权的法律文书、追踪案件动态，并在统一边界内完成与承办律师团队的协作联络。`
   }
-  return '本门户旨在为委托客户提供受控的数字化协作环境，用于查阅经授权的法律文书、追踪事务进展，并与承办律师团队保持高效专业的联络。'
+  return '本门户面向已建立正式委托关系的客户开放，用于查阅经授权的法律文书、追踪案件动态，并在统一边界内完成与承办律师团队的协作联络。'
 })
 </script>
 
 <style scoped>
 .portal-page {
   min-height: 100vh;
-  background: #f7f5f1;
+  background:
+    radial-gradient(circle at top left, rgba(27, 59, 95, 0.06), transparent 28%),
+    linear-gradient(180deg, #f6f4ef 0%, #f8f7f3 50%, #f2eee7 100%);
 }
 
 .content {
@@ -276,31 +325,26 @@ const heroLead = computed(() => {
 .portal-section,
 .commitment,
 .portal-footer {
-  padding-top: 72px;
-  padding-bottom: 72px;
+  padding-top: 88px;
+  padding-bottom: 88px;
 }
 
 .portal-hero {
-  padding-top: 104px;
+  padding-top: 108px;
   padding-bottom: 120px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  border-bottom: 1px solid rgba(16, 42, 67, 0.08);
   background: transparent;
 }
 
 .hero-layout {
-  display: block;
-}
-
-.hero-panel {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 380px);
+  gap: 72px;
+  align-items: start;
 }
 
 .hero-copy {
-  max-width: 840px;
+  max-width: 760px;
 }
 
 .hero-eyebrow,
@@ -314,17 +358,28 @@ const heroLead = computed(() => {
   text-transform: uppercase;
 }
 
+.hero-brand {
+  margin: 0 0 18px;
+  color: #1b3b5f;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 .hero-title {
   margin: 0;
   color: var(--text-primary);
-  font-size: clamp(48px, 6vw, 76px);
+  font-family: 'EB Garamond', 'PingFang SC', serif;
+  font-size: clamp(54px, 6vw, 88px);
   font-weight: 600;
-  line-height: 1.18;
-  letter-spacing: -0.03em;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
 }
 
 .hero-lead,
+.section-head p,
 .capability-card p,
+.instruction-intro,
 .instruction-item p,
 .commitment-copy p,
 .commitment-support p {
@@ -335,16 +390,16 @@ const heroLead = computed(() => {
 
 .hero-lead {
   max-width: 700px;
-  margin-top: 32px;
-  font-size: 19px;
-  line-height: 2;
+  margin-top: 28px;
+  font-size: 18px;
+  line-height: 1.95;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 44px;
+  gap: 16px;
+  margin-top: 36px;
 }
 
 .hero-primary,
@@ -355,10 +410,12 @@ const heroLead = computed(() => {
   min-height: 52px;
   padding: 0 28px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
+  letter-spacing: 0.06em;
   text-decoration: none;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  text-transform: uppercase;
 }
 
 .hero-primary {
@@ -377,9 +434,62 @@ const heroLead = computed(() => {
   transform: translateY(-1px);
 }
 
+.hero-aside {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.hero-note-card {
+  width: min(100%, 380px);
+  padding: 28px;
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 30px rgba(16, 42, 67, 0.06);
+}
+
+.note-kicker {
+  margin: 0 0 24px;
+  color: #486581;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-note-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.hero-note-grid article {
+  display: grid;
+  gap: 6px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.hero-note-grid article:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.hero-note-grid span {
+  color: #829ab1;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-note-grid strong {
+  color: #102a43;
+  font-size: 16px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
 .portal-section {
   background: transparent;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  border-bottom: 1px solid rgba(16, 42, 67, 0.08);
 }
 
 .portal-section--plain {
@@ -401,6 +511,8 @@ const heroLead = computed(() => {
 .section-head {
   margin-bottom: 56px;
   max-width: 720px;
+  display: grid;
+  gap: 16px;
 }
 
 .section-head h2,
@@ -408,22 +520,23 @@ const heroLead = computed(() => {
 .commitment h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 34px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: 'EB Garamond', 'PingFang SC', serif;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.05;
 }
 
 .capability-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 48px;
+  gap: 28px;
 }
 
 .capability-card {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  padding: 30px;
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 16px 28px rgba(16, 42, 67, 0.04);
 }
 
 .capability-icon {
@@ -432,9 +545,9 @@ const heroLead = computed(() => {
   justify-content: center;
   width: 48px;
   height: 48px;
-  margin-bottom: 28px;
+  margin-bottom: 22px;
   border-radius: 4px;
-  background: var(--lex-primary-container, rgba(30, 64, 175, 0.1));
+  background: rgba(27, 59, 95, 0.08);
   color: var(--lex-primary);
   font-size: 24px;
 }
@@ -447,27 +560,32 @@ const heroLead = computed(() => {
 .capability-card h3 {
   margin: 0 0 12px;
   color: var(--text-primary);
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.3;
 }
 
 .instruction-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
-  gap: 88px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 72px;
   align-items: start;
+}
+
+.instruction-copy {
+  display: grid;
+  gap: 18px;
 }
 
 .instruction-list {
   display: grid;
   gap: 30px;
-  margin-top: 36px;
+  margin-top: 18px;
 }
 
 .instruction-note {
   margin: 40px 0 0;
   padding: 0 0 0 18px;
-  border-left: 2px solid rgba(30, 64, 175, 0.3);
+  border-left: 2px solid rgba(27, 59, 95, 0.26);
   background: transparent;
   color: var(--text-secondary);
   line-height: 1.8;
@@ -485,7 +603,7 @@ const heroLead = computed(() => {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border: 1px solid var(--lex-primary);
+  border: 1px solid rgba(27, 59, 95, 0.3);
   color: var(--lex-primary);
   font-size: 12px;
   font-weight: 700;
@@ -505,8 +623,9 @@ const heroLead = computed(() => {
 .mock-card {
   width: min(100%, 360px);
   padding: 36px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 20px 36px rgba(16, 42, 67, 0.06);
 }
 
 .mock-head {
@@ -536,7 +655,7 @@ const heroLead = computed(() => {
 .mock-field {
   height: 36px;
   background: #fff;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
 .mock-lock {
@@ -558,18 +677,19 @@ const heroLead = computed(() => {
 }
 
 .commitment {
-  background: var(--lex-surface-dark);
-  color: #fff;
+  background: transparent;
+  color: var(--text-primary);
 }
 
 .commitment-frame {
   display: grid;
   justify-items: center;
   text-align: center;
-  padding: 96px 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  padding: 72px 64px;
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background:
+    linear-gradient(180deg, rgba(27, 59, 95, 0.94) 0%, rgba(16, 42, 67, 0.96) 100%);
+  box-shadow: 0 28px 48px rgba(16, 42, 67, 0.12);
 }
 
 .commitment-icon {
@@ -639,13 +759,14 @@ const heroLead = computed(() => {
 }
 
 @media (max-width: 1200px) {
-  .capability-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
+  .hero-layout,
   .instruction-layout {
     grid-template-columns: 1fr;
     gap: 40px;
+  }
+
+  .hero-aside {
+    justify-content: flex-start;
   }
 }
 
@@ -659,10 +780,12 @@ const heroLead = computed(() => {
   }
 
   .hero-title {
-    font-size: clamp(34px, 10vw, 52px);
+    font-size: clamp(42px, 14vw, 58px);
   }
 
   .hero-lead,
+  .section-head p,
+  .instruction-intro,
   .commitment-copy p,
   .commitment-support p {
     font-size: 16px;
@@ -675,6 +798,10 @@ const heroLead = computed(() => {
 
   .mock-card {
     padding: 24px;
+  }
+
+  .commitment-frame {
+    padding: 48px 24px;
   }
 
   .hero-actions {

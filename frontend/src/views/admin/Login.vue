@@ -1,135 +1,176 @@
 <template>
   <div class="login-page">
-    <section class="login-card">
-      <div class="logo-shell">
-        <img
-          v-if="appConfigStore.logoUrl"
-          :src="appConfigStore.logoUrl"
-          alt="Logo"
-          class="logo-image"
-        >
-        <svg
-          v-else
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-          aria-hidden="true"
-          class="logo-fallback"
-        >
-          <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
-          <path d="M12 12L20 7.5" />
-          <path d="M12 12V21" />
-          <path d="M12 12L4 7.5" />
-        </svg>
-      </div>
-
-      <div class="brand-copy">
-        <p class="brand-label">
-          {{ organizationName || '律师事务所' }}
-        </p>
-        <h1 class="form-title">{{ UI_TEXTS.loginTitle }}</h1>
-        <p class="form-subtitle">{{ UI_TEXTS.loginSubtitle }}</p>
-      </div>
-
-      <a-form
-        :model="form"
-        :rules="rules"
-        class="login-form"
-        @finish="handleLogin"
-      >
-        <a-form-item name="username">
-          <a-input
-            v-model:value="form.username"
-            size="large"
-            :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
-            class="login-input"
-          >
-            <template #prefix>
-              <UserOutlined class="input-icon" />
-            </template>
-          </a-input>
-        </a-form-item>
-
-        <a-form-item name="password">
-          <a-input-password
-            v-model:value="form.password"
-            size="large"
-            :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
-            class="login-input"
-            @press-enter="handleLogin"
-          >
-            <template #prefix>
-              <LockOutlined class="input-icon" />
-            </template>
-          </a-input-password>
-        </a-form-item>
-
-        <a-form-item name="captchaText">
-          <div class="captcha-row">
-            <a-input
-              v-model:value="form.captchaText"
-              size="large"
-              :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
-              class="login-input captcha-input"
-              @press-enter="handleLogin"
-            />
-            <button
-              type="button"
-              class="captcha-image"
-              @click="refreshCaptcha"
+    <section class="login-shell">
+      <div class="brand-panel">
+        <div class="brand-topline">
+          <div class="logo-shell">
+            <img
+              v-if="appConfigStore.logoUrl"
+              :src="appConfigStore.logoUrl"
+              alt="Logo"
+              class="logo-image"
             >
-              <img
-                v-if="captchaImage"
-                :src="captchaImage"
-                alt="验证码"
-              >
-              <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
-            </button>
+            <svg
+              v-else
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+              class="logo-fallback"
+            >
+              <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
+              <path d="M12 12L20 7.5" />
+              <path d="M12 12V21" />
+              <path d="M12 12L4 7.5" />
+            </svg>
           </div>
-        </a-form-item>
 
-        <a-form-item>
-          <a-button
-            type="primary"
-            html-type="submit"
-            size="large"
-            :loading="loading"
-            block
-            class="login-button"
-          >
-            {{ UI_TEXTS.loginButton }}
-          </a-button>
-        </a-form-item>
-      </a-form>
+          <div class="brand-lockup">
+            <p class="brand-label">
+              {{ organizationName || '律师事务所' }}
+            </p>
+            <p class="brand-heading">{{ UI_TEXTS.loginTitle }}</p>
+          </div>
+        </div>
 
-      <a-alert
-        v-if="errorMessage"
-        :message="errorMessage"
-        type="error"
-        show-icon
-        class="error-alert"
-      />
+        <div class="brand-copy">
+          <p class="brand-kicker">Secure Access Gateway</p>
+          <h1 class="form-title">专业 · 诚信 · 高效</h1>
+          <p class="form-subtitle">{{ UI_TEXTS.loginSubtitle }}</p>
+        </div>
 
-      <div class="form-footer">
-        <p v-if="appConfigStore.copyright">
-          {{ appConfigStore.copyright }}
-        </p>
-        <p v-else>
-          © {{ currentYear }} {{ organizationName }}
-        </p>
-        <p
-          v-if="appConfigStore.icpLicense"
-          class="icp-link"
+        <div class="brand-points">
+          <article class="brand-point">
+            <span class="point-index">01</span>
+            <div>
+              <h2>受控访问</h2>
+              <p>仅向经授权的管理成员开放，所有登录入口均纳入统一审计与权限边界管理。</p>
+            </div>
+          </article>
+          <article class="brand-point">
+            <span class="point-index">02</span>
+            <div>
+              <h2>协作留痕</h2>
+              <p>通知、案件、文书和文件流转遵循统一的系统记录策略，减少信息分散与口径偏差。</p>
+            </div>
+          </article>
+          <article class="brand-point">
+            <span class="point-index">03</span>
+            <div>
+              <h2>数据边界</h2>
+              <p>以案件授权为基础控制访问范围，确保管理后台与客户协作空间保持明确隔离。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="form-panel">
+        <div class="form-panel-head">
+          <p class="form-eyebrow">管理端登录</p>
+          <h2>进入工作台</h2>
+          <p>请使用已分配的账户信息完成身份校验后进入管理后台。</p>
+        </div>
+
+        <a-form
+          :model="form"
+          :rules="rules"
+          class="login-form"
+          @finish="handleLogin"
         >
-          <a
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noopener"
+          <a-form-item name="username">
+            <a-input
+              v-model:value="form.username"
+              size="large"
+              :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
+              class="login-input"
+            >
+              <template #prefix>
+                <UserOutlined class="input-icon" />
+              </template>
+            </a-input>
+          </a-form-item>
+
+          <a-form-item name="password">
+            <a-input-password
+              v-model:value="form.password"
+              size="large"
+              :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
+              class="login-input"
+              @press-enter="handleLogin"
+            >
+              <template #prefix>
+                <LockOutlined class="input-icon" />
+              </template>
+            </a-input-password>
+          </a-form-item>
+
+          <a-form-item name="captchaText">
+            <div class="captcha-row">
+              <a-input
+                v-model:value="form.captchaText"
+                size="large"
+                :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
+                class="login-input captcha-input"
+                @press-enter="handleLogin"
+              />
+              <button
+                type="button"
+                class="captcha-image"
+                @click="refreshCaptcha"
+              >
+                <img
+                  v-if="captchaImage"
+                  :src="captchaImage"
+                  alt="验证码"
+                >
+                <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
+              </button>
+            </div>
+          </a-form-item>
+
+          <a-form-item>
+            <a-button
+              type="primary"
+              html-type="submit"
+              size="large"
+              :loading="loading"
+              block
+              class="login-button"
+            >
+              {{ UI_TEXTS.loginButton }}
+            </a-button>
+          </a-form-item>
+        </a-form>
+
+        <a-alert
+          v-if="errorMessage"
+          :message="errorMessage"
+          type="error"
+          show-icon
+          class="error-alert"
+        />
+
+        <div class="form-footer">
+          <p v-if="footerCopyright">
+            {{ footerCopyright }}
+          </p>
+          <p v-else>
+            © {{ currentYear }} {{ organizationName }}
+          </p>
+          <p
+            v-if="appConfigStore.icpLicense"
+            class="icp-link"
           >
-            {{ appConfigStore.icpLicense }}
-          </a>
-        </p>
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ appConfigStore.icpLicense }}
+            </a>
+          </p>
+        </div>
       </div>
     </section>
   </div>
@@ -153,6 +194,30 @@ const appConfigStore = useAppConfigStore()
 
 const currentYear = new Date().getFullYear()
 const organizationName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName)
+const footerCopyright = computed(() => {
+  const normalized = appConfigStore.copyright
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+  if (normalized.length <= 1) {
+    return normalized[0] ?? ''
+  }
+
+  const orgName = organizationName.value?.trim()
+  if (!orgName) {
+    return normalized.join(' ')
+  }
+
+  const dedupedLines = normalized.filter((line, index) => {
+    if (index === 0 && line === orgName) {
+      return false
+    }
+    return true
+  })
+
+  return dedupedLines.join(' ')
+})
 
 const form = ref({
   username: '',
@@ -252,27 +317,56 @@ onMounted(() => {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 32px;
   background:
-    radial-gradient(circle at top, rgba(27, 59, 95, 0.16), transparent 42%),
-    linear-gradient(180deg, #f5f7fa 0%, #edf2f7 100%);
+    radial-gradient(circle at top left, rgba(27, 59, 95, 0.1), transparent 34%),
+    linear-gradient(180deg, #f6f4ef 0%, #f3f0ea 52%, #ece7df 100%);
 }
 
-.login-card {
-  width: min(400px, 100%);
-  padding: 48px 40px;
-  border-radius: 20px;
-  border: 1px solid rgba(232, 236, 239, 0.92);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 24px 48px rgba(16, 42, 67, 0.12);
+.login-shell {
+  width: min(1120px, 100%);
   display: grid;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 420px);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 24px 60px rgba(16, 42, 67, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.brand-panel {
+  display: grid;
+  align-content: space-between;
+  gap: 44px;
+  min-height: 720px;
+  padding: 56px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.56) 0%, rgba(255, 255, 255, 0.18) 100%),
+    linear-gradient(145deg, rgba(16, 42, 67, 0.04) 0%, rgba(27, 59, 95, 0.01) 100%);
+  border-right: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.brand-topline {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand-lockup {
+  display: grid;
+  gap: 4px;
 }
 
 .logo-shell {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(16, 42, 67, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 12px 24px rgba(16, 42, 67, 0.06);
 }
 
 .logo-image,
@@ -283,38 +377,147 @@ onMounted(() => {
 
 .brand-copy {
   display: grid;
-  gap: 8px;
-  text-align: center;
+  gap: 18px;
+  max-width: 560px;
 }
 
 .brand-label {
   margin: 0;
-  font-size: 13px;
-  color: #627d98;
-  letter-spacing: 0.08em;
+  color: #1b3b5f;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.brand-heading {
+  margin: 0;
+  color: #486581;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.brand-kicker {
+  margin: 0;
+  color: rgba(72, 101, 129, 0.82);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .form-title {
   margin: 0;
-  font-size: 24px;
+  font-family: 'EB Garamond', 'PingFang SC', serif;
+  font-size: clamp(44px, 4vw, 64px);
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.06;
   color: #102a43;
+  letter-spacing: -0.03em;
 }
 
 .form-subtitle {
   margin: 0;
-  font-size: 14px;
+  max-width: 520px;
+  font-size: 16px;
   color: #627d98;
+  line-height: 1.9;
+}
+
+.brand-points {
+  display: grid;
+  gap: 20px;
+  max-width: 560px;
+}
+
+.brand-point {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding-top: 20px;
+  border-top: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.point-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 42, 67, 0.12);
+  color: #1b3b5f;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.brand-point h2 {
+  margin: 0 0 8px;
+  color: #102a43;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.brand-point p {
+  margin: 0;
+  color: #627d98;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.form-panel {
+  display: grid;
+  align-content: center;
+  gap: 28px;
+  padding: 56px 48px;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.form-panel-head {
+  display: grid;
+  gap: 10px;
+}
+
+.form-eyebrow {
+  margin: 0;
+  color: #486581;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.form-panel-head h2 {
+  margin: 0;
+  color: #102a43;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.form-panel-head p {
+  margin: 0;
+  color: #627d98;
+  font-size: 14px;
+  line-height: 1.8;
 }
 
 .login-form {
-  display: grid;
-  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.login-form :deep(.ant-form-item) {
+  margin-bottom: 18px;
+}
+
+.login-form :deep(.ant-form-item:last-child) {
+  margin-bottom: 0;
 }
 
 .login-input {
-  min-height: 44px;
+  min-height: 48px;
 }
 
 .input-icon {
@@ -322,19 +525,18 @@ onMounted(() => {
 }
 
 .captcha-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 13fr) minmax(0, 6fr);
   align-items: stretch;
-  gap: 5%;
+  column-gap: 5%;
 }
 
 .captcha-input {
-  flex: 0 0 65%;
   min-width: 0;
 }
 
 .captcha-image {
-  flex: 0 0 30%;
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 10px;
   border: 1px solid #d9e2ec;
   border-radius: 4px;
@@ -353,25 +555,28 @@ onMounted(() => {
 }
 
 .login-button {
-  height: 44px !important;
+  height: 48px !important;
   font-size: 16px !important;
   font-weight: 700 !important;
+  letter-spacing: 0.04em;
 }
 
 .error-alert {
-  margin-top: -8px;
+  margin-top: -4px;
 }
 
 .form-footer {
   display: grid;
   gap: 6px;
-  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(16, 42, 67, 0.08);
 }
 
 .form-footer p {
   margin: 0;
-  color: var(--text-tertiary);
+  color: #829ab1;
   font-size: 12px;
+  line-height: 1.7;
 }
 
 .icp-link a {
@@ -379,22 +584,53 @@ onMounted(() => {
   text-decoration: none;
 }
 
+@media (max-width: 960px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-panel {
+    min-height: auto;
+    padding: 40px 28px 32px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(16, 42, 67, 0.08);
+  }
+
+  .form-panel {
+    padding: 36px 28px 32px;
+  }
+}
+
 @media (max-width: 480px) {
   .login-page {
     padding: 16px;
   }
 
-  .login-card {
-    padding: 40px 20px;
+  .brand-panel,
+  .form-panel {
+    padding-inline: 20px;
+  }
+
+  .brand-topline {
+    align-items: flex-start;
+  }
+
+  .logo-shell {
+    width: 56px;
+    height: 56px;
   }
 
   .captcha-row {
+    grid-template-columns: 1fr;
     gap: 12px;
-    flex-wrap: wrap;
   }
 
   .captcha-image {
-    flex: 1 1 100%;
+    min-height: 48px;
+  }
+
+  .form-title {
+    font-size: 40px;
   }
 }
 </style>

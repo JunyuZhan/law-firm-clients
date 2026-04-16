@@ -21,7 +21,10 @@
               </div>
               <div class="logo-text">
                 <h1>{{ lawFirmName }}</h1>
-                <p class="logo-system-label">
+                <p
+                  v-if="title"
+                  class="logo-system-label"
+                >
                   {{ portalSystemLabel }}
                 </p>
               </div>
@@ -185,8 +188,8 @@ const detailSubtitle = computed(() => '项目进展与文件')
 }
 
 .app-header.portal .header-backdrop {
-  background: linear-gradient(135deg, #1b3b5f 0%, #2d5a8e 100%);
-  border-bottom: 0;
+  background: rgba(246, 244, 239, 0.84);
+  border-bottom: 1px solid rgba(16, 42, 67, 0.08);
 }
 
 .header-content {
@@ -270,22 +273,25 @@ const detailSubtitle = computed(() => '项目进展与文件')
 }
 
 .app-header.portal .logo-text h1,
-.app-header.portal .logo-system-label,
 .app-header.portal .welcome-text,
 .app-header.portal .page-title,
 .app-header.portal .page-caption {
-  color: #fff;
+  color: #102a43;
+}
+
+.app-header.portal .logo-system-label {
+  color: #627d98;
 }
 
 .app-header.portal .header-btn {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  border-color: rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  color: #102a43;
 }
 
 .app-header.portal .header-btn:hover {
-  border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(16, 42, 67, 0.16);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .logo-text {
