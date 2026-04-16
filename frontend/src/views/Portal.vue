@@ -19,6 +19,12 @@
             <p class="hero-brand">
               {{ lawFirmName }}
             </p>
+            <p
+              v-if="heroMotto"
+              class="hero-motto"
+            >
+              {{ heroMotto }}
+            </p>
             <h1 class="hero-title">
               {{ heroTitle }}
             </h1>
@@ -26,12 +32,27 @@
               {{ heroLead }}
             </p>
 
+            <div class="hero-trust">
+              <article class="trust-item">
+                <span>访问范围</span>
+                <strong>按案件授权开放</strong>
+              </article>
+              <article class="trust-item">
+                <span>资料治理</span>
+                <strong>文书与文件统一管理</strong>
+              </article>
+              <article class="trust-item">
+                <span>协作方式</span>
+                <strong>与承办律师团队定向联络</strong>
+              </article>
+            </div>
+
             <div class="hero-actions">
               <a
                 href="#instructions"
                 class="hero-primary"
               >
-                查阅访问说明
+                查阅访问规则
               </a>
               <a
                 :href="contactHref"
@@ -74,7 +95,7 @@
           <div class="section-head">
             <p class="section-kicker">服务能力</p>
             <h2>客户协作与资料治理</h2>
-            <p>围绕案件信息、数字化文书和受控通知建立统一协作界面，减少客户在邮件、聊天和附件中的信息切换成本。</p>
+            <p>围绕案件动态、授权文书与关键信息通知建立统一协作界面，减少分散沟通带来的理解偏差。</p>
           </div>
 
           <div class="capability-grid">
@@ -129,7 +150,7 @@
                   <span>01</span>
                   <div>
                     <h3>定向准入制</h3>
-                    <p>本门户仅向已建立正式委托关系的特定客户开放，不设公开注册入口，以确保相关资料保持必要的隔离性。</p>
+                    <p>本门户仅面向已建立正式委托关系的客户开放，不设公开注册入口。</p>
                   </div>
                 </article>
 
@@ -137,7 +158,7 @@
                   <span>02</span>
                   <div>
                     <h3>基于受控链接的访问机制</h3>
-                    <p>访问权限由承办律师根据案件保密要求进行管理，客户通过预留的联络渠道获取对应的访问凭证。</p>
+                    <p>访问权限由承办律师依据案件保密要求进行管理，客户通过预留联络渠道获取访问凭证。</p>
                   </div>
                 </article>
 
@@ -145,7 +166,7 @@
                   <span>03</span>
                   <div>
                     <h3>权限动态管理</h3>
-                    <p>访问范围严格限定于当前委托事项，并依据协作进度及合规要求进行持续审核与管理。</p>
+                    <p>访问范围限定于当前委托事项，并随协作进度与合规要求动态调整。</p>
                   </div>
                 </article>
               </div>
@@ -186,12 +207,12 @@
           <SafetyCertificateOutlined class="commitment-icon" />
           <h2>专业隐私承诺</h2>
           <div class="commitment-copy">
-            <p>我们高度重视法律事务的私密性。本门户的设计与运行逻辑均遵循律师职业道德规范及行业数据保护要求。</p>
-            <p>通过访问控制与协作流程管理，确保数字化案卷与线上沟通记录始终处于必要边界之内。维护客户的信息安全与利益，是服务过程中的基本前提。</p>
+            <p>本门户的设计与运行遵循律师职业伦理与行业数据保护要求，所有访问均建立在授权边界与协作关系之上。</p>
+            <p>维护客户信息安全与事务私密性，是数字化协作的基本前提，而非附加承诺。</p>
           </div>
           <div class="commitment-support">
             <p class="support-label">业务支持</p>
-            <p>如在访问过程中遇到问题或需调整协作权限，请通过预留联络方式直接联系您的承办律师团队。</p>
+            <p>如需调整访问权限或补充协作资料，请直接联系您的承办律师团队。</p>
           </div>
         </div>
       </section>
@@ -300,11 +321,10 @@ const heroTitle = computed(() => {
 })
 
 const heroLead = computed(() => {
-  if (slogan.value) {
-    return `${slogan.value}。本门户面向已建立正式委托关系的客户开放，用于查阅经授权的法律文书、追踪案件动态，并在统一边界内完成与承办律师团队的协作联络。`
-  }
-  return '本门户面向已建立正式委托关系的客户开放，用于查阅经授权的法律文书、追踪案件动态，并在统一边界内完成与承办律师团队的协作联络。'
+  return '本门户用于查阅经授权的法律文书、跟进案件动态，并在统一边界内完成与承办律师团队的协作联络。'
 })
+
+const heroMotto = computed(() => slogan.value || '')
 </script>
 
 <style scoped>
@@ -370,10 +390,20 @@ const heroLead = computed(() => {
   margin: 0;
   color: var(--text-primary);
   font-family: 'EB Garamond', 'PingFang SC', serif;
-  font-size: clamp(54px, 6vw, 88px);
+  font-size: clamp(28px, 3vw, 40px);
   font-weight: 600;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.hero-motto {
+  margin: 0 0 18px;
+  color: #102a43;
+  font-family: 'EB Garamond', 'PingFang SC', serif;
+  font-size: clamp(60px, 8vw, 118px);
+  font-weight: 600;
+  line-height: 0.94;
+  letter-spacing: -0.05em;
 }
 
 .hero-lead,
@@ -393,6 +423,35 @@ const heroLead = computed(() => {
   margin-top: 28px;
   font-size: 18px;
   line-height: 1.95;
+}
+
+.hero-trust {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 760px;
+  margin-top: 30px;
+}
+
+.trust-item {
+  display: grid;
+  gap: 8px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(16, 42, 67, 0.1);
+}
+
+.trust-item span {
+  color: #829ab1;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.trust-item strong {
+  color: #102a43;
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 600;
 }
 
 .hero-actions {
@@ -780,15 +839,25 @@ const heroLead = computed(() => {
   }
 
   .hero-title {
-    font-size: clamp(42px, 14vw, 58px);
+    font-size: 28px;
+  }
+
+  .hero-motto {
+    font-size: clamp(48px, 16vw, 72px);
   }
 
   .hero-lead,
+  .trust-item strong,
   .section-head p,
   .instruction-intro,
   .commitment-copy p,
   .commitment-support p {
     font-size: 16px;
+  }
+
+  .hero-trust {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 
   .capability-grid {

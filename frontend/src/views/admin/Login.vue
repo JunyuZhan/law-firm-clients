@@ -37,7 +37,7 @@
         <div class="brand-copy">
           <p class="brand-kicker">Secure Access Gateway</p>
           <h1 class="form-title">专业 · 诚信 · 高效</h1>
-          <p class="form-subtitle">{{ UI_TEXTS.loginSubtitle }}</p>
+          <p class="form-subtitle">面向管理成员的受控入口，用于统一处理案件、通知、文书与客户协作事项。</p>
         </div>
 
         <div class="brand-points">
@@ -45,21 +45,14 @@
             <span class="point-index">01</span>
             <div>
               <h2>受控访问</h2>
-              <p>仅向经授权的管理成员开放，所有登录入口均纳入统一审计与权限边界管理。</p>
+              <p>仅向经授权的管理成员开放，统一纳入权限边界与登录审计。</p>
             </div>
           </article>
           <article class="brand-point">
             <span class="point-index">02</span>
             <div>
-              <h2>协作留痕</h2>
-              <p>通知、案件、文书和文件流转遵循统一的系统记录策略，减少信息分散与口径偏差。</p>
-            </div>
-          </article>
-          <article class="brand-point">
-            <span class="point-index">03</span>
-            <div>
               <h2>数据边界</h2>
-              <p>以案件授权为基础控制访问范围，确保管理后台与客户协作空间保持明确隔离。</p>
+              <p>案件、文书与客户协作空间按授权范围隔离，保持资料治理秩序。</p>
             </div>
           </article>
         </div>
@@ -537,11 +530,11 @@ onMounted(() => {
 
 .captcha-image {
   min-height: 48px;
-  padding: 0 10px;
+  padding: 4px 8px;
   border: 1px solid #d9e2ec;
   border-radius: 4px;
   background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -549,9 +542,11 @@ onMounted(() => {
 }
 
 .captcha-image img {
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-height: 38px;
+  object-fit: contain;
 }
 
 .login-button {
