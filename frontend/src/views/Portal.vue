@@ -1,7 +1,7 @@
 <template>
   <div class="portal-page">
-    <div class="portal-shell fade-in">
-      <header class="portal-header">
+    <a-layout class="portal-shell fade-in">
+      <a-layout-header class="portal-header">
         <div class="portal-brand">
           <div class="portal-brand__logo">
             <img
@@ -15,114 +15,186 @@
           <span class="portal-brand__name">{{ lawFirmName }}</span>
         </div>
 
-        <button
-          type="button"
+        <a-button
+          type="text"
           class="portal-login"
           :title="staffEntryTitle"
           :aria-label="staffEntryTitle"
           @click="goToAdminLogin"
         >
-          <LoginOutlined />
-        </button>
-      </header>
+          <template #icon>
+            <LoginOutlined />
+          </template>
+        </a-button>
+      </a-layout-header>
 
-      <main>
-        <section class="portal-hero">
-          <div class="portal-hero__copy">
-            <h1 class="portal-hero__title">
-              {{ lawFirmName }} 客户服务系统
-            </h1>
-            <p class="portal-hero__eyebrow">
-              {{ heroEyebrow }}
-            </p>
-
-            <div class="portal-hero__feature-list">
-              <article
-                v-for="item in heroHighlights"
-                :key="item.title"
-                class="hero-highlight"
-              >
-                <div class="hero-highlight__icon">
-                  <component :is="item.icon" />
-                </div>
-                <div>
-                  <h2>{{ item.title }}</h2>
-                  <p>{{ item.description }}</p>
-                </div>
-              </article>
-            </div>
-
-            <p
-              v-if="accessNotice"
-              class="portal-hero__notice"
+      <a-layout-content>
+        <section class="portal-section portal-section--hero">
+          <a-row
+            :gutter="[56, 32]"
+            align="middle"
+          >
+            <a-col
+              :xs="24"
+              :lg="12"
             >
-              {{ accessNotice }}
-            </p>
-          </div>
+              <div class="portal-hero__copy">
+                <a-typography-title
+                  :level="1"
+                  class="portal-hero__title"
+                >
+                  {{ lawFirmName }} 客户服务系统
+                </a-typography-title>
 
-          <div class="portal-hero__visual">
-            <div class="portal-hero__image-frame">
-              <img
-                :src="heroImageUrl"
-                alt="律师事务所接待办公空间"
-                class="portal-hero__image"
+                <a-typography-text class="portal-hero__eyebrow">
+                  {{ heroEyebrow }}
+                </a-typography-text>
+
+                <a-space
+                  direction="vertical"
+                  :size="18"
+                  class="portal-hero__feature-list"
+                >
+                  <article
+                    v-for="item in heroHighlights"
+                    :key="item.title"
+                    class="hero-highlight"
+                  >
+                    <div class="hero-highlight__icon">
+                      <component :is="item.icon" />
+                    </div>
+                    <div class="hero-highlight__body">
+                      <h2>{{ item.title }}</h2>
+                      <p>{{ item.description }}</p>
+                    </div>
+                  </article>
+                </a-space>
+
+                <a-typography-paragraph
+                  v-if="accessNotice"
+                  class="portal-hero__notice"
+                >
+                  {{ accessNotice }}
+                </a-typography-paragraph>
+              </div>
+            </a-col>
+
+            <a-col
+              :xs="0"
+              :lg="12"
+            >
+              <a-card
+                :bordered="false"
+                class="portal-hero__card"
+                :body-style="{ padding: '0px' }"
               >
-            </div>
-          </div>
+                <img
+                  :src="heroImageUrl"
+                  alt="律师事务所接待办公空间"
+                  class="portal-hero__image"
+                >
+              </a-card>
+            </a-col>
+          </a-row>
         </section>
 
         <section
           id="portal-features"
-          class="portal-tools"
+          class="portal-section portal-section--tools"
         >
           <div class="portal-section-head">
-            <h2>数字化法律工具集</h2>
+            <a-typography-title
+              :level="2"
+              class="portal-section-head__title"
+            >
+              数字化法律工具集
+            </a-typography-title>
             <span class="portal-section-head__line" />
           </div>
 
-          <div class="portal-tools__grid">
-            <article
+          <a-row
+            :gutter="[1, 1]"
+            class="portal-tools__grid"
+          >
+            <a-col
               v-for="feature in featureCards"
               :key="feature.title"
-              class="portal-tool-card"
+              :xs="24"
+              :sm="12"
+              :lg="6"
             >
-              <div class="portal-tool-card__icon">
-                <component :is="feature.icon" />
-              </div>
-              <h3>{{ feature.title }}</h3>
-              <p>{{ feature.description }}</p>
-            </article>
-          </div>
+              <a-card
+                :bordered="false"
+                class="portal-tool-card"
+              >
+                <div class="portal-tool-card__icon">
+                  <component :is="feature.icon" />
+                </div>
+                <a-typography-title
+                  :level="4"
+                  class="portal-tool-card__title"
+                >
+                  {{ feature.title }}
+                </a-typography-title>
+                <a-typography-paragraph class="portal-tool-card__description">
+                  {{ feature.description }}
+                </a-typography-paragraph>
+              </a-card>
+            </a-col>
+          </a-row>
         </section>
 
-        <section class="portal-security">
-          <div class="portal-security__badge">
-            <SafetyCertificateOutlined />
-            <span>Security Protocol Active</span>
-          </div>
+        <section class="portal-section portal-section--security">
+          <div class="portal-security">
+            <div class="portal-security__badge">
+              <SafetyCertificateOutlined />
+              <span>Security Protocol Active</span>
+            </div>
 
-          <h2>金融级安全与数据隐私保护</h2>
-
-          <div class="portal-security__grid">
-            <article
-              v-for="item in securityCards"
-              :key="item.title"
-              class="portal-security__item"
+            <a-typography-title
+              :level="2"
+              class="portal-security__title"
             >
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.description }}</p>
-            </article>
+              金融级安全与数据隐私保护
+            </a-typography-title>
+
+            <a-row
+              :gutter="[26, 26]"
+              class="portal-security__grid"
+            >
+              <a-col
+                v-for="item in securityCards"
+                :key="item.title"
+                :xs="24"
+                :md="8"
+              >
+                <div class="portal-security__item">
+                  <a-typography-title
+                    :level="4"
+                    class="portal-security__item-title"
+                  >
+                    {{ item.title }}
+                  </a-typography-title>
+                  <a-typography-paragraph class="portal-security__item-description">
+                    {{ item.description }}
+                  </a-typography-paragraph>
+                </div>
+              </a-col>
+            </a-row>
           </div>
         </section>
-      </main>
+      </a-layout-content>
 
-      <footer class="portal-footer">
+      <a-layout-footer class="portal-footer">
         <div class="portal-footer__meta">
           <span>{{ copyrightText }}</span>
           <span v-if="icpText">{{ icpText }}</span>
         </div>
 
-        <div class="portal-footer__links">
+        <a-space
+          :size="16"
+          class="portal-footer__links"
+        >
           <a
             href="#portal-features"
             aria-label="查看服务条款"
@@ -131,9 +203,9 @@
             href="#portal-features"
             aria-label="查看隐私政策"
           >隐私政策</a>
-        </div>
-      </footer>
-    </div>
+        </a-space>
+      </a-layout-footer>
+    </a-layout>
   </div>
 </template>
 
@@ -294,7 +366,6 @@ function goToAdminLogin() {
 .portal-shell {
   width: min(100%, 1450px);
   margin: 0 auto;
-  border: 1px solid rgba(15, 23, 42, 0.18);
   overflow: hidden;
   background: #f8fafc;
   box-shadow: 0 30px 80px rgba(15, 23, 42, 0.24);
@@ -304,7 +375,9 @@ function goToAdminLogin() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: auto;
   padding: 22px 28px;
+  line-height: normal;
   background: #f8fafc;
 }
 
@@ -342,32 +415,25 @@ function goToAdminLogin() {
   justify-content: center;
   width: 30px;
   height: 30px;
-  border: none;
-  background: transparent;
   color: #5b6f91;
-  cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.portal-login:hover {
-  color: var(--lex-primary);
-  transform: scale(1.04);
+.portal-section {
+  padding: 0 28px;
 }
 
-.portal-hero {
-  display: grid;
-  grid-template-columns: 1fr 500px;
-  gap: 56px;
-  align-items: center;
-  padding: 48px 28px 64px;
+.portal-section--hero {
+  padding-top: 48px;
+  padding-bottom: 64px;
 }
 
 .portal-hero__copy {
   max-width: 680px;
 }
 
+.portal-hero__title:deep(.ant-typography),
 .portal-hero__title {
-  margin: 0;
+  margin-bottom: 0;
   color: var(--lex-primary);
   font-size: clamp(28px, 4vw, 58px);
   font-weight: 800;
@@ -376,7 +442,8 @@ function goToAdminLogin() {
 }
 
 .portal-hero__eyebrow {
-  margin: 14px 0 0;
+  display: block;
+  margin-top: 14px;
   color: #5d7090;
   font-size: 14px;
   font-weight: 700;
@@ -385,8 +452,7 @@ function goToAdminLogin() {
 }
 
 .portal-hero__feature-list {
-  display: grid;
-  gap: 18px;
+  width: 100%;
   margin-top: 34px;
 }
 
@@ -407,11 +473,10 @@ function goToAdminLogin() {
 }
 
 .hero-highlight h2,
-.portal-tool-card h3,
-.portal-security__item h3 {
+.portal-tool-card__title,
+.portal-security__item-title {
   margin: 0;
   color: #0f2749;
-  font-size: 23px;
   font-weight: 700;
   line-height: 1.35;
 }
@@ -421,8 +486,8 @@ function goToAdminLogin() {
 }
 
 .hero-highlight p,
-.portal-tool-card p,
-.portal-security__item p,
+.portal-tool-card__description,
+.portal-security__item-description,
 .portal-hero__notice,
 .portal-footer span,
 .portal-footer a {
@@ -434,30 +499,26 @@ function goToAdminLogin() {
 
 .portal-hero__notice {
   margin-top: 28px;
+  margin-bottom: 0;
   max-width: 650px;
   font-size: 14px;
 }
 
-.portal-hero__visual {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.portal-hero__image-frame {
-  width: 100%;
-  aspect-ratio: 1.18 / 0.9;
+.portal-hero__card {
   overflow: hidden;
   background: #d9dee6;
 }
 
 .portal-hero__image {
+  display: block;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1.18 / 0.9;
   object-fit: cover;
 }
 
-.portal-tools {
-  padding: 54px 28px 56px;
+.portal-section--tools {
+  padding-top: 54px;
+  padding-bottom: 56px;
   background: #f2f4f7;
 }
 
@@ -465,8 +526,9 @@ function goToAdminLogin() {
   margin-bottom: 28px;
 }
 
-.portal-section-head h2 {
-  margin: 0;
+.portal-section-head__title,
+.portal-security__title {
+  margin-bottom: 0;
   color: var(--lex-primary);
   font-size: 38px;
   font-weight: 800;
@@ -482,17 +544,19 @@ function goToAdminLogin() {
 }
 
 .portal-tools__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
   background: #d8e0ea;
-  border: 1px solid #d8e0ea;
 }
 
 .portal-tool-card {
   min-height: 220px;
-  padding: 24px 22px;
+  height: 100%;
+  border-radius: 0;
   background: #fff;
+}
+
+.portal-tool-card :deep(.ant-card-body) {
+  height: 100%;
+  padding: 24px 22px;
 }
 
 .portal-tool-card__icon {
@@ -504,21 +568,26 @@ function goToAdminLogin() {
   font-size: 18px;
 }
 
-.portal-tool-card h3 {
+.portal-tool-card__title {
   font-size: 18px;
 }
 
-.portal-tool-card p {
+.portal-tool-card__description {
   margin-top: 14px;
+  margin-bottom: 0;
   font-size: 14px;
+}
+
+.portal-section--security {
+  padding-top: 48px;
+  padding-bottom: 54px;
+  background: #123a7a;
 }
 
 .portal-security {
   display: grid;
   justify-items: center;
   gap: 22px;
-  padding: 48px 28px 54px;
-  background: #123a7a;
   text-align: center;
 }
 
@@ -536,32 +605,27 @@ function goToAdminLogin() {
   text-transform: uppercase;
 }
 
-.portal-security h2 {
-  margin: 0;
-  color: #ffffff;
+.portal-security__title {
+  color: #fff;
   font-size: 32px;
-  font-weight: 800;
 }
 
 .portal-security__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 26px;
-  max-width: 980px;
-  width: 100%;
+  width: min(100%, 980px);
 }
 
-.portal-security__item h3,
-.portal-security__item p {
-  color: #ffffff;
+.portal-security__item-title,
+.portal-security__item-description {
+  color: #fff;
 }
 
-.portal-security__item h3 {
+.portal-security__item-title {
   font-size: 18px;
 }
 
-.portal-security__item p {
+.portal-security__item-description {
   margin-top: 10px;
+  margin-bottom: 0;
   color: rgba(233, 241, 255, 0.74);
   font-size: 14px;
 }
@@ -575,11 +639,14 @@ function goToAdminLogin() {
   background: #f8fafc;
 }
 
-.portal-footer__meta,
-.portal-footer__links {
+.portal-footer__meta {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.portal-footer__links {
+  display: inline-flex;
 }
 
 .portal-footer span,
@@ -593,31 +660,12 @@ function goToAdminLogin() {
   color: var(--lex-primary);
 }
 
-@media (max-width: 1180px) {
-  .portal-hero {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-
-  .portal-hero__copy {
-    max-width: 100%;
-  }
-
-  .portal-hero__visual {
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 900px) {
-  .portal-tools__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .portal-tool-card h3 {
+@media (max-width: 991px) {
+  .portal-tool-card__title {
     font-size: 16px;
   }
 
-  .portal-tool-card p {
+  .portal-tool-card__description {
     font-size: 13px;
   }
 }
@@ -627,54 +675,33 @@ function goToAdminLogin() {
     padding: 0;
   }
 
-  .portal-shell {
-    border: none;
-  }
-
+  .portal-section,
   .portal-header,
-  .portal-hero,
-  .portal-tools,
-  .portal-security,
   .portal-footer {
     padding-left: 18px;
     padding-right: 18px;
   }
 
-  .portal-hero {
-    grid-template-columns: 1fr;
+  .portal-section--hero {
     padding-top: 24px;
     padding-bottom: 40px;
-  }
-
-  .portal-hero__visual {
-    display: none;
-  }
-
-  .portal-hero__title {
-    font-size: 32px;
   }
 
   .hero-highlight h2 {
     font-size: 18px;
   }
 
-  .portal-section-head h2,
-  .portal-security h2 {
+  .portal-section-head__title,
+  .portal-security__title {
     font-size: 24px;
-  }
-
-  .portal-tools__grid,
-  .portal-security__grid {
-    grid-template-columns: 1fr;
   }
 
   .portal-tool-card {
     min-height: 180px;
-    padding: 20px 18px;
   }
 
-  .portal-tool-card h3 {
-    font-size: 16px;
+  .portal-tool-card :deep(.ant-card-body) {
+    padding: 20px 18px;
   }
 
   .portal-footer {

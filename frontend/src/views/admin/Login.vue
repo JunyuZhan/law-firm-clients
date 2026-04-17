@@ -1,179 +1,228 @@
 <template>
   <div class="login-page">
-    <section class="login-shell">
-      <div class="brand-panel">
-        <div class="brand-topline">
-          <div class="logo-shell">
-            <img
-              v-if="appConfigStore.logoUrl"
-              :src="appConfigStore.logoUrl"
-              alt="Logo"
-              class="logo-image"
-            >
-            <svg
-              v-else
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              aria-hidden="true"
-              class="logo-fallback"
-            >
-              <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
-              <path d="M12 12L20 7.5" />
-              <path d="M12 12V21" />
-              <path d="M12 12L4 7.5" />
-            </svg>
-          </div>
-
-          <div class="brand-lockup">
-            <p class="brand-label">
-              {{ organizationName || '律师事务所' }}
-            </p>
-            <p class="brand-heading">
-              {{ UI_TEXTS.loginTitle }}
-            </p>
-          </div>
-        </div>
-
-        <div class="brand-copy">
-          <p class="brand-kicker">
-            Administrator Access
-          </p>
-          <h1 class="form-title">
-            {{ appSlogan }}
-          </h1>
-          <p class="form-subtitle">
-            管理员通过本入口进入系统后台，统一处理客户协作、案件流转、通知记录与平台配置。
-          </p>
-        </div>
-
-        <div class="brand-points">
-          <article class="brand-point">
-            <div>
-              <h2>管理员受控入口</h2>
-              <p>仅向已授权的系统管理员开放，所有登录行为均纳入身份校验与权限边界控制。</p>
-            </div>
-          </article>
-          <article class="brand-point">
-            <div>
-              <h2>统一资料治理</h2>
-              <p>案件、文书、通知与客户协作信息在统一后台中维护，保持数据口径与操作秩序一致。</p>
-            </div>
-          </article>
-        </div>
-      </div>
-
-      <div class="form-panel">
-        <div class="form-panel-head">
-          <p class="form-eyebrow">
-            管理端登录
-          </p>
-          <h2>进入工作台</h2>
-          <p>请使用已分配的账户信息完成身份校验后进入管理后台。</p>
-        </div>
-
-        <a-form
-          :model="form"
-          :rules="rules"
-          class="login-form"
-          @finish="handleLogin"
+    <a-layout class="login-shell">
+      <a-layout-content class="login-content">
+        <a-row
+          class="login-grid"
+          :gutter="[0, 0]"
         >
-          <a-form-item name="username">
-            <a-input
-              v-model:value="form.username"
-              size="large"
-              :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
-              class="login-input"
-            >
-              <template #prefix>
-                <UserOutlined class="input-icon" />
-              </template>
-            </a-input>
-          </a-form-item>
-
-          <a-form-item name="password">
-            <a-input-password
-              v-model:value="form.password"
-              size="large"
-              :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
-              class="login-input"
-              @press-enter="handleLogin"
-            >
-              <template #prefix>
-                <LockOutlined class="input-icon" />
-              </template>
-            </a-input-password>
-          </a-form-item>
-
-          <a-form-item name="captchaText">
-            <div class="captcha-row">
-              <a-input
-                v-model:value="form.captchaText"
-                size="large"
-                :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
-                class="login-input captcha-input"
-                @press-enter="handleLogin"
-              />
-              <button
-                type="button"
-                class="captcha-image"
-                @click="refreshCaptcha"
-              >
-                <img
-                  v-if="captchaImage"
-                  :src="captchaImage"
-                  alt="验证码"
-                >
-                <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
-              </button>
-            </div>
-          </a-form-item>
-
-          <a-form-item>
-            <a-button
-              type="primary"
-              html-type="submit"
-              size="large"
-              :loading="loading"
-              block
-              class="login-button"
-            >
-              {{ UI_TEXTS.loginButton }}
-            </a-button>
-          </a-form-item>
-        </a-form>
-
-        <a-alert
-          v-if="errorMessage"
-          :message="errorMessage"
-          type="error"
-          show-icon
-          class="error-alert"
-        />
-
-        <div class="form-footer">
-          <p v-if="footerCopyright">
-            {{ footerCopyright }}
-          </p>
-          <p v-else>
-            © {{ currentYear }} {{ organizationName }}
-          </p>
-          <p
-            v-if="appConfigStore.icpLicense"
-            class="icp-link"
+          <a-col
+            :xs="24"
+            :lg="14"
+            class="brand-panel"
           >
-            <a
-              href="https://beian.miit.gov.cn/"
-              target="_blank"
-              rel="noopener"
+            <div class="brand-topline">
+              <div class="logo-shell">
+                <img
+                  v-if="appConfigStore.logoUrl"
+                  :src="appConfigStore.logoUrl"
+                  alt="Logo"
+                  class="logo-image"
+                >
+                <svg
+                  v-else
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  aria-hidden="true"
+                  class="logo-fallback"
+                >
+                  <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
+                  <path d="M12 12L20 7.5" />
+                  <path d="M12 12V21" />
+                  <path d="M12 12L4 7.5" />
+                </svg>
+              </div>
+
+              <div class="brand-lockup">
+                <a-typography-text class="brand-label">
+                  {{ organizationName || '律师事务所' }}
+                </a-typography-text>
+                <a-typography-text class="brand-heading">
+                  {{ UI_TEXTS.loginTitle }}
+                </a-typography-text>
+              </div>
+            </div>
+
+            <div class="brand-copy">
+              <a-typography-text class="brand-kicker">
+                Administrator Access
+              </a-typography-text>
+              <a-typography-title
+                :level="1"
+                class="form-title"
+              >
+                {{ appSlogan }}
+              </a-typography-title>
+              <a-typography-paragraph class="form-subtitle">
+                管理员通过本入口进入系统后台，统一处理客户协作、案件流转、通知记录与平台配置。
+              </a-typography-paragraph>
+            </div>
+
+            <a-space
+              direction="vertical"
+              :size="18"
+              class="brand-points"
             >
-              {{ appConfigStore.icpLicense }}
-            </a>
-          </p>
-        </div>
-      </div>
-    </section>
+              <article class="brand-point">
+                <div>
+                  <a-typography-title
+                    :level="4"
+                    class="brand-point__title"
+                  >
+                    管理员受控入口
+                  </a-typography-title>
+                  <a-typography-paragraph class="brand-point__description">
+                    仅向已授权的系统管理员开放，所有登录行为均纳入身份校验与权限边界控制。
+                  </a-typography-paragraph>
+                </div>
+              </article>
+
+              <article class="brand-point">
+                <div>
+                  <a-typography-title
+                    :level="4"
+                    class="brand-point__title"
+                  >
+                    统一资料治理
+                  </a-typography-title>
+                  <a-typography-paragraph class="brand-point__description">
+                    案件、文书、通知与客户协作信息在统一后台中维护，保持数据口径与操作秩序一致。
+                  </a-typography-paragraph>
+                </div>
+              </article>
+            </a-space>
+          </a-col>
+
+          <a-col
+            :xs="24"
+            :lg="10"
+            class="form-panel-wrap"
+          >
+            <a-card
+              :bordered="false"
+              class="form-panel"
+            >
+              <div class="form-panel-head">
+                <a-typography-text class="form-eyebrow">
+                  管理端登录
+                </a-typography-text>
+                <a-typography-title
+                  :level="2"
+                  class="form-panel-head__title"
+                >
+                  进入工作台
+                </a-typography-title>
+                <a-typography-paragraph class="form-panel-head__desc">
+                  请使用已分配的账户信息完成身份校验后进入管理后台。
+                </a-typography-paragraph>
+              </div>
+
+              <a-form
+                :model="form"
+                :rules="rules"
+                class="login-form"
+                @finish="handleLogin"
+              >
+                <a-form-item name="username">
+                  <a-input
+                    v-model:value="form.username"
+                    size="large"
+                    :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
+                    class="login-input"
+                  >
+                    <template #prefix>
+                      <UserOutlined class="input-icon" />
+                    </template>
+                  </a-input>
+                </a-form-item>
+
+                <a-form-item name="password">
+                  <a-input-password
+                    v-model:value="form.password"
+                    size="large"
+                    :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
+                    class="login-input"
+                    @press-enter="handleLogin"
+                  >
+                    <template #prefix>
+                      <LockOutlined class="input-icon" />
+                    </template>
+                  </a-input-password>
+                </a-form-item>
+
+                <a-form-item name="captchaText">
+                  <div class="captcha-row">
+                    <a-input
+                      v-model:value="form.captchaText"
+                      size="large"
+                      :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
+                      class="login-input captcha-input"
+                      @press-enter="handleLogin"
+                    />
+                    <button
+                      type="button"
+                      class="captcha-image"
+                      @click="refreshCaptcha"
+                    >
+                      <img
+                        v-if="captchaImage"
+                        :src="captchaImage"
+                        alt="验证码"
+                      >
+                      <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
+                    </button>
+                  </div>
+                </a-form-item>
+
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    html-type="submit"
+                    size="large"
+                    :loading="loading"
+                    block
+                    class="login-button"
+                  >
+                    {{ UI_TEXTS.loginButton }}
+                  </a-button>
+                </a-form-item>
+              </a-form>
+
+              <a-alert
+                v-if="errorMessage"
+                :message="errorMessage"
+                type="error"
+                show-icon
+                class="error-alert"
+              />
+
+              <div class="form-footer">
+                <p v-if="footerCopyright">
+                  {{ footerCopyright }}
+                </p>
+                <p v-else>
+                  © {{ currentYear }} {{ organizationName }}
+                </p>
+                <p
+                  v-if="appConfigStore.icpLicense"
+                  class="icp-link"
+                >
+                  <a
+                    href="https://beian.miit.gov.cn/"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {{ appConfigStore.icpLicense }}
+                  </a>
+                </p>
+              </div>
+            </a-card>
+          </a-col>
+        </a-row>
+      </a-layout-content>
+    </a-layout>
   </div>
 </template>
 
@@ -211,13 +260,7 @@ const footerCopyright = computed(() => {
     return normalized.join(' ')
   }
 
-  const dedupedLines = normalized.filter((line, index) => {
-    if (index === 0 && line === orgName) {
-      return false
-    }
-    return true
-  })
-
+  const dedupedLines = normalized.filter((line, index) => !(index === 0 && line === orgName))
   return dedupedLines.join(' ')
 })
 
@@ -317,8 +360,6 @@ onMounted(() => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
   padding: 32px;
   background:
     radial-gradient(circle at top left, rgba(27, 59, 95, 0.12), transparent 32%),
@@ -326,10 +367,19 @@ onMounted(() => {
 }
 
 .login-shell {
+  min-height: calc(100vh - 64px);
+  background: transparent;
+}
+
+.login-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-grid {
   width: min(1120px, 100%);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(380px, 430px);
-  border: 1px solid rgba(16, 42, 67, 0.08);
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.88);
   box-shadow: 0 24px 60px rgba(16, 42, 67, 0.08);
   backdrop-filter: blur(18px);
@@ -359,11 +409,11 @@ onMounted(() => {
 }
 
 .logo-shell {
-  width: 62px;
-  height: 62px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 62px;
+  height: 62px;
   flex-shrink: 0;
   border-radius: 16px;
   border: 1px solid rgba(16, 42, 67, 0.12);
@@ -383,8 +433,13 @@ onMounted(() => {
   max-width: 520px;
 }
 
+.brand-label,
+.brand-heading,
+.brand-kicker {
+  margin-bottom: 0;
+}
+
 .brand-label {
-  margin: 0;
   color: #1b3b5f;
   font-size: 12px;
   font-weight: 700;
@@ -393,7 +448,6 @@ onMounted(() => {
 }
 
 .brand-heading {
-  margin: 0;
   color: #486581;
   font-size: 14px;
   font-weight: 600;
@@ -401,7 +455,6 @@ onMounted(() => {
 }
 
 .brand-kicker {
-  margin: 0;
   color: rgba(72, 101, 129, 0.82);
   font-size: 12px;
   letter-spacing: 0.22em;
@@ -409,7 +462,7 @@ onMounted(() => {
 }
 
 .form-title {
-  margin: 0;
+  margin-bottom: 0;
   font-family: 'EB Garamond', 'STSong', 'Songti SC', serif;
   font-size: clamp(54px, 6vw, 82px);
   font-weight: 600;
@@ -419,7 +472,7 @@ onMounted(() => {
 }
 
 .form-subtitle {
-  margin: 0;
+  margin-bottom: 0;
   max-width: 460px;
   font-size: 16px;
   color: #627d98;
@@ -427,41 +480,46 @@ onMounted(() => {
 }
 
 .brand-points {
-  display: grid;
-  gap: 18px;
+  width: 100%;
   max-width: 520px;
   margin-top: auto;
 }
 
 .brand-point {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0;
-  align-items: start;
   padding-top: 18px;
   border-top: 1px solid rgba(16, 42, 67, 0.08);
 }
 
-.brand-point h2 {
-  margin: 0 0 8px;
+.brand-point__title {
+  margin-bottom: 8px;
   color: #102a43;
   font-size: 17px;
   font-weight: 600;
 }
 
-.brand-point p {
-  margin: 0;
+.brand-point__description {
+  margin-bottom: 0;
   color: #627d98;
   font-size: 14px;
   line-height: 1.8;
 }
 
+.form-panel-wrap {
+  display: flex;
+}
+
 .form-panel {
+  width: 100%;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.form-panel :deep(.ant-card-body) {
   display: grid;
   align-content: center;
   gap: 28px;
+  min-height: 100%;
   padding: 56px 44px;
-  background: rgba(255, 255, 255, 0.98);
 }
 
 .form-panel-head {
@@ -470,7 +528,6 @@ onMounted(() => {
 }
 
 .form-eyebrow {
-  margin: 0;
   color: #486581;
   font-size: 12px;
   font-weight: 700;
@@ -478,8 +535,8 @@ onMounted(() => {
   text-transform: uppercase;
 }
 
-.form-panel-head h2 {
-  margin: 0;
+.form-panel-head__title {
+  margin-bottom: 0;
   color: #102a43;
   font-family: 'EB Garamond', 'STSong', 'Songti SC', serif;
   font-size: 34px;
@@ -488,8 +545,8 @@ onMounted(() => {
   letter-spacing: -0.03em;
 }
 
-.form-panel-head p {
-  margin: 0;
+.form-panel-head__desc {
+  margin-bottom: 0;
   color: #627d98;
   font-size: 14px;
   line-height: 1.8;
@@ -583,11 +640,7 @@ onMounted(() => {
   text-decoration: none;
 }
 
-@media (max-width: 960px) {
-  .login-shell {
-    grid-template-columns: 1fr;
-  }
-
+@media (max-width: 991px) {
   .brand-panel {
     min-height: auto;
     padding: 40px 28px 32px;
@@ -595,7 +648,7 @@ onMounted(() => {
     border-bottom: 1px solid rgba(16, 42, 67, 0.08);
   }
 
-  .form-panel {
+  .form-panel :deep(.ant-card-body) {
     padding: 36px 28px 32px;
   }
 }
@@ -605,8 +658,11 @@ onMounted(() => {
     padding: 16px;
   }
 
-  .brand-panel,
-  .form-panel {
+  .brand-panel {
+    padding-inline: 20px;
+  }
+
+  .form-panel :deep(.ant-card-body) {
     padding-inline: 20px;
   }
 
@@ -630,10 +686,6 @@ onMounted(() => {
 
   .captcha-image {
     min-height: 48px;
-  }
-
-  .form-title {
-    font-size: 40px;
   }
 }
 </style>
