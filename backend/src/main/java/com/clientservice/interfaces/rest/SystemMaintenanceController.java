@@ -2,6 +2,7 @@ package com.clientservice.interfaces.rest;
 
 import com.clientservice.common.result.Result;
 import com.clientservice.application.service.AdminAuthorizationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.nio.file.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,8 +42,9 @@ public class SystemMaintenanceController {
     private final JdbcTemplate jdbcTemplate;
     private final RestTemplate restTemplate;
     private final AdminAuthorizationService adminAuthorizationService;
+    private final ObjectMapper objectMapper;
 
-    @Value("${file.storage.path:/data/client-service/files}")
+    @Value("${client-service.file.storage.local.path:/data/client-service/files}")
     private String fileStoragePath;
 
     @Value("${client-service.backup.directory:/tmp/client-service-backups}")
@@ -56,6 +62,12 @@ public class SystemMaintenanceController {
 
     @Value("${app.version.github-repo:}")
     private String githubRepo;  // 格式: owner/repo
+
+    @Value("${app.version.dist-center.project:law-firm-clients}")
+    private String distCenterProject;
+
+    @Value("${app.version.dist-center.latest-file:}")
+    private String distCenterLatestFile;
 
     /**
      * 获取系统状态
@@ -399,15 +411,7 @@ public class SystemMaintenanceController {
                 List<String> values = new ArrayList<>();
                 for (String col : columns) {
                     Object val = row.get(col);
-                    if (val == null) {
-                        values.add("NULL");
-                    } else if (val instanceof String) {
-                        values.add("'" + ((String) val).replace("'", "''") + "'");
-                    } else if (val instanceof Boolean) {
-                        values.add((Boolean) val ? "true" : "false");
-                    } else {
-                        values.add(val.toString());
-                    }
+                    values.add(toSqlLiteral(val));
                 }
                 sb.append(String.join(", ", values));
                 sb.append(") ON CONFLICT DO NOTHING;\n");
@@ -418,6 +422,78 @@ public class SystemMaintenanceController {
         }
         
         return sb.toString();
+    }
+
+    private String toSqlLiteral(Object value) {
+        if (value == null) {
+            return "NULL";
+        }
+        if (value instanceof String stringValue) {
+            return quoteSqlString(stringValue);
+        }
+        if (value instanceof Boolean boolValue) {
+            return boolValue ? "true" : "false";
+        }
+        if (value instanceof Number) {
+            return value.toString();
+        }
+        if (isPostgresObject(value)) {
+            return formatPostgresObject(value);
+        }
+        if (value instanceof Timestamp timestamp) {
+            return quoteSqlString(timestamp.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+        if (value instanceof LocalDateTime localDateTime) {
+            return quoteSqlString(localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        }
+        if (value instanceof OffsetDateTime offsetDateTime) {
+            return quoteSqlString(offsetDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        }
+        if (value instanceof LocalDate localDate) {
+            return quoteSqlString(localDate.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        }
+        if (value instanceof TemporalAccessor temporalAccessor) {
+            return quoteSqlString(DateTimeFormatter.ISO_DATE_TIME.format(temporalAccessor));
+        }
+        if (value instanceof Map || value instanceof List) {
+            try {
+                return quoteSqlString(objectMapper.writeValueAsString(value));
+            } catch (Exception e) {
+                log.warn("JSON 序列化失败，退回字符串导出: valueType={}", value.getClass().getName(), e);
+                return quoteSqlString(value.toString());
+            }
+        }
+        return quoteSqlString(value.toString());
+    }
+
+    private String formatPostgresObject(Object value) {
+        String raw = invokePgGetter(value, "getValue");
+        if (raw == null) {
+            return "NULL";
+        }
+        String type = invokePgGetter(value, "getType");
+        if ("json".equalsIgnoreCase(type) || "jsonb".equalsIgnoreCase(type)) {
+            return quoteSqlString(raw) + "::" + type.toLowerCase(Locale.ROOT);
+        }
+        return quoteSqlString(raw);
+    }
+
+    private String quoteSqlString(String value) {
+        return "'" + value.replace("'", "''") + "'";
+    }
+
+    private boolean isPostgresObject(Object value) {
+        return value != null && "org.postgresql.util.PGobject".equals(value.getClass().getName());
+    }
+
+    private String invokePgGetter(Object value, String methodName) {
+        try {
+            Object result = value.getClass().getMethod(methodName).invoke(value);
+            return result != null ? result.toString() : null;
+        } catch (Exception e) {
+            log.warn("读取 PostgreSQL 扩展对象失败: type={}, method={}", value.getClass().getName(), methodName, e);
+            return null;
+        }
     }
 
     // ==================== 版本信息与升级 API ====================
@@ -433,19 +509,9 @@ public class SystemMaintenanceController {
         
         // 当前版本
         result.put("currentVersion", currentVersion);
-        
-        // 检查 GitHub 仓库配置
-        if (githubRepo == null || githubRepo.isEmpty()) {
-            result.put("error", "未配置 GitHub 仓库（APP_VERSION_GITHUB_REPO）");
-            result.put("lastCheckTime", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")));
-            return Result.success(result);
-        }
-        
-        result.put("githubRepo", githubRepo);
-        
+
         try {
-            // 从 GitHub 获取最新版本
-            Map<String, Object> latestVersion = fetchFromGitHub(githubRepo);
+            Map<String, Object> latestVersion = fetchLatestVersion();
             
             if (latestVersion != null) {
                 String remoteVersion = (String) latestVersion.get("version");
@@ -453,6 +519,15 @@ public class SystemMaintenanceController {
                 result.put("releaseUrl", latestVersion.get("releaseUrl"));
                 result.put("releaseNotes", latestVersion.get("releaseNotes"));
                 result.put("publishedAt", latestVersion.get("publishedAt"));
+                result.put("versionSource", latestVersion.get("source"));
+                if (latestVersion.get("project") != null) {
+                    result.put("distCenterProject", latestVersion.get("project"));
+                }
+                if (latestVersion.get("githubRepo") != null) {
+                    result.put("githubRepo", latestVersion.get("githubRepo"));
+                } else if (githubRepo != null && !githubRepo.isEmpty()) {
+                    result.put("githubRepo", githubRepo);
+                }
                 
                 // 比较版本
                 if (remoteVersion != null) {
@@ -469,7 +544,7 @@ public class SystemMaintenanceController {
             } else {
                 result.put("remoteVersion", "无法获取");
                 result.put("hasUpdate", false);
-                result.put("error", "无法从 GitHub 获取版本信息");
+                result.put("error", "无法获取最新版本信息");
             }
         } catch (Exception e) {
             log.error("获取版本信息失败", e);
@@ -654,7 +729,16 @@ public class SystemMaintenanceController {
     private Map<String, Object> fetchLatestVersion() {
         // 优先使用自定义 URL
         if (versionCheckUrl != null && !versionCheckUrl.isEmpty()) {
-            return fetchFromCustomUrl(versionCheckUrl);
+            Map<String, Object> remoteLatest = fetchFromCustomUrl(versionCheckUrl);
+            if (remoteLatest != null) {
+                return remoteLatest;
+            }
+        }
+
+        // 开发环境兜底：读取同级 Dist Center latest.json
+        Map<String, Object> localLatest = fetchFromDistCenter();
+        if (localLatest != null) {
+            return localLatest;
         }
         
         // 使用 GitHub Release API
@@ -662,6 +746,138 @@ public class SystemMaintenanceController {
             return fetchFromGitHub(githubRepo);
         }
         
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> fetchFromDistCenter() {
+        Path latestFile = resolveDistCenterLatestFile();
+        if (latestFile == null) {
+            return null;
+        }
+
+        try {
+            if (!Files.exists(latestFile) || !Files.isRegularFile(latestFile)) {
+                log.info("Dist Center 版本文件不存在: {}", latestFile);
+                return null;
+            }
+
+            Map<String, Object> raw = objectMapper.readValue(latestFile.toFile(), Map.class);
+            if (raw == null || raw.isEmpty()) {
+                return null;
+            }
+
+            Map<String, Object> result = new LinkedHashMap<>();
+            String version = selectDistCenterVersion(raw);
+
+            result.put("version", version);
+            result.put("releaseNotes", buildDistCenterReleaseNotes(raw, latestFile));
+            result.put("releaseUrl", null);
+            result.put("publishedAt", formatLastModifiedTime(latestFile));
+            result.put("source", "dist-center");
+            result.put("project", firstNonBlank(asString(raw.get("project")), distCenterProject));
+            result.put("distCenterFile", latestFile.toAbsolutePath().normalize().toString());
+            return result;
+        } catch (Exception e) {
+            log.warn("读取 Dist Center 版本文件失败: path={}, error={}", latestFile, e.getMessage());
+            return null;
+        }
+    }
+
+    private Path resolveDistCenterLatestFile() {
+        if (distCenterLatestFile != null && !distCenterLatestFile.isBlank()) {
+            return Paths.get(distCenterLatestFile).toAbsolutePath().normalize();
+        }
+
+        String project = firstNonBlank(distCenterProject, "portal");
+        Path userDir = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath().normalize();
+        List<Path> candidates = List.of(
+                userDir.resolve("../dist-center/projects/" + project + "/versions/latest.json").normalize(),
+                userDir.resolve("../../dist-center/projects/" + project + "/versions/latest.json").normalize(),
+                userDir.resolve("dist-center/projects/" + project + "/versions/latest.json").normalize()
+        );
+
+        for (Path candidate : candidates) {
+            if (Files.exists(candidate)) {
+                return candidate;
+            }
+        }
+        return candidates.get(0);
+    }
+
+    private String buildDistCenterReleaseNotes(Map<String, Object> raw, Path latestFile) {
+        List<String> lines = new ArrayList<>();
+        lines.add("来源: Dist Center");
+
+        String project = asString(raw.get("project"));
+        if (project != null) {
+            lines.add("项目: " + project);
+        }
+
+        String bootstrapVersion = asString(raw.get("version"));
+        if (bootstrapVersion != null) {
+            lines.add("分发版本: " + bootstrapVersion);
+        }
+
+        String appVersion = asString(raw.get("app_version"));
+        if (appVersion != null) {
+            lines.add("应用版本: " + appVersion);
+        }
+
+        String installRoot = asString(raw.get("install_root"));
+        if (installRoot != null) {
+            lines.add("安装目录: " + installRoot);
+        }
+
+        Object assets = raw.get("assets");
+        if (assets instanceof List<?> assetList) {
+            lines.add("静态资源数: " + assetList.size());
+        }
+
+        Object archives = raw.get("archives");
+        if (archives instanceof List<?> archiveList) {
+            lines.add("归档包数: " + archiveList.size());
+        }
+
+        lines.add("版本文件: " + latestFile.toAbsolutePath().normalize());
+        return String.join("\n", lines);
+    }
+
+    private String selectDistCenterVersion(Map<String, Object> raw) {
+        String appVersion = asString(raw.get("app_version"));
+        if (appVersion != null && !"latest".equalsIgnoreCase(appVersion)) {
+            return appVersion;
+        }
+        return firstNonBlank(asString(raw.get("version")), appVersion);
+    }
+
+    private String formatLastModifiedTime(Path path) {
+        try {
+            return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(
+                    LocalDateTime.ofInstant(Files.getLastModifiedTime(path).toInstant(), java.time.ZoneId.systemDefault())
+            );
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private String asString(Object value) {
+        if (value == null) {
+            return null;
+        }
+        String text = String.valueOf(value).trim();
+        return text.isEmpty() ? null : text;
+    }
+
+    private String firstNonBlank(String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
         return null;
     }
 
@@ -684,7 +900,11 @@ public class SystemMaintenanceController {
                 log.warn("版本检查 URL 指向内网，已拒绝: {}", url);
                 return null;
             }
-            return restTemplate.getForObject(url, Map.class);
+            Map<String, Object> result = restTemplate.getForObject(url, Map.class);
+            if (result != null) {
+                result.putIfAbsent("source", "custom-url");
+            }
+            return result;
         } catch (Exception e) {
             log.warn("从自定义 URL 获取版本失败: {}", e.getMessage());
             return null;
@@ -751,8 +971,8 @@ public class SystemMaintenanceController {
      */
     private int parseVersionPart(String part) {
         try {
-            // 提取数字部分
-            Pattern pattern = Pattern.compile("^(\\d+)");
+            // 提取首个数字片段，兼容 bootstrap-20260418 等格式
+            Pattern pattern = Pattern.compile("(\\d+)");
             Matcher matcher = pattern.matcher(part);
             if (matcher.find()) {
                 return Integer.parseInt(matcher.group(1));

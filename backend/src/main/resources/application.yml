@@ -91,8 +91,14 @@ server:
 app:
   version: 1.0.0
   version-check:
-    # 自定义版本检查 URL（可选，返回 JSON: {"version": "x.x.x", "releaseNotes": "...", "releaseUrl": "..."}）
-    url: ${APP_VERSION_CHECK_URL:}
+    dist-center:
+      # 开发环境兜底读取同级目录 ../dist-center/projects/{project}/versions/latest.json
+      project: ${APP_VERSION_DIST_CENTER_PROJECT:law-firm-clients}
+      # 可选：直接指定 Dist Center latest.json 绝对路径
+      latest-file: ${APP_VERSION_DIST_CENTER_LATEST_FILE:}
+    # 软件正式运行时默认检查公网分发中心版本描述
+    # 返回 JSON: {"version": "x.x.x", "releaseNotes": "...", "releaseUrl": "..."}
+    url: ${APP_VERSION_CHECK_URL:https://install.albertzhan.top/projects/law-firm-clients/versions/latest.json}
     # GitHub 仓库（可选，格式: owner/repo，将从 GitHub Releases 获取最新版本）
     github-repo: ${APP_VERSION_GITHUB_REPO:}
 
