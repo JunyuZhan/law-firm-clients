@@ -57,7 +57,7 @@ class SystemMaintenanceControllerTest {
         ReflectionTestUtils.setField(systemMaintenanceController, "currentVersion", "1.0.0");
         ReflectionTestUtils.setField(systemMaintenanceController, "githubRepo", "test/repo");
         ReflectionTestUtils.setField(systemMaintenanceController, "backupDirectory", "/tmp/client-service-backups");
-        ReflectionTestUtils.setField(systemMaintenanceController, "distCenterProject", "portal");
+        ReflectionTestUtils.setField(systemMaintenanceController, "distCenterProject", "law-firm-clients");
         ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", "");
     }
 
@@ -209,10 +209,10 @@ class SystemMaintenanceControllerTest {
             Path tempFile = Files.createTempFile("dist-center-latest", ".json");
             Files.writeString(tempFile, """
                     {
-                      "project": "portal",
+                      "project": "law-firm-clients",
                       "version": "bootstrap-20260418",
                       "app_version": "latest",
-                      "install_root": "/opt/law-firm"
+                      "install_root": "/opt/law-firm-clients"
                     }
                     """);
             ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", tempFile.toString());
@@ -235,13 +235,13 @@ class SystemMaintenanceControllerTest {
             Path tempFile = Files.createTempFile("dist-center-latest", ".json");
             Files.writeString(tempFile, """
                     {
-                      "project": "portal",
+                      "project": "law-firm-clients",
                       "version": "bootstrap-20260418",
                       "app_version": "latest"
                     }
                     """);
             ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", tempFile.toString());
-            ReflectionTestUtils.setField(systemMaintenanceController, "versionCheckUrl", "https://install.albertzhan.top/projects/portal/versions/latest.json");
+            ReflectionTestUtils.setField(systemMaintenanceController, "versionCheckUrl", "https://install.albertzhan.top/projects/law-firm-clients/versions/latest.json");
             when(restTemplate.getForObject(anyString(), eq(Map.class))).thenThrow(new RuntimeException("network error"));
 
             Result<Map<String, Object>> result = systemMaintenanceController.checkVersion();
@@ -260,7 +260,7 @@ class SystemMaintenanceControllerTest {
             Path tempFile = Files.createTempFile("dist-center-latest", ".json");
             Files.writeString(tempFile, """
                     {
-                      "project": "portal",
+                      "project": "law-firm-clients",
                       "version": "bootstrap-20260418",
                       "app_version": "latest"
                     }
@@ -272,7 +272,7 @@ class SystemMaintenanceControllerTest {
             assertTrue(result.isSuccess());
             Map<String, Object> data = result.getData();
             assertEquals("dist-center", data.get("versionSource"));
-            assertEquals("portal", data.get("distCenterProject"));
+            assertEquals("law-firm-clients", data.get("distCenterProject"));
             assertEquals("bootstrap-20260418", data.get("remoteVersion"));
         }
         

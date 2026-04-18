@@ -789,7 +789,7 @@ public class SystemMaintenanceController {
             return Paths.get(distCenterLatestFile).toAbsolutePath().normalize();
         }
 
-        String project = firstNonBlank(distCenterProject, "portal");
+        String project = firstNonBlank(distCenterProject, "law-firm-clients");
         Path userDir = Paths.get(System.getProperty("user.dir", ".")).toAbsolutePath().normalize();
         List<Path> candidates = List.of(
                 userDir.resolve("../dist-center/projects/" + project + "/versions/latest.json").normalize(),
