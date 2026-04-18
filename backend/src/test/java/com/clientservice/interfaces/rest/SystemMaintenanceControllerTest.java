@@ -2,6 +2,11 @@ package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.service.AdminAuthorizationService;
 import com.clientservice.common.result.Result;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -38,6 +44,9 @@ class SystemMaintenanceControllerTest {
     @Mock
     private AdminAuthorizationService adminAuthorizationService;
 
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @InjectMocks
     private SystemMaintenanceController systemMaintenanceController;
 
@@ -48,6 +57,8 @@ class SystemMaintenanceControllerTest {
         ReflectionTestUtils.setField(systemMaintenanceController, "currentVersion", "1.0.0");
         ReflectionTestUtils.setField(systemMaintenanceController, "githubRepo", "test/repo");
         ReflectionTestUtils.setField(systemMaintenanceController, "backupDirectory", "/tmp/client-service-backups");
+        ReflectionTestUtils.setField(systemMaintenanceController, "distCenterProject", "portal");
+        ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", "");
     }
 
     @Nested
@@ -116,6 +127,28 @@ class SystemMaintenanceControllerTest {
             assertTrue((Boolean) data.get("success"));
             assertNotNull(data.get("filename"));
         }
+
+        @Test
+        @DisplayName("备份导出应正确序列化时间和JSON字段")
+        void createDatabaseBackup_ShouldSerializeTimestampAndJsonb() throws Exception {
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
+            Path tempDir = Files.createTempDirectory("backup-test");
+            ReflectionTestUtils.setField(systemMaintenanceController, "backupDirectory", tempDir.toString());
+
+            Map<String, Object> row = new HashMap<>();
+            row.put("created_at", Timestamp.valueOf(LocalDateTime.of(2026, 4, 17, 10, 30, 0)));
+            row.put("config_value", Map.of("enabled", true));
+
+            when(jdbcTemplate.queryForList(anyString())).thenReturn(java.util.List.of(row));
+
+            Result<Map<String, Object>> result = systemMaintenanceController.createDatabaseBackup();
+
+            assertTrue(result.isSuccess());
+            String filename = (String) result.getData().get("filename");
+            String sql = Files.readString(tempDir.resolve(filename));
+            assertTrue(sql.contains("'2026-04-17T10:30:00'"));
+            assertTrue(sql.contains("'{\"enabled\":true}'"));
+        }
     }
 
     @Nested
@@ -127,6 +160,7 @@ class SystemMaintenanceControllerTest {
         void getGitInfo_ShouldSuccess() {
             // Given
             doNothing().when(adminAuthorizationService).requireSuperAdmin();
+            ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", "/tmp/not-found-latest.json");
             Map<String, Object> releaseInfo = new HashMap<>();
             releaseInfo.put("tag_name", "v1.1.0");
             releaseInfo.put("body", "Release notes");
@@ -151,6 +185,7 @@ class SystemMaintenanceControllerTest {
         void checkVersion_ShouldReturnUpdateStatus() {
             // Given
             doNothing().when(adminAuthorizationService).requireSuperAdmin();
+            ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", "/tmp/not-found-latest.json");
             Map<String, Object> releaseInfo = new HashMap<>();
             releaseInfo.put("tag_name", "v1.1.0");
             
@@ -164,6 +199,81 @@ class SystemMaintenanceControllerTest {
             Map<String, Object> data = result.getData();
             assertEquals("1.1.0", data.get("latestVersion"));
             assertTrue((Boolean) data.get("hasUpdate"));
+        }
+
+        @Test
+        @DisplayName("版本检查应优先读取同级 Dist Center latest.json")
+        void checkVersion_ShouldPreferDistCenterLatestFile() throws Exception {
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
+
+            Path tempFile = Files.createTempFile("dist-center-latest", ".json");
+            Files.writeString(tempFile, """
+                    {
+                      "project": "portal",
+                      "version": "bootstrap-20260418",
+                      "app_version": "latest",
+                      "install_root": "/opt/law-firm"
+                    }
+                    """);
+            ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", tempFile.toString());
+
+            Result<Map<String, Object>> result = systemMaintenanceController.checkVersion();
+
+            assertTrue(result.isSuccess());
+            Map<String, Object> data = result.getData();
+            assertEquals("bootstrap-20260418", data.get("latestVersion"));
+            assertTrue((Boolean) data.get("hasUpdate"));
+            assertTrue(String.valueOf(data.get("releaseNotes")).contains("Dist Center"));
+            verify(restTemplate, never()).getForObject(anyString(), eq(Map.class));
+        }
+
+        @Test
+        @DisplayName("远端版本检查失败时应回退到同级 Dist Center latest.json")
+        void checkVersion_ShouldFallbackToDistCenterWhenRemoteUnavailable() throws Exception {
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
+
+            Path tempFile = Files.createTempFile("dist-center-latest", ".json");
+            Files.writeString(tempFile, """
+                    {
+                      "project": "portal",
+                      "version": "bootstrap-20260418",
+                      "app_version": "latest"
+                    }
+                    """);
+            ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", tempFile.toString());
+            ReflectionTestUtils.setField(systemMaintenanceController, "versionCheckUrl", "https://install.albertzhan.top/projects/portal/versions/latest.json");
+            when(restTemplate.getForObject(anyString(), eq(Map.class))).thenThrow(new RuntimeException("network error"));
+
+            Result<Map<String, Object>> result = systemMaintenanceController.checkVersion();
+
+            assertTrue(result.isSuccess());
+            Map<String, Object> data = result.getData();
+            assertEquals("bootstrap-20260418", data.get("latestVersion"));
+            assertTrue((Boolean) data.get("hasUpdate"));
+        }
+
+        @Test
+        @DisplayName("获取版本信息应返回 Dist Center 来源标识")
+        void getGitInfo_ShouldExposeDistCenterSource() throws Exception {
+            doNothing().when(adminAuthorizationService).requireSuperAdmin();
+
+            Path tempFile = Files.createTempFile("dist-center-latest", ".json");
+            Files.writeString(tempFile, """
+                    {
+                      "project": "portal",
+                      "version": "bootstrap-20260418",
+                      "app_version": "latest"
+                    }
+                    """);
+            ReflectionTestUtils.setField(systemMaintenanceController, "distCenterLatestFile", tempFile.toString());
+
+            Result<Map<String, Object>> result = systemMaintenanceController.getGitInfo();
+
+            assertTrue(result.isSuccess());
+            Map<String, Object> data = result.getData();
+            assertEquals("dist-center", data.get("versionSource"));
+            assertEquals("portal", data.get("distCenterProject"));
+            assertEquals("bootstrap-20260418", data.get("remoteVersion"));
         }
         
         @Test
