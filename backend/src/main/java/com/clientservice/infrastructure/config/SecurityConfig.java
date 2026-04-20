@@ -2,11 +2,13 @@ package com.clientservice.infrastructure.config;
 
 import com.clientservice.common.exception.BusinessException;
 import com.clientservice.common.exception.ErrorCode;
+import com.clientservice.infrastructure.security.JwtSecretProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,15 +18,15 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class SecurityConfig {
 
     private final Environment environment;
+    private final JwtSecretProvider jwtSecretProvider;
 
-    @Value("${client-service.jwt.secret}")
-    private String jwtSecret;
-
-    public SecurityConfig(Environment environment) {
+    public SecurityConfig(Environment environment, JwtSecretProvider jwtSecretProvider) {
         this.environment = environment;
+        this.jwtSecretProvider = jwtSecretProvider;
     }
 
     /**
@@ -53,6 +55,7 @@ public class SecurityConfig {
      * - 建议使用环境变量配置，不要硬编码
      */
     private void validateJwtSecret() {
+        String jwtSecret = jwtSecretProvider.getSecret();
         if (jwtSecret == null || jwtSecret.isEmpty()) {
             log.error("❌ JWT Secret 未配置！请设置 client-service.jwt.secret");
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "JWT Secret 未配置，请检查配置文件");

@@ -58,6 +58,7 @@ export async function mockAdminSession(page: Page) {
       username: 'admin',
       realName: '测试管理员',
       email: 'admin@example.com',
+      superAdmin: true,
     }))
   })
 }
@@ -96,6 +97,39 @@ export async function mockAdminShellApis(page: Page) {
 
 export async function mockMatterList(page: Page) {
   await page.route('**/api/matter/list**', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(ok([
+        {
+          id: 'MAT-001',
+          lawFirmMatterId: 1001,
+          clientId: 501,
+          clientName: '张三',
+          status: 'ACTIVE',
+          validDays: 30,
+          expiresAt: '2099-12-31T12:00:00.000Z',
+          accessUrl: 'https://example.com/portal/matter/MAT-001?token=abc123',
+          createdAt: '2026-04-01T12:00:00.000Z',
+          updatedAt: '2026-04-01T12:00:00.000Z',
+        },
+        {
+          id: 'MAT-002',
+          lawFirmMatterId: 1002,
+          clientId: 502,
+          clientName: '李四',
+          status: 'EXPIRED',
+          validDays: 15,
+          expiresAt: '2026-03-01T12:00:00.000Z',
+          accessUrl: 'https://example.com/portal/matter/MAT-002?token=expired',
+          createdAt: '2026-03-01T12:00:00.000Z',
+          updatedAt: '2026-03-01T12:00:00.000Z',
+        },
+      ])),
+    })
+  })
+
+  await page.route('**/api/admin/matter/list**', async route => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',

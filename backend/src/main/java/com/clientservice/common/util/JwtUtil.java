@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
+import com.clientservice.infrastructure.security.JwtSecretProvider;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,19 +17,23 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
+@lombok.RequiredArgsConstructor
 public class JwtUtil {
 
-    @Value("${client-service.jwt.secret}")
-    private String secret;
+    private final JwtSecretProvider jwtSecretProvider;
 
-    @Value("${client-service.jwt.expiration-hours:24}")
+    @org.springframework.beans.factory.annotation.Value("${client-service.jwt.expiration-hours:24}")
     private Long expirationHours;
+
+    public String getActiveSecret() {
+        return jwtSecretProvider.getSecret();
+    }
 
     /**
      * 获取签名密钥
      */
     private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = getActiveSecret().getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

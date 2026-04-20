@@ -62,6 +62,15 @@ public class FileController {
         return "application/octet-stream";
     }
 
+    private ClientFileDTO sanitizeCustomerFile(final ClientFileDTO file) {
+        if (file == null) {
+            return null;
+        }
+        file.setStoragePath(null);
+        file.setFileHash(null);
+        return file;
+    }
+
     private final FileService fileService;
     private final MatterService matterService;
     private final DownloadLogService downloadLogService;
@@ -156,7 +165,10 @@ public class FileController {
         }
 
         // 获取文件列表
-        List<ClientFileDTO> files = fileService.getFilesByMatterId(matterId, status);
+        List<ClientFileDTO> files = fileService.getFilesByMatterId(matterId, status)
+                .stream()
+                .map(this::sanitizeCustomerFile)
+                .toList();
 
         return Result.success(files);
     }
@@ -170,8 +182,19 @@ public class FileController {
     @Operation(summary = "获取文件详情")
     @GetMapping("/{fileId}")
     public Result<ClientFileDTO> getFile(
+            @Parameter(description = "项目ID", required = true) @RequestParam final String matterId,
+            @Parameter(description = "访问令牌", required = true) @RequestParam final String token,
             @Parameter(description = "文件ID", required = true) @PathVariable final String fileId) {
-        ClientFileDTO file = fileService.getFileById(fileId);
+        ClientMatter matter = matterService.getMatterByToken(token);
+        if (!matter.getId().equals(matterId)) {
+            return Result.forbidden("项目ID不匹配");
+        }
+
+        ClientFileDTO file = sanitizeCustomerFile(fileService.getActiveFileById(fileId));
+        if (!file.getMatterId().equals(matterId)) {
+            return Result.forbidden("文件不属于该项目");
+        }
+
         return Result.success(file);
     }
 
@@ -200,7 +223,7 @@ public class FileController {
         }
 
         // 获取文件实体
-        com.clientservice.domain.entity.ClientFile file = fileService.getFileEntity(fileId);
+        com.clientservice.domain.entity.ClientFile file = fileService.getActiveFileEntity(fileId);
         if (!file.getMatterId().equals(matterId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -272,7 +295,7 @@ public class FileController {
         }
 
         // 获取文件实体
-        com.clientservice.domain.entity.ClientFile file = fileService.getFileEntity(fileId);
+        com.clientservice.domain.entity.ClientFile file = fileService.getActiveFileEntity(fileId);
         if (!file.getMatterId().equals(matterId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -311,7 +334,7 @@ public class FileController {
         }
 
         // 验证文件是否属于该项目
-        ClientFileDTO file = fileService.getFileById(fileId);
+        ClientFileDTO file = fileService.getActiveFileById(fileId);
         if (!file.getMatterId().equals(matterId)) {
             return Result.forbidden("文件不属于该项目");
         }

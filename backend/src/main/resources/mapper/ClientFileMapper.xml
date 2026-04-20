@@ -10,6 +10,9 @@
         <if test="status != null and status != ''">
             AND status = #{status}
         </if>
+        <if test="status == null or status == ''">
+            AND status = 'ACTIVE'
+        </if>
         ORDER BY uploaded_at DESC
     </select>
 

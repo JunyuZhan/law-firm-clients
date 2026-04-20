@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +31,7 @@ class UrlGeneratorTest {
     void setUp() {
         // 设置默认baseUrl
         ReflectionTestUtils.setField(urlGenerator, "defaultBaseUrl", "http://localhost:8081");
+        ReflectionTestUtils.setField(urlGenerator, "allowRequestDerivedBaseUrl", false);
         // Mock SysConfigService 返回null，使用默认值
         when(sysConfigService.getConfigValue(eq("system.base-url"), anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(1));
@@ -119,6 +121,37 @@ class UrlGeneratorTest {
         String url = urlGenerator.generateAccessUrl(matterId, token);
 
         // Then
+        assertTrue(url.startsWith("http://localhost:8081"));
+    }
+
+    @Test
+    @DisplayName("auto 模式默认不应信任请求头生成外链")
+    void generateAccessUrl_WithAutoBaseUrl_ShouldFallbackToDefaultWhenHeaderTrustDisabled() {
+        when(sysConfigService.getConfigValue("system.base-url", "http://localhost:8081"))
+                .thenReturn("auto");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Host", "evil.example.com");
+        request.addHeader("X-Forwarded-Proto", "https");
+
+        String url = urlGenerator.generateAccessUrl("CS1706860800000123456", "test-token", request);
+
+        assertTrue(url.startsWith("http://localhost:8081"));
+        assertFalse(url.startsWith("https://evil.example.com"));
+    }
+
+    @Test
+    @DisplayName("启用请求头推导时应拒绝不安全Host")
+    void generateAccessUrl_WithUnsafeForwardedHost_ShouldFallbackToDefault() {
+        ReflectionTestUtils.setField(urlGenerator, "allowRequestDerivedBaseUrl", true);
+        when(sysConfigService.getConfigValue("system.base-url", "http://localhost:8081"))
+                .thenReturn("auto");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Host", "localhost:8081");
+        request.addHeader("X-Forwarded-Proto", "https");
+        request.addHeader("X-Forwarded-Host", "evil.example.com/path");
+
+        String url = urlGenerator.generateAccessUrl("CS1706860800000123456", "test-token", request);
+
         assertTrue(url.startsWith("http://localhost:8081"));
     }
 }

@@ -155,8 +155,7 @@ describe('AppHeader', () => {
 
     expect(wrapper.find('.logo-section').exists()).toBe(true)
     expect(wrapper.find('.logo-text h1').text().trim()).toBe('北京某某律师事务所')
-    expect(wrapper.find('.logo-system-label').text().trim()).toBe('某某客户服务')
-    expect(wrapper.find('.logo-slogan').text().trim()).toBe('专业事项，一个清晰的客户入口')
+    expect(wrapper.find('.logo-system-label').exists()).toBe(false)
   })
 
   it('does not render logo section for detail variant', () => {

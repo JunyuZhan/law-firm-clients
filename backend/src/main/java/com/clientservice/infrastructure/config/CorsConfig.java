@@ -6,6 +6,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -21,6 +22,12 @@ import org.springframework.web.filter.CorsFilter;
 @Slf4j
 @Configuration
 public class CorsConfig {
+
+    private final Environment environment;
+
+    public CorsConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     /**
      * 允许的来源域名，多个域名用逗号分隔
@@ -51,11 +58,8 @@ public class CorsConfig {
     public FilterRegistrationBean<CorsFilter> corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        
-        // 允许所有来源，简化配置
-        // 注意：使用 allowedOriginPatterns("*") 而不是 allowedOrigins("*") 
-        // 因为当 allowCredentials 为 true 时，不能使用 allowedOrigins("*")
-        config.addAllowedOriginPattern("*");
+
+        configureAllowedOrigins(config);
         
         // 配置允许的方法
         for (String method : allowedMethods.split(",")) {
@@ -75,5 +79,38 @@ public class CorsConfig {
         FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
         bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return bean;
+    }
+
+    private void configureAllowedOrigins(CorsConfiguration config) {
+        if (allowedOrigins != null && !allowedOrigins.isBlank()) {
+            for (String origin : allowedOrigins.split(",")) {
+                String trimmed = origin.trim();
+                if (!trimmed.isEmpty()) {
+                    config.addAllowedOrigin(trimmed);
+                }
+            }
+            return;
+        }
+
+        if (isLocalProfile()) {
+            config.addAllowedOriginPattern("http://localhost:*");
+            config.addAllowedOriginPattern("http://127.0.0.1:*");
+            config.addAllowedOriginPattern("http://[::1]:*");
+            config.addAllowedOriginPattern("https://localhost:*");
+            log.info("CORS 未配置白名单，当前为本地/测试环境，仅允许 localhost 来源");
+            return;
+        }
+
+        log.warn("CORS 未配置允许来源，生产/非本地环境将拒绝所有跨域浏览器请求");
+    }
+
+    private boolean isLocalProfile() {
+        for (String profile : environment.getActiveProfiles()) {
+            if ("dev".equalsIgnoreCase(profile) || "test".equalsIgnoreCase(profile)
+                    || "local".equalsIgnoreCase(profile)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

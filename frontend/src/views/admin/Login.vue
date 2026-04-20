@@ -1,228 +1,177 @@
 <template>
   <div class="login-page">
-    <a-layout class="login-shell">
-      <a-layout-content class="login-content">
-        <a-row
-          class="login-grid"
-          :gutter="[0, 0]"
-        >
-          <a-col
-            :xs="24"
-            :lg="14"
-            class="brand-panel"
-          >
-            <div class="brand-topline">
-              <div class="logo-shell">
-                <img
-                  v-if="appConfigStore.logoUrl"
-                  :src="appConfigStore.logoUrl"
-                  alt="Logo"
-                  class="logo-image"
-                >
-                <svg
-                  v-else
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  aria-hidden="true"
-                  class="logo-fallback"
-                >
-                  <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
-                  <path d="M12 12L20 7.5" />
-                  <path d="M12 12V21" />
-                  <path d="M12 12L4 7.5" />
-                </svg>
-              </div>
-
-              <div class="brand-lockup">
-                <a-typography-text class="brand-label">
-                  {{ organizationName || '律师事务所' }}
-                </a-typography-text>
-                <a-typography-text class="brand-heading">
-                  {{ UI_TEXTS.loginTitle }}
-                </a-typography-text>
-              </div>
+    <div class="login-shell fade-in">
+      <section class="login-panel surface-card">
+        <div class="login-panel__brand">
+          <div class="login-brand-topline">
+            <div class="logo-shell">
+              <img
+                v-if="appConfigStore.logoUrl"
+                :src="appConfigStore.logoUrl"
+                alt="Logo"
+                class="logo-image"
+              >
+              <svg
+                v-else
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+                class="logo-fallback"
+              >
+                <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
+                <path d="M12 12L20 7.5" />
+                <path d="M12 12V21" />
+                <path d="M12 12L4 7.5" />
+              </svg>
             </div>
 
-            <div class="brand-copy">
-              <a-typography-text class="brand-kicker">
-                Administrator Access
-              </a-typography-text>
-              <a-typography-title
-                :level="1"
-                class="form-title"
-              >
-                {{ appSlogan }}
-              </a-typography-title>
-              <a-typography-paragraph class="form-subtitle">
-                管理员通过本入口进入系统后台，统一处理客户协作、案件流转、通知记录与平台配置。
-              </a-typography-paragraph>
+            <div class="brand-lockup">
+              <p class="brand-label">
+                {{ organizationName || '律师事务所' }}
+              </p>
+              <h1 class="brand-system-name">
+                {{ UI_TEXTS.loginTitle }}
+              </h1>
             </div>
+          </div>
 
-            <a-space
-              direction="vertical"
-              :size="18"
-              class="brand-points"
+          <div class="brand-copy">
+            <span class="eyebrow">Administrator Access</span>
+            <h2 class="brand-title">
+              管理后台登录
+            </h2>
+            <p class="brand-subtitle">
+              聚焦客户协作、事项流转与系统配置，仅向已授权管理员开放。
+            </p>
+          </div>
+
+          <div class="brand-points">
+            <article
+              v-for="item in adminHighlights"
+              :key="item.title"
+              class="brand-point"
             >
-              <article class="brand-point">
-                <div>
-                  <a-typography-title
-                    :level="4"
-                    class="brand-point__title"
-                  >
-                    管理员受控入口
-                  </a-typography-title>
-                  <a-typography-paragraph class="brand-point__description">
-                    仅向已授权的系统管理员开放，所有登录行为均纳入身份校验与权限边界控制。
-                  </a-typography-paragraph>
-                </div>
-              </article>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.description }}</p>
+            </article>
+          </div>
+        </div>
 
-              <article class="brand-point">
-                <div>
-                  <a-typography-title
-                    :level="4"
-                    class="brand-point__title"
-                  >
-                    统一资料治理
-                  </a-typography-title>
-                  <a-typography-paragraph class="brand-point__description">
-                    案件、文书、通知与客户协作信息在统一后台中维护，保持数据口径与操作秩序一致。
-                  </a-typography-paragraph>
-                </div>
-              </article>
-            </a-space>
-          </a-col>
+        <div class="login-panel__form">
+          <div class="form-panel-head">
+            <span class="form-eyebrow">管理端登录</span>
+            <h2 class="form-panel-head__title">
+              进入工作台
+            </h2>
+            <p class="form-panel-head__desc">
+              请使用已分配的管理员账户完成校验后进入工作台。
+            </p>
+          </div>
 
-          <a-col
-            :xs="24"
-            :lg="10"
-            class="form-panel-wrap"
+          <a-form
+            :model="form"
+            :rules="rules"
+            class="login-form"
+            @finish="handleLogin"
           >
-            <a-card
-              :bordered="false"
-              class="form-panel"
-            >
-              <div class="form-panel-head">
-                <a-typography-text class="form-eyebrow">
-                  管理端登录
-                </a-typography-text>
-                <a-typography-title
-                  :level="2"
-                  class="form-panel-head__title"
-                >
-                  进入工作台
-                </a-typography-title>
-                <a-typography-paragraph class="form-panel-head__desc">
-                  请使用已分配的账户信息完成身份校验后进入管理后台。
-                </a-typography-paragraph>
-              </div>
-
-              <a-form
-                :model="form"
-                :rules="rules"
-                class="login-form"
-                @finish="handleLogin"
+            <a-form-item name="username">
+              <a-input
+                v-model:value="form.username"
+                size="large"
+                :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
+                class="login-input"
               >
-                <a-form-item name="username">
-                  <a-input
-                    v-model:value="form.username"
-                    size="large"
-                    :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
-                    class="login-input"
-                  >
-                    <template #prefix>
-                      <UserOutlined class="input-icon" />
-                    </template>
-                  </a-input>
-                </a-form-item>
+                <template #prefix>
+                  <UserOutlined class="input-icon" />
+                </template>
+              </a-input>
+            </a-form-item>
 
-                <a-form-item name="password">
-                  <a-input-password
-                    v-model:value="form.password"
-                    size="large"
-                    :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
-                    class="login-input"
-                    @press-enter="handleLogin"
-                  >
-                    <template #prefix>
-                      <LockOutlined class="input-icon" />
-                    </template>
-                  </a-input-password>
-                </a-form-item>
+            <a-form-item name="password">
+              <a-input-password
+                v-model:value="form.password"
+                size="large"
+                :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
+                class="login-input"
+                @press-enter="handleLogin"
+              >
+                <template #prefix>
+                  <LockOutlined class="input-icon" />
+                </template>
+              </a-input-password>
+            </a-form-item>
 
-                <a-form-item name="captchaText">
-                  <div class="captcha-row">
-                    <a-input
-                      v-model:value="form.captchaText"
-                      size="large"
-                      :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
-                      class="login-input captcha-input"
-                      @press-enter="handleLogin"
-                    />
-                    <button
-                      type="button"
-                      class="captcha-image"
-                      @click="refreshCaptcha"
-                    >
-                      <img
-                        v-if="captchaImage"
-                        :src="captchaImage"
-                        alt="验证码"
-                      >
-                      <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
-                    </button>
-                  </div>
-                </a-form-item>
-
-                <a-form-item>
-                  <a-button
-                    type="primary"
-                    html-type="submit"
-                    size="large"
-                    :loading="loading"
-                    block
-                    class="login-button"
-                  >
-                    {{ UI_TEXTS.loginButton }}
-                  </a-button>
-                </a-form-item>
-              </a-form>
-
-              <a-alert
-                v-if="errorMessage"
-                :message="errorMessage"
-                type="error"
-                show-icon
-                class="error-alert"
-              />
-
-              <div class="form-footer">
-                <p v-if="footerCopyright">
-                  {{ footerCopyright }}
-                </p>
-                <p v-else>
-                  © {{ currentYear }} {{ organizationName }}
-                </p>
-                <p
-                  v-if="appConfigStore.icpLicense"
-                  class="icp-link"
+            <a-form-item name="captchaText">
+              <div class="captcha-row">
+                <a-input
+                  v-model:value="form.captchaText"
+                  size="large"
+                  :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
+                  class="login-input captcha-input"
+                  @press-enter="handleLogin"
+                />
+                <button
+                  type="button"
+                  class="captcha-image"
+                  @click="refreshCaptcha"
                 >
-                  <a
-                    href="https://beian.miit.gov.cn/"
-                    target="_blank"
-                    rel="noopener"
+                  <img
+                    v-if="captchaImage"
+                    :src="captchaImage"
+                    alt="验证码"
                   >
-                    {{ appConfigStore.icpLicense }}
-                  </a>
-                </p>
+                  <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
+                </button>
               </div>
-            </a-card>
-          </a-col>
-        </a-row>
-      </a-layout-content>
-    </a-layout>
+            </a-form-item>
+
+            <a-form-item>
+              <a-button
+                type="primary"
+                html-type="submit"
+                size="large"
+                :loading="loading"
+                block
+                class="login-button"
+              >
+                {{ UI_TEXTS.loginButton }}
+              </a-button>
+            </a-form-item>
+          </a-form>
+
+          <a-alert
+            v-if="errorMessage"
+            :message="errorMessage"
+            type="error"
+            show-icon
+            class="error-alert"
+          />
+
+          <div class="form-footer">
+            <p v-if="footerCopyright">
+              {{ footerCopyright }}
+            </p>
+            <p v-else>
+              © {{ currentYear }} {{ organizationName }}
+            </p>
+            <p
+              v-if="appConfigStore.icpLicense"
+              class="icp-link"
+            >
+              <a
+                href="https://beian.miit.gov.cn/"
+                target="_blank"
+                rel="noopener"
+              >
+                {{ appConfigStore.icpLicense }}
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -242,9 +191,19 @@ const router = useRouter()
 const authStore = useAuthStore()
 const appConfigStore = useAppConfigStore()
 
+const adminHighlights = [
+  {
+    title: '受控登录入口',
+    description: '仅向已授权管理员开放，登录权限与访问边界统一控制。',
+  },
+  {
+    title: '统一事务管理',
+    description: '案件、文件与系统配置集中处理，减少后台切换成本。',
+  },
+]
+
 const currentYear = new Date().getFullYear()
 const organizationName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName)
-const appSlogan = computed(() => appConfigStore.appSlogan?.trim() || '专业 · 诚信 · 高效')
 const footerCopyright = computed(() => {
   const normalized = appConfigStore.copyright
     .split(/\r?\n/)
@@ -359,66 +318,63 @@ onMounted(() => {
 
 <style scoped>
 .login-page {
+  --login-accent: #b88a2b;
+  --login-accent-soft: rgba(184, 138, 43, 0.12);
+  --login-ink: #0f172a;
+  --login-ink-soft: #334155;
+  --login-border: rgba(15, 23, 42, 0.08);
   min-height: 100vh;
-  padding: 32px;
+  padding: 28px;
   background:
-    radial-gradient(circle at top left, rgba(27, 59, 95, 0.12), transparent 32%),
-    linear-gradient(180deg, #f6f7f9 0%, #eef1f5 54%, #f7f9fc 100%);
+    radial-gradient(circle at top left, rgba(15, 23, 42, 0.08), transparent 30%),
+    radial-gradient(circle at top right, rgba(184, 138, 43, 0.08), transparent 22%),
+    linear-gradient(180deg, #fafaf9 0%, #f8fafc 48%, #f1f5f9 100%);
 }
 
 .login-shell {
-  min-height: calc(100vh - 64px);
-  background: transparent;
+  min-height: calc(100vh - 56px);
+  display: grid;
+  place-items: center;
 }
 
-.login-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-grid {
-  width: min(1120px, 100%);
+.login-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(360px, 440px);
+  width: min(1040px, 100%);
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 24px 60px rgba(16, 42, 67, 0.08);
-  backdrop-filter: blur(18px);
+  border-radius: 28px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 26px 56px rgba(15, 23, 42, 0.09);
 }
 
-.brand-panel {
+.login-panel__brand {
   display: grid;
-  align-content: start;
-  gap: 40px;
-  min-height: 680px;
-  padding: 56px;
+  gap: 28px;
+  padding: 44px;
   background:
-    radial-gradient(circle at top right, rgba(27, 59, 95, 0.06), transparent 36%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 100%);
-  border-right: 1px solid rgba(16, 42, 67, 0.08);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
+    radial-gradient(circle at top left, rgba(184, 138, 43, 0.08), transparent 36%);
+  border-right: 1px solid var(--login-border);
 }
 
-.brand-topline {
+.login-brand-topline {
   display: flex;
   align-items: center;
-  gap: 20px;
-}
-
-.brand-lockup {
-  display: grid;
-  gap: 6px;
+  gap: 16px;
 }
 
 .logo-shell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 62px;
-  height: 62px;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
   flex-shrink: 0;
-  border-radius: 16px;
-  border: 1px solid rgba(16, 42, 67, 0.12);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 12px 24px rgba(16, 42, 67, 0.06);
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  color: var(--login-accent);
 }
 
 .logo-image,
@@ -427,99 +383,94 @@ onMounted(() => {
   height: 100%;
 }
 
-.brand-copy {
-  display: grid;
-  gap: 16px;
-  max-width: 520px;
+.brand-lockup {
+  min-width: 0;
 }
 
 .brand-label,
-.brand-heading,
-.brand-kicker {
-  margin-bottom: 0;
+.brand-system-name,
+.brand-title,
+.brand-subtitle,
+.form-panel-head__title,
+.form-panel-head__desc,
+.form-eyebrow {
+  margin: 0;
 }
 
-.brand-label {
-  color: #1b3b5f;
+.brand-label,
+.form-eyebrow {
+  color: var(--login-accent);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.brand-heading {
-  color: #486581;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.5;
+.brand-system-name {
+  margin-top: 6px;
+  color: var(--login-ink);
+  font-size: 20px;
+  line-height: 1.3;
 }
 
-.brand-kicker {
-  color: rgba(72, 101, 129, 0.82);
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.form-title {
-  margin-bottom: 0;
-  font-family: 'EB Garamond', 'STSong', 'Songti SC', serif;
-  font-size: clamp(54px, 6vw, 82px);
-  font-weight: 600;
-  line-height: 0.96;
-  color: #102a43;
-  letter-spacing: -0.05em;
-}
-
-.form-subtitle {
-  margin-bottom: 0;
+.brand-copy {
+  display: grid;
+  gap: 12px;
   max-width: 460px;
-  font-size: 16px;
-  color: #627d98;
-  line-height: 1.9;
+}
+
+.brand-title,
+.form-panel-head__title {
+  color: var(--login-ink);
+  font-size: clamp(30px, 3.8vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.brand-subtitle,
+.form-panel-head__desc,
+.brand-point p,
+.form-footer p {
+  color: #475569;
+  line-height: 1.75;
+}
+
+.brand-subtitle {
+  font-size: 15px;
+  max-width: 30em;
 }
 
 .brand-points {
-  width: 100%;
-  max-width: 520px;
+  display: grid;
+  gap: 14px;
   margin-top: auto;
 }
 
 .brand-point {
-  padding-top: 18px;
-  border-top: 1px solid rgba(16, 42, 67, 0.08);
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
 }
 
-.brand-point__title {
-  margin-bottom: 8px;
-  color: #102a43;
-  font-size: 17px;
-  font-weight: 600;
+.brand-point h3 {
+  margin: 0;
+  color: var(--login-ink);
+  font-size: 16px;
 }
 
-.brand-point__description {
-  margin-bottom: 0;
-  color: #627d98;
+.brand-point p {
+  margin-top: 8px;
   font-size: 14px;
-  line-height: 1.8;
 }
 
-.form-panel-wrap {
-  display: flex;
-}
-
-.form-panel {
-  width: 100%;
-  border-radius: 0;
-  background: rgba(255, 255, 255, 0.98);
-}
-
-.form-panel :deep(.ant-card-body) {
+.login-panel__form {
   display: grid;
   align-content: center;
-  gap: 28px;
-  min-height: 100%;
-  padding: 56px 44px;
+  gap: 26px;
+  padding: 44px 38px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 250, 249, 0.96));
 }
 
 .form-panel-head {
@@ -527,38 +478,17 @@ onMounted(() => {
   gap: 10px;
 }
 
-.form-eyebrow {
-  color: #486581;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
 .form-panel-head__title {
-  margin-bottom: 0;
-  color: #102a43;
-  font-family: 'EB Garamond', 'STSong', 'Songti SC', serif;
-  font-size: 34px;
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
+  font-size: 32px;
 }
 
 .form-panel-head__desc {
-  margin-bottom: 0;
-  color: #627d98;
   font-size: 14px;
-  line-height: 1.8;
+  max-width: 26em;
 }
 
 .login-form {
-  margin-bottom: 12px;
-}
-
-.login-form :deep(.ant-input-affix-wrapper),
-.login-form :deep(.ant-input) {
-  border-radius: 4px;
+  margin-bottom: 2px;
 }
 
 .login-form :deep(.ant-form-item) {
@@ -569,19 +499,45 @@ onMounted(() => {
   margin-bottom: 0;
 }
 
+.login-form :deep(.ant-input-affix-wrapper),
+.login-form :deep(.ant-input),
+.captcha-image {
+  border-radius: 14px;
+}
+
+.login-form :deep(.ant-input-affix-wrapper),
+.login-form :deep(.ant-input) {
+  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: none;
+}
+
+.login-form :deep(.ant-input-affix-wrapper:hover),
+.login-form :deep(.ant-input:hover),
+.captcha-image:hover {
+  border-color: rgba(184, 138, 43, 0.3);
+}
+
+.login-form :deep(.ant-input-affix-wrapper-focused),
+.login-form :deep(.ant-input:focus),
+.captcha-image:focus-visible {
+  border-color: var(--login-accent);
+  box-shadow: 0 0 0 3px rgba(184, 138, 43, 0.14);
+}
+
 .login-input {
-  min-height: 48px;
+  min-height: 52px;
 }
 
 .input-icon {
-  color: #999999;
+  color: #64748b;
 }
 
 .captcha-row {
   display: grid;
   grid-template-columns: minmax(0, 13fr) minmax(0, 6fr);
   align-items: stretch;
-  column-gap: 5%;
+  gap: 12px;
 }
 
 .captcha-input {
@@ -589,14 +545,13 @@ onMounted(() => {
 }
 
 .captcha-image {
-  min-height: 48px;
-  padding: 4px 8px;
-  border: 1px solid #d9e2ec;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 52px;
+  padding: 4px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
   overflow: hidden;
   cursor: pointer;
 }
@@ -605,16 +560,16 @@ onMounted(() => {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 38px;
+  max-height: 40px;
   object-fit: contain;
 }
 
 .login-button {
-  height: 48px !important;
-  font-size: 16px !important;
+  height: 52px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .error-alert {
@@ -624,15 +579,12 @@ onMounted(() => {
 .form-footer {
   display: grid;
   gap: 6px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(16, 42, 67, 0.08);
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .form-footer p {
-  margin: 0;
-  color: #829ab1;
   font-size: 12px;
-  line-height: 1.7;
 }
 
 .icp-link a {
@@ -640,52 +592,70 @@ onMounted(() => {
   text-decoration: none;
 }
 
-@media (max-width: 991px) {
-  .brand-panel {
-    min-height: auto;
-    padding: 40px 28px 32px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(16, 42, 67, 0.08);
+.icp-link a:hover {
+  color: var(--login-ink);
+}
+
+@media (max-width: 960px) {
+  .login-page {
+    padding: 20px;
   }
 
-  .form-panel :deep(.ant-card-body) {
-    padding: 36px 28px 32px;
+  .login-shell {
+    min-height: calc(100vh - 40px);
+  }
+
+  .login-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .login-panel__brand {
+    gap: 22px;
+    padding: 32px 28px 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--login-border);
+  }
+
+  .login-panel__form {
+    padding: 32px 28px;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 560px) {
   .login-page {
-    padding: 16px;
+    padding: 12px;
   }
 
-  .brand-panel {
+  .login-shell {
+    min-height: calc(100vh - 24px);
+  }
+
+  .login-panel {
+    border-radius: 22px;
+  }
+
+  .login-panel__brand,
+  .login-panel__form {
     padding-inline: 20px;
   }
 
-  .form-panel :deep(.ant-card-body) {
-    padding-inline: 20px;
-  }
-
-  .brand-topline {
+  .login-brand-topline {
     align-items: flex-start;
   }
 
   .logo-shell {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
   }
 
-  .form-title {
-    font-size: clamp(40px, 16vw, 56px);
+  .brand-title,
+  .form-panel-head__title {
+    font-size: 28px;
   }
 
   .captcha-row {
     grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .captcha-image {
-    min-height: 48px;
   }
 }
 </style>

@@ -419,6 +419,17 @@ public class FileService {
     }
 
     /**
+     * 根据ID获取可供客户访问的有效文件。
+     *
+     * @param fileId 文件ID
+     * @return 文件DTO
+     */
+    public ClientFileDTO getActiveFileById(final String fileId) {
+        ClientFile file = loadRequiredActiveFile(fileId);
+        return convertToDTO(file);
+    }
+
+    /**
      * 获取文件资源（用于下载）
      *
      * @param fileId 文件ID
@@ -455,6 +466,16 @@ public class FileService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "文件不存在");
         }
         return file;
+    }
+
+    /**
+     * 获取可供客户访问的有效文件实体。
+     *
+     * @param fileId 文件ID
+     * @return 文件实体
+     */
+    public ClientFile getActiveFileEntity(final String fileId) {
+        return loadRequiredActiveFile(fileId);
     }
 
     /**
@@ -520,6 +541,14 @@ public class FileService {
     private ClientFile loadRequiredFile(final String fileId) {
         ClientFile file = fileMapper.selectById(fileId);
         if (file == null || file.getDeleted()) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "文件不存在");
+        }
+        return file;
+    }
+
+    private ClientFile loadRequiredActiveFile(final String fileId) {
+        ClientFile file = loadRequiredFile(fileId);
+        if (!ClientFile.STATUS_ACTIVE.equals(file.getStatus())) {
             throw new BusinessException(ErrorCode.NOT_FOUND, "文件不存在");
         }
         return file;

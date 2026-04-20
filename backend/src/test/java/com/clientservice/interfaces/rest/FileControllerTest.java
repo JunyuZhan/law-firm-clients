@@ -224,37 +224,97 @@ class FileControllerTest {
         @DisplayName("获取文件详情应该成功")
         void getFile_ShouldSuccess() throws Exception {
             // Given
+            String matterId = "CS1234567890123456789";
+            String token = "test-token";
             String fileId = "file-id-123";
             ClientFileDTO fileDTO = createClientFileDTO();
 
-            when(fileService.getFileById(fileId)).thenReturn(fileDTO);
+            when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
+            when(fileService.getActiveFileById(fileId)).thenReturn(fileDTO);
 
             // When & Then
-            mockMvc.perform(get("/api/client/files/{fileId}", fileId))
+            mockMvc.perform(get("/api/client/files/{fileId}", fileId)
+                            .param("matterId", matterId)
+                            .param("token", token))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.success").value(true))
                     .andExpect(jsonPath("$.code").value(200))
-                    .andExpect(jsonPath("$.data.id").value(fileId));
+                    .andExpect(jsonPath("$.data.id").value(fileId))
+                    .andExpect(jsonPath("$.data.storagePath").doesNotExist())
+                    .andExpect(jsonPath("$.data.fileHash").doesNotExist());
 
-            verify(fileService, times(1)).getFileById(fileId);
+            verify(matterService, times(1)).getMatterByToken(token);
+            verify(fileService, times(1)).getActiveFileById(fileId);
         }
 
         @Test
         @DisplayName("文件不存在应该返回404")
         void getFile_WithNonExistentFile_ShouldReturn404() throws Exception {
             // Given
+            String matterId = "CS1234567890123456789";
+            String token = "test-token";
             String fileId = "non-existent";
 
-            when(fileService.getFileById(fileId)).thenThrow(
+            when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
+            when(fileService.getActiveFileById(fileId)).thenThrow(
                     new BusinessException("404", "文件不存在"));
 
             // When & Then
-            mockMvc.perform(get("/api/client/files/{fileId}", fileId))
+            mockMvc.perform(get("/api/client/files/{fileId}", fileId)
+                            .param("matterId", matterId)
+                            .param("token", token))
                     .andExpect(status().isNotFound())
                     .andExpect(jsonPath("$.success").value(false))
                     .andExpect(jsonPath("$.code").value("404"));
 
-            verify(fileService, times(1)).getFileById(fileId);
+            verify(matterService, times(1)).getMatterByToken(token);
+            verify(fileService, times(1)).getActiveFileById(fileId);
+        }
+
+        @Test
+        @DisplayName("文件详情在项目不匹配时应该返回403")
+        void getFile_WithMismatchedMatterId_ShouldReturn403() throws Exception {
+            String matterId = "CS1234567890123456789";
+            String token = "test-token";
+            String fileId = "file-id-123";
+
+            ClientMatter wrongMatter = createClientMatter("CS9999999999999999999");
+            when(matterService.getMatterByToken(token)).thenReturn(wrongMatter);
+
+            mockMvc.perform(get("/api/client/files/{fileId}", fileId)
+                            .param("matterId", matterId)
+                            .param("token", token))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(jsonPath("$.code").value(403))
+                    .andExpect(jsonPath("$.message").value("项目ID不匹配"));
+
+            verify(matterService, times(1)).getMatterByToken(token);
+            verify(fileService, never()).getActiveFileById(anyString());
+        }
+
+        @Test
+        @DisplayName("文件不属于该项目时应该返回403")
+        void getFile_WithFileNotBelongingToMatter_ShouldReturn403() throws Exception {
+            String matterId = "CS1234567890123456789";
+            String token = "test-token";
+            String fileId = "file-id-123";
+            ClientFileDTO fileDTO = createClientFileDTO();
+            fileDTO.setMatterId("different-matter-id");
+
+            when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
+            when(fileService.getActiveFileById(fileId)).thenReturn(fileDTO);
+
+            mockMvc.perform(get("/api/client/files/{fileId}", fileId)
+                            .param("matterId", matterId)
+                            .param("token", token))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success").value(false))
+                    .andExpect(jsonPath("$.code").value(403))
+                    .andExpect(jsonPath("$.message").value("文件不属于该项目"));
+
+            verify(matterService, times(1)).getMatterByToken(token);
+            verify(fileService, times(1)).getActiveFileById(fileId);
         }
     }
 
@@ -273,7 +333,7 @@ class FileControllerTest {
             Resource mockResource = mock(Resource.class);
 
             when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
-            when(fileService.getFileEntity(fileId)).thenReturn(fileEntity);
+            when(fileService.getActiveFileEntity(fileId)).thenReturn(fileEntity);
             when(fileService.getFileResource(fileId)).thenReturn(mockResource);
 
             // When & Then
@@ -284,7 +344,7 @@ class FileControllerTest {
                     .andExpect(header().exists(HttpHeaders.CONTENT_DISPOSITION));
 
             verify(matterService, times(1)).getMatterByToken(token);
-            verify(fileService, times(1)).getFileEntity(fileId);
+            verify(fileService, times(1)).getActiveFileEntity(fileId);
             verify(fileService, times(1)).getFileResource(fileId);
         }
 
@@ -307,7 +367,7 @@ class FileControllerTest {
                     .andExpect(status().isForbidden());
 
             verify(matterService, times(1)).getMatterByToken(token);
-            verify(fileService, never()).getFileEntity(anyString());
+            verify(fileService, never()).getActiveFileEntity(anyString());
         }
 
         @Test
@@ -321,7 +381,7 @@ class FileControllerTest {
             fileEntity.setMatterId("different-matter-id"); // 不同的项目ID
 
             when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
-            when(fileService.getFileEntity(fileId)).thenReturn(fileEntity);
+            when(fileService.getActiveFileEntity(fileId)).thenReturn(fileEntity);
 
             // When & Then
             mockMvc.perform(get("/api/client/files/{fileId}/download", fileId)
@@ -330,7 +390,7 @@ class FileControllerTest {
                     .andExpect(status().isForbidden());
 
             verify(matterService, times(1)).getMatterByToken(token);
-            verify(fileService, times(1)).getFileEntity(fileId);
+            verify(fileService, times(1)).getActiveFileEntity(fileId);
             verify(fileService, never()).getFileResource(anyString());
         }
     }
@@ -350,7 +410,7 @@ class FileControllerTest {
             fileDTO.setMatterId(matterId);
 
             when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
-            when(fileService.getFileById(fileId)).thenReturn(fileDTO);
+            when(fileService.getActiveFileById(fileId)).thenReturn(fileDTO);
             doNothing().when(fileService).deleteFile(fileId);
 
             // When & Then
@@ -362,7 +422,7 @@ class FileControllerTest {
                     .andExpect(jsonPath("$.code").value(200));
 
             verify(matterService, times(1)).getMatterByToken(token);
-            verify(fileService, times(1)).getFileById(fileId);
+            verify(fileService, times(1)).getActiveFileById(fileId);
             verify(fileService, times(1)).deleteFile(fileId);
         }
 
@@ -377,7 +437,7 @@ class FileControllerTest {
             fileDTO.setMatterId("different-matter-id"); // 不同的项目ID
 
             when(matterService.getMatterByToken(token)).thenReturn(mockMatter);
-            when(fileService.getFileById(fileId)).thenReturn(fileDTO);
+            when(fileService.getActiveFileById(fileId)).thenReturn(fileDTO);
 
             // When & Then
             mockMvc.perform(delete("/api/client/files/{fileId}", fileId)
@@ -389,7 +449,7 @@ class FileControllerTest {
                     .andExpect(jsonPath("$.message").value("文件不属于该项目"));
 
             verify(matterService, times(1)).getMatterByToken(token);
-            verify(fileService, times(1)).getFileById(fileId);
+            verify(fileService, times(1)).getActiveFileById(fileId);
             verify(fileService, never()).deleteFile(anyString());
         }
     }
