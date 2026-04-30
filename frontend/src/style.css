@@ -331,6 +331,65 @@ th.ant-table-cell-fix-left {
   font-size: 12px;
 }
 
+.portal-panel {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  box-shadow: 0 18px 36px rgba(16, 42, 67, 0.06);
+}
+
+.portal-panel--intro {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.portal-kicker {
+  color: #8c6a2b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.portal-heading {
+  margin: 8px 0 0;
+  color: var(--lex-primary);
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.section-actions,
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.section-actions__hint,
+.filter-row__label {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.skeleton-list {
+  display: grid;
+  gap: 12px;
+}
+
+.skeleton-item {
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--lex-bg-muted);
+  border: 1px solid var(--border-color-light);
+}
+
 .dashboard-spotlight-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(0, 1fr));
@@ -567,6 +626,21 @@ th.ant-table-cell-fix-left {
     grid-template-columns: 1fr;
   }
 
+  .portal-panel,
+  .portal-panel--intro {
+    padding: 18px;
+  }
+
+  .portal-panel--intro {
+    grid-template-columns: 1fr;
+  }
+
+  .section-actions,
+  .filter-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .matter-list-container .content,
   .file-list-container .content,
   .notifications-container .content,
@@ -574,5 +648,11 @@ th.ant-table-cell-fix-left {
   .help-center-container .content {
     width: min(var(--page-content-max-width), calc(100vw - 2 * var(--shell-gutter)));
     padding: 16px 0 var(--page-content-bottom-space);
+  }
+
+  .matter-list-container .stats-grid,
+  .file-list-container .stats-grid,
+  .notifications-container .stats-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

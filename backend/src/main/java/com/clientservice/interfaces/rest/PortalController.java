@@ -1,9 +1,12 @@
 package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.ClientFileDTO;
+import com.clientservice.application.dto.PortalMatterListItemDTO;
+import com.clientservice.application.dto.PortalNotificationItemDTO;
 import com.clientservice.application.service.AccessLogService;
 import com.clientservice.application.service.FileService;
 import com.clientservice.application.service.MatterService;
+import com.clientservice.application.service.NotificationRecordService;
 import com.clientservice.common.exception.ErrorCode;
 import com.clientservice.common.result.Result;
 import com.clientservice.domain.entity.ClientMatter;
@@ -34,6 +37,7 @@ public class PortalController {
     private final MatterService matterService;
     private final AccessLogService accessLogService;
     private final FileService fileService;
+    private final NotificationRecordService notificationRecordService;
 
     /**
      * 获取项目详情（客户门户API）
@@ -115,5 +119,52 @@ public class PortalController {
         log.info("客户访问文件列表: matterId={}, fileCount={}", matterId, files != null ? files.size() : 0);
 
         return Result.success(files);
+    }
+
+    /**
+     * 获取当前客户可访问的事项列表。
+     *
+     * @param token 当前有效事项访问令牌
+     * @param limit 限制数量
+     * @return 事项列表
+     */
+    @Operation(summary = "获取当前客户事项列表", description = "基于当前有效访问令牌，返回该客户可访问的事项列表")
+    @Timed(value = "api.portal.matters.list", description = "客户门户获取事项列表接口耗时")
+    @GetMapping("/api/matters")
+    public Result<List<PortalMatterListItemDTO>> getPortalMatters(
+            @Parameter(description = "访问令牌", required = true) @RequestParam(required = true) final String token,
+            @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+
+        validatePortalToken(token);
+        List<PortalMatterListItemDTO> matters = matterService.getPortalMatterList(token, limit);
+        return Result.success(matters);
+    }
+
+    /**
+     * 获取当前客户通知记录。
+     *
+     * @param token 当前有效事项访问令牌
+     * @param limit 限制数量
+     * @return 通知记录
+     */
+    @Operation(summary = "获取当前客户通知记录", description = "基于当前有效访问令牌，返回该客户的通知记录")
+    @Timed(value = "api.portal.notifications.list", description = "客户门户获取通知记录接口耗时")
+    @GetMapping("/api/notifications")
+    public Result<List<PortalNotificationItemDTO>> getPortalNotifications(
+            @Parameter(description = "访问令牌", required = true) @RequestParam(required = true) final String token,
+            @Parameter(description = "限制数量") @RequestParam(required = false) final Integer limit) {
+
+        validatePortalToken(token);
+        ClientMatter matter = matterService.getMatterByToken(token);
+        List<PortalNotificationItemDTO> notifications =
+                notificationRecordService.getPortalNotifications(matter.getClientId(), limit);
+        return Result.success(notifications);
+    }
+
+    private void validatePortalToken(final String token) {
+        if (token == null || token.length() < 8 || token.length() > 500
+                || !token.matches("^[a-zA-Z0-9_\\-]+$")) {
+            throw new com.clientservice.common.exception.BusinessException(ErrorCode.BAD_REQUEST, "访问令牌格式无效");
+        }
     }
 }

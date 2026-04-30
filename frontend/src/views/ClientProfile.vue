@@ -9,7 +9,16 @@
       class="content"
       tabindex="-1"
     >
-      <section class="profile-hero section-shell">
+      <section class="section-shell portal-panel profile-hero">
+        <div>
+          <span class="portal-kicker">个人中心</span>
+          <h2 class="portal-heading">
+            查看当前访客识别信息与常用入口
+          </h2>
+          <p class="intro-text">
+            个人中心不承接公开注册，仅显示当前识别到的访客信息，以及继续进入事项协作所需的常用入口。
+          </p>
+        </div>
         <div class="profile-header">
           <a-avatar
             :size="84"
@@ -34,10 +43,13 @@
         </div>
       </section>
 
-      <section class="table-panel section-shell">
-        <h2 class="panel-title">
-          快捷入口
-        </h2>
+      <section class="section-shell portal-panel">
+        <div class="section-head">
+          <h3 class="panel-title">
+            快捷入口
+          </h3>
+          <p>从这里继续进入文件、消息和帮助信息，不切换到无关页面。</p>
+        </div>
         <van-cell-group
           inset
           class="profile-cell-group"
@@ -108,14 +120,6 @@ const clientIdText = computed(() => {
   gap: 20px;
 }
 
-.profile-hero {
-  padding: 20px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: var(--lex-surface-strong);
-  box-shadow: var(--shadow-sm);
-}
-
 .profile-header {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -152,8 +156,8 @@ const clientIdText = computed(() => {
 .profile-badge {
   display: grid;
   gap: 4px;
-  padding: 12px 14px;
-  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  border-radius: 18px;
   background: var(--lex-bg-muted);
   border: 1px solid var(--border-color-light);
 }
@@ -170,9 +174,20 @@ const clientIdText = computed(() => {
 }
 
 .panel-title {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 18px;
   color: var(--lex-primary);
+}
+
+.section-head {
+  display: grid;
+  gap: 8px;
+}
+
+.section-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
 .profile-cell-group {
@@ -211,8 +226,8 @@ const clientIdText = computed(() => {
 }
 
 @media (max-width: 768px) {
-  .profile-hero {
-    padding: 16px;
+  .portal-panel {
+    padding: 18px;
   }
 
   .profile-header {

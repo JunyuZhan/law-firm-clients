@@ -11,13 +11,19 @@
       class="content"
       tabindex="-1"
     >
-      <section class="help-hero section-shell">
-        <p class="help-summary">
-          常见问题与自助排查。
-        </p>
+      <section class="section-shell portal-panel help-hero">
+        <div>
+          <span class="portal-kicker">帮助中心</span>
+          <h2 class="portal-heading">
+            围绕访问方式与常见问题提供自助说明
+          </h2>
+          <p class="help-summary">
+            帮助中心聚焦访问链接、文件查看、通知位置和失效处理，不承接泛化介绍内容。
+          </p>
+        </div>
       </section>
 
-      <section class="quick-grid section-shell">
+      <section class="section-shell quick-grid">
         <article class="quick-card">
           <span class="quick-label">访客</span>
           <strong>{{ visitorName }}</strong>
@@ -32,9 +38,10 @@
         </article>
       </section>
 
-      <section class="help-card section-shell">
+      <section class="section-shell portal-panel help-card">
         <div class="section-head">
           <h3>常见问题</h3>
+          <p>先解决访问和协作中的高频问题，再决定是否需要联系承办律师。</p>
         </div>
         <van-collapse
           v-model="activeNames"
@@ -53,7 +60,7 @@
         </van-collapse>
       </section>
 
-      <section class="guide-grid section-shell">
+      <section class="section-shell guide-grid">
         <article class="guide-card">
           <h3>链接打不开</h3>
           <ol class="guide-list">
@@ -146,39 +153,25 @@ function goBack() {
   gap: 16px;
 }
 
-.help-hero {
-  padding: 20px 24px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: var(--lex-surface-strong);
-  box-shadow: var(--shadow-sm);
-}
-
 .help-summary {
-  margin: 8px 0 0;
-  line-height: 1.6;
+  margin: 0;
+  line-height: 1.75;
   color: var(--text-secondary);
 }
 
 .quick-card,
 .help-card,
 .guide-card {
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: var(--lex-surface-strong);
-  box-shadow: var(--shadow-sm);
-}
-
-.help-card {
-  padding: 20px;
-  margin-bottom: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 16px 32px rgba(16, 42, 67, 0.06);
 }
 
 .quick-grid,
 .guide-grid {
   display: grid;
   gap: 16px;
-  margin-bottom: 16px;
 }
 
 .quick-grid {
@@ -226,13 +219,20 @@ function goBack() {
 }
 
 .section-head {
-  margin-bottom: 16px;
+  display: grid;
+  gap: 8px;
 }
 
 .section-head h3 {
   margin: 0;
   font-size: 18px;
   color: var(--lex-primary);
+}
+
+.section-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
 .faq-collapse {
@@ -286,9 +286,8 @@ function goBack() {
     grid-template-columns: 1fr;
   }
 
-  .help-hero,
+  .portal-panel,
   .quick-card,
-  .help-card,
   .guide-card {
     padding: 16px;
   }

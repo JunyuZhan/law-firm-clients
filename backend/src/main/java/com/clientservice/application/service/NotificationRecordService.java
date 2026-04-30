@@ -1,12 +1,17 @@
 package com.clientservice.application.service;
 
 import com.clientservice.application.dto.NotificationHistoryDTO;
+import com.clientservice.application.dto.PortalNotificationItemDTO;
+import com.clientservice.domain.entity.ClientMatter;
 import com.clientservice.domain.entity.NotificationRecord;
+import com.clientservice.infrastructure.persistence.mapper.ClientMatterMapper;
 import com.clientservice.infrastructure.persistence.mapper.NotificationRecordMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +26,7 @@ import org.springframework.stereotype.Service;
 public class NotificationRecordService {
 
     private final NotificationRecordMapper notificationRecordMapper;
+    private final ClientMatterMapper clientMatterMapper;
 
     /**
      * 获取通知历史
@@ -190,5 +196,84 @@ public class NotificationRecordService {
                 .nextRetryAt(record.getNextRetryAt())
                 .lastRetryAt(record.getLastRetryAt())
                 .build();
+    }
+
+    /**
+     * 获取客户门户通知记录。
+     *
+     * @param clientId 客户ID
+     * @param limit 限制数量
+     * @return 门户通知列表
+     */
+    public List<PortalNotificationItemDTO> getPortalNotifications(final Long clientId, final Integer limit) {
+        LambdaQueryWrapper<NotificationRecord> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(NotificationRecord::getClientId, clientId)
+                .orderByDesc(NotificationRecord::getCreatedAt);
+
+        int limitValue = limit != null && limit > 0 ? Math.min(limit, 100) : 20;
+        Page<NotificationRecord> page = new Page<>(1, limitValue);
+        page.setSearchCount(false);
+
+        List<NotificationRecord> records = notificationRecordMapper.selectPage(page, queryWrapper).getRecords();
+
+        return records.stream()
+                .map(this::convertToPortalDTO)
+                .collect(Collectors.toList());
+    }
+
+    private PortalNotificationItemDTO convertToPortalDTO(final NotificationRecord record) {
+        ClientMatter matter = null;
+        if (record.getMatterId() != null && !record.getMatterId().isBlank()) {
+            matter = clientMatterMapper.selectById(record.getMatterId());
+        }
+
+        String matterName = matter != null ? extractMatterName(matter) : null;
+        String title = firstNonBlank(
+                matterName != null ? matterName + " 通知" : null,
+                record.getNotificationType() + " 通知");
+
+        return PortalNotificationItemDTO.builder()
+                .id(record.getId())
+                .matterId(record.getMatterId())
+                .matterName(matterName)
+                .title(title)
+                .content(record.getContent())
+                .notificationType(record.getNotificationType())
+                .status(record.getStatus())
+                .recipient(record.getRecipient())
+                .sentAt(record.getSentAt())
+                .createdAt(record.getCreatedAt())
+                .build();
+    }
+
+    private String extractMatterName(final ClientMatter matter) {
+        if (matter == null || matter.getMatterData() == null || matter.getMatterData().isBlank()) {
+            return matter != null ? matter.getId() : null;
+        }
+
+        try {
+            Map<String, Object> matterData = new ObjectMapper().readValue(
+                    matter.getMatterData(),
+                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            Object matterName = matterData.get("matterName");
+            if (matterName != null && !String.valueOf(matterName).isBlank()) {
+                return String.valueOf(matterName).trim();
+            }
+        } catch (Exception e) {
+            log.warn("解析门户通知对应的事项名称失败: matterId={}", matter.getId(), e);
+        }
+        return matter.getId();
+    }
+
+    private String firstNonBlank(final String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
     }
 }

@@ -9,10 +9,14 @@
       class="content"
       tabindex="-1"
     >
-      <section class="page-intro section-shell">
+      <section class="section-shell portal-panel portal-panel--intro">
         <div>
+          <span class="portal-kicker">文件协作</span>
+          <h2 class="portal-heading">
+            查看当前事项已授权的文件资料
+          </h2>
           <p class="intro-text">
-            当前项目的文书与证据材料，以移动端动作面板方式进行预览、下载与分享。
+            文件中心只承接当前事项下的材料查看与下载。打开文件后可继续预览、下载或复制预览链接。
           </p>
         </div>
         <div class="stats-grid">
@@ -27,7 +31,23 @@
         </div>
       </section>
 
-      <section class="table-panel section-shell">
+      <section class="section-shell portal-panel">
+        <div
+          v-if="hasStoredContext || hasAccessContext"
+          class="section-actions"
+        >
+          <span class="section-actions__hint">
+            {{ sourceText }}
+          </span>
+          <a-button
+            type="default"
+            size="small"
+            @click="loadFiles"
+          >
+            刷新文件
+          </a-button>
+        </div>
+
         <a-spin :spinning="loading">
           <div
             v-if="loading"
@@ -44,37 +64,52 @@
               />
             </div>
           </div>
-          <div
-            v-else-if="!matterId || !token"
-            class="empty-state"
+          <PortalStatePanel
+            v-else-if="errorState === 'missing-token'"
+            title="暂无可用访问上下文"
+            description="请先通过律师发送的专属链接进入一个事项，再查看对应的文件资料。"
           >
-            <FileOutlined class="empty-icon" />
-            <p>{{ hasStoredContext ? '最近访问项目已失效' : '请先进入项目' }}</p>
-            <p class="empty-hint">
-              {{ hasStoredContext ? '请重新进入项目详情页后再查看文件。' : '请先从首页或项目列表进入一个有效项目。' }}
-            </p>
-            <a-space class="empty-actions">
+            <template #icon>
+              <FileOutlined />
+            </template>
+            <template #actions>
               <a-button
                 type="primary"
-                @click="router.push('/matters')"
+                @click="router.push('/portal')"
               >
-                查看项目
-              </a-button>
-              <a-button @click="router.push('/portal')">
                 返回首页
               </a-button>
-            </a-space>
-          </div>
-          <div
-            v-else-if="files.length === 0"
-            class="empty-state"
+            </template>
+          </PortalStatePanel>
+          <PortalStatePanel
+            v-else-if="errorState === 'invalid-token'"
+            title="访问链接已失效"
+            description="当前保存的文件访问凭据不可用，可能已过期或被撤销。请重新通过律师发送的专属链接进入事项。"
           >
-            <FileOutlined class="empty-icon" />
-            <p>暂无文件</p>
-            <p class="empty-hint">
-              律所将为您上传相关文件
-            </p>
-          </div>
+            <template #icon>
+              <FileOutlined />
+            </template>
+            <template #actions>
+              <a-button
+                type="primary"
+                @click="router.push('/portal')"
+              >
+                返回首页
+              </a-button>
+              <a-button @click="clearAccessContext">
+                清除本地记录
+              </a-button>
+            </template>
+          </PortalStatePanel>
+          <PortalStatePanel
+            v-else-if="files.length === 0"
+            title="暂无文件"
+            description="律所将为您上传相关文件。"
+          >
+            <template #icon>
+              <FileOutlined />
+            </template>
+          </PortalStatePanel>
           <div
             v-else
             class="file-card-grid"
@@ -97,6 +132,9 @@
                   <span>{{ formatDate(item.uploadedAt) }}</span>
                   <span>{{ formatSize(item.fileSize) }}</span>
                 </div>
+                <p class="file-note">
+                  点击后可继续预览、下载或分享当前文件。
+                </p>
               </div>
             </article>
           </div>
@@ -123,18 +161,22 @@ import { Icon } from '@iconify/vue'
 import { message } from 'ant-design-vue'
 import AppHeader from '@/components/AppHeader.vue'
 import MobileBottomNav from '@/components/MobileBottomNav.vue'
+import PortalStatePanel from '@/components/PortalStatePanel.vue'
 import { getFileList, downloadFile, previewFile, type FileInfo } from '@/api/file'
-import { usePortalVisitorStore } from '@/stores/portalVisitor'
+import { usePortalAccessContext } from '@/composables/usePortalAccessContext'
+import {
+  resolvePortalAccessErrorState,
+  type PortalAccessErrorState,
+} from '@/utils/portalState'
 
 const route = useRoute()
 const router = useRouter()
-const portalVisitorStore = usePortalVisitorStore()
 const loading = ref(false)
 const files = ref<FileInfo[]>([])
-const matterId = ref('')
-const token = ref('')
 const actionSheetOpen = ref(false)
 const selectedFile = ref<FileInfo | null>(null)
+const errorState = ref<PortalAccessErrorState>('none')
+const { matterId, token, hasStoredContext, hasAccessContext, sourceText, clearAccessContext } = usePortalAccessContext()
 const fileActions = [
   { name: '预览', key: 'preview' },
   { name: '下载', key: 'download' },
@@ -149,34 +191,23 @@ const latestFileDate = computed(() => {
   const latest = dates.length > 0 ? dates[dates.length - 1] : undefined
   return latest ? formatDate(latest) : '-'
 })
-const hasStoredContext = computed(() => Boolean(
-  portalVisitorStore.profile.lastMatterId && portalVisitorStore.profile.lastMatterToken,
-))
-
-function syncAccessContext() {
-  const routeMatterId = (route.query.matterId as string) || ''
-  const routeToken = (route.query.token as string) || ''
-
-  if (routeMatterId && routeToken) {
-    matterId.value = routeMatterId
-    token.value = routeToken
+async function loadFiles() {
+  if (!matterId.value || !token.value) {
+    files.value = []
+    errorState.value = 'missing-token'
     return
   }
 
-  matterId.value = portalVisitorStore.profile.lastMatterId || ''
-  token.value = portalVisitorStore.profile.lastMatterToken || ''
-}
-
-async function loadFiles() {
-  if (!matterId.value || !token.value) return
-
   loading.value = true
+  errorState.value = 'none'
   try {
     const res = await getFileList(matterId.value, token.value)
     if (res.success && res.data) {
       files.value = res.data
     }
-  } catch {
+  } catch (error) {
+    files.value = []
+    errorState.value = resolvePortalAccessErrorState(error)
     message.error('加载文件列表失败')
   } finally {
     loading.value = false
@@ -251,13 +282,11 @@ async function handleFileAction(action: { key?: string; name: string }) {
 watch(
   () => [route.query.matterId, route.query.token],
   () => {
-    syncAccessContext()
     loadFiles()
   },
 )
 
 onMounted(() => {
-  syncAccessContext()
   loadFiles()
 })
 </script>
@@ -277,19 +306,24 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(217, 226, 236, 0.92);
-  box-shadow: 0 10px 24px rgba(16, 42, 67, 0.08);
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+}
+
+.file-card:hover {
+  border-color: rgba(16, 42, 67, 0.14);
+  box-shadow: 0 14px 28px rgba(16, 42, 67, 0.08);
+  transform: translateY(-1px);
 }
 
 .file-card__icon {
-  width: 46px;
-  height: 46px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--lex-bg-muted);
   font-size: 26px;
   flex-shrink: 0;
@@ -314,15 +348,13 @@ onMounted(() => {
   color: var(--text-secondary);
 }
 
-.skeleton-list {
-  display: grid;
-  gap: 12px;
+.file-note {
+  margin: 2px 0 0;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.7;
 }
 
-.skeleton-item {
-  padding: 16px;
-  border-radius: 8px;
-  background: var(--lex-bg-muted);
-  border: 1px solid var(--border-color-light);
+@media (max-width: 768px) {
 }
 </style>

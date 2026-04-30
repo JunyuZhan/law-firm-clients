@@ -20,38 +20,38 @@
             v-if="matterDetail"
             class="detail-shell"
           >
-            <section class="hero-panel glass-panel">
+            <section class="hero-panel">
               <div class="hero-copy">
+                <span class="hero-eyebrow">事项协作空间</span>
                 <h1 class="hero-title">
                   {{ matterData.matterName || `项目 ${matterId}` }}
                 </h1>
                 <p class="hero-subtitle">
-                  {{ matterDetail.clientName }} · 进度、材料与节点见下方各区块。
+                  {{ matterDetail.clientName }} · 当前页面仅展示已授权的事项信息、文件和提醒，便于围绕同一案件继续协作。
                 </p>
 
                 <div class="hero-meta">
-                  <article class="hero-meta-item">
-                    <strong>项目编号</strong>
-                    <span>{{ matterData.matterNo || '未同步' }}</span>
-                  </article>
-                  <article class="hero-meta-item">
-                    <strong>项目类型</strong>
-                    <span>{{ matterData.matterTypeName || matterData.matterType || '未分类' }}</span>
-                  </article>
-                  <article class="hero-meta-item">
-                    <strong>有效期至</strong>
-                    <span>{{ formatDate(matterDetail.expiresAt) }}</span>
+                  <article
+                    v-for="item in heroFacts"
+                    :key="item.label"
+                    class="hero-meta-item"
+                  >
+                    <strong>{{ item.label }}</strong>
+                    <span>{{ item.value }}</span>
                   </article>
                 </div>
               </div>
 
               <div class="hero-side">
-                <a-tag
-                  class="hero-status"
-                  :color="getStatusColor(displayStatusRaw)"
-                >
-                  {{ displayStatus }}
-                </a-tag>
+                <div class="hero-status-row">
+                  <a-tag
+                    class="hero-status"
+                    :color="getStatusColor(displayStatusRaw)"
+                  >
+                    {{ displayStatus }}
+                  </a-tag>
+                  <span class="hero-status-note">仅展示当前授权范围内的协作内容</span>
+                </div>
 
                 <div class="hero-progress-card">
                   <span class="hero-progress-label">当前阶段</span>
@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="hero-action-card">
-                  <span class="hero-progress-label">建议</span>
+                  <span class="hero-progress-label">当前建议</span>
                   <strong>{{ heroActionTitle }}</strong>
                   <p>{{ heroActionDescription }}</p>
                   <a-button
@@ -82,10 +82,28 @@
               </div>
             </section>
 
+            <section class="summary-ribbon">
+              <article class="summary-ribbon__item">
+                <span>访问有效期</span>
+                <strong>{{ formatDate(matterDetail.expiresAt) }}</strong>
+                <p>过期后需由律所重新发送访问链接。</p>
+              </article>
+              <article class="summary-ribbon__item">
+                <span>文件快照</span>
+                <strong>{{ fileList.length }} 份</strong>
+                <p>含律所推送文件与客户补充材料。</p>
+              </article>
+              <article class="summary-ribbon__item">
+                <span>待办事项</span>
+                <strong>{{ pendingTaskCount }} 项</strong>
+                <p>{{ pendingTaskCount > 0 ? '请结合下方任务与截止时间继续处理。' : '当前暂无待办任务。' }}</p>
+              </article>
+            </section>
+
             <section class="detail-grid">
               <div class="detail-main">
                 <a-card
-                  title="项目信息"
+                  title="事项概览"
                   class="detail-block"
                 >
                   <a-descriptions
@@ -124,7 +142,7 @@
 
                 <a-card
                   v-if="showProgressSection"
-                  title="项目进度"
+                  title="事项进度"
                   class="detail-block"
                 >
                   <div class="progress-panel">
@@ -151,7 +169,7 @@
 
                 <a-card
                   v-if="recentActivityList.length > 0"
-                  title="最近动态"
+                  title="最近协作动态"
                   class="detail-block"
                 >
                   <div class="activity-list">
@@ -255,7 +273,7 @@
 
                 <a-card
                   v-if="showDocumentsSection"
-                  title="文档列表"
+                  title="事项文档"
                   class="detail-block"
                 >
                   <template #extra>
@@ -297,9 +315,29 @@
 
               <aside class="detail-side">
                 <a-card
+                  title="协作边界"
+                  class="detail-block side-card side-card--accent"
+                >
+                  <div class="boundary-list">
+                    <div class="boundary-item">
+                      <strong>授权范围访问</strong>
+                      <p>当前页面仅展示律师授权给客户查看的事项内容，不提供公开浏览入口。</p>
+                    </div>
+                    <div class="boundary-item">
+                      <strong>文件操作留痕</strong>
+                      <p>查看、下载、上传等协作动作将用于支持有序、可回溯的资料流转。</p>
+                    </div>
+                    <div class="boundary-item">
+                      <strong>异常请联系承办律师</strong>
+                      <p>如事项信息、文件或时间节点存在差异，请联系承办律师进行核对。</p>
+                    </div>
+                  </div>
+                </a-card>
+
+                <a-card
                   v-if="showLawyersSection"
                   title="承办律师"
-                  class="detail-block"
+                  class="detail-block side-card"
                 >
                   <div
                     v-if="matterData.leadLawyerName"
@@ -351,7 +389,7 @@
                 <a-card
                   v-if="showFeesSection"
                   title="费用信息"
-                  class="detail-block"
+                  class="detail-block side-card"
                 >
                   <div class="fee-stack">
                     <div class="fee-item">
@@ -371,7 +409,7 @@
 
                 <a-card
                   title="访问说明"
-                  class="detail-block"
+                  class="detail-block side-card"
                 >
                   <div class="note-list">
                     <div class="note-item">
@@ -392,7 +430,7 @@
                 <a-card
                   v-if="upcomingSnapshot.length > 0"
                   title="关键快照"
-                  class="detail-block"
+                  class="detail-block side-card"
                 >
                   <div class="snapshot-list">
                     <article
@@ -410,7 +448,7 @@
             </section>
 
             <a-card
-              title="文件管理"
+              title="文件协作"
               class="detail-block files-block"
             >
               <template #extra>
@@ -720,6 +758,20 @@ const displayLastUpdate = computed(() => String(matterData.value.lastUpdateTime 
 const pendingTasksList = computed(() => Array.isArray(matterData.value.pendingTasks) ? matterData.value.pendingTasks : [])
 const deadlinesList = computed(() => Array.isArray(matterData.value.deadlines) ? matterData.value.deadlines : [])
 const documentsList = computed(() => Array.isArray(matterData.value.documents) ? matterData.value.documents : [])
+const heroFacts = computed(() => [
+  {
+    label: '项目编号',
+    value: matterData.value.matterNo || '未同步',
+  },
+  {
+    label: '项目类型',
+    value: String(matterData.value.matterTypeName || matterData.value.matterType || '未分类'),
+  },
+  {
+    label: '访问有效期',
+    value: formatDate(matterDetail.value?.expiresAt || ''),
+  },
+])
 const pendingTaskCount = computed(() => pendingTasksList.value.length)
 const completedTasksLabel = computed(() => {
   if (matterData.value.completedTaskCount !== undefined || matterData.value.totalTaskCount !== undefined) {
@@ -860,9 +912,8 @@ async function loadMatterDetail() {
     portalVisitorStore.saveProfile({
       clientId: res.data.clientId ?? null,
       clientName: res.data.clientName || '',
-      lastMatterId: res.data.id || matterId.value,
-      lastMatterToken: token.value || '',
     })
+    portalVisitorStore.applyMatterAccessContext(res.data.id || matterId.value, token.value || '')
     await loadFileList()
     logger.debug('[MatterDetail] 数据加载成功')
   } catch (error: unknown) {
@@ -1093,57 +1144,76 @@ onUnmounted(() => {
 .content {
   width: min(var(--shell-max-width), calc(100vw - 2 * var(--shell-gutter)));
   margin: 0 auto;
-  padding: 24px 0 110px;
+  padding: 26px 0 110px;
 }
 
 .detail-shell {
   display: grid;
-  gap: 18px;
+  gap: 20px;
 }
 
 .hero-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
-  gap: 20px;
-  padding: 28px;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+  gap: 24px;
+  padding: 30px;
+  border-radius: 30px;
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(27, 59, 95, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 250, 0.96));
+  box-shadow: 0 24px 56px rgba(16, 42, 67, 0.08);
 }
 
 .hero-copy {
   display: grid;
-  gap: 16px;
+  gap: 18px;
+  align-content: start;
+}
+
+.hero-eyebrow {
+  color: #8c6a2b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .hero-title {
   margin: 0;
+  color: var(--lex-primary);
   font-size: clamp(34px, 5vw, 58px);
-  line-height: 1.02;
+  line-height: 1.04;
+  letter-spacing: -0.05em;
 }
 
 .hero-subtitle {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.9;
   max-width: 720px;
 }
 
 .hero-meta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .hero-meta-item {
   display: grid;
-  gap: 6px;
-  padding: 16px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  gap: 8px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
 .hero-meta-item strong {
   font-size: 12px;
   color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .hero-meta-item span {
@@ -1157,28 +1227,40 @@ onUnmounted(() => {
   gap: 14px;
 }
 
+.hero-status-row {
+  display: grid;
+  gap: 10px;
+}
+
 .hero-status {
   justify-self: start;
   padding-inline: 12px !important;
+  border-radius: 999px;
+}
+
+.hero-status-note {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 .hero-progress-card {
   display: grid;
   gap: 10px;
   padding: 20px;
-  border-radius: 8px;
-  background: var(--lex-surface);
-  border: 1px solid var(--lex-outline);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
 .hero-action-card {
   display: grid;
   gap: 10px;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 20px;
   background: linear-gradient(135deg, var(--lex-surface-dark) 0%, var(--lex-surface-dark-muted) 100%);
   color: rgba(255, 255, 255, 0.82);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 20px 40px rgba(16, 42, 67, 0.18);
 }
 
 .hero-action-card strong {
@@ -1201,6 +1283,8 @@ onUnmounted(() => {
 .side-kicker {
   font-size: 12px;
   color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .hero-progress-card strong {
@@ -1212,6 +1296,41 @@ onUnmounted(() => {
 .hero-progress-foot {
   color: var(--text-secondary);
   font-size: 13px;
+}
+
+.summary-ribbon {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.summary-ribbon__item {
+  display: grid;
+  gap: 8px;
+  padding: 20px 22px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(16, 42, 67, 0.08);
+  box-shadow: 0 14px 32px rgba(16, 42, 67, 0.05);
+}
+
+.summary-ribbon__item span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summary-ribbon__item strong {
+  color: var(--lex-primary);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.summary-ribbon__item p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
 .detail-grid {
@@ -1231,11 +1350,28 @@ onUnmounted(() => {
   margin: 0;
 }
 
+.detail-block :deep(.ant-card-head) {
+  min-height: 62px;
+  border-bottom: 0;
+  padding: 0 24px;
+}
+
+.detail-block :deep(.ant-card-head-title) {
+  color: var(--lex-primary);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.detail-block :deep(.ant-card-body) {
+  padding: 0 24px 24px;
+}
+
 .progress-panel,
 .fee-stack,
 .note-list,
 .activity-list,
-.snapshot-list {
+ .snapshot-list,
+ .boundary-list {
   display: grid;
   gap: 14px;
 }
@@ -1259,10 +1395,18 @@ onUnmounted(() => {
   width: 100%;
 }
 
+.side-card {
+  border-radius: 22px;
+}
+
+.side-card--accent {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 251, 0.94));
+}
+
 .lead-lawyer {
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px dashed rgba(15, 23, 42, 0.1);
+  border-bottom: 1px dashed rgba(15, 23, 42, 0.12);
 }
 
 .lead-lawyer strong {
@@ -1301,14 +1445,19 @@ onUnmounted(() => {
 }
 
 .activity-item,
-.snapshot-item {
+.snapshot-item,
+.boundary-item {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
   gap: 12px;
-  padding: 16px;
-  border-radius: 8px;
+  padding: 18px;
+  border-radius: 18px;
   background: var(--lex-bg-muted);
   border: 1px solid var(--lex-outline);
+}
+
+.activity-item,
+.snapshot-item {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .activity-dot {
@@ -1326,12 +1475,14 @@ onUnmounted(() => {
 }
 
 .activity-copy strong,
-.snapshot-item strong {
+.snapshot-item strong,
+.boundary-item strong {
   color: var(--lex-primary);
 }
 
 .activity-copy p,
-.snapshot-item p {
+.snapshot-item p,
+.boundary-item p {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.7;
@@ -1352,8 +1503,8 @@ onUnmounted(() => {
 .note-item {
   display: grid;
   gap: 6px;
-  padding: 16px;
-  border-radius: 8px;
+  padding: 18px;
+  border-radius: 18px;
   background: var(--lex-bg-muted);
   border: 1px solid var(--lex-outline);
 }
@@ -1387,6 +1538,10 @@ onUnmounted(() => {
   margin-top: 4px;
 }
 
+.files-block :deep(.ant-card-head) {
+  padding-top: 4px;
+}
+
 .file-actions {
   flex-wrap: nowrap;
 }
@@ -1415,7 +1570,8 @@ onUnmounted(() => {
 
 @media (max-width: 1024px) {
   .hero-panel,
-  .detail-grid {
+  .detail-grid,
+  .summary-ribbon {
     grid-template-columns: 1fr;
   }
 
@@ -1467,6 +1623,12 @@ onUnmounted(() => {
 
   .upload-btn {
     width: 100%;
+  }
+
+  .detail-block :deep(.ant-card-head),
+  .detail-block :deep(.ant-card-body) {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }
 </style>

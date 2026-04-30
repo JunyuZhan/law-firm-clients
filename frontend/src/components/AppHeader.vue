@@ -73,7 +73,7 @@
               v-if="variant === 'portal'"
               class="welcome-text"
             >
-              {{ lawFirmName }}
+              {{ portalSystemLabel }}
             </div>
             <div
               v-else-if="welcomeText"
@@ -161,8 +161,8 @@ const appConfigStore = useAppConfigStore()
 const logoUrl = computed(() => appConfigStore.logoUrl)
 const lawFirmName = computed(() => appConfigStore.lawFirmName || appConfigStore.displayName || '律师事务所')
 const portalSystemLabel = computed(() => appConfigStore.appShortName || '客户服务系统')
-const portalSubtitle = computed(() => '客户服务系统')
-const detailSubtitle = computed(() => '项目进展与文件')
+const portalSubtitle = computed(() => '仅展示当前授权范围内的客户协作内容')
+const detailSubtitle = computed(() => '围绕事项进展、文件与提醒继续协作')
 </script>
 
 <style scoped>
@@ -175,21 +175,21 @@ const detailSubtitle = computed(() => '项目进展与文件')
 }
 
 .app-header.portal {
-  color: #fff;
+  color: #1f2937;
 }
 
 .header-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(var(--backdrop-blur));
-  border-bottom: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #f0f0f0;
   pointer-events: none;
 }
 
 .app-header.portal .header-backdrop {
-  background: rgba(246, 244, 239, 0.84);
-  border-bottom: 1px solid rgba(16, 42, 67, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .header-content {
@@ -198,12 +198,12 @@ const detailSubtitle = computed(() => '项目进展与文件')
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 18px;
-  padding: 16px 0;
+  gap: 16px;
+  padding: 12px 24px;
 }
 
 .app-header.has-welcome .header-content {
-  min-height: 82px;
+  min-height: 72px;
 }
 
 .header-left,
@@ -251,24 +251,26 @@ const detailSubtitle = computed(() => '项目进展与文件')
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   min-width: 0;
   max-width: min(100%, 640px);
 }
 
 .logo-icon {
-  width: 62px;
-  height: 62px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
   flex-shrink: 0;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
 }
 
 .logo-image {
-  width: 100%;
-  height: 100%;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
@@ -276,22 +278,22 @@ const detailSubtitle = computed(() => '项目进展与文件')
 .app-header.portal .welcome-text,
 .app-header.portal .page-title,
 .app-header.portal .page-caption {
-  color: #102a43;
+  color: #1f2937;
 }
 
 .app-header.portal .logo-system-label {
-  color: #627d98;
+  color: #6b7280;
 }
 
 .app-header.portal .header-btn {
-  border-color: rgba(16, 42, 67, 0.08);
-  background: rgba(255, 255, 255, 0.7);
-  color: #102a43;
+  border-color: #d9d9d9;
+  background: #ffffff;
+  color: #1f2937;
 }
 
 .app-header.portal .header-btn:hover {
-  border-color: rgba(16, 42, 67, 0.16);
-  background: rgba(255, 255, 255, 0.96);
+  border-color: #1677ff;
+  color: #1677ff;
 }
 
 .logo-text {
@@ -301,19 +303,20 @@ const detailSubtitle = computed(() => '项目进展与文件')
 
 .logo-text h1 {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.3;
-  color: var(--lex-primary);
+  font-weight: 600;
+  color: #1f2937;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 .logo-system-label {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   font-size: 12px;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  line-height: 1.5;
+  color: #6b7280;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -321,47 +324,50 @@ const detailSubtitle = computed(() => '项目进展与文件')
 
 .title-section {
   min-width: 0;
-  display: grid;
-  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
 }
 
 .welcome-text {
-  color: var(--lex-accent-strong);
+  color: #1677ff;
   font-size: 12px;
   line-height: 1.5;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .page-title {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.3;
-  color: var(--lex-primary);
+  font-weight: 600;
+  color: #1f2937;
 }
 
 .page-caption {
   margin: 0;
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.6;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .header-btn {
-  min-width: 40px;
-  min-height: 40px;
-  padding-inline: 12px;
-  border-radius: 999px;
-  border: 1px solid var(--border-color);
-  background: var(--lex-bg-muted) !important;
-  color: var(--lex-primary-soft) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  background: #ffffff !important;
+  color: #4b5563 !important;
 }
 
 .header-btn:hover {
-  background: var(--lex-surface-strong) !important;
-  color: var(--lex-primary) !important;
-  transform: translateY(-1px);
+  border-color: #1677ff;
+  color: #1677ff !important;
 }
 
 .back-btn-text {
@@ -371,31 +377,35 @@ const detailSubtitle = computed(() => '项目进展与文件')
 @media (max-width: 768px) {
   .header-content {
     min-height: 56px;
-    gap: 12px;
-    padding: 12px 0;
+    gap: 8px;
+    padding: 8px 16px;
   }
 
   .app-header.has-welcome .header-content {
-    min-height: 72px;
+    min-height: 64px;
   }
 
   .logo-icon {
-    width: 52px;
-    height: 52px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+  }
+  
+  .logo-image {
+    width: 20px;
+    height: 20px;
   }
 
   .logo-text h1 {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .logo-system-label {
-    margin-top: 2px;
     font-size: 11px;
-    line-height: 1.5;
   }
 
   .title-section {
-    gap: 2px;
+    gap: 0;
   }
 
   .welcome-text,
@@ -408,21 +418,20 @@ const detailSubtitle = computed(() => '项目进展与文件')
 
   .welcome-text {
     font-size: 10px;
-    letter-spacing: 0.1em;
   }
 
   .page-title {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .page-caption {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 11px;
   }
 
   .header-btn {
-    min-width: 38px;
-    min-height: 38px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
   }
 
   .back-btn-text,

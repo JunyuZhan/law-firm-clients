@@ -1,78 +1,73 @@
 <template>
   <div class="login-page">
-    <div class="login-shell fade-in">
-      <section class="login-panel surface-card">
-        <div class="login-panel__brand">
-          <div class="login-brand-topline">
-            <div class="logo-shell">
-              <img
-                v-if="appConfigStore.logoUrl"
-                :src="appConfigStore.logoUrl"
-                alt="Logo"
-                class="logo-image"
-              >
-              <svg
-                v-else
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                aria-hidden="true"
-                class="logo-fallback"
-              >
-                <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
-                <path d="M12 12L20 7.5" />
-                <path d="M12 12V21" />
-                <path d="M12 12L4 7.5" />
-              </svg>
-            </div>
-
-            <div class="brand-lockup">
-              <p class="brand-label">
-                {{ organizationName || '律师事务所' }}
-              </p>
-              <h1 class="brand-system-name">
-                {{ UI_TEXTS.loginTitle }}
-              </h1>
-            </div>
+    <div class="login-container">
+      <div class="login-left">
+        <div class="login-left-content">
+          <div class="logo-container">
+            <img
+              v-if="appConfigStore.logoUrl"
+              :src="appConfigStore.logoUrl"
+              alt="Logo"
+              class="logo-image"
+            >
+            <svg
+              v-else
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+              class="logo-fallback"
+            >
+              <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" />
+              <path d="M12 12L20 7.5" />
+              <path d="M12 12V21" />
+              <path d="M12 12L4 7.5" />
+            </svg>
+            <span class="brand-name">{{ organizationName || '律师事务所' }}</span>
+          </div>
+          
+          <div class="hero-text">
+            <h1>{{ UI_TEXTS.loginTitle }}</h1>
+            <p>专业、高效的客户服务系统，聚焦客户协作、事项流转与系统配置。</p>
           </div>
 
-          <div class="brand-copy">
-            <span class="eyebrow">Administrator Access</span>
-            <h2 class="brand-title">
-              管理后台登录
-            </h2>
-            <p class="brand-subtitle">
-              聚焦客户协作、事项流转与系统配置，仅向已授权管理员开放。
-            </p>
-          </div>
-
-          <div class="brand-points">
-            <article
+          <div class="feature-list">
+            <div
               v-for="item in adminHighlights"
               :key="item.title"
-              class="brand-point"
+              class="feature-item"
             >
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.description }}</p>
-            </article>
+              <div class="feature-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <div class="feature-text">
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.description }}</p>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="login-panel__form">
-          <div class="form-panel-head">
-            <span class="form-eyebrow">管理端登录</span>
-            <h2 class="form-panel-head__title">
-              进入工作台
-            </h2>
-            <p class="form-panel-head__desc">
-              请使用已分配的管理员账户完成校验后进入工作台。
-            </p>
+      <div class="login-right">
+        <div class="login-form-container">
+          <div class="form-header">
+            <h2>欢迎回来</h2>
+            <p>请使用管理员账户登录系统</p>
           </div>
 
           <a-form
             :model="form"
             :rules="rules"
+            layout="vertical"
             class="login-form"
             @finish="handleLogin"
           >
@@ -81,7 +76,6 @@
                 v-model:value="form.username"
                 size="large"
                 :placeholder="ADMIN_LOGIN_TEXTS.placeholders.username"
-                class="login-input"
               >
                 <template #prefix>
                   <UserOutlined class="input-icon" />
@@ -94,7 +88,6 @@
                 v-model:value="form.password"
                 size="large"
                 :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
-                class="login-input"
                 @press-enter="handleLogin"
               >
                 <template #prefix>
@@ -104,17 +97,15 @@
             </a-form-item>
 
             <a-form-item name="captchaText">
-              <div class="captcha-row">
+              <div class="captcha-wrapper">
                 <a-input
                   v-model:value="form.captchaText"
                   size="large"
                   :placeholder="ADMIN_LOGIN_TEXTS.placeholders.captcha"
-                  class="login-input captcha-input"
                   @press-enter="handleLogin"
                 />
-                <button
-                  type="button"
-                  class="captcha-image"
+                <div
+                  class="captcha-img-container"
                   @click="refreshCaptcha"
                 >
                   <img
@@ -122,8 +113,11 @@
                     :src="captchaImage"
                     alt="验证码"
                   >
-                  <span v-else>{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
-                </button>
+                  <span
+                    v-else
+                    class="captcha-loading"
+                  >{{ ADMIN_LOGIN_TEXTS.placeholders.captchaLoading }}</span>
+                </div>
               </div>
             </a-form-item>
 
@@ -134,7 +128,7 @@
                 size="large"
                 :loading="loading"
                 block
-                class="login-button"
+                class="submit-btn"
               >
                 {{ UI_TEXTS.loginButton }}
               </a-button>
@@ -164,13 +158,11 @@
                 href="https://beian.miit.gov.cn/"
                 target="_blank"
                 rel="noopener"
-              >
-                {{ appConfigStore.icpLicense }}
-              </a>
+              >{{ appConfigStore.icpLicense }}</a>
             </p>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   </div>
 </template>
@@ -318,344 +310,237 @@ onMounted(() => {
 
 <style scoped>
 .login-page {
-  --login-accent: #b88a2b;
-  --login-accent-soft: rgba(184, 138, 43, 0.12);
-  --login-ink: #0f172a;
-  --login-ink-soft: #334155;
-  --login-border: rgba(15, 23, 42, 0.08);
   min-height: 100vh;
-  padding: 28px;
-  background:
-    radial-gradient(circle at top left, rgba(15, 23, 42, 0.08), transparent 30%),
-    radial-gradient(circle at top right, rgba(184, 138, 43, 0.08), transparent 22%),
-    linear-gradient(180deg, #fafaf9 0%, #f8fafc 48%, #f1f5f9 100%);
+  display: flex;
+  background-color: #f3f4f6;
 }
 
-.login-shell {
-  min-height: calc(100vh - 56px);
-  display: grid;
-  place-items: center;
+.login-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
 }
 
-.login-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 0.96fr) minmax(360px, 440px);
-  width: min(1040px, 100%);
+.login-left {
+  display: none;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+  color: white;
+  position: relative;
   overflow: hidden;
-  border-radius: 28px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 26px 56px rgba(15, 23, 42, 0.09);
 }
 
-.login-panel__brand {
-  display: grid;
-  gap: 28px;
-  padding: 44px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top left, rgba(184, 138, 43, 0.08), transparent 36%);
-  border-right: 1px solid var(--login-border);
+@media (min-width: 1024px) {
+  .login-left {
+    display: flex;
+    flex: 1;
+    max-width: 50%;
+  }
 }
 
-.login-brand-topline {
+.login-left-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 64px;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.logo-container {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.logo-image, .logo-fallback {
+  width: 40px;
+  height: 40px;
+  color: white;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.hero-text {
+  margin-top: 60px;
+  margin-bottom: auto;
+}
+
+.hero-text h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.hero-text p {
+  font-size: 1.125rem;
+  color: #bfdbfe;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
   gap: 16px;
 }
 
-.logo-shell {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #93c5fd;
   flex-shrink: 0;
-  border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
-  color: var(--login-accent);
 }
 
-.logo-image,
-.logo-fallback {
+.feature-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.feature-text h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 4px;
+}
+
+.feature-text p {
+  font-size: 0.875rem;
+  color: #bfdbfe;
+  margin: 0;
+}
+
+.login-right {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background-color: white;
+}
+
+.login-form-container {
   width: 100%;
-  height: 100%;
+  max-width: 400px;
 }
 
-.brand-lockup {
-  min-width: 0;
+.form-header {
+  margin-bottom: 40px;
 }
 
-.brand-label,
-.brand-system-name,
-.brand-title,
-.brand-subtitle,
-.form-panel-head__title,
-.form-panel-head__desc,
-.form-eyebrow {
-  margin: 0;
-}
-
-.brand-label,
-.form-eyebrow {
-  color: var(--login-accent);
-  font-size: 12px;
+.form-header h2 {
+  font-size: 1.875rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  color: #111827;
+  margin: 0 0 8px;
 }
 
-.brand-system-name {
-  margin-top: 6px;
-  color: var(--login-ink);
-  font-size: 20px;
-  line-height: 1.3;
-}
-
-.brand-copy {
-  display: grid;
-  gap: 12px;
-  max-width: 460px;
-}
-
-.brand-title,
-.form-panel-head__title {
-  color: var(--login-ink);
-  font-size: clamp(30px, 3.8vw, 40px);
-  line-height: 1.12;
-  letter-spacing: -0.035em;
-}
-
-.brand-subtitle,
-.form-panel-head__desc,
-.brand-point p,
-.form-footer p {
-  color: #475569;
-  line-height: 1.75;
-}
-
-.brand-subtitle {
-  font-size: 15px;
-  max-width: 30em;
-}
-
-.brand-points {
-  display: grid;
-  gap: 14px;
-  margin-top: auto;
-}
-
-.brand-point {
-  padding: 18px 20px;
-  border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
-}
-
-.brand-point h3 {
+.form-header p {
+  font-size: 1rem;
+  color: #6b7280;
   margin: 0;
-  color: var(--login-ink);
-  font-size: 16px;
-}
-
-.brand-point p {
-  margin-top: 8px;
-  font-size: 14px;
-}
-
-.login-panel__form {
-  display: grid;
-  align-content: center;
-  gap: 26px;
-  padding: 44px 38px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 250, 249, 0.96));
-}
-
-.form-panel-head {
-  display: grid;
-  gap: 10px;
-}
-
-.form-panel-head__title {
-  font-size: 32px;
-}
-
-.form-panel-head__desc {
-  font-size: 14px;
-  max-width: 26em;
-}
-
-.login-form {
-  margin-bottom: 2px;
-}
-
-.login-form :deep(.ant-form-item) {
-  margin-bottom: 18px;
-}
-
-.login-form :deep(.ant-form-item:last-child) {
-  margin-bottom: 0;
-}
-
-.login-form :deep(.ant-input-affix-wrapper),
-.login-form :deep(.ant-input),
-.captcha-image {
-  border-radius: 14px;
 }
 
 .login-form :deep(.ant-input-affix-wrapper),
 .login-form :deep(.ant-input) {
-  border-color: rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: none;
-}
-
-.login-form :deep(.ant-input-affix-wrapper:hover),
-.login-form :deep(.ant-input:hover),
-.captcha-image:hover {
-  border-color: rgba(184, 138, 43, 0.3);
-}
-
-.login-form :deep(.ant-input-affix-wrapper-focused),
-.login-form :deep(.ant-input:focus),
-.captcha-image:focus-visible {
-  border-color: var(--login-accent);
-  box-shadow: 0 0 0 3px rgba(184, 138, 43, 0.14);
-}
-
-.login-input {
-  min-height: 52px;
+  border-radius: 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .input-icon {
-  color: #64748b;
+  color: #9ca3af;
 }
 
-.captcha-row {
-  display: grid;
-  grid-template-columns: minmax(0, 13fr) minmax(0, 6fr);
-  align-items: stretch;
+.captcha-wrapper {
+  display: flex;
   gap: 12px;
 }
 
-.captcha-input {
-  min-width: 0;
+.captcha-wrapper .ant-input {
+  flex: 1;
 }
 
-.captcha-image {
+.captcha-img-container {
+  width: 120px;
+  height: 40px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
-  padding: 4px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-  overflow: hidden;
-  cursor: pointer;
+  background-color: #f9fafb;
 }
 
-.captcha-image img {
-  display: block;
+.captcha-img-container img {
   width: 100%;
-  height: auto;
-  max-height: 40px;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
 }
 
-.login-button {
-  height: 52px !important;
-  border-radius: 14px !important;
-  font-size: 15px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.04em;
+.captcha-loading {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.submit-btn {
+  height: 44px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.submit-btn:hover {
+  background-color: #1e40af !important;
+  border-color: #1e40af !important;
 }
 
 .error-alert {
-  margin-top: -4px;
+  margin-bottom: 24px;
+  border-radius: 8px;
 }
 
 .form-footer {
-  display: grid;
-  gap: 6px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  margin-top: 32px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
 }
 
 .form-footer p {
-  font-size: 12px;
+  margin: 4px 0;
 }
 
 .icp-link a {
-  color: inherit;
+  color: #6b7280;
   text-decoration: none;
+  transition: color 0.2s;
 }
 
 .icp-link a:hover {
-  color: var(--login-ink);
-}
-
-@media (max-width: 960px) {
-  .login-page {
-    padding: 20px;
-  }
-
-  .login-shell {
-    min-height: calc(100vh - 40px);
-  }
-
-  .login-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .login-panel__brand {
-    gap: 22px;
-    padding: 32px 28px 20px;
-    border-right: 0;
-    border-bottom: 1px solid var(--login-border);
-  }
-
-  .login-panel__form {
-    padding: 32px 28px;
-  }
-}
-
-@media (max-width: 560px) {
-  .login-page {
-    padding: 12px;
-  }
-
-  .login-shell {
-    min-height: calc(100vh - 24px);
-  }
-
-  .login-panel {
-    border-radius: 22px;
-  }
-
-  .login-panel__brand,
-  .login-panel__form {
-    padding-inline: 20px;
-  }
-
-  .login-brand-topline {
-    align-items: flex-start;
-  }
-
-  .logo-shell {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-  }
-
-  .brand-title,
-  .form-panel-head__title {
-    font-size: 28px;
-  }
-
-  .captcha-row {
-    grid-template-columns: 1fr;
-  }
+  color: #111827;
 }
 </style>

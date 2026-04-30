@@ -15,6 +15,19 @@ export interface MatterListItem {
   updatedAt: string
 }
 
+export interface PortalMatterListItem {
+  id: string
+  clientName: string
+  matterName: string
+  status: string
+  statusName?: string
+  counsel?: string
+  expiresAt?: string
+  accessToken: string
+  createdAt?: string
+  updatedAt?: string
+}
+
 // 获取项目列表
 export function getMatterList(params: {
   clientId?: number
@@ -104,6 +117,12 @@ export interface ClientMatterDetail {
 export function getClientMatterDetail(matterId: string, token: string): Promise<ApiResponse<ClientMatterDetail>> {
   return request.get(`/portal/api/matter/${matterId}`, {
     params: { token },
+  })
+}
+
+export function getPortalMatterList(token: string, limit = 20): Promise<ApiResponse<PortalMatterListItem[]>> {
+  return request.get('/portal/api/matters', {
+    params: { token, limit },
   })
 }
 

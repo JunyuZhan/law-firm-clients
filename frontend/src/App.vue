@@ -10,8 +10,6 @@
       >
         跳到主要内容
       </a>
-      <div class="app-frame__glow app-frame__glow--primary" />
-      <div class="app-frame__glow app-frame__glow--accent" />
       <router-view />
     </div>
   </a-config-provider>
@@ -34,86 +32,25 @@ onMounted(() => {
 const themeConfig = computed(() => ({
   algorithm: theme.defaultAlgorithm,
   token: {
-    colorPrimary: '#1B3B5F',
-    colorSuccess: '#2D6A4F',
-    colorWarning: '#9C6B1A',
-    colorError: '#A61E2D',
-    colorInfo: '#2D5A8E',
-    colorBgBase: '#F5F7FA',
-    colorTextBase: '#102A43',
-    colorBorder: '#E8ECEF',
-    colorSplit: '#E8ECEF',
-    borderRadius: 4,
+    colorPrimary: '#1677ff',
+    colorSuccess: '#52c41a',
+    colorWarning: '#faad14',
+    colorError: '#f5222d',
+    colorInfo: '#1677ff',
+    colorBgBase: '#f0f2f5',
+    colorTextBase: '#1f2937',
+    borderRadius: 6,
     wireframe: false,
-    motionDurationSlow: '0.24s',
-    motionDurationMid: '0.2s',
     fontSize: 14,
-    controlHeight: 40,
-    fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", sans-serif',
-    fontFamilyCode: '"SFMono-Regular", "JetBrains Mono", "Consolas", monospace',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-    boxShadowSecondary: '0 10px 26px rgba(16, 42, 67, 0.08)',
-    controlOutline: 'rgba(27, 59, 95, 0.16)',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
   },
   components: {
     Layout: {
-      bodyBg: '#F5F7FA',
+      bodyBg: '#f0f2f5',
       headerBg: '#ffffff',
-      siderBg: '#001529',
-      triggerBg: '#001529',
-    },
-    Button: {
-      borderRadius: 4,
-      controlHeight: 40,
-      fontWeight: 600,
-      primaryShadow: 'none',
     },
     Card: {
-      borderRadiusLG: 12,
-      headerBg: 'transparent',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-    },
-    Input: {
-      borderRadius: 4,
-      controlHeight: 40,
-      hoverBorderColor: '#1B3B5F',
-      activeBorderColor: '#1B3B5F',
-    },
-    Select: {
-      borderRadius: 4,
-      controlHeight: 40,
-    },
-    Table: {
-      borderColor: '#E8ECEF',
-      headerBg: '#FAFBFC',
-      headerColor: '#102A43',
-      headerSplitColor: '#E8ECEF',
-      rowHoverBg: 'rgba(27, 59, 95, 0.04)',
-    },
-    Menu: {
-      borderRadius: 6,
-      itemBorderRadius: 4,
-      itemHeight: 44,
-      itemMarginInline: 8,
-      itemMarginBlock: 4,
-      darkItemBg: 'transparent',
-      darkSubMenuItemBg: 'transparent',
-      darkItemHoverBg: 'rgba(255, 255, 255, 0.06)',
-      darkItemSelectedBg: 'rgba(59, 130, 246, 0.16)',
-    },
-    Drawer: {
-      colorBgElevated: '#ffffff',
-    },
-    Modal: {
-      borderRadiusLG: 12,
-    },
-    Tag: {
-      borderRadiusSM: 999,
-    },
-    Tabs: {
-      itemColor: '#627D98',
-      itemSelectedColor: '#1B3B5F',
-      inkBarColor: '#1B3B5F',
+      borderRadiusLG: 8,
     },
   },
 }) as ConfigProviderProps['theme'])
@@ -134,7 +71,6 @@ const renderEmpty: ConfigProviderProps['renderEmpty'] = componentName =>
 .app-frame {
   position: relative;
   min-height: 100vh;
-  overflow: clip;
 }
 
 .skip-link {
@@ -144,74 +80,42 @@ const renderEmpty: ConfigProviderProps['renderEmpty'] = componentName =>
   z-index: 2000;
   padding: 10px 14px;
   border-radius: 8px;
-  background: var(--lex-surface-strong);
-  color: var(--lex-primary-soft);
-  border: 1px solid var(--border-color);
+  background: #ffffff;
+  color: #1677ff;
+  border: 1px solid #d9d9d9;
   text-decoration: none;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: top 0.3s;
 }
 
 .skip-link:focus {
   top: 16px;
 }
 
-.app-frame__glow {
-  position: fixed;
-  pointer-events: none;
-  filter: blur(56px);
-  opacity: 0.85;
-  z-index: 0;
-}
-
-.app-frame__glow--primary {
-  top: -100px;
-  right: -40px;
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, rgba(30, 64, 175, 0.14) 0%, rgba(30, 64, 175, 0) 72%);
-}
-
-.app-frame__glow--accent {
-  left: -80px;
-  bottom: 8vh;
-  width: 340px;
-  height: 340px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0) 72%);
-}
-
 :deep(.app-empty-state) {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  padding: 32px 20px;
-  border-radius: 18px;
-  border: 1px dashed rgba(27, 59, 95, 0.18);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 247, 250, 0.92));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0;
 }
 
 :deep(.app-empty-state__icon) {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
-  background: rgba(27, 59, 95, 0.08);
-  color: #1b3b5f;
-  font-size: 24px;
+  font-size: 48px;
+  color: #1677ff;
+  opacity: 0.2;
+  margin-bottom: 16px;
 }
 
 :deep(.app-empty-state__title) {
-  color: #102a43;
-  font-size: 15px;
-  font-weight: 600;
+  color: #1f2937;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
 :deep(.app-empty-state__hint) {
-  margin: 0;
-  max-width: 280px;
-  color: #627d98;
-  font-size: 13px;
-  line-height: 1.7;
-  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
 }
 </style>

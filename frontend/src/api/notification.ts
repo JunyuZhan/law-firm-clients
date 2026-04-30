@@ -35,6 +35,19 @@ export interface NotificationStatistics {
   email?: { total: number; success: number; failed: number; pending: number }
 }
 
+export interface PortalNotificationItem {
+  id: number
+  matterId: string
+  matterName?: string
+  title: string
+  content: string
+  notificationType: string
+  status: string
+  recipient?: string
+  sentAt?: string
+  createdAt: string
+}
+
 // 获取通知历史
 export function getNotificationHistory(params: {
   matterId?: string
@@ -63,4 +76,10 @@ export function getNotificationStatistics(params: {
   endTime?: string
 }): Promise<ApiResponse<NotificationStatistics>> {
   return request.get('/api/notification/statistics', { params })
+}
+
+export function getPortalNotifications(token: string, limit = 20): Promise<ApiResponse<PortalNotificationItem[]>> {
+  return request.get('/portal/api/notifications', {
+    params: { token, limit },
+  })
 }

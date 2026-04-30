@@ -1,9 +1,10 @@
 package com.clientservice.application.service;
 
+import com.clientservice.application.dto.MatterDetailDTO;
+import com.clientservice.application.dto.MatterListDTO;
 import com.clientservice.application.dto.MatterReceiveRequest;
 import com.clientservice.application.dto.MatterReceiveResponse;
-import com.clientservice.application.dto.MatterListDTO;
-import com.clientservice.application.dto.MatterDetailDTO;
+import com.clientservice.application.dto.PortalMatterListItemDTO;
 import com.clientservice.common.exception.BusinessException;
 import com.clientservice.common.exception.ErrorCode;
 import com.clientservice.common.util.TokenGenerator;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -522,6 +524,37 @@ public class MatterService {
     }
 
     /**
+     * 获取客户门户事项列表。
+     *
+     * <p>通过当前有效 token 确认客户身份后，返回该客户当前可访问的事项。</p>
+     *
+     * @param token 当前事项访问令牌
+     * @param limit 限制数量
+     * @return 门户事项列表
+     */
+    public List<PortalMatterListItemDTO> getPortalMatterList(final String token, final Integer limit) {
+        ClientMatter currentMatter = getMatterByToken(token);
+
+        LambdaQueryWrapper<ClientMatter> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ClientMatter::getClientId, currentMatter.getClientId())
+                .in(ClientMatter::getStatus, List.of(
+                        ClientMatter.STATUS_ACTIVE,
+                        ClientMatter.STATUS_EXPIRED,
+                        ClientMatter.STATUS_REVOKED))
+                .orderByDesc(ClientMatter::getUpdatedAt);
+
+        int limitValue = limit != null && limit > 0 ? Math.min(limit, 100) : 20;
+        Page<ClientMatter> page = new Page<>(1, limitValue);
+        page.setSearchCount(false);
+
+        List<ClientMatter> matters = matterMapper.selectPage(page, queryWrapper).getRecords();
+
+        return matters.stream()
+                .map(this::convertToPortalListItemDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 转换为列表DTO
      */
     private MatterListDTO convertToListDTO(final ClientMatter matter) {
@@ -539,6 +572,31 @@ public class MatterService {
                 .build();
     }
 
+    private PortalMatterListItemDTO convertToPortalListItemDTO(final ClientMatter matter) {
+        Map<String, Object> matterDataMap = parseMatterDataMap(matter.getMatterData(), matter.getId());
+
+        return PortalMatterListItemDTO.builder()
+                .id(matter.getId())
+                .clientName(matter.getClientName())
+                .matterName(firstNonBlank(
+                        asString(matterDataMap.get("matterName")),
+                        asString(matterDataMap.get("title")),
+                        "事项 " + matter.getId()))
+                .status(matter.getStatus())
+                .statusName(firstNonBlank(
+                        asString(matterDataMap.get("statusName")),
+                        matter.getStatus()))
+                .counsel(firstNonBlank(
+                        asString(matterDataMap.get("leadLawyerName")),
+                        asString(matterDataMap.get("counsel")),
+                        asString(matterDataMap.get("lawyerName"))))
+                .expiresAt(matter.getExpiresAt())
+                .accessToken(matter.getAccessToken())
+                .createdAt(matter.getCreatedAt())
+                .updatedAt(matter.getUpdatedAt())
+                .build();
+    }
+
     /**
      * 获取项目详情（管理后台使用）
      *
@@ -549,15 +607,7 @@ public class MatterService {
         ClientMatter matter = getMatterById(id);
 
         // 解析项目数据JSON（初始化为空Map避免NPE）
-        Map<String, Object> matterDataMap = new java.util.HashMap<>();
-        if (matter.getMatterData() != null && !matter.getMatterData().isEmpty()) {
-            try {
-                matterDataMap = objectMapper.readValue(matter.getMatterData(), 
-                        new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
-            } catch (Exception e) {
-                log.warn("解析项目数据JSON失败: id={}", id, e);
-            }
-        }
+        Map<String, Object> matterDataMap = parseMatterDataMap(matter.getMatterData(), id);
 
         return MatterDetailDTO.builder()
                 .id(matter.getId())
@@ -574,5 +624,38 @@ public class MatterService {
                 .createdAt(matter.getCreatedAt())
                 .updatedAt(matter.getUpdatedAt())
                 .build();
+    }
+
+    private Map<String, Object> parseMatterDataMap(final String matterData, final String matterId) {
+        Map<String, Object> matterDataMap = new java.util.HashMap<>();
+        if (matterData == null || matterData.isEmpty()) {
+            return matterDataMap;
+        }
+
+        try {
+            matterDataMap = objectMapper.readValue(
+                    matterData,
+                    new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            log.warn("解析项目数据JSON失败: id={}", matterId, e);
+        }
+        return matterDataMap;
+    }
+
+    private String asString(final Object value) {
+        return value == null ? null : String.valueOf(value).trim();
+    }
+
+    private String firstNonBlank(final String... values) {
+        if (values == null) {
+            return null;
+        }
+
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
     }
 }

@@ -26,6 +26,7 @@ export const usePortalVisitorStore = defineStore('portalVisitor', () => {
   const hasProfile = computed(() => Boolean(profile.value.clientName))
   const displayName = computed(() => profile.value.clientName || '访客')
   const displayId = computed(() => profile.value.clientId)
+  const hasAccessContext = computed(() => Boolean(profile.value.lastMatterId && profile.value.lastMatterToken))
 
   function saveProfile(payload: Partial<PortalVisitorProfile>) {
     profile.value = {
@@ -44,13 +45,60 @@ export const usePortalVisitorStore = defineStore('portalVisitor', () => {
     removeItem(STORAGE_KEY)
   }
 
+  function clearAccessContext() {
+    profile.value = {
+      ...profile.value,
+      lastMatterId: '',
+      lastMatterToken: '',
+    }
+    setJSON(STORAGE_KEY, profile.value)
+  }
+
+  function applyMatterAccessContext(matterId: string, accessToken: string) {
+    saveProfile({
+      lastMatterId: matterId,
+      lastMatterToken: accessToken,
+    })
+  }
+
+  function resolveAccessContext(routeQuery?: Record<string, unknown>) {
+    const routeMatterId = typeof routeQuery?.matterId === 'string' ? routeQuery.matterId : ''
+    const routeToken = typeof routeQuery?.token === 'string' ? routeQuery.token : ''
+
+    if (routeMatterId && routeToken) {
+      return {
+        matterId: routeMatterId,
+        token: routeToken,
+        source: 'route' as const,
+      }
+    }
+
+    if (profile.value.lastMatterId && profile.value.lastMatterToken) {
+      return {
+        matterId: profile.value.lastMatterId,
+        token: profile.value.lastMatterToken,
+        source: 'stored' as const,
+      }
+    }
+
+    return {
+      matterId: '',
+      token: '',
+      source: 'none' as const,
+    }
+  }
+
   return {
     profile,
     hasProfile,
     displayName,
     displayId,
+    hasAccessContext,
     saveProfile,
     hydrateProfile,
     clearProfile,
+    clearAccessContext,
+    applyMatterAccessContext,
+    resolveAccessContext,
   }
 })
