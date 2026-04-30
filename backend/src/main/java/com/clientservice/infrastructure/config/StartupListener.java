@@ -3,7 +3,6 @@ package com.clientservice.infrastructure.config;
 import com.clientservice.common.util.PasswordUtil;
 import com.clientservice.domain.entity.AdminUser;
 import com.clientservice.infrastructure.security.JwtSecretProvider;
-import com.clientservice.infrastructure.persistence.mapper.SysConfigMapper;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -43,7 +42,6 @@ public class StartupListener implements ApplicationListener<ApplicationReadyEven
     private final JdbcTemplate jdbcTemplate;
     private final PasswordUtil passwordUtil;
     private final JwtSecretProvider jwtSecretProvider;
-    private final SysConfigMapper sysConfigMapper;
 
     @Value("${server.port:8081}")
     private int serverPort;
