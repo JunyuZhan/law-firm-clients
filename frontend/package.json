@@ -2,6 +2,7 @@
   "name": "client-service-portal",
   "version": "1.0.0",
   "private": true,
+  "author": "junyuzhan",
   "type": "module",
   "scripts": {
     "dev": "vite",
