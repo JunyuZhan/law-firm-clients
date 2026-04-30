@@ -53,6 +53,8 @@ jobs:
             local pkg="${dir}/package.json"
             [ -f "$pkg" ] || return 0
 
+            # 修正传入脚本的路径（使用绝对路径，因为是在宿主机运行这段 JS）
+            local abs_pkg="${ROOT_DIR}/${pkg}"
             local install_cmd="npm install --no-fund --no-audit"
             local run_lint="true"
             local run_test="true"
@@ -82,10 +84,10 @@ jobs:
 
             echo "==> Node project: ${dir}"
             local cmd="${install_cmd}"
-            if has_package_script "$pkg" lint; then cmd="${cmd} && ${run_lint}"; fi
-            if has_package_script "$pkg" test; then cmd="${cmd} && ${run_test}"; fi
-            if has_package_script "$pkg" build; then cmd="${cmd} && ${run_build}"; fi
-            if has_package_script "$pkg" typecheck; then cmd="${cmd} && ${run_typecheck}"; fi
+            if has_package_script "$abs_pkg" lint; then cmd="${cmd} && ${run_lint}"; fi
+            if has_package_script "$abs_pkg" test; then cmd="${cmd} && ${run_test}"; fi
+            if has_package_script "$abs_pkg" build; then cmd="${cmd} && ${run_build}"; fi
+            if has_package_script "$abs_pkg" typecheck; then cmd="${cmd} && ${run_typecheck}"; fi
             run_in_container "node:20-alpine" "$dir" "$cmd"
           }
 
