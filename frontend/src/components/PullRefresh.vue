@@ -18,7 +18,7 @@
           :spin="translateY >= pullThreshold"
         />
       </div>
-      <div class="pull-refresh-text">
+      <div class="pull-refresh-text" aria-live="polite">
         {{ statusText }}
       </div>
     </div>
@@ -56,7 +56,7 @@ const isDragging = ref(false)
 const pullThreshold = computed(() => props.threshold)
 const canRefresh = computed(() => translateY.value >= pullThreshold.value)
 const statusText = computed(() => {
-  if (props.loading) return '加载中...'
+  if (props.loading) return '加载中…'
   if (canRefresh.value) return '释放立即刷新'
   return '下拉刷新'
 })

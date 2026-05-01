@@ -12,15 +12,17 @@
       tabindex="-1"
     >
       <section class="section-shell portal-panel help-hero">
-        <div>
-          <span class="portal-kicker">帮助中心</span>
-          <h2 class="portal-heading">
-            围绕访问方式与常见问题提供自助说明
-          </h2>
+        <header>
+          <hgroup>
+            <p class="portal-kicker">帮助中心</p>
+            <h2 class="portal-heading">
+              围绕访问方式与常见问题提供自助说明
+            </h2>
+          </hgroup>
           <p class="help-summary">
             帮助中心聚焦访问链接、文件查看、通知位置和失效处理，不承接泛化介绍内容。
           </p>
-        </div>
+        </header>
       </section>
 
       <section class="section-shell quick-grid">
@@ -138,7 +140,11 @@ const faqItems = [
 ]
 
 function goBack() {
-  router.back()
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/portal')
+  }
 }
 </script>
 

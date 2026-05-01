@@ -103,12 +103,23 @@
             </div>
             <a-form layout="vertical">
               <a-form-item :label="ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoUrlLabel">
-                <a-input
-                  v-model:value="brandConfig.logoUrl"
-                  :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoPlaceholder"
-                  @blur="saveBrandConfig('system.logo-url', brandConfig.logoUrl)"
-                />
-                <div class="field-hint">
+                <div style="display: flex; gap: 8px;">
+                  <a-input
+                    v-model:value="brandConfig.logoUrl"
+                    :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoPlaceholder"
+                    @blur="saveBrandConfig('system.logo-url', brandConfig.logoUrl)"
+                  />
+                  <a-upload
+                    name="file"
+                    :show-upload-list="false"
+                    :before-upload="handleLogoUpload"
+                  >
+                    <a-button :loading="uploadingLogo">
+                      <UploadOutlined /> 本地上传
+                    </a-button>
+                  </a-upload>
+                </div>
+                <div class="field-hint" style="margin-top: 8px;">
                   {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoHint }}
                 </div>
               </a-form-item>
@@ -118,6 +129,8 @@
                     v-if="brandConfig.logoUrl"
                     :src="brandConfig.logoUrl"
                     alt="Logo预览"
+                    width="64"
+                    height="64"
                     @error="handleLogoError"
                   >
                   <div
@@ -305,6 +318,8 @@
               >
                 <a-input-password
                   v-model:value="systemConfig.callbackApiKey"
+                  name="callbackApiKey"
+                  autocomplete="new-password"
                   :placeholder="ADMIN_SYSTEM_CONFIG_TEXTS.system.callbackSecretPlaceholder"
                   @blur="saveSystemConfig('callback.api-key', systemConfig.callbackApiKey)"
                 />
@@ -574,7 +589,7 @@ import { ref, reactive, onMounted, computed, onUnmounted } from 'vue'
 import { message } from 'ant-design-vue'
 import logger from '@/utils/logger'
 import type { TablePaginationConfig } from 'ant-design-vue'
-import { ReloadOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { ReloadOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import {
   getConfigList,
   saveConfig,
@@ -582,6 +597,7 @@ import {
   deleteConfig,
   getPortalConfig,
   getBrandConfig,
+  uploadPublicFile,
   type SysConfigInfo,
   type SaveConfigRequest,
   type UpdateConfigRequest,
@@ -764,7 +780,7 @@ function savePortalConfig(key: string, value: string) {
     'system.app-slogan': '首页标语',
     'system.portal-eyebrow-en': '门户页英文眉标',
     'system.portal-access-notice': '门户页客户说明',
-    'system.staff-entry-label': '工作人员入口（页脚链）',
+    'system.staff-entry-label': '系统管理入口',
     'system.icp-license': 'ICP备案号',
     'system.copyright': '版权信息',
   }
@@ -780,6 +796,30 @@ function saveSystemConfig(key: string, value: string) {
     'callback.allow-internal': '允许回调到内网地址（企业内网部署设为true）',
   }
   saveConfigItem(key, value, descriptions[key])
+}
+
+const uploadingLogo = ref(false)
+
+async function handleLogoUpload(file: File) {
+  if (!file.type.startsWith('image/')) {
+    message.error('请选择图片文件')
+    return false
+  }
+  
+  uploadingLogo.value = true
+  try {
+    const res = await uploadPublicFile(file)
+    if (res.success && res.data?.url) {
+      brandConfig.logoUrl = res.data.url
+      await saveBrandConfig('system.logo-url', res.data.url)
+      message.success('Logo 上传并保存成功')
+    }
+  } catch (error: any) {
+    message.error(error.message || '上传失败，请重试')
+  } finally {
+    uploadingLogo.value = false
+  }
+  return false // 阻止默认的自动上传行为
 }
 
 function handleLogoError(e: Event) {

@@ -68,5 +68,5 @@ export const PORTAL_EYEBROW_EN = import.meta.env.VITE_PORTAL_EYEBROW_EN || ''
 /** 门户公开页：主说明文案（建议在后台「系统配置 → 门户配置」填写） */
 export const PORTAL_ACCESS_NOTICE = import.meta.env.VITE_PORTAL_ACCESS_NOTICE || ''
 
-/** 门户公开页：工作人员入口按钮文案（空则不显示该按钮） */
+/** 门户公开页：系统管理入口按钮文案（空则不显示该按钮） */
 export const STAFF_ENTRY_LABEL = import.meta.env.VITE_STAFF_ENTRY_LABEL || ''

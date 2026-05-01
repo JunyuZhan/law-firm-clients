@@ -10,15 +10,17 @@
       tabindex="-1"
     >
       <section class="section-shell portal-panel portal-panel--intro">
-        <div>
-          <span class="portal-kicker">文件协作</span>
-          <h2 class="portal-heading">
-            查看当前事项已授权的文件资料
-          </h2>
-          <p class="intro-text">
+        <header>
+          <hgroup>
+            <p class="portal-kicker">文件协作</p>
+            <h2 class="portal-heading text-balance">
+              查看当前事项已授权的文件资料
+            </h2>
+          </hgroup>
+          <p class="intro-text text-balance">
             文件中心只承接当前事项下的材料查看与下载。打开文件后可继续预览、下载或复制预览链接。
           </p>
-        </div>
+        </header>
         <div class="stats-grid">
           <article class="stats-card">
             <span class="stats-label">文件数</span>
@@ -50,7 +52,7 @@
 
         <a-spin :spinning="loading">
           <div
-            v-if="loading"
+            v-if="loading && files.length === 0 && errorState === 'none'"
             class="skeleton-list"
           >
             <div
@@ -114,9 +116,10 @@
             v-else
             class="file-card-grid"
           >
-            <article
+            <button
               v-for="item in files"
               :key="item.id"
+              type="button"
               class="file-card"
               @click="openFileActions(item)"
             >
@@ -136,7 +139,7 @@
                   点击后可继续预览、下载或分享当前文件。
                 </p>
               </div>
-            </article>
+            </button>
           </div>
         </a-spin>
       </section>
@@ -229,7 +232,7 @@ function formatSize(size?: number): string {
 function handlePreview(item: FileInfo) {
   if (!matterId.value || !token.value) return
   const url = previewFile(item.id, matterId.value, token.value)
-  window.open(url, '_blank')
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 function handleDownload(item: FileInfo) {

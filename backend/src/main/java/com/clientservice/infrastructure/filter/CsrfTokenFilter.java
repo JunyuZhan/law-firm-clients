@@ -79,8 +79,17 @@ public class CsrfTokenFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 从请求头获取 JWT Token 并计算哈希作为 Session ID
+        String jwtToken = request.getHeader("Authorization");
+        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
+            jwtToken = jwtToken.substring(7);
+        } else {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        String sessionId = cn.hutool.crypto.digest.DigestUtil.sha256Hex(jwtToken);
+
         // 验证 CSRF Token
-        String sessionId = String.valueOf(user.getId());
         if (!csrfTokenService.validateToken(sessionId, csrfToken)) {
             log.warn("CSRF Token 验证失败: path={}, method={}, username={}", path, method, user.getUsername());
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -56,18 +56,20 @@ export function getRelativeTime(date?: string): string {
   const diffHours = target.diff(now, 'hour')
   const diffDays = target.diff(now, 'day')
   
+  const rtf = new Intl.RelativeTimeFormat('zh-CN', { numeric: 'auto' })
+  
   if (diffMinutes >= 0 && diffMinutes < 60) {
-    return diffMinutes === 0 ? '刚刚' : `${diffMinutes}分钟后`
+    return diffMinutes === 0 ? '刚刚' : rtf.format(diffMinutes, 'minute')
   } else if (diffMinutes < 0 && diffMinutes > -60) {
-    return `${Math.abs(diffMinutes)}分钟前`
+    return rtf.format(diffMinutes, 'minute')
   } else if (diffHours >= 0 && diffHours < 24) {
-    return `${diffHours}小时后`
+    return rtf.format(diffHours, 'hour')
   } else if (diffHours < 0 && diffHours > -24) {
-    return `${Math.abs(diffHours)}小时前`
+    return rtf.format(diffHours, 'hour')
   } else if (diffDays >= 0 && diffDays < 30) {
-    return `${diffDays}天后`
+    return rtf.format(diffDays, 'day')
   } else if (diffDays < 0 && diffDays > -30) {
-    return `${Math.abs(diffDays)}天前`
+    return rtf.format(diffDays, 'day')
   } else {
     return formatDate(date, 'YYYY-MM-DD')
   }

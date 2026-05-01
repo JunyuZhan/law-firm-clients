@@ -134,7 +134,7 @@
 
       <div class="table-summary dashboard-table-summary">
         <span>{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.totalPrefix }}{{ files.length }}{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.totalSuffix }}</span>
-        <span v-if="selectedRowKeys.length">{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.selectedPrefix }}{{ selectedRowKeys.length }}{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.selectedSuffix }}</span>
+        <span v-if="selectedRowKeys.length > 0">{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.selectedPrefix }}{{ selectedRowKeys.length }}{{ ADMIN_FILE_MANAGEMENT_TEXTS.filter.selectedSuffix }}</span>
       </div>
 
       <a-table

@@ -31,7 +31,7 @@ export const ADMIN_SYSTEM_CONFIG_TEXTS = {
     shortNameHint: '显示在管理后台侧边栏',
     shortNameEnPlaceholder: '如：XX Law Service（可选）',
     shortNameEnHint: '可选字段；如需双语品牌展示，可显示在管理后台侧边栏下方',
-    logoPlaceholder: '如：/logo.png 或 https://...',
+    logoPlaceholder: '如：/logo.png 或 https://…',
     logoHint: '支持相对路径或完整 URL',
     logoEmpty: '暂未设置 Logo',
   },
@@ -43,7 +43,7 @@ export const ADMIN_SYSTEM_CONFIG_TEXTS = {
     sloganLabel: '首页标语',
     eyebrowLabel: '门户页英文眉标（可选）',
     accessNoticeLabel: '门户页客户说明（公开页主文案）',
-    staffEntryLabelText: '工作人员入口（页脚小字链）',
+    staffEntryLabelText: '系统管理入口',
     icpLabel: 'ICP 备案号',
     copyrightLabel: '版权信息',
     lawFirmNamePlaceholder: '如：XX律师事务所',
@@ -56,7 +56,7 @@ export const ADMIN_SYSTEM_CONFIG_TEXTS = {
     eyebrowHint: '显示在公开门户页主标题上方',
     accessNoticePlaceholder: '说明客户如何通过律师发送的链接使用本系统',
     accessNoticeHint: '显示在公开门户页中央；留空则不显示该段落',
-    staffEntryPlaceholder: '如：工作人员入口；留空则不显示',
+    staffEntryPlaceholder: '如：系统管理入口；留空则不显示',
     staffEntryHint: '显示在公开门户页底部，链向管理后台登录；勿写敏感信息',
     icpPlaceholder: '如：京ICP备XXXXXXXX号',
     icpHint: '显示在页面底部，可选',
@@ -105,7 +105,7 @@ export const ADMIN_SYSTEM_CONFIG_TEXTS = {
     valueNumberPlaceholder: '请输入数字',
     valueDefaultPlaceholder: '请输入配置值',
     descriptionPlaceholder: '请输入配置描述',
-    saveSaving: '保存中...',
+    saveSaving: '保存中…',
     saveSaved: '已保存',
     saveFailed: '保存失败',
     totalPrefix: '共 ',
@@ -975,11 +975,26 @@ export const ADMIN_NOTIFICATION_HISTORY_TEXTS = {
 } as const
 
 export const ADMIN_LOGIN_TEXTS = {
+  headings: {
+    titleSuffix: '管理后台',
+    subtitle: '请输入您的管理凭证',
+    fallbackLawFirm: '律师事务所',
+  },
+  footer: {
+    privacy: '隐私政策',
+    terms: '使用条款',
+  },
+  a11y: {
+    showPassword: '显示密码',
+    hidePassword: '隐藏密码',
+    refreshCaptcha: '刷新验证码',
+    captchaImage: '验证码',
+  },
   placeholders: {
     username: '请输入用户名',
     password: '请输入密码',
     captcha: '请输入验证码',
-    captchaLoading: '加载中...',
+    captchaLoading: '加载中…',
   },
   validation: {
     usernameRequired: '请输入用户名',

@@ -226,7 +226,7 @@ class AdminAuthControllerTest {
             mockMvc.perform(get("/api/admin/auth/me"))
                     .andExpect(status().isOk()) // Result.unauthorized returns 200 OK with 401 code in body
                     .andExpect(jsonPath("$.code").value("401"))
-                    .andExpect(jsonPath("$.message").value("未登录"));
+                    .andExpect(jsonPath("$.message").value("用户未登录"));
         }
     }
 

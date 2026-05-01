@@ -56,6 +56,17 @@ export function deleteConfig(id: number): Promise<ApiResponse<void>> {
   return request.delete(`/api/admin/config/${id}`)
 }
 
+// ==================== 文件上传接口 ====================
+export function uploadPublicFile(file: File): Promise<ApiResponse<{ url: string; path: string }>> {
+  const formData = new FormData()
+  formData.append('file', file)
+  return request.post('/api/admin/files/public/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+}
+
 // ==================== 公开配置接口（无需认证） ====================
 
 /**
@@ -90,7 +101,7 @@ export interface PortalConfig {
   portalEyebrowEn?: string
   /** 门户页客户说明（公开页主文案） */
   portalAccessNotice?: string
-  /** 工作人员入口页脚链文案（可选，空则不显示） */
+  /** 系统管理入口页脚链文案（可选，空则不显示） */
   staffEntryLabel?: string
 }
 

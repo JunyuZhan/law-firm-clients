@@ -10,22 +10,24 @@
       tabindex="-1"
     >
       <section class="section-shell portal-panel profile-hero">
-        <div>
-          <span class="portal-kicker">个人中心</span>
-          <h2 class="portal-heading">
-            查看当前访客识别信息与常用入口
-          </h2>
-          <p class="intro-text">
+        <header>
+          <hgroup>
+            <p class="portal-kicker">个人中心</p>
+            <h2 class="portal-heading text-balance">
+              查看当前访客识别信息与常用入口
+            </h2>
+          </hgroup>
+          <p class="intro-text text-balance">
             个人中心不承接公开注册，仅显示当前识别到的访客信息，以及继续进入事项协作所需的常用入口。
           </p>
-        </div>
+        </header>
         <div class="profile-header">
           <a-avatar
             :size="84"
             class="profile-avatar"
           >
             <template #icon>
-              <UserOutlined />
+              <UserOutlined aria-hidden="true" />
             </template>
           </a-avatar>
           <div class="profile-info">

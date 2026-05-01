@@ -123,6 +123,7 @@
             <a
               :href="record.accessUrl"
               target="_blank"
+              rel="noopener noreferrer"
               class="matter-link"
             >
               {{ record.accessUrl }}

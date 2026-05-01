@@ -14,10 +14,10 @@
               v-if="!verifyResult"
               class="verify-card"
             >
-              <h1 class="verify-page-title">
+              <h1 class="verify-page-title text-balance">
                 电子函件真伪验证
               </h1>
-              <p class="verify-page-lead">
+              <p class="verify-page-lead text-balance">
                 输入函件编号与验证码，查询核验结果。
               </p>
 
@@ -34,6 +34,9 @@
                 >
                   <a-input
                     v-model:value="formData.applicationNo"
+                    name="applicationNo"
+                    autocomplete="off"
+                    :spellcheck="false"
                     placeholder="请输入函件申请编号"
                     size="large"
                     allow-clear
@@ -50,6 +53,9 @@
                 >
                   <a-input
                     v-model:value="formData.code"
+                    name="code"
+                    autocomplete="off"
+                    :spellcheck="false"
                     placeholder="请输入验证码"
                     size="large"
                     allow-clear

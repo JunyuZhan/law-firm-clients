@@ -14,6 +14,8 @@
             :src="logoUrl"
             alt="Logo"
             class="drawer-logo"
+            width="32"
+            height="32"
           >
         </div>
         <div class="drawer-title">
@@ -42,7 +44,7 @@
           导航
         </div>
         <a-menu
-          v-model:selected-keys="selectedKeys"
+          :selected-keys="selectedKeys"
           mode="inline"
           class="drawer-menu"
           @click="handleMenuClick"

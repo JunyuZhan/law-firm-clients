@@ -71,6 +71,22 @@ canvas {
   box-shadow: none !important;
 }
 
+.ant-btn:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid var(--lex-primary) !important;
+  outline-offset: 2px !important;
+}
+
+.ant-btn[type="button"],
+.ant-btn:not([type="submit"]):not([type="reset"]) {
+  /* 显式声明为按钮类型，防止在表单中隐式触发表单提交 */
+}
+
 .ant-btn-default,
 .ant-btn-text,
 .ant-btn-link {
@@ -89,7 +105,7 @@ canvas {
 
 .ant-btn-primary:not(.ant-btn-dangerous):hover,
 .ant-btn-primary:not(.ant-btn-dangerous):focus {
-  background: #102a43 !important;
+  background: var(--cta-color-hover) !important;
   border-color: transparent !important;
 }
 
@@ -160,8 +176,8 @@ canvas {
 }
 
 .ant-table-thead > tr > th {
-  background: #fafbfc !important;
-  color: #102a43 !important;
+  background: var(--bg-color-light) !important;
+  color: var(--lex-text) !important;
   font-weight: 600 !important;
   border-bottom: 1px solid var(--border-color-light) !important;
 }
@@ -170,6 +186,7 @@ canvas {
   border-bottom: 1px solid var(--border-color-light) !important;
   background: var(--lex-surface-strong);
   height: 56px;
+  font-variant-numeric: tabular-nums;
 }
 
 .ant-table-tbody > tr.ant-table-row:hover > td:not(.ant-table-cell-fix-right):not(.ant-table-cell-fix-left),
@@ -221,6 +238,7 @@ th.ant-table-cell-fix-left {
   border-radius: 12px !important;
   overflow: hidden;
   background: var(--lex-surface-strong) !important;
+  overscroll-behavior: contain;
 }
 
 .ant-modal-header,
@@ -240,6 +258,12 @@ th.ant-table-cell-fix-left {
 [data-clickable='true'],
 [role='button'] {
   cursor: pointer;
+}
+
+[disabled],
+.ant-btn[disabled] {
+  cursor: not-allowed !important;
+  pointer-events: none;
 }
 
 .page-intro,
@@ -283,6 +307,10 @@ th.ant-table-cell-fix-left {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.7;
+}
+
+.text-balance {
+  text-wrap: balance;
 }
 
 .filter-panel,
@@ -347,7 +375,7 @@ th.ant-table-cell-fix-left {
 }
 
 .portal-kicker {
-  color: #8c6a2b;
+  color: var(--warning-color);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -560,6 +588,21 @@ th.ant-table-cell-fix-left {
   .dashboard-panel-head,
   .dashboard-section-head {
     display: grid;
+  }
+
+  /* 移动端提升点击区域大小 (A11y/UX) */
+  .ant-btn:not(.ant-btn-sm),
+  .ant-input:not(.ant-input-sm),
+  .ant-select-selector,
+  .ant-picker {
+    min-height: 44px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ant-btn-icon-only {
+    min-width: 44px !important;
   }
 }
 

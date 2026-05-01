@@ -10,15 +10,17 @@
       tabindex="-1"
     >
       <section class="section-shell portal-panel portal-panel--intro">
-        <div>
-          <span class="portal-kicker">通知提醒</span>
-          <h2 class="portal-heading">
-            查看当前客户的通知记录与发送状态
-          </h2>
-          <p class="intro-text">
+        <header>
+          <hgroup>
+            <p class="portal-kicker">通知提醒</p>
+            <h2 class="portal-heading text-balance">
+              查看当前客户的通知记录与发送状态
+            </h2>
+          </hgroup>
+          <p class="intro-text text-balance">
             通知页展示当前客户已生成的事项通知记录，重点是通知内容、对应事项和发送状态，而不是伪造未读消息模型。
           </p>
-        </div>
+        </header>
         <div class="stats-grid">
           <article class="stats-card">
             <span class="stats-label">全部</span>
@@ -61,7 +63,7 @@
 
         <a-spin :spinning="loading">
           <div
-            v-if="loading"
+            v-if="loading && notifications.length === 0 && errorState === 'none'"
             class="skeleton-list"
           >
             <div
@@ -189,10 +191,17 @@ function formatTime(dateStr?: string): string {
   const diff = now.getTime() - date.getTime()
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
 
-  if (days === 0) return '今天'
-  if (days === 1) return '昨天'
-  if (days < 7) return `${days}天前`
-  return dateStr.split('T')[0]
+  const rtf = new Intl.RelativeTimeFormat('zh-CN', { numeric: 'auto' })
+
+  if (days === 0) return rtf.format(0, 'day')
+  if (days === 1) return rtf.format(-1, 'day')
+  if (days < 7) return rtf.format(-days, 'day')
+  
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(date).replace(/\//g, '-')
 }
 
 const getStatusText = getPortalNotificationStatusText

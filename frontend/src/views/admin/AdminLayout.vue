@@ -25,6 +25,8 @@
               :src="logoUrl"
               alt="Logo"
               class="logo-image"
+              width="32"
+              height="32"
             >
           </div>
           <div class="logo-text">
@@ -39,6 +41,8 @@
             :src="logoCollapsedUrl"
             alt="Logo"
             class="logo-image-collapsed"
+            width="32"
+            height="32"
           >
         </div>
       </div>
@@ -102,6 +106,7 @@
             <a-button
               type="text"
               class="collapse-btn"
+              aria-label="切换侧边栏"
               @click="collapsed = !collapsed"
             >
               <template #icon>
@@ -123,6 +128,7 @@
                 <a-button
                   type="text"
                   class="header-btn"
+                  aria-label="通知中心"
                 >
                   <template #icon>
                     <BellOutlined />
@@ -441,7 +447,7 @@ async function checkForUpdates() {
 
 function viewReleaseNotes() {
   if (updateInfo.value.releaseUrl) {
-    window.open(updateInfo.value.releaseUrl, '_blank')
+    window.open(updateInfo.value.releaseUrl, '_blank', 'noopener,noreferrer')
   } else if (updateInfo.value.releaseNotes) {
     Modal.info({
       title: `v${updateInfo.value.latestVersion || ADMIN_LAYOUT_TEXTS.update.unknownVersion}${ADMIN_LAYOUT_TEXTS.update.releaseNotesTitleSuffix}`,

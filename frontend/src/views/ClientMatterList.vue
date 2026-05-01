@@ -10,15 +10,17 @@
       tabindex="-1"
     >
       <section class="section-shell portal-panel portal-panel--intro">
-        <div>
-          <span class="portal-kicker">事项列表</span>
-          <h2 class="portal-heading">
-            查看当前可访问的事项入口
-          </h2>
-          <p class="intro-text">
+        <header>
+          <hgroup>
+            <p class="portal-kicker">事项列表</p>
+            <h2 class="portal-heading text-balance">
+              查看当前可访问的事项入口
+            </h2>
+          </hgroup>
+          <p class="intro-text text-balance">
             当前页面仅列出已授权访问的事项。进入详情后可继续查看进展、文件、期限与后续协作动作。
           </p>
-        </div>
+        </header>
         <div class="stats-grid">
           <article class="stats-card">
             <span class="stats-label">全部</span>
@@ -50,7 +52,7 @@
 
         <a-spin :spinning="loading">
           <div
-            v-if="loading"
+            v-if="loading && matters.length === 0 && errorState === 'none'"
             class="skeleton-list"
           >
             <div
@@ -114,21 +116,22 @@
             v-else
             class="matter-card-grid"
           >
-            <article
+            <button
               v-for="item in matters"
               :key="item.id"
+              type="button"
               class="matter-card"
               @click="openMatterPanel(item)"
             >
               <div class="matter-card__head">
-                <div>
+                <hgroup class="matter-card__head-title">
                   <p class="matter-card__eyebrow">
                     案件编号 {{ item.id }}
                   </p>
                   <h3 class="matter-card__title">
                     {{ item.matterName }}
                   </h3>
-                </div>
+                </hgroup>
                 <van-tag
                   plain
                   :type="getStatusTone(item.status)"
@@ -143,7 +146,7 @@
               <p class="matter-card__hint">
                 点击查看事项概览并进入协作详情。
               </p>
-            </article>
+            </button>
           </div>
         </a-spin>
       </section>
@@ -163,12 +166,12 @@
       >
         <div class="matter-sheet__handle" />
         <div class="matter-sheet__header">
-          <div>
+          <hgroup>
             <p class="matter-sheet__eyebrow">
               案件事务概览
             </p>
             <h2>{{ selectedMatter.matterName }}</h2>
-          </div>
+          </hgroup>
           <van-tag
             plain
             :type="getStatusTone(selectedMatter.status)"
@@ -308,7 +311,7 @@ watch(
   background: #ffffff;
   border: 1px solid #f0f0f0;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .matter-card:hover {
@@ -323,6 +326,10 @@ watch(
   gap: 12px;
 }
 
+.matter-card__head-title {
+  text-align: left;
+}
+
 .matter-card__eyebrow {
   margin: 0 0 4px;
   font-size: 12px;
@@ -334,6 +341,11 @@ watch(
   color: #1f2937;
   font-size: 16px;
   font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .matter-card__meta {
@@ -352,10 +364,12 @@ watch(
 }
 
 .matter-sheet {
-  padding: 16px 24px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
+  padding: 24px;
+  height: 100%;
+  overscroll-behavior: contain;
 }
 
 .matter-sheet__handle {
@@ -384,6 +398,7 @@ watch(
   color: #1f2937;
   font-size: 18px;
   font-weight: 600;
+  text-wrap: balance;
 }
 
 .matter-sheet__panel {

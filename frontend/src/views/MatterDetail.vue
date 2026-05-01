@@ -17,16 +17,25 @@
       >
         <a-spin :spinning="loading">
           <div
-            v-if="matterDetail"
+            v-if="loading && !matterDetail"
+            class="detail-shell skeleton-shell"
+          >
+            <a-skeleton active :paragraph="{ rows: 4 }" />
+            <a-skeleton active :paragraph="{ rows: 6 }" style="margin-top: 24px" />
+          </div>
+          <div
+            v-else-if="matterDetail"
             class="detail-shell"
           >
             <section class="hero-panel">
               <div class="hero-copy">
-                <span class="hero-eyebrow">事项协作空间</span>
-                <h1 class="hero-title">
-                  {{ matterData.matterName || `项目 ${matterId}` }}
-                </h1>
-                <p class="hero-subtitle">
+                <hgroup>
+                  <p class="hero-eyebrow">事项协作空间</p>
+                  <h1 class="hero-title text-balance">
+                    {{ matterData.matterName || `项目 ${matterId}` }}
+                  </h1>
+                </hgroup>
+                <p class="hero-subtitle text-balance">
                   {{ matterDetail.clientName }} · 当前页面仅展示已授权的事项信息、文件和提醒，便于围绕同一案件继续协作。
                 </p>
 
@@ -475,7 +484,13 @@
               >
                 <template #bodyCell="{ column, record }">
                   <template v-if="column.key === 'fileName'">
-                    <a @click="handlePreview(record)">{{ record.fileName }}</a>
+                    <a-button
+                      type="link"
+                      class="file-name-btn"
+                      @click="handlePreview(record)"
+                    >
+                      {{ record.fileName }}
+                    </a-button>
                   </template>
                   <template v-else-if="column.key === 'fileSource'">
                     <a-tag :color="record.fileSource === FILE_SOURCE_PUSHED ? 'blue' : 'green'">
@@ -1101,7 +1116,10 @@ function formatFileSize(bytes: number) {
 function formatCurrency(value: unknown) {
   const amount = Number(value ?? 0)
   if (Number.isNaN(amount)) return '0.00'
-  return amount.toFixed(2)
+  return new Intl.NumberFormat('zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)
 }
 
 const getStatusColor = getMatterStatusColor
@@ -1114,7 +1132,11 @@ function isDeadlineNear(deadline: string) {
 }
 
 function goBack() {
-  router.push('/portal')
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/portal')
+  }
 }
 
 let resizeHandler: (() => void) | null = null
@@ -1172,7 +1194,8 @@ onUnmounted(() => {
 }
 
 .hero-eyebrow {
-  color: #8c6a2b;
+  margin: 0;
+  color: var(--warning-color);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -1556,6 +1579,14 @@ onUnmounted(() => {
 
 .action-btn :deep(.anticon) {
   font-size: 14px;
+}
+
+.file-name-btn {
+  padding: 0;
+  height: auto;
+  text-align: left;
+  white-space: normal;
+  word-break: break-all;
 }
 
 .upload-btn-text,

@@ -24,7 +24,10 @@
     </section>
 
     <section class="status-strip config-card">
-      <div class="status-strip-grid">
+      <div
+        class="status-strip-grid"
+        aria-live="polite"
+      >
         <a-alert
           :message="setupStatus.title"
           :type="setupStatus.type"
@@ -114,7 +117,7 @@
               :placeholder="ADMIN_INITIAL_SETUP_TEXTS.placeholders.portalAccessNotice"
             />
           </a-form-item>
-          <a-form-item label="工作人员入口（页脚小字链）">
+          <a-form-item label="系统管理入口">
             <a-input
               v-model:value="form.staffEntryLabel"
               maxlength="40"
@@ -153,6 +156,8 @@
                 :src="form.logoUrl"
                 alt="Logo 预览"
                 class="preview-logo"
+                width="40"
+                height="40"
               >
               <span v-else>{{ ADMIN_INITIAL_SETUP_TEXTS.preview.logoEmpty }}</span>
             </div>
@@ -220,7 +225,7 @@ const defaultValues = {
   portalEyebrowEn: '',
   portalAccessNotice:
     '本系统由律师事务所为客户提供专项服务。查看项目进展与材料，请使用承办律师向您发送的专属访问链接。',
-  staffEntryLabel: '工作人员入口',
+  staffEntryLabel: '系统管理入口',
   copyright: '© 2026 律师事务所',
 }
 

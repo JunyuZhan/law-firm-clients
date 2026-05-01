@@ -7,6 +7,7 @@ import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
+import org.springframework.core.env.Profiles;
 import org.springframework.util.StringUtils;
 
 /**
@@ -22,6 +23,10 @@ public class SynologyDefaultsEnvironmentPostProcessor implements EnvironmentPost
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        if (environment.acceptsProfiles(Profiles.of("test"))) {
+            return;
+        }
+
         Map<String, Object> defaults = new LinkedHashMap<>();
 
         putIfMissing(environment, defaults, "spring.datasource.url", DEFAULT_DATASOURCE_URL);

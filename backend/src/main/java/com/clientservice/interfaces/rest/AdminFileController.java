@@ -138,4 +138,53 @@ public class AdminFileController {
         log.info("清理过期文件完成: cleanedCount={}, days={}", cleanedCount, days);
         return Result.success(result);
     }
+
+    /**
+     * 上传系统公共文件（如Logo）
+     */
+    @Operation(summary = "上传公共文件", description = "管理员上传系统公共文件，如Logo图片")
+    @PostMapping("/public/upload")
+    public Result<Map<String, String>> uploadPublicFile(
+            @Parameter(description = "文件", required = true) @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        adminAuthorizationService.requireSuperAdmin();
+        
+        if (file == null || file.isEmpty()) {
+            return Result.badRequest("上传文件不能为空");
+        }
+        
+        try {
+            // 生成唯一文件名，防止覆盖
+            String originalFilename = file.getOriginalFilename();
+            String extension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            
+            // 简单的类型校验，主要允许图片
+            if (!extension.matches("(?i)\\.(jpg|jpeg|png|gif|webp|svg)")) {
+                return Result.badRequest("仅支持上传图片文件(jpg, png, gif, webp, svg)");
+            }
+            
+            String fileId = com.clientservice.common.util.TokenGenerator.generateId();
+            String relativePath = "public/images/" + fileId + extension;
+            
+            com.clientservice.infrastructure.storage.StorageStrategy storageStrategy = 
+                org.springframework.web.context.support.WebApplicationContextUtils
+                .getWebApplicationContext(((org.springframework.web.context.request.ServletRequestAttributes) 
+                org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes()).getRequest().getServletContext())
+                .getBean(com.clientservice.infrastructure.storage.StorageStrategyFactory.class)
+                .getStorageStrategy();
+                
+            String fileUrl = storageStrategy.uploadFile(file, relativePath);
+            
+            Map<String, String> result = new HashMap<>();
+            result.put("url", fileUrl);
+            result.put("path", relativePath);
+            
+            return Result.success(result);
+        } catch (Exception e) {
+            log.error("公共文件上传失败", e);
+            return Result.error("文件上传失败: " + e.getMessage());
+        }
+    }
 }

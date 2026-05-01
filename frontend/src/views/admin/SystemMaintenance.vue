@@ -208,6 +208,7 @@
             v-if="gitInfo.githubRepo"
             :href="'https://github.com/' + gitInfo.githubRepo"
             target="_blank"
+            rel="noopener noreferrer"
           >
             {{ gitInfo.githubRepo }}
           </a>
@@ -234,6 +235,7 @@
             type="link"
             :href="gitInfo.releaseUrl"
             target="_blank"
+            rel="noopener noreferrer"
           >
             {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.releaseNotes }}
           </a-button>
@@ -246,14 +248,16 @@
         show-icon
         style="margin-bottom: 16px"
       />
-      <a-alert
-        v-if="gitInfo.error"
-        :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.failedTitle"
-        :description="gitInfo.error"
-        type="warning"
-        show-icon
-        style="margin-bottom: 16px"
-      />
+      <div aria-live="polite">
+        <a-alert
+          v-if="gitInfo.error"
+          :message="ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.failedTitle"
+          :description="gitInfo.error"
+          type="warning"
+          show-icon
+          style="margin-bottom: 16px"
+        />
+      </div>
 
       <a-divider />
 
@@ -351,6 +355,7 @@
           type="link"
           :href="gitInfo.releaseUrl"
           target="_blank"
+          rel="noopener noreferrer"
         >
           {{ ADMIN_SYSTEM_MAINTENANCE_TEXTS.upgrade.githubReleases }}
         </a-button>

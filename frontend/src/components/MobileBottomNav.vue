@@ -6,6 +6,7 @@
       type="button"
       class="nav-item"
       :class="{ active: activeKey === item.key }"
+      :aria-current="activeKey === item.key ? 'page' : undefined"
       @click="handleClick(item)"
     >
       <component

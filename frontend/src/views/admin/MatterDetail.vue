@@ -100,6 +100,7 @@
                 <a
                   :href="matterDetail.accessUrl"
                   target="_blank"
+                  rel="noopener noreferrer"
                   class="access-url"
                 >
                   {{ matterDetail.accessUrl }}
@@ -203,7 +204,11 @@ async function loadData() {
 }
 
 function goBack() {
-  router.push('/admin/matters')
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/admin/matters')
+  }
 }
 
 async function handleRevoke() {

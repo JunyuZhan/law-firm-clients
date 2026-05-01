@@ -131,7 +131,7 @@ class CallbackIntegrationTest {
         for (org.springframework.http.HttpEntity entity : entityCaptor.getAllValues()) {
             Map<String, Object> data = (Map<String, Object>) entity.getBody();
             if (data != null && lawFirmMatterId.equals(data.get("matterId"))) {
-                assertEquals(2001L, data.get("clientId"));
+                assertEquals(2001L, ((Number) data.get("clientId")).longValue());
                 assertEquals("ACCESS", data.get("eventType"));
                 found = true;
                 break;
@@ -184,7 +184,7 @@ class CallbackIntegrationTest {
         for (org.springframework.http.HttpEntity entity : entityCaptor.getAllValues()) {
             Map<String, Object> data = (Map<String, Object>) entity.getBody();
             if (data != null && lawFirmMatterId.equals(data.get("matterId"))) {
-                assertEquals(2001L, data.get("clientId"));
+                assertEquals(2001L, ((Number) data.get("clientId")).longValue());
                 assertEquals("CS1234567890123456789", data.get("fileId"));
                 assertEquals("判决书.pdf", data.get("fileName"));
                 assertEquals("DOWNLOAD", data.get("eventType"));

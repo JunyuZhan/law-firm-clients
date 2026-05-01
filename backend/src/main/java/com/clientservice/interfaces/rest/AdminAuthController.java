@@ -118,8 +118,9 @@ public class AdminAuthController {
                 .superAdmin(adminAuthorizationService.isSuperAdmin(user))
                 .build();
 
-        // 4. 生成 CSRF Token（使用用户ID作为会话ID）
-        String csrfToken = csrfTokenService.generateToken(String.valueOf(user.getId()));
+        // 4. 生成 CSRF Token（使用JWT Token哈希作为会话ID，支持多端登录）
+        String tokenHash = cn.hutool.crypto.digest.DigestUtil.sha256Hex(token);
+        String csrfToken = csrfTokenService.generateToken(tokenHash);
 
         LoginResponse response = LoginResponse.builder()
                 .token(token)
@@ -137,11 +138,11 @@ public class AdminAuthController {
      */
     @Operation(summary = "获取当前用户信息", description = "从JWT Token中获取当前登录用户信息（过滤器已验证Token）")
     @GetMapping("/me")
-    public Result<Map<String, Object>> getCurrentUser() {
+    public Result<Map<String, Object>> getCurrentUser(HttpServletRequest request) {
         // 从JWT过滤器获取当前登录用户（过滤器已验证Token）
         AdminUser user = JwtAuthenticationFilter.getCurrentUser();
         if (user == null) {
-            return Result.unauthorized("未登录");
+            return Result.error(ErrorCode.UNAUTHORIZED, "用户未登录");
         }
 
         UserInfo userInfo = UserInfo.builder()
@@ -153,8 +154,13 @@ public class AdminAuthController {
                 .superAdmin(adminAuthorizationService.isSuperAdmin(user))
                 .build();
 
-        // 生成或刷新 CSRF Token
-        String csrfToken = csrfTokenService.generateToken(String.valueOf(user.getId()));
+        // 提取当前的JWT Token并生成或刷新 CSRF Token
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        String tokenHash = cn.hutool.crypto.digest.DigestUtil.sha256Hex(token);
+        String csrfToken = csrfTokenService.generateToken(tokenHash);
 
         Map<String, Object> result = new HashMap<>();
         result.put("user", userInfo);
@@ -182,7 +188,12 @@ public class AdminAuthController {
         String token = extractToken(httpRequest);
         if (token != null) {
             tokenBlacklistService.addToBlacklist(token);
-            log.info("Token已加入黑名单: username={}", user != null ? user.getUsername() : "unknown");
+            
+            // 清理关联的CSRF Token
+            String tokenHash = cn.hutool.crypto.digest.DigestUtil.sha256Hex(token);
+            csrfTokenService.deleteToken(tokenHash);
+            
+            log.info("Token已加入黑名单且清理CSRF凭据: username={}", user != null ? user.getUsername() : "unknown");
         }
         
         return Result.success();

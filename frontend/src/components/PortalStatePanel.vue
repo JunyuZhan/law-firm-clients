@@ -7,7 +7,7 @@
     >
       <slot name="icon" />
     </div>
-    <div class="portal-state-panel__body">
+    <hgroup class="portal-state-panel__body">
       <h3 class="portal-state-panel__title">
         {{ title }}
       </h3>
@@ -17,7 +17,7 @@
       >
         {{ description }}
       </p>
-    </div>
+    </hgroup>
     <div
       v-if="$slots.actions"
       class="portal-state-panel__actions"

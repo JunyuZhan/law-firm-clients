@@ -7,7 +7,7 @@
         </p>
       </div>
       <a-space>
-        <a-button @click="router.back()">
+        <a-button @click="goBack">
           {{ UI_TEXTS.back }}
         </a-button>
         <a-button
@@ -15,7 +15,7 @@
           @click="handleLogout"
         >
           <template #icon>
-            <LogoutOutlined />
+            <LogoutOutlined aria-hidden="true" />
           </template>
           {{ UI_TEXTS.logout }}
         </a-button>
@@ -43,20 +43,20 @@
 
     <section class="profile-grid">
       <article class="profile-card identity-card">
-        <div class="identity-hero">
+        <header class="identity-hero">
           <a-avatar
             :size="88"
             class="profile-avatar"
           >
             <template #icon>
-              <UserOutlined />
+              <UserOutlined aria-hidden="true" />
             </template>
           </a-avatar>
-          <div class="identity-copy">
+          <hgroup class="identity-copy">
             <h3>{{ userInfo.realName || userInfo.username || ADMIN_PROFILE_TEXTS.stats.adminFallback }}</h3>
             <p>{{ ADMIN_PROFILE_TEXTS.identity.roleDesc }}</p>
-          </div>
-        </div>
+          </hgroup>
+        </header>
 
         <div class="meta-list">
           <div class="meta-item">
@@ -79,14 +79,14 @@
       </article>
 
       <article class="profile-card security-card">
-        <div class="section-header">
-          <div>
+        <header class="section-header">
+          <hgroup>
             <h3>{{ ADMIN_PROFILE_TEXTS.security.title }}</h3>
-          </div>
-          <div class="section-note">
-            {{ ADMIN_PROFILE_TEXTS.security.note }}
-          </div>
-        </div>
+            <p class="section-note">
+              {{ ADMIN_PROFILE_TEXTS.security.note }}
+            </p>
+          </hgroup>
+        </header>
 
         <a-tabs v-model:active-key="activeTab">
           <a-tab-pane
@@ -107,10 +107,12 @@
               >
                 <a-input-password
                   v-model:value="passwordForm.oldPassword"
+                  name="oldPassword"
+                  autocomplete="current-password"
                   :placeholder="ADMIN_PROFILE_TEXTS.security.oldPasswordPlaceholder"
                 >
                   <template #prefix>
-                    <LockOutlined />
+                    <LockOutlined aria-hidden="true" />
                   </template>
                 </a-input-password>
               </a-form-item>
@@ -121,10 +123,12 @@
               >
                 <a-input-password
                   v-model:value="passwordForm.newPassword"
+                  name="newPassword"
+                  autocomplete="new-password"
                   :placeholder="ADMIN_PROFILE_TEXTS.security.newPasswordPlaceholder"
                 >
                   <template #prefix>
-                    <KeyOutlined />
+                    <KeyOutlined aria-hidden="true" />
                   </template>
                 </a-input-password>
               </a-form-item>
@@ -135,10 +139,12 @@
               >
                 <a-input-password
                   v-model:value="passwordForm.confirmPassword"
+                  name="confirmPassword"
+                  autocomplete="new-password"
                   :placeholder="ADMIN_PROFILE_TEXTS.security.confirmPasswordPlaceholder"
                 >
                   <template #prefix>
-                    <CheckOutlined />
+                    <CheckOutlined aria-hidden="true" />
                   </template>
                 </a-input-password>
               </a-form-item>
@@ -171,7 +177,7 @@ import {
   KeyOutlined,
   CheckOutlined,
 } from '@ant-design/icons-vue'
-import type { FormInstance, Rule } from 'ant-design-vue/es/form'
+import type { Rule } from 'ant-design-vue/es/form'
 import { useAuthStore } from '@/stores/auth'
 import { changePassword } from '@/api/auth'
 import type { UserInfo } from '@/api/auth'
@@ -185,7 +191,6 @@ const authStore = useAuthStore()
 
 const userInfo = computed<Partial<UserInfo>>(() => authStore.user || {})
 const activeTab = ref('password')
-const passwordFormRef = ref<FormInstance>()
 const changingPassword = ref(false)
 
 const passwordForm = reactive({
@@ -239,6 +244,14 @@ const handlePasswordChange = async () => {
 const handleLogout = () => {
   authStore.logout()
   router.push('/admin/login')
+}
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push('/admin/notifications')
+  }
 }
 </script>
 

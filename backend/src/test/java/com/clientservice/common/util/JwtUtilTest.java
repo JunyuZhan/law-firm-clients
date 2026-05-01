@@ -7,10 +7,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import com.clientservice.infrastructure.security.JwtSecretProvider;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 /**
  * JWT工具类测试
@@ -22,12 +25,15 @@ class JwtUtilTest {
     @InjectMocks
     private JwtUtil jwtUtil;
 
+    @Mock
+    private JwtSecretProvider jwtSecretProvider;
+
     private String secret = "test-secret-key-for-jwt-testing-purposes-only-2026";
     private Long expirationHours = 24L;
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(jwtUtil, "secret", secret);
+        when(jwtSecretProvider.getSecret()).thenReturn(secret);
         ReflectionTestUtils.setField(jwtUtil, "expirationHours", expirationHours);
     }
 

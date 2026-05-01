@@ -118,21 +118,27 @@
               <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpUserLabel">
                 <a-input
                   v-model:value="emailForm.smtpUsername"
+                  name="smtpUsername"
+                  autocomplete="off"
                   :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpUserPlaceholder"
                 />
               </a-form-item>
               <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpPasswordLabel">
                 <a-input-password
                   v-model:value="emailForm.smtpPassword"
+                  name="smtpPassword"
+                  autocomplete="new-password"
                   :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpPasswordPlaceholder"
                 />
               </a-form-item>
-              <a-alert
-                :message="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpAlert"
-                type="info"
-                show-icon
-                class="inline-alert"
-              />
+              <div aria-live="polite">
+                <a-alert
+                  :message="ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.smtpAlert"
+                  type="info"
+                  show-icon
+                  class="inline-alert"
+                />
+              </div>
 
               <div class="subsection-title">
                 {{ ADMIN_NOTIFICATION_SETTINGS_TEXTS.email.senderTitle }}
@@ -223,6 +229,8 @@
                 <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.accessKeySecretLabel">
                   <a-input-password
                     v-model:value="smsForm.aliyun.accessKeySecret"
+                    name="aliyunAccessKeySecret"
+                    autocomplete="new-password"
                     :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.accessKeySecretPlaceholder"
                   />
                 </a-form-item>
@@ -259,6 +267,8 @@
                 <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.secretKeyLabel">
                   <a-input-password
                     v-model:value="smsForm.tencent.secretKey"
+                    name="tencentSecretKey"
+                    autocomplete="new-password"
                     :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.sms.secretKeyPlaceholder"
                   />
                 </a-form-item>
@@ -349,6 +359,8 @@
               <a-form-item :label="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appSecretLabel">
                 <a-input-password
                   v-model:value="wechatForm.appSecret"
+                  name="wechatAppSecret"
+                  autocomplete="new-password"
                   :placeholder="ADMIN_NOTIFICATION_SETTINGS_TEXTS.wechat.appSecretPlaceholder"
                 />
               </a-form-item>

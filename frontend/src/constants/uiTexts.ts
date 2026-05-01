@@ -1,5 +1,5 @@
 export const UI_TEXTS = {
-  loginTitle: '法律服务管理门户',
+  loginTitle: '客户服务系统',
   loginSubtitle: '专业 · 高效 · 安全',
   matterManagement: '案件事务管理',
   progressNoticeCenter: '进度告知中心',

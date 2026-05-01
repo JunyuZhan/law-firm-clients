@@ -17,6 +17,8 @@
                   :src="logoUrl"
                   alt="Logo"
                   class="logo-image"
+                  width="24"
+                  height="24"
                 >
               </div>
               <div class="logo-text">
@@ -35,6 +37,7 @@
             v-else-if="showBack"
             type="default"
             class="header-btn back-btn"
+            :aria-label="showBackText ? undefined : backText"
             @click="$emit('back')"
           >
             <template #icon>
@@ -51,6 +54,7 @@
           v-if="variant === 'portal' && !title && showBack"
           type="default"
           class="header-btn back-btn"
+          :aria-label="showBackText ? undefined : backText"
           @click="$emit('back')"
         >
           <template #icon>
@@ -65,22 +69,22 @@
 
       <div class="header-center">
         <slot name="center">
-          <div
+          <hgroup
             v-if="title"
             class="title-section"
           >
-            <div
+            <p
               v-if="variant === 'portal'"
               class="welcome-text"
             >
               {{ portalSystemLabel }}
-            </div>
-            <div
+            </p>
+            <p
               v-else-if="welcomeText"
               class="welcome-text"
             >
               {{ welcomeText }}
-            </div>
+            </p>
             <h1 class="page-title">
               {{ title }}
             </h1>
@@ -90,7 +94,7 @@
             >
               {{ variant === 'portal' ? portalSubtitle : detailSubtitle }}
             </p>
-          </div>
+          </hgroup>
         </slot>
       </div>
 
@@ -101,6 +105,7 @@
             type="default"
             class="header-btn admin-link"
             :title="'管理员入口'"
+            aria-label="管理员入口"
             @click="$emit('admin-click')"
           >
             <template #icon>
@@ -112,6 +117,7 @@
             v-if="showMobileMenu"
             type="default"
             class="header-btn mobile-menu-btn"
+            aria-label="打开菜单"
             @click="$emit('menu-click')"
           >
             <template #icon>
@@ -199,7 +205,7 @@ const detailSubtitle = computed(() => '围绕事项进展、文件与提醒继�
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 16px;
-  padding: 12px 24px;
+  padding: 12px max(24px, env(safe-area-inset-right)) 12px max(24px, env(safe-area-inset-left));
 }
 
 .app-header.has-welcome .header-content {
@@ -331,6 +337,7 @@ const detailSubtitle = computed(() => '围绕事项进展、文件与提醒继�
 }
 
 .welcome-text {
+  margin: 0;
   color: #1677ff;
   font-size: 12px;
   line-height: 1.5;
@@ -365,9 +372,12 @@ const detailSubtitle = computed(() => '围绕事项进展、文件与提醒继�
   color: #4b5563 !important;
 }
 
-.header-btn:hover {
+.header-btn:hover,
+.header-btn:focus-visible {
   border-color: #1677ff;
   color: #1677ff !important;
+  outline: 2px solid rgba(22, 119, 255, 0.2);
+  outline-offset: 2px;
 }
 
 .back-btn-text {

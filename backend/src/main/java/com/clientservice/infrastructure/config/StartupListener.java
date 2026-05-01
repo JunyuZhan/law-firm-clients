@@ -148,15 +148,20 @@ public class StartupListener implements ApplicationListener<ApplicationReadyEven
                     rs -> rs.next() ? rs.getString(1) : null);
             if (!StringUtils.hasText(configValue)) {
                 String generatedSecret = generateTokenLikeSecret(48);
-                jdbcTemplate.update(
-                        "INSERT INTO sys_config (config_key, config_value, config_type, description, deleted) " +
-                                "VALUES (?, ?, 'STRING', ?, false) " +
-                                "ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value, " +
-                                "config_type = EXCLUDED.config_type, description = EXCLUDED.description, " +
-                                "deleted = false, updated_at = CURRENT_TIMESTAMP",
-                        JwtSecretProvider.JWT_SECRET_CONFIG_KEY,
+                int updated = jdbcTemplate.update(
+                        "UPDATE sys_config SET config_value = ?, config_type = 'STRING', description = ?, " +
+                                "deleted = false, updated_at = CURRENT_TIMESTAMP WHERE config_key = ?",
                         generatedSecret,
-                        "JWT signing secret generated automatically for container bootstrap");
+                        "JWT signing secret generated automatically for container bootstrap",
+                        JwtSecretProvider.JWT_SECRET_CONFIG_KEY);
+                if (updated == 0) {
+                    jdbcTemplate.update(
+                            "INSERT INTO sys_config (config_key, config_value, config_type, description, deleted) " +
+                                    "VALUES (?, ?, 'STRING', ?, false)",
+                            JwtSecretProvider.JWT_SECRET_CONFIG_KEY,
+                            generatedSecret,
+                            "JWT signing secret generated automatically for container bootstrap");
+                }
                 jwtSecretProvider.refresh();
                 log.info("已自动生成并持久化 JWT 密钥到 sys_config");
             } else {
