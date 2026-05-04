@@ -1,126 +1,88 @@
-# Docker 部署指南
+# Docker 部署指南 (Zero-Config)
+
+随着架构升级为 **Zero-Config (零配置启动)** 和 **全栈单体镜像**，手动部署变得极其简单。您不再需要运行繁杂的部署脚本或手动拼凑配置。
 
 ## ⚠️ 生产环境部署前检查清单
 
 > **重要提醒**：部署前请务必完成以下检查，否则存在安全风险！
 
+- [ ] 确保目标服务器已安装 **Docker** 和 **Docker Compose (V2)**。
+- [ ] 确保目标服务器能访问镜像仓库（如 `192.168.50.5:5050`）。
 - [ ] 修改 `.env` 中的数据库密码（`POSTGRES_PASSWORD`）
-- [ ] 配置强 JWT 密钥（`CLIENT_SERVICE_JWT_SECRET`，建议 64 位以上随机字符串）
-- [ ] 配置正确的系统访问地址（`BASE_URL`）
-- [ ] 部署后立即登录修改默认管理员密码（默认：`admin/admin123`）
-- [ ] 如使用 MinIO，修改默认密钥（`MINIO_ACCESS_KEY`、`MINIO_SECRET_KEY`）
 - [ ] 配置律所系统回调地址或 API 密钥（如需要）
 - [ ] 配置 HTTPS（生产环境强烈建议）
-- [ ] 关闭 Swagger UI（`SWAGGER_ENABLED=false`）
 
 ---
 
-## 📋 目录
+## 🚀 手动部署步骤 (只需三步)
 
-- [生产环境部署前检查清单](#️-生产环境部署前检查清单)
-- [快速开始](#快速开始)
-- [环境变量配置](#环境变量配置)
-- [构建和运行](#构建和运行)
-- [数据持久化](#数据持久化)
-- [健康检查](#健康检查)
-- [常见问题](#常见问题)
+### 1. 准备配置和 Compose 文件
+在目标服务器的部署目录（如 `/opt/law-firm-clients`）下，准备 `docker-compose.yml` 文件。
 
----
-
-## 🚀 快速开始
-
-### 1. 准备环境变量
-
+你可以直接使用项目中的精简版配置：
 ```bash
-cd docker
-cp .env.example .env
-# 编辑 .env 文件，修改配置值
+# 在部署目录执行
+cat << 'EOF' > docker-compose.yml
+version: '3.8'
+
+services:
+  nginx:
+    image: 192.168.50.5:5050/albert/law-firm-clients:v1.0.11 # 替换为最新版本
+    container_name: law-firm-clients-nginx
+    restart: always
+    ports:
+      - "8080:80"
+    command: ["nginx", "-g", "daemon off;"]
+    depends_on:
+      - backend
+
+  backend:
+    image: 192.168.50.5:5050/albert/law-firm-clients:v1.0.11 # 替换为最新版本
+    container_name: law-firm-clients-backend
+    restart: always
+    command: ["java", "-jar", "app.jar"]
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/client_service
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: law-firm-clients-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres123}
+      - POSTGRES_DB=client_service
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: law-firm-clients-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+EOF
 ```
 
-### 2. 构建应用
+### 2. 一键启动
 
 ```bash
-# 在项目根目录执行
-cd backend
-mvn clean package -DskipTests
+docker compose up -d
 ```
 
-### 3. 启动服务
+### 3. 初始化系统
 
-```bash
-cd docker
-docker-compose up -d
-```
-
-### 4. 查看日志
-
-```bash
-# 查看所有服务日志
-docker-compose logs -f
-
-# 查看应用日志
-docker-compose logs -f app
-
-# 查看数据库日志
-docker-compose logs -f postgres
-```
-
-### 5. 停止服务
-
-```bash
-docker-compose down
-```
-
----
-
-## ⚙️ 环境变量配置
-
-主要环境变量说明：
-
-| 变量名 | 说明 | 默认值 |
-|--------|------|--------|
-| `POSTGRES_PASSWORD` | PostgreSQL密码 | `postgres` |
-| `BASE_URL` | 应用基础URL | `http://localhost:8081` |
-| `SPRING_PROFILES_ACTIVE` | Spring Profile | `prod` |
-| `CLIENT_SERVICE_FILE_STORAGE_LOCAL_PATH` | 文件存储路径 | `/data/client-service/files` |
-
-详细配置请参考 `.env.example` 文件。
-
----
-
-## 🔨 构建和运行
-
-### 构建Docker镜像
-
-```bash
-# 在项目根目录执行
-docker build -f docker/Dockerfile -t client-service:latest .
-```
-
-### 使用docker-compose
-
-```bash
-# 启动所有服务
-docker-compose up -d
-
-# 启动特定服务
-docker-compose up -d postgres redis
-
-# 重新构建并启动
-docker-compose up -d --build
-
-# 查看服务状态
-docker-compose ps
-
-# 停止服务
-docker-compose stop
-
-# 停止并删除容器
-docker-compose down
-
-# 停止并删除容器和卷（注意：会删除数据）
-docker-compose down -v
-```
+1. 打开浏览器访问 `http://<服务器IP>:8080`。
+2. 系统会自动检测到无初始管理员账号，并引导您进入 **“初始化管理员密码”** 页面。
+3. 设置密码后，即可登录使用。
 
 ---
 
@@ -130,28 +92,19 @@ Docker Compose配置了以下数据卷：
 
 - `postgres_data`: PostgreSQL数据
 - `redis_data`: Redis数据
-- `file_storage`: 应用文件存储
-- `app_logs`: 应用日志
-
-数据卷位置：
-- Linux: `/var/lib/docker/volumes/`
-- macOS/Windows: Docker Desktop管理
 
 ### 备份数据
 
 ```bash
 # 备份PostgreSQL数据
-docker-compose exec postgres pg_dump -U postgres client_service > backup.sql
-
-# 备份文件存储
-docker cp client-service-backend:/data/client-service/files ./backup/files
+docker compose exec postgres pg_dump -U postgres client_service > backup.sql
 ```
 
 ### 恢复数据
 
 ```bash
 # 恢复PostgreSQL数据
-docker-compose exec -T postgres psql -U postgres client_service < backup.sql
+docker compose exec -T postgres psql -U postgres client_service < backup.sql
 ```
 
 ---
