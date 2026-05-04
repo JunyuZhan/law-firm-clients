@@ -1,211 +1,60 @@
-# =====================================================
-# 客户服务系统 Docker Compose 配置
-# =====================================================
-name: client-service
-# 架构：Nginx (80) -> 前端静态文件 + 后端 API 代理
-# 数据库和缓存仅内部网络访问，不暴露端口
-# =====================================================
-
-# 全局日志限制（防止日志无限增长占满磁盘）
-x-logging: &default-logging
-  driver: json-file
-  options:
-    max-size: "10m"
-    max-file: "3"
+version: '3.8'
 
 services:
-  # ========== Nginx 入口（唯一对外暴露端口）==========
-  # 使用非 root 用户运行（安全最佳实践）
+  # =====================================================
+  # 1. 前端服务 (Nginx)
+  # =====================================================
   nginx:
-    image: client-service-frontend:latest
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.frontend
-    container_name: client-service-nginx
+    image: 192.168.50.5:5050/albert/law-firm-clients:latest
+    container_name: law-firm-clients-nginx
+    restart: always
     ports:
-      - "${NGINX_PORT:-8080}:8080"
+      - "8080:80"
+    command: ["nginx", "-g", "daemon off;"]
     depends_on:
-      app:
-        condition: service_healthy
-    networks:
-      - client-service-network
-    restart: unless-stopped
-    logging: *default-logging
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+      - backend
 
-  # ========== 后端应用 ==========
-  app:
-    image: client-service-backend:latest
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    container_name: client-service-backend
-    # 不暴露端口，仅通过 Nginx 代理访问
-    expose:
-      - "8081"
+  # =====================================================
+  # 2. 后端服务 (Spring Boot)
+  # =====================================================
+  backend:
+    image: 192.168.50.5:5050/albert/law-firm-clients:latest
+    container_name: law-firm-clients-backend
+    restart: always
+    command: ["java", "-jar", "app.jar"]
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/client_service
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: ${REDIS_PASSWORD:-}
-      BASE_URL: ${BASE_URL:-http://localhost}
-      CLIENT_SERVICE_JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
-      CLIENT_SERVICE_JWT_EXPIRATION: ${JWT_EXPIRATION:-24}
-      FILE_STORAGE_TYPE: ${FILE_STORAGE_TYPE:-local}
-      FILE_STORAGE_PATH: /data/client-service/files
-      # MinIO 配置（如果使用）
-      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-}
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-}
-      MINIO_BUCKET: ${MINIO_BUCKET:-client-service}
-    volumes:
-      - client_service_file_storage:/data/client-service/files
-      - client_service_app_logs:/app/logs
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/client_service
+      # 零配置启动：如果不提供密码，系统会使用安全的默认配置，后端自动建表并生成初始状态
+      # - POSTGRES_PASSWORD=your_password
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - client-service-network
-    restart: unless-stopped
-    logging: *default-logging
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - postgres
+      - redis
 
-  # ========== PostgreSQL 数据库 ==========
+  # =====================================================
+  # 3. 数据库 (PostgreSQL)
+  # =====================================================
   postgres:
     image: postgres:15-alpine
-    container_name: client-service-postgres
-    # 不暴露端口，仅内部网络访问
-    expose:
-      - "5432"
+    container_name: law-firm-clients-postgres
+    restart: always
     environment:
-      POSTGRES_DB: client_service
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres123}
+      - POSTGRES_DB=client_service
     volumes:
-      - client_service_postgres_data:/var/lib/postgresql/data
-    networks:
-      - client-service-network
-    restart: unless-stopped
-    logging: *default-logging
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - postgres_data:/var/lib/postgresql/data
 
-  # ========== Redis 缓存 ==========
+  # =====================================================
+  # 4. 缓存 (Redis)
+  # =====================================================
   redis:
     image: redis:7-alpine
-    container_name: client-service-redis
-    # 不暴露端口，仅内部网络访问
-    expose:
-      - "6379"
-    command: >
-      redis-server 
-      --appendonly yes 
-      ${REDIS_PASSWORD:+--requirepass ${REDIS_PASSWORD}}
+    container_name: law-firm-clients-redis
+    restart: always
     volumes:
-      - client_service_redis_data:/data
-    networks:
-      - client-service-network
-    restart: unless-stopped
-    logging: *default-logging
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli ${REDIS_PASSWORD:+-a $REDIS_PASSWORD} ping | grep -q PONG"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-  # ========== MinIO 对象存储（可选）==========
-  # 取消注释以启用 MinIO
-  # minio:
-  #   image: minio/minio:latest
-  #   container_name: client-service-minio
-  #   ports:
-  #     # Console 管理界面（运维访问）
-  #     - "${MINIO_CONSOLE_PORT:-9001}:9001"
-  #   expose:
-  #     # API 端口仅内部网络访问（后端通过内部网络调用）
-  #     - "9000"
-  #   environment:
-  #     MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
-  #     MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
-  #   command: server /data --console-address ":9001"
-  #   volumes:
-  #     - minio_data:/data
-  #   networks:
-  #     - client-service-network
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-
-  # ========== OnlyOffice 文档服务（可选）==========
-  # 取消注释以启用 OnlyOffice 文档预览/编辑
-  # 
-  # 启用步骤：
-  # 1. 取消下面 onlyoffice 服务的注释
-  # 2. 取消 nginx.conf 中 upstream onlyoffice 和 location /onlyoffice/ 的注释
-  # 3. 取消下面 volumes 中 onlyoffice_data 和 onlyoffice_logs 的注释
-  # 4. 在 .env 中配置 ONLYOFFICE_JWT_SECRET
-  # 5. 后端需要实现 JWT 签名生成逻辑
-  #
-  # onlyoffice:
-  #   image: onlyoffice/documentserver:8.0
-  #   container_name: client-service-onlyoffice
-  #   expose:
-  #     - "80"
-  #   environment:
-  #     # JWT 认证（必须启用，防止未授权访问）
-  #     JWT_ENABLED: "true"
-  #     JWT_SECRET: ${ONLYOFFICE_JWT_SECRET:?ONLYOFFICE_JWT_SECRET is required}
-  #     JWT_HEADER: Authorization
-  #     JWT_IN_BODY: "true"
-  #     # 允许的来源（设置为你的域名）
-  #     # WOPI_ENABLED: "false"
-  #   volumes:
-  #     - onlyoffice_data:/var/www/onlyoffice/Data
-  #     - onlyoffice_logs:/var/log/onlyoffice
-  #     - onlyoffice_fonts:/var/www/onlyoffice/documentserver/fonts
-  #   networks:
-  #     - client-service-network
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost/healthcheck"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-
-networks:
-  client-service-network:
-    driver: bridge
+      - redis_data:/data
 
 volumes:
-  client_service_postgres_data:
-    name: client-service-postgres-data
-  client_service_redis_data:
-    name: client-service-redis-data
-  client_service_file_storage:
-    name: client-service-file-storage
-  client_service_app_logs:
-    name: client-service-app-logs
-  # minio_data:       # 取消注释以启用 MinIO
-  # onlyoffice_data:  # 取消注释以启用 OnlyOffice
-  # onlyoffice_logs:  # 取消注释以启用 OnlyOffice
-  # onlyoffice_fonts: # 取消注释以启用 OnlyOffice（自定义字体）
+  postgres_data:
+  redis_data:
