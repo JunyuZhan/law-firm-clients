@@ -42,10 +42,16 @@ jobs:
             local image="$1"
             local workdir="$2"
             local command="$3"
-            docker run --rm \
-              -v "$ROOT_DIR":/workspace \
-              -w "/workspace/${workdir}" \
-              "$image" sh -lc "$command"
+            echo "==> Running in disposable container ($image): $command"
+            echo "$command" > .ci-cmd.sh
+            tar -c --exclude=.git --exclude=node_modules --exclude=target --exclude=dist . | docker run -i --rm "$image" sh -c "
+              mkdir -p /workspace
+              cd /workspace
+              tar -x
+              cd \"$workdir\"
+              sh -l /workspace/.ci-cmd.sh
+            "
+            rm -f .ci-cmd.sh
           }
 
           run_node_project() {

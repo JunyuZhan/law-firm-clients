@@ -41,26 +41,44 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Sync Dist Assets
+      - name: Sync and Update Dist Center
         shell: bash
         run: |
           set -euo pipefail
+          
+          cat << 'EOF' > .ci-dist.sh
+          apk add --no-cache bash python3 rsync
+          mkdir -p /workspace
+          cd /workspace
+          tar -x
+          
           bash scripts/release/sync-dist-center.sh
-
-      - name: Update Dist Version Descriptor
-        shell: bash
-        run: |
-          set -euo pipefail
+          
           bash scripts/release/update-dist-version.sh \
             --dist-root "$DIST_ROOT" \
             --project "$DIST_PROJECT" \
-            --version "${{ steps.version.outputs.version }}" \
-            --app-version "${{ steps.version.outputs.version }}" \
+            --version "$VERSION" \
+            --app-version "$VERSION" \
             --snapshot
+          EOF
+          
+          tar -c --exclude=.git . | docker run -i --rm \
+            -v "$DIST_ROOT:$DIST_ROOT" \
+            -e DIST_ROOT="$DIST_ROOT" \
+            -e DIST_PROJECT="$DIST_PROJECT" \
+            -e PROJECT_SLUG="$DIST_PROJECT" \
+            -e VERSION="${{ steps.version.outputs.version }}" \
+            alpine:latest sh -e .ci-dist.sh
+            
+          rm -f .ci-dist.sh
 
       - name: Deploy Dist Center
         if: ${{ env.DIST_DEPLOY == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
-          docker compose -f "$DIST_ROOT/docker-compose.yml" up --build -d
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$DIST_ROOT:$DIST_ROOT" \
+            -w "$DIST_ROOT" \
+            docker:cli compose up --build -d
