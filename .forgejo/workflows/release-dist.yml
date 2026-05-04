@@ -48,9 +48,6 @@ jobs:
           
           cat << 'EOF' > .ci-dist.sh
           apk add --no-cache bash python3 rsync
-          mkdir -p /workspace
-          cd /workspace
-          tar -x
           
           bash scripts/release/sync-dist-center.sh
           
@@ -68,7 +65,7 @@ jobs:
             -e DIST_PROJECT="$DIST_PROJECT" \
             -e PROJECT_SLUG="$DIST_PROJECT" \
             -e VERSION="${{ steps.version.outputs.version }}" \
-            alpine:latest sh -e .ci-dist.sh
+            alpine:latest sh -c "mkdir -p /workspace && cd /workspace && tar -x && sh .ci-dist.sh"
             
           rm -f .ci-dist.sh
 
