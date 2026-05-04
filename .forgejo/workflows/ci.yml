@@ -44,7 +44,7 @@ jobs:
             local command="$3"
             echo "==> Running in disposable container ($image): $command"
             echo "$command" > .ci-cmd.sh
-            tar -c --exclude=.git --exclude=node_modules --exclude=target --exclude=dist . | docker run -i --rm "$image" sh -c "
+            tar -c --exclude=.git --exclude=node_modules --exclude=target --exclude=dist . | docker run -i --rm -e CI=true "$image" sh -c "
               mkdir -p /workspace
               cd /workspace
               tar -x
