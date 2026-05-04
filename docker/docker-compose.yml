@@ -97,7 +97,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}
     volumes:
       - client_service_postgres_data:/var/lib/postgresql/data
-      - ../scripts/init-db:/docker-entrypoint-initdb.d
     networks:
       - client-service-network
     restart: unless-stopped
