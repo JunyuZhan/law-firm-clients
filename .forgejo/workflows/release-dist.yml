@@ -19,7 +19,7 @@ jobs:
   sync-and-deploy:
     runs-on: self-hosted
     env:
-      DIST_ROOT: /Users/apple/Documents/Project/dist-center
+      DIST_ROOT: /opt/dist-center
       DIST_PROJECT: law-firm-clients
       DIST_DEPLOY: "true"
     steps:
