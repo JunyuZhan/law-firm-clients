@@ -14,7 +14,9 @@
       <section class="section-shell portal-panel help-hero">
         <header>
           <hgroup>
-            <p class="portal-kicker">帮助中心</p>
+            <p class="portal-kicker">
+              帮助中心
+            </p>
             <h2 class="portal-heading">
               围绕访问方式与常见问题提供自助说明
             </h2>

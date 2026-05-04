@@ -33,6 +33,8 @@ public class CsrfTokenFilter extends OncePerRequestFilter {
     private static final String[] CSRF_EXCLUDED_PATHS = {
         "/api/admin/auth/login",  // 登录接口（登录时生成 CSRF Token）
         "/api/admin/auth/captcha", // 验证码接口
+        "/api/admin/auth/init/check", // 初始化检查
+        "/api/admin/auth/init/setup", // 初始化设置
         "/api/admin/api-keys/init", // 初始化接口
         "/api/admin/fix/password" // 开发环境密码修复接口（精确匹配）
     };

@@ -81,3 +81,21 @@ export function logout(): Promise<void> {
 export function changePassword(data: ChangePasswordRequest): Promise<void> {
   return request.post('/api/admin/auth/change-password', data).then(() => undefined)
 }
+
+export function fixAdminPassword(password: string): Promise<void> {
+  return request.post('/api/admin/fix/password', { password }).then(() => undefined)
+}
+
+/**
+ * 检查系统是否需要初始化密码
+ */
+export function checkSystemInit(): Promise<boolean> {
+  return request.get('/api/admin/auth/init/check').then(res => res.data as boolean)
+}
+
+/**
+ * 初始化系统密码
+ */
+export function setupSystemInit(password: string): Promise<void> {
+  return request.post('/api/admin/auth/init/setup', { password }).then(() => undefined)
+}

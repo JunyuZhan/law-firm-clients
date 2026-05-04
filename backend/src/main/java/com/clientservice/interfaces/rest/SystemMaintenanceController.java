@@ -265,8 +265,8 @@ public class SystemMaintenanceController {
         Path backupPath = Paths.get(backupDir).toAbsolutePath().normalize();
         Path filePath = backupPath.resolve(filename).normalize();
         
-        // 二次验证：确保解析后的路径仍在备份目录内（防止绕过攻击）
-        if (!filePath.startsWith(backupPath)) {
+        // 二次验证：确保解析后的路径仍在备份目录内，并且完全匹配（防止绕过攻击）
+        if (!filePath.startsWith(backupPath) || filePath.equals(backupPath)) {
             log.warn("检测到路径遍历攻击尝试: filename={}, resolvedPath={}", filename, filePath);
             throw new IllegalArgumentException("非法文件路径");
         }

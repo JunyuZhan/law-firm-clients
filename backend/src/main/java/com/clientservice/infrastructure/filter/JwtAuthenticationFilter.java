@@ -136,6 +136,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 排除登录接口、验证码接口和初始化接口
         if (path.equals("/api/admin/auth/login") || 
             path.equals("/api/admin/auth/captcha") ||  // 验证码接口，登录前调用，不需要Token
+            path.equals("/api/admin/auth/init/check") || // 初始化检查
+            path.equals("/api/admin/auth/init/setup") || // 初始化设置
             path.equals("/api/admin/api-keys/init") ||
             path.equals("/api/admin/fix/password")) {  // 开发环境密码修复（精确匹配，防止路径绕过）
             return false;

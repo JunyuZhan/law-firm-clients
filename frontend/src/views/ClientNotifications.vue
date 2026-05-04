@@ -12,7 +12,9 @@
       <section class="section-shell portal-panel portal-panel--intro">
         <header>
           <hgroup>
-            <p class="portal-kicker">通知提醒</p>
+            <p class="portal-kicker">
+              通知提醒
+            </p>
             <h2 class="portal-heading text-balance">
               查看当前客户的通知记录与发送状态
             </h2>

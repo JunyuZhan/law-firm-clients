@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useAppConfigStore } from '@/stores/appConfig'
 import { APP_NAME } from '@/config/app'
 import logger from '@/utils/logger'
+import { checkSystemInit } from '@/api/auth'
 
 // 迁移检查标志（确保只执行一次）
 let migrationChecked = false
@@ -190,6 +191,19 @@ router.beforeEach(async (to, _from, next) => {
       query: to.query,
       matched: to.matched.map(r => ({ path: r.path, name: r.name }))
     })
+  }
+
+  // 初始化检查流程：只在访问管理员相关页面时检查
+  if (to.path.startsWith('/admin')) {
+    try {
+      const needsInit = await checkSystemInit()
+      // 如果系统需要初始化，强制跳转到登录页（登录页已集成初始化逻辑）
+      if (needsInit && to.name !== 'AdminLogin') {
+        return next({ name: 'AdminLogin' })
+      }
+    } catch (error) {
+      console.error('Failed to check system init status:', error)
+    }
   }
 
   const authStore = useAuthStore()

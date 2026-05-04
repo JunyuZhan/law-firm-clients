@@ -2,6 +2,7 @@ package com.clientservice.interfaces.rest;
 
 import com.clientservice.application.dto.CaptchaResponse;
 import com.clientservice.application.dto.ChangePasswordRequest;
+import com.clientservice.application.dto.InitSetupRequest;
 import com.clientservice.application.dto.LoginRequest;
 import com.clientservice.application.dto.LoginResponse;
 import com.clientservice.application.dto.UserInfo;
@@ -49,6 +50,19 @@ public class AdminAuthController {
     private final RequestRateLimitService requestRateLimitService;
     private final com.clientservice.application.service.TokenBlacklistService tokenBlacklistService;
     private final com.clientservice.application.service.CsrfTokenService csrfTokenService;
+
+    @Operation(summary = "检查是否需要初始化", description = "检查系统是否处于未初始化状态（需要设置管理员密码）")
+    @GetMapping("/init/check")
+    public Result<Boolean> checkInit() {
+        return Result.success(adminUserService.needsInit());
+    }
+
+    @Operation(summary = "初始化系统", description = "首次运行设置管理员密码")
+    @PostMapping("/init/setup")
+    public Result<Void> initSetup(@Valid @RequestBody InitSetupRequest request) {
+        adminUserService.initSetup(request.getPassword());
+        return Result.success();
+    }
 
     /**
      * 获取验证码

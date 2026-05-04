@@ -20,8 +20,15 @@
             v-if="loading && !matterDetail"
             class="detail-shell skeleton-shell"
           >
-            <a-skeleton active :paragraph="{ rows: 4 }" />
-            <a-skeleton active :paragraph="{ rows: 6 }" style="margin-top: 24px" />
+            <a-skeleton
+              active
+              :paragraph="{ rows: 4 }"
+            />
+            <a-skeleton
+              active
+              :paragraph="{ rows: 6 }"
+              style="margin-top: 24px"
+            />
           </div>
           <div
             v-else-if="matterDetail"
@@ -30,7 +37,9 @@
             <section class="hero-panel">
               <div class="hero-copy">
                 <hgroup>
-                  <p class="hero-eyebrow">事项协作空间</p>
+                  <p class="hero-eyebrow">
+                    事项协作空间
+                  </p>
                   <h1 class="hero-title text-balance">
                     {{ matterData.matterName || `项目 ${matterId}` }}
                   </h1>

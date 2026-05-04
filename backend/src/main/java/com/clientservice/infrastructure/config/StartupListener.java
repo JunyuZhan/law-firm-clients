@@ -56,7 +56,7 @@ public class StartupListener implements ApplicationListener<ApplicationReadyEven
     public void onApplicationEvent(ApplicationReadyEvent event) {
         bootstrapDatabase();
         ensureJwtSecret();
-        initDefaultAdminUser();
+        // initDefaultAdminUser(); // 取消自动创建管理员，改为前台引导设置密码
         
         // 输出启动成功信息（在Spring Boot banner之后）
         System.out.println("");

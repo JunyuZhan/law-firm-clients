@@ -119,7 +119,10 @@
                     </a-button>
                   </a-upload>
                 </div>
-                <div class="field-hint" style="margin-top: 8px;">
+                <div
+                  class="field-hint"
+                  style="margin-top: 8px;"
+                >
                   {{ ADMIN_SYSTEM_CONFIG_TEXTS.brand.logoHint }}
                 </div>
               </a-form-item>

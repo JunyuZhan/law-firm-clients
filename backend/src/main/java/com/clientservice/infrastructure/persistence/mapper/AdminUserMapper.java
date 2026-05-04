@@ -4,8 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.clientservice.domain.entity.AdminUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
-/**
+import org.apache.ibatis.annotations.Select;/**
  * 管理员用户Mapper
  */
 @Mapper
@@ -55,4 +54,11 @@ public interface AdminUserMapper extends BaseMapper<AdminUser> {
      * @param id 用户ID
      */
     void unlockAccount(@Param("id") Long id);
+    /**
+     * 统计所有有效管理员数量
+     *
+     * @return 数量
+     */
+    @Select("SELECT COUNT(*) FROM admin_user WHERE deleted = false")
+    Integer countAll();
 }

@@ -18,7 +18,10 @@
           :spin="translateY >= pullThreshold"
         />
       </div>
-      <div class="pull-refresh-text" aria-live="polite">
+      <div
+        class="pull-refresh-text"
+        aria-live="polite"
+      >
         {{ statusText }}
       </div>
     </div>

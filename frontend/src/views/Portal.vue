@@ -1,16 +1,26 @@
 <template>
   <div class="portal-page dark-saas-theme">
     <!-- 背景光效与网格 -->
-    <div class="hero-grid"></div>
-    <div class="hero-glow hero-glow-a"></div>
-    <div class="hero-glow hero-glow-b"></div>
+    <div class="hero-grid" />
+    <div class="hero-glow hero-glow-a" />
+    <div class="hero-glow hero-glow-b" />
 
     <!-- 极简导航栏 -->
     <header class="portal-header fade-in-down">
       <div class="portal-header__inner">
         <div class="portal-brand">
-          <div class="portal-brand__logo" :class="{ 'portal-brand__logo--fallback': !logoUrl }">
-            <img v-if="logoUrl" :src="logoUrl" alt="律所标识" width="28" height="28" class="portal-brand__image">
+          <div
+            class="portal-brand__logo"
+            :class="{ 'portal-brand__logo--fallback': !logoUrl }"
+          >
+            <img
+              v-if="logoUrl"
+              :src="logoUrl"
+              alt="律所标识"
+              width="28"
+              height="28"
+              class="portal-brand__image"
+            >
             <BankOutlined v-else />
           </div>
           <strong class="portal-brand__name">{{ lawFirmName || ADMIN_LOGIN_TEXTS.headings.fallbackLawFirm }}</strong>
@@ -58,8 +68,12 @@
       <!-- 英雄区：干净、居中、专注 -->
       <section class="portal-hero">
         <div class="hero-content fade-in-up">
-          <div class="hero-badge">{{ heroEyebrow }}</div>
-          <h1 class="hero-title">{{ portalSystemName || UI_TEXTS.loginTitle }}</h1>
+          <div class="hero-badge">
+            {{ heroEyebrow }}
+          </div>
+          <h1 class="hero-title">
+            {{ portalSystemName || UI_TEXTS.loginTitle }}
+          </h1>
           <p class="hero-subtitle">
             {{ accessNotice }}
           </p>
@@ -67,10 +81,17 @@
       </section>
 
       <!-- 核心能力：极简卡片网格 -->
-      <section id="collaboration" class="portal-features">
+      <section
+        id="collaboration"
+        class="portal-features"
+      >
         <div class="section-header fade-in-up delay-1">
-          <h2 class="section-title">核心能力</h2>
-          <p class="section-desc">围绕真实案件为您设计的协作体验，剔除冗余信息，结构清晰可读。</p>
+          <h2 class="section-title">
+            核心能力
+          </h2>
+          <p class="section-desc">
+            围绕真实案件为您设计的协作体验，剔除冗余信息，结构清晰可读。
+          </p>
         </div>
 
         <div class="features-grid">
@@ -81,11 +102,21 @@
             :style="{ animationDelay: `${(index + 2) * 100}ms` }"
           >
             <div class="feature-icon-wrapper">
-              <component :is="item.icon" class="feature-icon" aria-hidden="true" />
+              <component
+                :is="item.icon"
+                class="feature-icon"
+                aria-hidden="true"
+              />
             </div>
-            <div class="feature-label">{{ item.label }}</div>
-            <h3 class="feature-title">{{ item.title }}</h3>
-            <p class="feature-desc">{{ item.description }}</p>
+            <div class="feature-label">
+              {{ item.label }}
+            </div>
+            <h3 class="feature-title">
+              {{ item.title }}
+            </h3>
+            <p class="feature-desc">
+              {{ item.description }}
+            </p>
           </article>
         </div>
       </section>
@@ -93,15 +124,28 @@
       <!-- 访问流程：清晰的步骤条 -->
       <section class="portal-workflow">
         <div class="section-header fade-in-up">
-          <h2 class="section-title">服务流程</h2>
+          <h2 class="section-title">
+            服务流程
+          </h2>
         </div>
         
         <div class="workflow-steps">
-          <div class="workflow-step fade-in-up" v-for="(item, index) in accessSteps" :key="item.title" :style="{ animationDelay: `${index * 150}ms` }">
-            <div class="step-number">{{ index + 1 }}</div>
+          <div
+            v-for="(item, index) in accessSteps"
+            :key="item.title"
+            class="workflow-step fade-in-up"
+            :style="{ animationDelay: `${index * 150}ms` }"
+          >
+            <div class="step-number">
+              {{ index + 1 }}
+            </div>
             <div class="step-content">
-              <h3 class="step-title">{{ item.title }}</h3>
-              <p class="step-desc">{{ item.description }}</p>
+              <h3 class="step-title">
+                {{ item.title }}
+              </h3>
+              <p class="step-desc">
+                {{ item.description }}
+              </p>
             </div>
           </div>
         </div>
@@ -113,15 +157,32 @@
       <div class="footer-inner">
         <div class="footer-left">
           <span class="copyright">{{ copyrightText }}</span>
-          <span v-if="icpText" class="divider">|</span>
-          <span class="icp" v-if="icpText">
-            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="footer-link">
+          <span
+            v-if="icpText"
+            class="divider"
+          >|</span>
+          <span
+            v-if="icpText"
+            class="icp"
+          >
+            <a
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer-link"
+            >
               {{ icpText }}
             </a>
           </span>
         </div>
         <div class="footer-right">
-          <a v-if="lawFirmWebsite" :href="lawFirmWebsite" target="_blank" rel="noopener noreferrer" class="footer-link">
+          <a
+            v-if="lawFirmWebsite"
+            :href="lawFirmWebsite"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-link"
+          >
             访问官网 ↗
           </a>
         </div>

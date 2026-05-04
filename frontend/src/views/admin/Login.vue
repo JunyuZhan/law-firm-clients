@@ -119,9 +119,21 @@
 
         <header class="form-heading-block">
           <h1 class="page-title">
-            {{ organizationName || ADMIN_LOGIN_TEXTS.headings.fallbackLawFirm }}
+            <template v-if="isInitMode">
+              系统初始化
+            </template>
+            <template v-else>
+              {{ organizationName || ADMIN_LOGIN_TEXTS.headings.fallbackLawFirm }}
+            </template>
           </h1>
-          <p class="page-subtitle">{{ ADMIN_LOGIN_TEXTS.headings.subtitle }}</p>
+          <p class="page-subtitle">
+            <template v-if="isInitMode">
+              欢迎使用客户服务系统，请设置超级管理员 (admin) 的初始密码
+            </template>
+            <template v-else>
+              {{ ADMIN_LOGIN_TEXTS.headings.subtitle }}
+            </template>
+          </p>
         </header>
 
         <a-form
@@ -131,7 +143,10 @@
           class="login-form"
           @finish="handleLogin"
         >
-          <a-form-item name="username">
+          <a-form-item
+            v-if="!isInitMode"
+            name="username"
+          >
             <div class="login-input-shell">
               <a-input
                 v-model:value="form.username"
@@ -161,9 +176,9 @@
                 size="large"
                 name="password"
                 :type="showPassword ? 'text' : 'password'"
-                autocomplete="current-password"
-                :aria-label="ADMIN_LOGIN_TEXTS.placeholders.password"
-                :placeholder="ADMIN_LOGIN_TEXTS.placeholders.password"
+                :autocomplete="isInitMode ? 'new-password' : 'current-password'"
+                :aria-label="isInitMode ? '请设置初始密码' : ADMIN_LOGIN_TEXTS.placeholders.password"
+                :placeholder="isInitMode ? '请设置初始密码' : ADMIN_LOGIN_TEXTS.placeholders.password"
                 @press-enter="handleLogin"
               >
                 <template #prefix>
@@ -192,9 +207,46 @@
                 </template>
               </a-input>
             </div>
+            <div
+              v-if="isInitMode"
+              class="password-requirements"
+            >
+              <ul>
+                <li>至少 8 个字符</li>
+                <li>包含大小写字母、数字和特殊字符</li>
+              </ul>
+            </div>
           </a-form-item>
 
-          <a-form-item name="captchaText">
+          <a-form-item
+            v-if="isInitMode"
+            name="confirmPassword"
+          >
+            <div class="login-input-shell">
+              <a-input
+                v-model:value="form.confirmPassword"
+                size="large"
+                name="confirmPassword"
+                :type="showPassword ? 'text' : 'password'"
+                autocomplete="new-password"
+                aria-label="请再次确认密码"
+                placeholder="请再次确认密码"
+                @press-enter="handleLogin"
+              >
+                <template #prefix>
+                  <LockOutlined
+                    class="input-icon"
+                    aria-hidden="true"
+                  />
+                </template>
+              </a-input>
+            </div>
+          </a-form-item>
+
+          <a-form-item
+            v-if="!isInitMode"
+            name="captchaText"
+          >
             <div class="captcha-wrapper">
               <div class="login-input-shell captcha-input-grow">
                 <a-input
@@ -245,7 +297,7 @@
               block
               class="submit-btn"
             >
-              {{ UI_TEXTS.loginButton }}
+              {{ isInitMode ? '完成初始化' : UI_TEXTS.loginButton }}
             </a-button>
           </a-form-item>
         </a-form>
@@ -295,7 +347,7 @@ import {
   UserOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons-vue'
-import { getCaptcha } from '@/api/auth'
+import { checkSystemInit, setupSystemInit, getCaptcha } from '@/api/auth'
 import AdminLoginMascots from '@/components/admin/login/AdminLoginMascots.vue'
 import { useAppConfigStore } from '@/stores/appConfig'
 import { useAuthStore } from '@/stores/auth'
@@ -308,6 +360,7 @@ const appConfigStore = useAppConfigStore()
 
 const showPassword = ref(false)
 const isTyping = ref(false)
+const isInitMode = ref(false)
 
 const currentYear = new Date().getFullYear()
 const organizationName = computed(() => appConfigStore.appName || appConfigStore.lawFirmName || appConfigStore.displayName)
@@ -334,6 +387,7 @@ const form = ref({
   username: '',
   password: '',
   captchaText: '',
+  confirmPassword: '',
 })
 
 const loading = ref(false)
@@ -350,6 +404,16 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return fallback
 }
 
+const validateConfirmPassword = async (_rule: Rule, value: string) => {
+  if (!isInitMode.value) return Promise.resolve()
+  if (value === '') {
+    return Promise.reject('请再次输入密码')
+  } else if (value !== form.value.password) {
+    return Promise.reject('两次输入的密码不一致')
+  }
+  return Promise.resolve()
+}
+
 const rules: Record<string, Rule[]> = {
   username: [
     { required: true, message: ADMIN_LOGIN_TEXTS.validation.usernameRequired, trigger: 'blur' },
@@ -364,6 +428,9 @@ const rules: Record<string, Rule[]> = {
     { required: true, message: ADMIN_LOGIN_TEXTS.validation.captchaRequired, trigger: 'blur' },
     { min: 4, max: 6, message: ADMIN_LOGIN_TEXTS.validation.captchaLength, trigger: 'blur' },
   ],
+  confirmPassword: [
+    { required: true, validator: validateConfirmPassword, trigger: 'blur' }
+  ]
 }
 
 async function loadCaptcha() {
@@ -391,6 +458,23 @@ async function handleLogin() {
 
   errorMessage.value = ''
 
+  if (isInitMode.value) {
+    loading.value = true
+    try {
+      await setupSystemInit(form.value.password)
+      message.success('系统初始化成功，请使用新密码登录')
+      isInitMode.value = false
+      form.value.password = ''
+      form.value.confirmPassword = ''
+      await loadCaptcha()
+    } catch (error: unknown) {
+      errorMessage.value = getErrorMessage(error, '初始化失败')
+    } finally {
+      loading.value = false
+    }
+    return
+  }
+
   if (!form.value.captchaText || !form.value.captchaText.trim()) {
     errorMessage.value = ADMIN_LOGIN_TEXTS.validation.captchaRequired
     return
@@ -415,11 +499,22 @@ async function handleLogin() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (!appConfigStore.loaded && !appConfigStore.loading) {
     appConfigStore.loadConfig()
   }
-  loadCaptcha()
+
+  try {
+    const needsInit = await checkSystemInit()
+    if (needsInit) {
+      isInitMode.value = true
+    } else {
+      await loadCaptcha()
+    }
+  } catch (error) {
+    console.error('Failed to check init status:', error)
+    await loadCaptcha()
+  }
 })
 </script>
 
@@ -822,5 +917,27 @@ onMounted(() => {
 
 .icp-link a:hover {
   text-decoration: underline;
+}
+
+.password-requirements {
+  margin-top: 8px;
+  padding: 12px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.password-requirements li {
+  margin-bottom: 4px;
+}
+
+.password-requirements li:last-child {
+  margin-bottom: 0;
 }
 </style>

@@ -12,7 +12,9 @@
       <section class="section-shell portal-panel portal-panel--intro">
         <header>
           <hgroup>
-            <p class="portal-kicker">事项列表</p>
+            <p class="portal-kicker">
+              事项列表
+            </p>
             <h2 class="portal-heading text-balance">
               查看当前可访问的事项入口
             </h2>

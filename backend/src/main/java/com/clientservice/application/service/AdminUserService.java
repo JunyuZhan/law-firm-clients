@@ -45,6 +45,41 @@ public class AdminUserService {
     private int lockDurationMinutes;
 
     /**
+     * 检查系统是否处于未初始化状态
+     */
+    public boolean needsInit() {
+        Integer adminCount = adminUserMapper.countAll();
+        return adminCount == null || adminCount == 0;
+    }
+
+    /**
+     * 初始化管理员账号
+     */
+    @Transactional
+    public void initSetup(String password) {
+        if (!needsInit()) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "系统已初始化，无需重复设置");
+        }
+
+        if (!passwordUtil.isValidPassword(password)) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, passwordUtil.getPasswordPolicyDescription());
+        }
+
+        AdminUser adminUser = AdminUser.builder()
+                .username("admin")
+                .passwordHash(passwordUtil.encode(password))
+                .realName("系统管理员")
+                .email("archive-admin@localhost")
+                .enabled(true)
+                .failedLoginCount(0)
+                .lockedUntil(null)
+                .build();
+
+        adminUserMapper.insert(adminUser);
+        log.info("系统初始化完成：成功创建默认管理员账号 (admin)");
+    }
+
+    /**
      * 登录验证
      *
      * @param username 用户名

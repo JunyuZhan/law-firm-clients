@@ -12,7 +12,9 @@
       <section class="section-shell portal-panel profile-hero">
         <header>
           <hgroup>
-            <p class="portal-kicker">个人中心</p>
+            <p class="portal-kicker">
+              个人中心
+            </p>
             <h2 class="portal-heading text-balance">
               查看当前访客识别信息与常用入口
             </h2>

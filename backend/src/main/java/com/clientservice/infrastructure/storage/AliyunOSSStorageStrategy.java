@@ -6,11 +6,12 @@ import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -119,15 +120,12 @@ public class AliyunOSSStorageStrategy implements StorageStrategy {
             }
 
             OSSObject ossObject = getOssClient().getObject(bucketName, relativePath);
-            // 读取完整内容后立即关闭 OSSObject，避免资源泄漏
-            byte[] content;
-            try (InputStream inputStream = ossObject.getObjectContent()) {
-                content = inputStream.readAllBytes();
-            } finally {
-                ossObject.close();
-            }
-
-            return new ByteArrayResource(content);
+            return new InputStreamResource(ossObject.getObjectContent()) {
+                @Override
+                public long contentLength() throws IOException {
+                    return ossObject.getObjectMetadata().getContentLength();
+                }
+            };
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
