@@ -727,6 +727,11 @@ onMounted(() => {
   color: #000; /* hover:text-foreground */
 }
 
+.password-suffix-btn:focus-visible {
+  outline: 2px solid rgba(22, 119, 255, 0.5);
+  outline-offset: 2px;
+}
+
 .password-suffix-icon {
   font-size: 16px;
 }
@@ -759,6 +764,11 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   background-color: #f9fafb;
+}
+
+.captcha-img-container:focus-visible {
+  outline: 2px solid rgba(22, 119, 255, 0.5);
+  outline-offset: 2px;
 }
 
 .captcha-img-container img {

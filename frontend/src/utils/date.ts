@@ -6,11 +6,24 @@ import dayjs from 'dayjs'
 /**
  * 格式化日期时间
  * @param date 日期字符串
- * @param format 格式，默认 'YYYY-MM-DD HH:mm:ss'
+ * @param format 格式 (仅用于降级或特定格式需求)
  * @returns 格式化后的日期字符串，如果输入为空则返回 '-'
  */
-export function formatDate(date?: string, format: string = 'YYYY-MM-DD HH:mm:ss'): string {
+export function formatDate(date?: string, format?: string): string {
   if (!date) return '-'
+  
+  if (!format || format === 'YYYY-MM-DD HH:mm:ss') {
+    return new Intl.DateTimeFormat('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).format(new Date(date)).replace(/\//g, '-')
+  }
+  
   return dayjs(date).format(format)
 }
 
@@ -20,7 +33,12 @@ export function formatDate(date?: string, format: string = 'YYYY-MM-DD HH:mm:ss'
  * @returns 格式化后的日期字符串
  */
 export function formatDateOnly(date?: string): string {
-  return formatDate(date, 'YYYY-MM-DD')
+  if (!date) return '-'
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date(date)).replace(/\//g, '-')
 }
 
 /**

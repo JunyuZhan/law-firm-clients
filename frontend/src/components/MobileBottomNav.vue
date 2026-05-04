@@ -102,6 +102,11 @@ function handleClick(item: NavItem) {
   color: var(--text-tertiary);
 }
 
+.nav-item:focus-visible {
+  outline: 2px solid var(--lex-primary);
+  outline-offset: -2px;
+}
+
 .nav-item.active {
   color: var(--lex-primary-soft);
   background: rgba(30, 64, 175, 0.08);

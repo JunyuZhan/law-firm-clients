@@ -219,14 +219,26 @@ async function loadFiles() {
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '-'
-  return dateStr.split('T')[0]
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date(dateStr)).replace(/\//g, '-')
 }
 
 function formatSize(size?: number): string {
   if (!size) return '-'
-  if (size < 1024) return size + ' B'
-  if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB'
-  return (size / (1024 * 1024)).toFixed(1) + ' MB'
+  
+  const formatter = (value: number, unit: string) => 
+    new Intl.NumberFormat('zh-CN', { 
+      style: 'unit', 
+      unit, 
+      maximumFractionDigits: 1 
+    }).format(value)
+
+  if (size < 1024) return formatter(size, 'byte')
+  if (size < 1024 * 1024) return formatter(size / 1024, 'kilobyte')
+  return formatter(size / (1024 * 1024), 'megabyte')
 }
 
 function handlePreview(item: FileInfo) {
@@ -315,10 +327,16 @@ onMounted(() => {
   border: 1px solid rgba(16, 42, 67, 0.08);
 }
 
-.file-card:hover {
+.file-card:hover,
+.file-card:focus-visible {
   border-color: rgba(16, 42, 67, 0.14);
   box-shadow: 0 14px 28px rgba(16, 42, 67, 0.08);
   transform: translateY(-1px);
+}
+
+.file-card:focus-visible {
+  outline: 2px solid var(--lex-primary);
+  outline-offset: 2px;
 }
 
 .file-card__icon {

@@ -240,7 +240,11 @@ const getStatusTone = getPortalMatterStatusTone
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return '-'
-  return dateStr.split('T')[0]
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date(dateStr)).replace(/\//g, '-')
 }
 
 async function loadMatters() {
@@ -314,9 +318,15 @@ watch(
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.matter-card:hover {
+.matter-card:hover,
+.matter-card:focus-visible {
   border-color: #1677ff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+}
+
+.matter-card:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
 }
 
 .matter-card__head {

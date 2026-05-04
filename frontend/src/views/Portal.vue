@@ -10,7 +10,7 @@
       <div class="portal-header__inner">
         <div class="portal-brand">
           <div class="portal-brand__logo" :class="{ 'portal-brand__logo--fallback': !logoUrl }">
-            <img v-if="logoUrl" :src="logoUrl" alt="律所标识" class="portal-brand__image">
+            <img v-if="logoUrl" :src="logoUrl" alt="律所标识" width="28" height="28" class="portal-brand__image">
             <BankOutlined v-else />
           </div>
           <strong class="portal-brand__name">{{ lawFirmName || ADMIN_LOGIN_TEXTS.headings.fallbackLawFirm }}</strong>
@@ -363,15 +363,21 @@ function goToAdminLogin() {
   cursor: pointer;
   padding: 8px;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.staff-entry-btn:hover {
+.staff-entry-btn:hover,
+.staff-entry-btn:focus-visible {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+}
+
+.staff-entry-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
 }
 
 .staff-entry-icon {
@@ -666,5 +672,14 @@ function goToAdminLogin() {
 @keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-up,
+  .fade-in-down {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 </style>
