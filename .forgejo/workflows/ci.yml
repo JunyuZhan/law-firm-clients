@@ -171,12 +171,11 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY##*/}"
           TAG="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
 
-          if [ -z "${REGISTRY_USERNAME:-}" ] || [ -z "${REGISTRY_PASSWORD:-}" ]; then
-            echo "Missing REGISTRY_USERNAME / REGISTRY_PASSWORD secrets."
-            exit 1
+          if [ -n "${REGISTRY_USERNAME:-}" ] && [ -n "${REGISTRY_PASSWORD:-}" ]; then
+            echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_HOST}" -u "${REGISTRY_USERNAME}" --password-stdin
+          else
+            echo "Missing REGISTRY_USERNAME / REGISTRY_PASSWORD secrets. Skipping docker login..."
           fi
-
-          echo "${REGISTRY_PASSWORD}" | docker login "${REGISTRY_HOST}" -u "${REGISTRY_USERNAME}" --password-stdin
 
           build_and_push() {
             local image_name="$1"
