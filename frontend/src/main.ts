@@ -8,8 +8,16 @@ import App from './App.vue'
 import router from './router'
 import logger from './utils/logger'
 import './style.css'
+import './styles/lex-elite-demo.css'
 
-const app = createApp(App)
+async function bootstrap() {
+  // 体验 Demo：启用 MSW Mock 后端（GitHub Pages 静态部署，无真实后端）
+  if (import.meta.env.VITE_DEMO_MODE === 'true') {
+    const { startMockWorker } = await import('./mocks/browser')
+    await startMockWorker()
+  }
+
+  const app = createApp(App)
 
 // 全局错误处理器：捕获组件渲染和生命周期中未处理的异常
 app.config.errorHandler = (err, _instance, info) => {
@@ -30,9 +38,12 @@ window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault()
 })
 
-app.use(createPinia())
-app.use(router)
-app.use(Antd)
-app.use(Vant)
+  app.use(createPinia())
+  app.use(router)
+  app.use(Antd)
+  app.use(Vant)
 
-app.mount('#app')
+  app.mount('#app')
+}
+
+bootstrap()

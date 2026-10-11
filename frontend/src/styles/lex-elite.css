@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Lex Elite — 设计 Token（典雅法律风）
+   --------------------------------------------------------------------------
+   深藏青 #1a2b4a 系主色 + 金色 #c9a961 点缀 + 衬线标题。
+   本文件是 Lex Elite 视觉语言的唯一 token 来源，供：
+     - theme.css（衍生语义变量）
+     - App.vue（Ant Design Vue ConfigProvider token）
+     - 各页面 scoped 样式（用于非 Ant 节点）
+   取值说明见文件末尾注释与 MASTER.md。
+   ========================================================================== */
+
+:root {
+  /* ---- 主色：深藏青 ---- */
+  --le-navy-900: #0d1830; /* 最深，页脚 / 深色底 */
+  --le-navy-800: #1a2b4a; /* 主色 Primary */
+  --le-navy-700: #24395e; /* 悬停态 */
+  --le-navy-600: #2f4a75; /* 次级强调 */
+  --le-navy-500: #3d5c8c; /* 弱化 / 链接 */
+  --le-navy-300: #7c93b5; /* 禁用 / 占位 */
+  --le-navy-tint: rgba(26, 43, 74, 0.08); /* 浅色底 */
+
+  /* ---- 点缀：金色 ---- */
+  --le-gold: #c9a961; /* 主金 Accent */
+  --le-gold-soft: #e0c485; /* 浅金，深底上的文字 */
+  --le-gold-deep: #a8873f; /* 深金，悬停 */
+  --le-gold-tint: rgba(201, 169, 97, 0.14); /* 金色浅底 */
+
+  /* ---- 中性 ---- */
+  --le-paper: #ffffff; /* 卡片白 */
+  --le-cream: #f8f6f1; /* 页面底（米白） */
+  --le-ink: #1a2330; /* 正文 */
+  --le-muted: #6b7787; /* 次要文字 */
+  --le-line: #e4dfd2; /* 分割线（暖灰） */
+  --le-line-soft: #eeebe1;
+
+  /* ---- 状态色（与品牌协调） ---- */
+  --le-success: #2d6a4f;
+  --le-warning: #9c6b1a;
+  --le-error: #a61e2d;
+  --le-info: var(--le-navy-600);
+
+  /* ---- 字体 ---- */
+  --le-font-serif: Georgia, 'Times New Roman', 'Songti SC', 'SimSun', 'Noto Serif SC', serif;
+  --le-font-sans: 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+    sans-serif;
+  --le-font-mono: 'SFMono-Regular', 'JetBrains Mono', Consolas, monospace;
+
+  /* ---- 圆角（典雅偏方正） ---- */
+  --le-radius-xs: 2px;
+  --le-radius-sm: 4px;
+  --le-radius-md: 6px;
+  --le-radius-lg: 8px;
+  --le-radius-pill: 999px;
+
+  /* ---- 间距 ---- */
+  --le-space-xs: 4px;
+  --le-space-sm: 8px;
+  --le-space-md: 16px;
+  --le-space-lg: 24px;
+  --le-space-xl: 32px;
+  --le-space-2xl: 48px;
+  --le-space-3xl: 64px;
+
+  /* ---- 阴影 ---- */
+  --le-shadow-xs: 0 1px 2px rgba(13, 24, 48, 0.05);
+  --le-shadow-sm: 0 2px 8px rgba(13, 24, 48, 0.07);
+  --le-shadow-md: 0 10px 30px rgba(13, 24, 48, 0.08);
+  --le-shadow-lg: 0 24px 48px rgba(13, 24, 48, 0.14);
+
+  /* ---- 渐变与装饰 ---- */
+  --le-hero-gradient: linear-gradient(160deg, var(--le-navy-800) 0%, var(--le-navy-600) 100%);
+  --le-gold-rule: linear-gradient(90deg, transparent, var(--le-gold), transparent);
+}

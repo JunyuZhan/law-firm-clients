@@ -1,0 +1,199 @@
+/* ===== Lex Elite Demo 通用样式 =====
+   供体验 Demo 的各视图复用：深藏青 #1a2b4a + 金 #c9a961。
+   颜色统一取自 src/styles/lex-elite.css 的 --le-* 变量，变量缺失时用回退值。 */
+
+.le-page {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+  color: var(--le-navy, #1a2b4a);
+  font-family: "EB Garamond", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* Hero */
+.le-hero {
+  padding: 40px 36px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--le-navy, #1a2b4a) 0%, #24365c 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.le-hero::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 169, 97, 0.35);
+}
+.le-eyebrow {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: var(--le-gold, #c9a961);
+  text-transform: uppercase;
+}
+.le-hero h1 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.le-sub {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+}
+
+/* Cards */
+.le-card {
+  background: #fff;
+  border: 1px solid #e8ecf3;
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 24px rgba(26, 43, 74, 0.05);
+}
+.le-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #eef1f6;
+}
+.le-card-head h2 {
+  margin: 0;
+  font-size: 17px;
+  color: var(--le-navy, #1a2b4a);
+}
+.le-card-head h2::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  margin-right: 10px;
+  vertical-align: -2px;
+  border-radius: 2px;
+  background: var(--le-gold, #c9a961);
+}
+.le-count { color: #8a94a6; font-size: 13px; }
+
+/* Stats */
+.le-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.le-stat {
+  background: #fff;
+  border: 1px solid #e8ecf3;
+  border-left: 3px solid var(--le-gold, #c9a961);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.le-stat-value { font-size: 26px; font-weight: 600; color: var(--le-navy, #1a2b4a); }
+.le-stat-label { font-size: 13px; color: #8a94a6; }
+
+/* Table */
+.le-table { width: 100%; }
+.le-row {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 0.8fr 1fr 0.8fr;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 4px;
+  border-bottom: 1px solid #f0f3f8;
+  font-size: 13.5px;
+}
+.le-row > span:last-child { text-align: right; }
+.le-row--head {
+  color: #8a94a6;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid #eef1f6;
+}
+.le-row small { color: #97a1b2; }
+.le-mono { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 12.5px; }
+
+/* Badges */
+.le-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-style: normal;
+  background: rgba(26, 43, 74, 0.08);
+  color: var(--le-navy, #1a2b4a);
+}
+.le-badge.is-ok { background: rgba(45, 138, 92, 0.12); color: #2d8a5c; }
+.le-badge.is-warn { background: rgba(201, 169, 97, 0.18); color: #9a7d2e; }
+.le-badge.is-danger { background: rgba(186, 65, 65, 0.12); color: #ba4141; }
+
+/* Definition list */
+.le-dl { margin: 0; }
+.le-dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 2px;
+  border-bottom: 1px dashed #eef1f6;
+}
+.le-dl dt { color: #8a94a6; font-size: 13px; }
+.le-dl dd { margin: 0; font-weight: 500; text-align: right; }
+
+/* Grid + timeline + actions + misc */
+.le-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.le-timeline { list-style: none; margin: 8px 0 0; padding: 0; }
+.le-timeline li { display: flex; gap: 12px; padding: 12px 2px; border-bottom: 1px dashed #eef1f6; }
+.le-timeline small { display: block; color: #97a1b2; }
+.le-dot {
+  width: 9px; height: 9px; margin-top: 6px; border-radius: 50%;
+  background: var(--le-gold, #c9a961); flex: 0 0 auto;
+}
+.le-dot.is-warn { background: #ba4141; }
+.le-people { list-style: none; margin: 0; padding: 0; }
+.le-people li { display: flex; justify-content: space-between; padding: 10px 2px; border-bottom: 1px dashed #eef1f6; }
+.le-people small { color: #8a94a6; }
+.le-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+.le-mini { background: #fff; border: 1px solid #e8ecf3; border-radius: 12px; padding: 20px 22px; }
+.le-mini h3 { margin: 0 0 8px; color: var(--le-navy, #1a2b4a); font-size: 16px; }
+.le-mini p { margin: 0; color: #6b7688; font-size: 13.5px; line-height: 1.7; }
+.le-msgs { list-style: none; margin: 0; padding: 0; }
+.le-msgs li { padding: 16px 2px; border-bottom: 1px dashed #eef1f6; }
+.le-msg-head { display: flex; justify-content: space-between; align-items: center; }
+.le-msgs p { margin: 6px 0; color: #4a5568; font-size: 13.5px; line-height: 1.7; }
+.le-msgs small { color: #97a1b2; }
+.le-faq { padding: 12px 0; border-bottom: 1px dashed #eef1f6; }
+.le-faq h3 { margin: 0 0 6px; font-size: 15px; color: var(--le-navy, #1a2b4a); }
+.le-faq p { margin: 0; color: #6b7688; font-size: 13.5px; }
+.le-form { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+.le-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #6b7688; }
+.le-form input {
+  height: 42px; min-width: 240px; padding: 0 14px;
+  border: 1px solid #d8dee9; border-radius: 10px; font-size: 14px; outline: none;
+}
+.le-form input:focus { border-color: var(--le-gold, #c9a961); }
+.le-actions { display: flex; gap: 12px; margin-top: 20px; }
+.le-actions--wrap { flex-wrap: wrap; margin-top: 8px; }
+.le-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 42px; padding: 0 22px; border-radius: 10px; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.35); color: #fff; font-size: 14px;
+  transition: all 0.2s ease;
+}
+.le-btn:hover { border-color: var(--le-gold, #c9a961); color: var(--le-gold, #c9a961); }
+.le-btn--primary { background: var(--le-gold, #c9a961); border-color: var(--le-gold, #c9a961); color: #1a2b4a; font-weight: 600; }
+.le-btn--primary:hover { background: #d8bb7c; color: #1a2b4a; }
+.le-link { color: #9a7d2e; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.le-foot { margin-top: 24px; text-align: center; color: #97a1b2; font-size: 12.5px; }
+
+@media (max-width: 900px) {
+  .le-stats { grid-template-columns: repeat(2, 1fr); }
+  .le-grid-2, .le-cards { grid-template-columns: 1fr; }
+  .le-row { grid-template-columns: 1fr 1fr; }
+  .le-row--head { display: none; }
+}

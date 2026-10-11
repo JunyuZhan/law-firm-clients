@@ -132,7 +132,7 @@ select:focus-visible,
 .ant-picker:hover,
 .ant-input-number:hover,
 .ant-input-textarea textarea:hover {
-  border-color: rgba(30, 64, 175, 0.35) !important;
+  border-color: rgba(26, 43, 74, 0.35) !important;
 }
 
 .ant-input:focus,
@@ -142,7 +142,7 @@ select:focus-visible,
 .ant-picker-focused,
 .ant-input-number-focused {
   border-color: var(--lex-primary-soft) !important;
-  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.12) !important;
+  box-shadow: 0 0 0 2px rgba(26, 43, 74, 0.12) !important;
 }
 
 .ant-form-item-label > label {
@@ -247,7 +247,12 @@ th.ant-table-cell-fix-left {
   border-bottom-color: transparent !important;
 }
 
-.ant-layout-sider-dark,
+/* 侧栏底色改由 Lex Elite token 提供（.ant-layout-sider-dark 不再透明），
+   菜单保持透明以透出侧栏底色。 */
+.ant-layout-sider-dark {
+  background: var(--le-navy-900) !important;
+}
+
 .ant-menu-dark {
   background: transparent !important;
 }

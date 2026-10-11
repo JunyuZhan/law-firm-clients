@@ -12,59 +12,72 @@
 
 **Project:** Law Firm Clients  
 **Generated:** 2026-03-30 22:18:49 · **Tokens synced:** 2026-04-09 · **阶段 4 闸门：** 本地 typecheck / vitest / eslint / playwright smoke 已通过（见 `REDESIGN-SPEC.md` 文首）  
-**Category:** Analytics Dashboard · **UI reference:** Stripe-inspired
+**Category:** Analytics Dashboard · **UI reference:** Lex Elite（典雅法律风）
 
 ---
 
 ## Global Rules
 
-### Color Palette
+### Color Palette（Lex Elite）
 
 | Role | Hex | CSS Variable (runtime) |
 |------|-----|-------------------------|
-| Primary (links / key UI) | `#1E40AF` | `--lex-primary-soft`, Ant `colorPrimary` |
-| Secondary | `#3B82F6` | Ant `colorInfo` |
-| CTA / primary actions | `#F59E0B` | `--lex-accent`, `.ant-btn-primary` |
-| Page background | `#F8FAFC` | `--lex-bg` |
-| Heading / emphasis text | `#1E3A8A` | `--lex-primary` |
-| Body text | `#0F172A` | `--lex-text` |
-| Border | `#E2E8F0` | `--lex-outline` |
+| Primary（主色，链接/关键 UI） | `#1a2b4a` | `--le-navy-800`, `--lex-primary`, Ant `colorPrimary` |
+| Primary hover | `#24395e` | `--le-navy-700` |
+| Secondary / info | `#2f4a75` | `--le-navy-600`, Ant `colorInfo` |
+| Accent / 点缀（金色） | `#c9a961` | `--le-gold`, `--lex-accent` |
+| Accent deep（金色悬停） | `#a8873f` | `--le-gold-deep` |
+| Accent soft（深底金文字） | `#e0c485` | `--le-gold-soft` |
+| Page background | `#f8f6f1` | `--le-cream`, `--lex-bg` |
+| Card surface | `#ffffff` | `--le-paper`, `--lex-surface-strong` |
+| Heading / emphasis text | `#1a2b4a` | `--lex-primary` |
+| Body text | `#1a2330` | `--le-ink`, `--lex-text` |
+| Muted text | `#6b7787` | `--le-muted` |
+| Border | `#e4dfd2` | `--le-line`, `--lex-outline` |
+| Sidebar / deep surface | `#0d1830` | `--le-navy-900`, Ant `Layout.siderBg` |
 
-**Color Notes:** Blue for brand + focus；琥珀用于主按钮与强调（Stripe 式清晰层级，非 Stripe 紫）。
+**Color Notes:** 深藏青 `#1a2b4a` 系为品牌主色（庄重、可信），金色 `#c9a961` 作点缀与强调（分隔线、选中态、点缀描边）。主按钮为深藏青底 + 金色悬停描边。状态色：success `#2d6a4f` / warning `#9c6b1a` / error `#a61e2d`。
+
+> **Token 单一来源：** `frontend/src/styles/lex-elite.css`（`--le-*` 基础 token）；语义层由 `theme.css` 衍生为 `--lex-*`；Ant 组件 token 见 `App.vue`。
 
 ### Typography
 
-- **Heading Font:** Fira Sans（字重 600，略紧字距）
-- **Body Font:** Fira Sans
-- **Monospace:** Fira Code（代码、等宽数据）
-- **Mood:** dashboard, data, B2B, trustworthy, precise
-- **Google Fonts:** [Fira Code + Fira Sans](https://fonts.google.com/share?selection.family=Fira+Code:wght@400;500;600;700|Fira+Sans:wght@300;400;500;600;700)
+- **Heading Font:** Georgia / Times New Roman / Songti SC（衬线，庄重；`--le-font-serif`）
+- **Body Font:** Helvetica Neue / Arial / PingFang SC（无衬线；`--le-font-sans`）
+- **Monospace:** SFMono-Regular / JetBrains Mono（`--le-font-mono`）
+- **Mood:** legal, elegant, trustworthy, precise
 
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
-```
+**CSS Import:** 无需外部字体（使用系统衬线与无衬线栈，避免离线环境阻塞页面加载）。
+
+### Radius（圆角，典雅偏方正）
+
+| Token | Value |
+|-------|-------|
+| `--le-radius-xs` | `2px` |
+| `--le-radius-sm` | `4px` |
+| `--le-radius-md` | `6px` |
+| `--le-radius-lg` | `8px` |
 
 ### Spacing Variables
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--space-xs` | `4px` / `0.25rem` | Tight gaps |
-| `--space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
-| `--space-md` | `16px` / `1rem` | Standard padding |
-| `--space-lg` | `24px` / `1.5rem` | Section padding |
-| `--space-xl` | `32px` / `2rem` | Large gaps |
-| `--space-2xl` | `48px` / `3rem` | Section margins |
-| `--space-3xl` | `64px` / `4rem` | Hero padding |
+| `--le-space-xs` | `4px` / `0.25rem` | Tight gaps |
+| `--le-space-sm` | `8px` / `0.5rem` | Icon gaps, inline spacing |
+| `--le-space-md` | `16px` / `1rem` | Standard padding |
+| `--le-space-lg` | `24px` / `1.5rem` | Section padding |
+| `--le-space-xl` | `32px` / `2rem` | Large gaps |
+| `--le-space-2xl` | `48px` / `3rem` | Section margins |
+| `--le-space-3xl` | `64px` / `4rem` | Hero padding |
 
 ### Shadow Depths
 
 | Level | Value | Usage |
 |-------|-------|-------|
-| `--shadow-xs` | `0 1px 2px rgba(15,23,42,0.04)` | 微抬起 |
-| `--shadow-sm` | 见 `theme.css` `--lex-panel-shadow` | 卡片、面板 |
-| `--shadow-md` | `0 8px 24px rgba(15,23,42,0.08)` | 悬停、下拉 |
-| `--shadow-lg` | `0 20px 40px rgba(15,23,42,0.1)` | 模态、强调浮层 |
+| `--le-shadow-xs` | `0 1px 2px rgba(13,24,48,0.05)` | 微抬起 |
+| `--le-shadow-sm` | `0 2px 8px rgba(13,24,48,0.07)` | 卡片、面板 |
+| `--le-shadow-md` | `0 10px 30px rgba(13,24,48,0.08)` | 悬停、下拉 |
+| `--le-shadow-lg` | `0 24px 48px rgba(13,24,48,0.14)` | 模态、强调浮层 |
 
 ---
 

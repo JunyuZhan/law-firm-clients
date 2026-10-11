@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useAuthStore } from '@/stores/auth'
@@ -164,8 +164,12 @@ const routes: RouteRecordRaw[] = [
   },
 ]
 
+// 体验 Demo（GitHub Pages 子路径静态部署）使用 hash 路由，避免 SPA 刷新 404。
+// 历史模式路由对应 404.html 回退；hash 模式最稳妥，刷新/直达均不会 404。
+const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true'
+
 const router = createRouter({
-  history: createWebHistory(),
+  history: DEMO_MODE ? createWebHashHistory() : createWebHistory(),
   routes,
   scrollBehavior(to, _from, savedPosition) {
     if (to.hash) {

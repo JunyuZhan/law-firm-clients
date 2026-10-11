@@ -4,6 +4,9 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // 体验 Demo 部署在 GitHub Pages 子路径 /law-firm-clients/ 下，需设置 base。
+  // 其他构建（正式环境根路径部署）保持 '/'。
+  base: process.env.VITE_DEMO_MODE === 'true' ? '/law-firm-clients/' : '/',
   plugins: [vue()],
   resolve: {
     alias: {
@@ -45,6 +48,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // MSW 仅用于 Demo mock，独立分包，避免打入主包
+          if (id.includes('msw')) {
+            return 'msw-mock'
+          }
           // 将 node_modules 中的依赖分割
           if (id.includes('node_modules')) {
             // Vue 核心库

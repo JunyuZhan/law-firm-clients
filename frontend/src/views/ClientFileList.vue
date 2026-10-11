@@ -1,383 +1,60 @@
 <template>
-  <div class="file-list-container">
-    <AppHeader
-      variant="portal"
-      title="文件中心"
-    />
-    <a-layout-content
-      id="main-content"
-      class="content"
-      tabindex="-1"
-    >
-      <section class="section-shell portal-panel portal-panel--intro">
-        <header>
-          <hgroup>
-            <p class="portal-kicker">
-              文件协作
-            </p>
-            <h2 class="portal-heading text-balance">
-              查看当前事项已授权的文件资料
-            </h2>
-          </hgroup>
-          <p class="intro-text text-balance">
-            文件中心只承接当前事项下的材料查看与下载。打开文件后可继续预览、下载或复制预览链接。
-          </p>
-        </header>
-        <div class="stats-grid">
-          <article class="stats-card">
-            <span class="stats-label">文件数</span>
-            <strong>{{ files.length }}</strong>
-          </article>
-          <article class="stats-card">
-            <span class="stats-label">最近更新</span>
-            <strong>{{ latestFileDate }}</strong>
-          </article>
+  <div class="le-page">
+    <header class="le-hero">
+      <p class="le-eyebrow">FILE CENTER</p>
+      <h1>文件中心</h1>
+      <p class="le-sub">系统推送的法律文书与您上传的补充材料（演示数据）</p>
+    </header>
+
+    <section class="le-card">
+      <div class="le-table">
+        <div class="le-row le-row--head">
+          <span>文件名</span><span>来源</span><span>大小</span><span>上传时间</span><span>操作</span>
         </div>
-      </section>
-
-      <section class="section-shell portal-panel">
-        <div
-          v-if="hasStoredContext || hasAccessContext"
-          class="section-actions"
-        >
-          <span class="section-actions__hint">
-            {{ sourceText }}
-          </span>
-          <a-button
-            type="default"
-            size="small"
-            @click="loadFiles"
-          >
-            刷新文件
-          </a-button>
+        <div v-for="f in list" :key="f.id" class="le-row">
+          <span><strong>{{ f.fileName }}</strong><br><small>{{ f.description || '—' }}</small></span>
+          <span><em class="le-badge">{{ f.fileSource === 'CLIENT_UPLOAD' ? '我上传的' : '律所推送' }}</em></span>
+          <span>{{ fmtSize(f.fileSize) }}</span>
+          <span>{{ (f.uploadedAt || '').slice(0, 16) }}</span>
+          <span><a class="le-link" @click="download(f)">下载</a></span>
         </div>
+      </div>
+    </section>
 
-        <a-spin :spinning="loading">
-          <div
-            v-if="loading && files.length === 0 && errorState === 'none'"
-            class="skeleton-list"
-          >
-            <div
-              v-for="i in 4"
-              :key="i"
-              class="skeleton-item"
-            >
-              <a-skeleton
-                :active="true"
-                :paragraph="{ rows: 2 }"
-              />
-            </div>
-          </div>
-          <PortalStatePanel
-            v-else-if="errorState === 'missing-token'"
-            title="暂无可用访问上下文"
-            description="请先通过律师发送的专属链接进入一个事项，再查看对应的文件资料。"
-          >
-            <template #icon>
-              <FileOutlined />
-            </template>
-            <template #actions>
-              <a-button
-                type="primary"
-                @click="router.push('/portal')"
-              >
-                返回首页
-              </a-button>
-            </template>
-          </PortalStatePanel>
-          <PortalStatePanel
-            v-else-if="errorState === 'invalid-token'"
-            title="访问链接已失效"
-            description="当前保存的文件访问凭据不可用，可能已过期或被撤销。请重新通过律师发送的专属链接进入事项。"
-          >
-            <template #icon>
-              <FileOutlined />
-            </template>
-            <template #actions>
-              <a-button
-                type="primary"
-                @click="router.push('/portal')"
-              >
-                返回首页
-              </a-button>
-              <a-button @click="clearAccessContext">
-                清除本地记录
-              </a-button>
-            </template>
-          </PortalStatePanel>
-          <PortalStatePanel
-            v-else-if="files.length === 0"
-            title="暂无文件"
-            description="律所将为您上传相关文件。"
-          >
-            <template #icon>
-              <FileOutlined />
-            </template>
-          </PortalStatePanel>
-          <div
-            v-else
-            class="file-card-grid"
-          >
-            <button
-              v-for="item in files"
-              :key="item.id"
-              type="button"
-              class="file-card"
-              @click="openFileActions(item)"
-            >
-              <div class="file-card__icon">
-                <Icon
-                  :icon="getFileVisual(item).icon"
-                  :style="{ color: getFileVisual(item).color }"
-                />
-              </div>
-              <div class="file-card__copy">
-                <strong class="file-name">{{ item.fileName }}</strong>
-                <div class="file-meta">
-                  <span>{{ formatDate(item.uploadedAt) }}</span>
-                  <span>{{ formatSize(item.fileSize) }}</span>
-                </div>
-                <p class="file-note">
-                  点击后可继续预览、下载或分享当前文件。
-                </p>
-              </div>
-            </button>
-          </div>
-        </a-spin>
-      </section>
-    </a-layout-content>
-    <MobileBottomNav />
-
-    <van-action-sheet
-      v-model:show="actionSheetOpen"
-      :actions="fileActions"
-      cancel-text="取消"
-      close-on-click-action
-      @select="handleFileAction"
-    />
+    <footer class="le-foot">© 汇衡律师事务所 · 客户服务门户（Demo）</footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { FileOutlined } from '@ant-design/icons-vue'
-import { Icon } from '@iconify/vue'
+import { onMounted, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AppHeader from '@/components/AppHeader.vue'
-import MobileBottomNav from '@/components/MobileBottomNav.vue'
-import PortalStatePanel from '@/components/PortalStatePanel.vue'
-import { getFileList, downloadFile, previewFile, type FileInfo } from '@/api/file'
-import { usePortalAccessContext } from '@/composables/usePortalAccessContext'
-import {
-  resolvePortalAccessErrorState,
-  type PortalAccessErrorState,
-} from '@/utils/portalState'
+import { getFileList, downloadFile, type FileInfo } from '@/api/file'
 
-const route = useRoute()
-const router = useRouter()
-const loading = ref(false)
-const files = ref<FileInfo[]>([])
-const actionSheetOpen = ref(false)
-const selectedFile = ref<FileInfo | null>(null)
-const errorState = ref<PortalAccessErrorState>('none')
-const { matterId, token, hasStoredContext, hasAccessContext, sourceText, clearAccessContext } = usePortalAccessContext()
-const fileActions = [
-  { name: '预览', key: 'preview' },
-  { name: '下载', key: 'download' },
-  { name: '分享', key: 'share' },
-]
+const DEMO_TOKEN = 'demo-portal-token-2026'
+const list = ref<FileInfo[]>([])
 
-const latestFileDate = computed(() => {
-  const dates = files.value
-    .map(item => item.uploadedAt)
-    .filter(Boolean)
-    .sort()
-  const latest = dates.length > 0 ? dates[dates.length - 1] : undefined
-  return latest ? formatDate(latest) : '-'
-})
-async function loadFiles() {
-  if (!matterId.value || !token.value) {
-    files.value = []
-    errorState.value = 'missing-token'
-    return
-  }
+function fmtSize(bytes: number) {
+  if (!bytes) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return `${(bytes / Math.pow(1024, i)).toFixed(i ? 1 : 0)} ${units[i]}`
+}
 
-  loading.value = true
-  errorState.value = 'none'
+async function download(f: FileInfo) {
   try {
-    const res = await getFileList(matterId.value, token.value)
-    if (res.success && res.data) {
-      files.value = res.data
-    }
-  } catch (error) {
-    files.value = []
-    errorState.value = resolvePortalAccessErrorState(error)
-    message.error('加载文件列表失败')
-  } finally {
-    loading.value = false
+    await downloadFile(f.id, f.matterId, DEMO_TOKEN, f.fileName)
+    message.success('已开始下载（演示文件）')
+  } catch {
+    message.error('下载失败')
   }
 }
 
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return '-'
-  return new Intl.DateTimeFormat('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).format(new Date(dateStr)).replace(/\//g, '-')
-}
-
-function formatSize(size?: number): string {
-  if (!size) return '-'
-  
-  const formatter = (value: number, unit: string) => 
-    new Intl.NumberFormat('zh-CN', { 
-      style: 'unit', 
-      unit, 
-      maximumFractionDigits: 1 
-    }).format(value)
-
-  if (size < 1024) return formatter(size, 'byte')
-  if (size < 1024 * 1024) return formatter(size / 1024, 'kilobyte')
-  return formatter(size / (1024 * 1024), 'megabyte')
-}
-
-function handlePreview(item: FileInfo) {
-  if (!matterId.value || !token.value) return
-  const url = previewFile(item.id, matterId.value, token.value)
-  window.open(url, '_blank', 'noopener,noreferrer')
-}
-
-function handleDownload(item: FileInfo) {
-  if (!matterId.value || !token.value) return
-  downloadFile(item.id, matterId.value, token.value)
-}
-
-function getFileVisual(item: FileInfo): { icon: string; color: string } {
-  const ext = item.fileName.split('.').pop()?.toLowerCase() || ''
-  if (ext === 'pdf') return { icon: 'mdi:file-pdf-box', color: '#b42318' }
-  if (['doc', 'docx'].includes(ext)) return { icon: 'mdi:file-word-box', color: '#175cd3' }
-  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) return { icon: 'mdi:file-image', color: '#2d6a4f' }
-  return { icon: 'mdi:file-document-outline', color: '#486581' }
-}
-
-function openFileActions(item: FileInfo) {
-  selectedFile.value = item
-  actionSheetOpen.value = true
-}
-
-async function handleFileAction(action: { key?: string; name: string }) {
-  const item = selectedFile.value
-  if (!item) return
-
-  if (action.key === 'preview') {
-    handlePreview(item)
-    return
+onMounted(async () => {
+  try {
+    const res = await getFileList('M2026001', DEMO_TOKEN)
+    list.value = res.data || []
+  } catch {
+    message.error('文件列表加载失败')
   }
-
-  if (action.key === 'download') {
-    handleDownload(item)
-    return
-  }
-
-  if (action.key === 'share' && matterId.value && token.value) {
-    const shareUrl = `${window.location.origin}${previewFile(item.id, matterId.value, token.value)}`
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: item.fileName, url: shareUrl })
-      } else {
-        await navigator.clipboard.writeText(shareUrl)
-        message.success('预览链接已复制')
-      }
-    } catch {
-      message.warning('分享未完成')
-    }
-  }
-}
-
-watch(
-  () => [route.query.matterId, route.query.token],
-  () => {
-    loadFiles()
-  },
-)
-
-onMounted(() => {
-  loadFiles()
 })
 </script>
-
-<style scoped>
-.content {
-  display: grid;
-  gap: 20px;
-}
-
-.file-card-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.file-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(16, 42, 67, 0.08);
-}
-
-.file-card:hover,
-.file-card:focus-visible {
-  border-color: rgba(16, 42, 67, 0.14);
-  box-shadow: 0 14px 28px rgba(16, 42, 67, 0.08);
-  transform: translateY(-1px);
-}
-
-.file-card:focus-visible {
-  outline: 2px solid var(--lex-primary);
-  outline-offset: 2px;
-}
-
-.file-card__icon {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
-  border-radius: 16px;
-  background: var(--lex-bg-muted);
-  font-size: 26px;
-  flex-shrink: 0;
-}
-
-.file-card__copy {
-  min-width: 0;
-  display: grid;
-  gap: 6px;
-}
-
-.file-name {
-  font-weight: 600;
-  color: var(--text-primary);
-  word-break: break-word;
-}
-
-.file-meta {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  color: var(--text-secondary);
-}
-
-.file-note {
-  margin: 2px 0 0;
-  color: var(--text-tertiary);
-  font-size: 13px;
-  line-height: 1.7;
-}
-
-@media (max-width: 768px) {
-}
-</style>
