@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <!-- Left: brand panel (desktop) -->
+    <!-- Left: illustration (desktop) -->
     <aside
       class="login-hero"
       aria-hidden="false"
@@ -12,8 +12,8 @@
               v-if="appConfigStore.logoUrl"
               :src="appConfigStore.logoUrl"
               alt=""
-              width="44"
-              height="44"
+              width="40"
+              height="40"
               class="logo-image"
             >
             <svg
@@ -77,12 +77,6 @@
         class="hero-glow hero-glow-b"
         aria-hidden="true"
       />
-      <div
-        class="hero-seal"
-        aria-hidden="true"
-      >
-        <span>LEX&nbsp;ELITE</span>
-      </div>
     </aside>
 
     <!-- Right: form -->
@@ -124,7 +118,6 @@
         </div>
 
         <header class="form-heading-block">
-          <span class="form-kicker eyebrow-text">Client Service Console</span>
           <h1 class="page-title">
             <template v-if="isInitMode">
               系统初始化
@@ -133,10 +126,6 @@
               {{ organizationName || ADMIN_LOGIN_TEXTS.headings.fallbackLawFirm }}
             </template>
           </h1>
-          <div
-            class="title-rule"
-            aria-hidden="true"
-          />
           <p class="page-subtitle">
             <template v-if="isInitMode">
               欢迎使用客户服务系统，请设置超级管理员 (admin) 的初始密码
@@ -530,16 +519,19 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ===== Lex Elite 登录页 =====
-   色值全部来自 src/styles/lex-elite.css（--le-*）。
-   深藏青主panel + 金色点缀 + 衬线标题；金色细线分隔。
-   布局保留：lg 双栏、左 p-12、右 p-8、表单 max-w-[420px]、h-12 输入壳。 */
+/* Layout tokens aligned with frontend/css.md (Tailwind): lg:grid-cols-2, left p-12, right p-8, form max-w-[420px], space-y-5, h-12 */
 .login-page {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr;
-  font-family: var(--le-font-sans);
-  background: var(--le-paper);
+  font-family:
+    'Inter',
+    'Helvetica Neue',
+    Helvetica,
+    -apple-system,
+    Arial,
+    sans-serif;
+  background: #ffffff;
 }
 
 @media (min-width: 1024px) {
@@ -548,16 +540,15 @@ onMounted(async () => {
   }
 }
 
-/* --- Hero：深藏青底 + 金色顶线，与 Lex Elite 样板一致 --- */
+/* --- Hero：底色与门户页 Portal.vue（--portal-bg）一致，网格/光斑观感统一 --- */
 .login-hero {
   display: none;
   position: relative;
   flex-direction: column;
   justify-content: space-between;
-  padding: var(--le-space-2xl); /* 48px */
+  padding: 48px; /* p-12 */
   color: #fff;
-  border-top: 3px solid var(--le-gold);
-  background: var(--le-hero-gradient);
+  background: #1e293b;
   overflow: hidden;
 }
 
@@ -575,7 +566,7 @@ onMounted(async () => {
 .hero-brand {
   display: flex;
   align-items: flex-start;
-  gap: var(--le-space-md);
+  gap: 12px;
 }
 
 .hero-brand-mark {
@@ -600,14 +591,14 @@ onMounted(async () => {
 
 .hero-eyebrow {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.45;
-  color: rgba(224, 196, 133, 0.92); /* gold-soft 上深底 */
-  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.04em;
 }
 
 .hero-eyebrow--mobile {
-  color: var(--le-muted);
+  color: #6b7280;
 }
 
 .hero-mascots {
@@ -626,21 +617,19 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--le-space-lg);
-  padding-top: var(--le-space-md);
-  border-top: 1px solid rgba(224, 196, 133, 0.28);
+  gap: 24px;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.6);
 }
 
 .hero-link {
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .hero-link:hover {
-  color: var(--le-gold-soft);
+  color: #fff;
 }
 
 .hero-dot {
@@ -656,11 +645,11 @@ onMounted(async () => {
   pointer-events: none;
   position: absolute;
   inset: 0;
-  opacity: 0.06;
+  opacity: 0.05;
   background-image:
     linear-gradient(rgba(255, 255, 255, 1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 1) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: 20px 20px;
   z-index: 0;
 }
 
@@ -672,81 +661,55 @@ onMounted(async () => {
   z-index: 0;
 }
 
+/* 与 Portal.vue .hero-glow-a / b 同参，左右分栏时装饰一致 */
 .hero-glow-a {
-  top: 12%;
-  right: 12%;
-  width: 320px;
-  height: 320px;
-  background: rgba(201, 169, 97, 0.18);
+  top: 15%;
+  right: 15%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .hero-glow-b {
-  bottom: 12%;
-  left: 12%;
-  width: 380px;
-  height: 380px;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-/* 装饰印记：呼应 Lex Elite 样板右上角金色圆环 */
-.hero-seal {
-  pointer-events: none;
-  position: absolute;
-  right: -70px;
-  top: -70px;
-  width: 300px;
-  height: 300px;
-  border: 1px solid rgba(201, 169, 97, 0.3);
-  border-radius: 50%;
-  z-index: 0;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.hero-seal span {
-  transform: translateY(38px);
-  font-family: var(--le-font-serif);
-  font-size: 11px;
-  letter-spacing: 0.4em;
-  color: rgba(224, 196, 133, 0.55);
+  bottom: 15%;
+  left: 15%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .login-hero .hero-brand-mark .logo-image,
 .login-hero .hero-brand-mark .logo-fallback {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--le-radius-xs);
-  color: var(--le-gold-soft);
-  border: 1px solid rgba(201, 169, 97, 0.5);
-  padding: 6px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  color: #fff;
 }
 
 .mobile-brand .hero-brand-mark .logo-image,
 .mobile-brand .hero-brand-mark .logo-fallback {
   width: 36px;
   height: 36px;
-  border-radius: var(--le-radius-xs);
+  border-radius: 8px;
 }
 
 .logo-fallback--accent {
-  color: var(--le-navy-800);
+  color: #4f46e5;
 }
 
 .brand-name {
-  font-family: var(--le-font-serif);
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.02em;
   line-height: 1.35;
 }
 
 .login-hero .brand-name {
-  color: rgba(255, 255, 255, 0.96);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .mobile-brand .brand-name {
-  color: var(--le-navy-900);
+  color: #111827;
 }
 
 /* --- Main --- */
@@ -754,8 +717,8 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--le-space-xl); /* 32px */
-  background: var(--le-paper);
+  padding: 32px; /* p-8，与 css.md 右侧一致 */
+  background: #ffffff; /* bg-background（浅色主题常用白底） */
 }
 
 .login-card {
@@ -764,7 +727,7 @@ onMounted(async () => {
 }
 
 .mobile-brand {
-  margin-bottom: var(--le-space-2xl); /* 48px */
+  margin-bottom: 48px; /* mb-12，与 css.md 移动端 Logo 区一致 */
 }
 
 @media (min-width: 1024px) {
@@ -775,51 +738,33 @@ onMounted(async () => {
 
 .form-heading-block {
   text-align: center;
-  margin-bottom: var(--le-space-xl); /* 32px */
-}
-
-.form-kicker {
-  display: inline-block;
-  margin-bottom: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--le-gold-deep);
+  margin-bottom: 40px; /* mb-10 */
 }
 
 .page-title {
-  margin: 0 0 12px 0;
-  font-family: var(--le-font-serif);
-  font-size: 30px;
-  line-height: 1.25;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--le-navy-800);
-}
-
-/* 标题下金色细线（Lex Elite 标志性分隔） */
-.title-rule {
-  width: 56px;
-  height: 2px;
-  margin: 0 auto 16px;
-  background: var(--le-gold-rule);
+  margin: 0 0 8px 0;
+  font-size: 30px; /* text-3xl */
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.025em; /* tracking-tight */
+  color: #000;
 }
 
 .page-subtitle {
   margin: 0;
   font-size: 14px;
-  color: var(--le-muted);
+  color: #6b7280; /* text-muted-foreground */
 }
 
 .login-form :deep(.ant-form-item) {
-  margin-bottom: 20px;
+  margin-bottom: 20px; /* space-y-5 */
 }
 
 .login-form :deep(.ant-form-item:last-child) {
   margin-bottom: 0;
 }
 
+/* 三框统一外高：固定 48px 外壳，避免 min-height 与 AD 内边距导致「看起来」高低不一 */
 .login-form {
   --login-input-h: 48px;
 }
@@ -838,8 +783,8 @@ onMounted(async () => {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  border-radius: var(--le-radius-sm);
-  border-color: var(--le-line);
+  border-radius: 8px;
+  border-color: rgba(229, 231, 235, 0.85);
   box-shadow: none;
   background-color: #fff;
 }
@@ -851,10 +796,11 @@ onMounted(async () => {
 .login-form .login-input-shell :deep(.ant-input-affix-wrapper:hover),
 .login-form .login-input-shell :deep(.ant-input-affix-wrapper-focused),
 .login-form .login-input-shell :deep(.ant-input-affix-wrapper:focus-within) {
-  border-color: var(--le-gold);
-  box-shadow: 0 0 0 2px rgba(201, 169, 97, 0.16);
+  border-color: #000;
+  box-shadow: none;
 }
 
+/* 密码可见性：使用 suffix 槽位，与 Ant Design 边框同一盒模型，避免绝对定位错位 */
 .password-suffix-btn {
   display: inline-flex;
   align-items: center;
@@ -863,9 +809,9 @@ onMounted(async () => {
   padding: 4px;
   border: none;
   background: transparent;
-  color: var(--le-muted);
+  color: rgba(107, 114, 128, 0.95);
   cursor: pointer;
-  border-radius: var(--le-radius-sm);
+  border-radius: 6px;
   line-height: 0;
   transition:
     color 0.15s ease,
@@ -873,11 +819,11 @@ onMounted(async () => {
 }
 
 .password-suffix-btn:hover {
-  color: var(--le-navy-800);
+  color: #000; /* hover:text-foreground */
 }
 
 .password-suffix-btn:focus-visible {
-  outline: 2px solid var(--le-gold);
+  outline: 2px solid rgba(22, 119, 255, 0.5);
   outline-offset: 2px;
 }
 
@@ -886,9 +832,10 @@ onMounted(async () => {
 }
 
 .input-icon {
-  color: var(--le-navy-300);
+  color: #9ca3af;
 }
 
+/* 验证码：无 prefix/suffix 时为原生 input（非 affix），高度需显式与上方 h-12 一致 */
 .captcha-wrapper {
   display: flex;
   gap: 12px;
@@ -904,18 +851,18 @@ onMounted(async () => {
   flex-shrink: 0;
   width: 120px;
   height: 48px;
-  border: 1px solid var(--le-line);
-  border-radius: var(--le-radius-sm);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f6f1;
+  background-color: #f9fafb;
 }
 
 .captcha-img-container:focus-visible {
-  outline: 2px solid var(--le-gold);
+  outline: 2px solid rgba(22, 119, 255, 0.5);
   outline-offset: 2px;
 }
 
@@ -927,36 +874,34 @@ onMounted(async () => {
 
 .captcha-loading {
   font-size: 12px;
-  color: var(--le-muted);
+  color: #6b7280;
 }
 
-/* 主按钮：深藏青底 + 金色描边（Lex Elite 庄重感） */
 .submit-btn {
-  height: 48px;
-  border-radius: var(--le-radius-sm);
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.06em;
-  background-color: var(--le-navy-800);
-  border: 1px solid var(--le-navy-800);
+  height: 48px; /* h-12 */
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 16px; /* text-base */
+  background-color: #000; /* Primary button color */
+  border-color: #000;
   margin-top: 4px;
 }
 
 .submit-btn:hover {
-  background-color: var(--le-navy-700) !important;
-  border-color: var(--le-gold) !important;
+  background-color: #333 !important;
+  border-color: #333 !important;
 }
 
 .error-alert {
   margin-bottom: 16px;
-  border-radius: var(--le-radius-sm);
+  border-radius: 8px;
 }
 
 .form-footer {
-  margin-top: var(--le-space-xl);
+  margin-top: 32px; /* 接近 css.md 底部链接 mt-8 */
   text-align: center;
   font-size: 14px;
-  color: var(--le-muted);
+  color: #6b7280;
 }
 
 .form-footer p {
@@ -964,23 +909,21 @@ onMounted(async () => {
 }
 
 .icp-link a {
-  color: var(--le-navy-800);
+  color: #111827; /* text-foreground */
   font-weight: 500;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .icp-link a:hover {
-  color: var(--le-gold-deep);
   text-decoration: underline;
 }
 
 .password-requirements {
   margin-top: 8px;
   padding: 12px;
-  background-color: #f8f6f1;
-  border: 1px solid var(--le-line-soft);
-  border-radius: var(--le-radius-sm);
+  background-color: #f8fafc;
+  border-radius: 6px;
   font-size: 13px;
   color: #4b5563;
 }

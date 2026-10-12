@@ -31,7 +31,6 @@
           </div>
           <div class="logo-text">
             <strong>{{ appShortName || '客户服务系统' }}</strong>
-            <span class="logo-sub">Client Service</span>
           </div>
         </div>
         <div
@@ -139,7 +138,7 @@
               <a-dropdown>
                 <a-button
                   type="text"
-                  class="header-btn header-user-btn"
+                  class="header-btn"
                 >
                   <template #icon>
                     <UserOutlined />
@@ -644,21 +643,17 @@ async function handleLogout() {
 </style>
 
 <style scoped>
-/* ===== Lex Elite 管理后台布局壳 =====
-   侧栏：深藏青底 --le-navy-900，金色点缀；顶栏：白底 + 暖灰分割线；
-   内容区：米白底 --le-cream，卡片白。字体与 token 见 src/styles/lex-elite.css。 */
 .admin-layout {
   position: relative;
   min-height: 100vh;
-  background: var(--le-cream);
 }
 
 .update-banner {
   margin: 80px 24px 0;
   padding: 12px 16px;
-  border-radius: var(--le-radius-sm);
-  border: 1px solid rgba(201, 169, 97, 0.45);
-  background: var(--le-gold-tint);
+  border-radius: 8px;
+  border: 1px solid #bae0ff;
+  background: #e6f4ff;
 }
 
 .update-content {
@@ -670,21 +665,20 @@ async function handleLogout() {
 
 .update-icon {
   font-size: 16px;
-  color: var(--le-gold-deep);
+  color: #1677ff;
 }
 
 .update-text {
   flex: 1;
   font-size: 14px;
-  color: var(--le-ink);
+  color: #1f2937;
 }
 
 .current-version {
-  color: var(--le-muted);
+  color: #6b7280;
   font-size: 12px;
 }
 
-/* --- 侧栏：深藏青 + 金色右边线 --- */
 .sider {
   position: fixed;
   left: 0;
@@ -692,8 +686,7 @@ async function handleLogout() {
   bottom: 0;
   height: 100vh;
   z-index: 100;
-  border-right: 1px solid rgba(201, 169, 97, 0.22);
-  box-shadow: 2px 0 12px 0 rgba(13, 24, 48, 0.14);
+  box-shadow: 2px 0 8px 0 rgba(29,35,41,.05);
 }
 
 .logo {
@@ -703,8 +696,7 @@ async function handleLogout() {
   justify-content: center;
   overflow: hidden;
   padding: 0 16px;
-  background: var(--le-navy-900);
-  border-bottom: 1px solid rgba(201, 169, 97, 0.2);
+  background: #001529;
 }
 
 .logo-content {
@@ -715,50 +707,30 @@ async function handleLogout() {
 }
 
 .logo-brand-mark {
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(201, 169, 97, 0.5);
-  border-radius: var(--le-radius-xs);
-  color: var(--le-gold-soft);
 }
 
 .logo-image, .logo-image-collapsed {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 4px;
 }
 
 .logo-text {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  line-height: 1.25;
 }
 
 .logo-text strong {
   display: block;
-  font-family: var(--le-font-serif);
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.logo-sub {
-  font-size: 10px;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--le-gold-soft);
   white-space: nowrap;
 }
 
@@ -771,51 +743,14 @@ async function handleLogout() {
 .admin-menu {
   flex: 1;
   border-right: none;
-  background: transparent;
-  padding: 8px 0;
-}
-
-/* 菜单选中态：金色文字 + 左侧金色竖条 */
-.admin-menu :deep(.ant-menu-item) {
-  border-radius: 0;
-  margin: 2px 0;
-  width: 100%;
-  color: rgba(224, 229, 240, 0.78);
-}
-
-.admin-menu :deep(.ant-menu-item:hover) {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.admin-menu :deep(.ant-menu-item-selected) {
-  position: relative;
-  color: var(--le-gold-soft) !important;
-  background: rgba(201, 169, 97, 0.14) !important;
-}
-
-.admin-menu :deep(.ant-menu-item-selected)::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: var(--le-gold);
-}
-
-.admin-menu :deep(.ant-menu-item-selected .anticon) {
-  color: var(--le-gold-soft);
 }
 
 .main-layout {
   margin-left: var(--sidebar-width);
   transition: margin-left 0.2s;
   min-height: 100vh;
-  background: var(--le-cream);
 }
 
-/* --- 顶栏：白底 + 暖灰底线 --- */
 .header {
   padding: 0;
   position: fixed;
@@ -826,8 +761,7 @@ async function handleLogout() {
   height: 64px;
   line-height: 64px;
   background: #fff;
-  border-bottom: 1px solid var(--le-line);
-  box-shadow: 0 1px 3px rgba(13, 24, 48, 0.05);
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
   transition: left 0.2s;
 }
 
@@ -852,34 +786,17 @@ async function handleLogout() {
   transition: color 0.3s;
   height: 64px;
   border-radius: 0;
-  color: var(--le-navy-800);
 }
 
 .collapse-btn:hover {
-  color: var(--le-gold-deep);
-  background: var(--le-gold-tint);
+  color: #1677ff;
+  background: rgba(0,0,0,.025);
 }
 
-/* E2E 依赖 .header .page-title 选择器与文本 */
 .page-title {
-  font-family: var(--le-font-serif);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--le-navy-800);
-  position: relative;
-  padding-left: 16px;
-}
-
-.page-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
-  background: var(--le-gold);
+  color: #1f2937;
 }
 
 .header-actions {
@@ -893,38 +810,29 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--le-navy-600);
+  color: #4b5563;
 }
 
 .header-btn:hover {
-  color: var(--le-navy-800);
-  background: var(--le-navy-tint);
-}
-
-.header-user-btn .header-btn-text {
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  background: rgba(0,0,0,.025);
 }
 
 .content {
   padding: 88px 24px 24px;
   min-height: 100vh;
-  background: transparent;
 }
 
 .content-wrapper {
   background: #fff;
-  border: 1px solid var(--le-line);
-  border-radius: var(--le-radius-md);
+  border-radius: 8px;
   padding: 24px;
   min-height: calc(100vh - 112px);
-  box-shadow: var(--le-shadow-xs);
 }
 
 .mobile-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(13, 24, 48, 0.5);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 99;
 }
 
