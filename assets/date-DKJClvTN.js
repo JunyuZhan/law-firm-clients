@@ -1,0 +1,1 @@
+import{d as t}from"./utils-vendor-suyiewtq.js";function i(i,e){return i?e&&"YYYY-MM-DD HH:mm:ss"!==e?t(i).format(e):new Intl.DateTimeFormat("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!1}).format(new Date(i)).replace(/\//g,"-"):"-"}function e(i){return!!i&&t(i).isBefore(t())}export{i as f,e as i};

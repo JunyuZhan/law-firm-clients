@@ -1,0 +1,1 @@
+import{r as t}from"./index-DcCT3onD.js";function i(i){return t.get("/api/notification/history",{params:i})}function a(i){return t.post("/api/notification/send",null,{params:{matterId:i}})}function n(i){return t.get("/api/notification/statistics",{params:i})}function o(i,a=20){return t.get("/portal/api/notifications",{params:{token:i,limit:a}})}export{i as a,n as b,o as g,a as s};

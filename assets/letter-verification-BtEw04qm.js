@@ -1,0 +1,1 @@
+import{r as t}from"./index-DcCT3onD.js";function i(i,e){return t.get("/letter/verification/verify",{params:{no:i,code:e}})}function e(i){return t.get("/api/admin/letter-verification/list",{params:i})}function r(i){return t.delete(`/api/admin/letter-verification/${i}`)}function a(){return t.get("/api/admin/letter-verification/statistics")}export{a,e as g,r,i as v};

@@ -1,0 +1,11 @@
+/**
+ * GitHub Pages 404 回退：将 404 请求重定向到 index.html，
+ * 保证 SPA 深链接（history 模式）刷新不 404。
+ *
+ * 注意：本 Demo 前端已改用 hash 路由（createWebHashHistory），
+ * 正常情况下不会触发此文件；此处作为额外兜底。
+ */
+const path = window.location.pathname.replace(/^\/law-firm-clients/, '')
+window.location.replace(
+  window.location.origin + '/law-firm-clients/#' + path + window.location.search
+)
